@@ -3,7 +3,7 @@
   "redirects": [
     {
       "source": "/",
-      "destination": "/HomeStorefront.dc.html",
+      "destination": "/HomeEditorial.dc.html",
       "permanent": true
     }
   ]
