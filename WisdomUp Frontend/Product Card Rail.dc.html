@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/typography.css">
+  <style>
+    body { margin: 0; background: #fff; }
+    a { color: #2350C8; text-decoration: none; }
+    a:hover { color: #1B3FA0; }
+  </style>
+</helmet>
+<section data-screen-label="Product Rail" style="background: #CEECF2; padding: 56px 0 64px; font-family: var(--font);">
+  <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; padding: 0 48px 28px;">
+    <h2 style="margin: 0; font: 800 34px/1.1 var(--font); color: #111;">Top rated</h2>
+    <div style="display: flex; gap: 10px;">
+      <button aria-label="Previous" onClick="{{ prev }}" disabled="{{ atStart }}" style="width: 48px; height: 48px; border-radius: 50%; border: 1.5px solid #111; background: #fff; color: #111; display: grid; place-items: center; cursor: pointer; opacity: {{ prevOp }}; transition: background-color 160ms ease;" style-hover="background: #F0F0F0;">
+        <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      </button>
+      <button aria-label="Next" onClick="{{ next }}" disabled="{{ atEnd }}" style="width: 48px; height: 48px; border-radius: 50%; border: 1.5px solid #111; background: #fff; color: #111; display: grid; place-items: center; cursor: pointer; opacity: {{ nextOp }}; transition: background-color 160ms ease;" style-hover="background: #F0F0F0;">
+        <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      </button>
+    </div>
+  </div>
+  <div ref="{{ trackRef }}" onScroll="{{ onScroll }}" style="display: flex; gap: 20px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 48px; padding: 0 48px; scrollbar-width: none; scroll-behavior: smooth;">
+    <sc-for list="{{ items }}" as="it" hint-placeholder-count="6">
+      <div style="flex: 0 0 430px; scroll-snap-align: start;">
+        <dc-import name="WUProductCard" title="{{ it.title }}" price="{{ it.price }}" rating="{{ it.rating }}" reviews="{{ it.reviews }}" eta="{{ it.eta }}" badge="{{ it.badge }}" colors="{{ it.colors }}" slot-id="{{ it.id }}" hint-size="100%,520px"></dc-import>
+      </div>
+    </sc-for>
+    <div style="flex: 0 0 28px;"></div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { atStart: true, atEnd: false };
+  trackRef = React.createRef();
+  step(dir) {
+    const el = this.trackRef.current; if (!el) return;
+    const card = el.firstElementChild; const w = card ? card.getBoundingClientRect().width + 20 : 300;
+    el.scrollBy({ left: dir * w, behavior: 'smooth' });
+  }
+  componentDidMount() { this.sync(); }
+  sync() {
+    const el = this.trackRef.current; if (!el) return;
+    const atStart = el.scrollLeft < 4, atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 4;
+    if (atStart !== this.state.atStart || atEnd !== this.state.atEnd) this.setState({ atStart, atEnd });
+  }
+  renderVals() {
+    const R = { name: 'Red', hex: '#A80C0C' }, K = { name: 'Black', hex: '#000' }, W = { name: 'White', hex: '#EDEDED' }, B = { name: 'Navy', hex: '#14287A' }, O = { name: 'Orange', hex: '#E0662A' };
+    const items = [
+      { id: 'r1', title: 'OWS-02 Buds', price: 'Rs.4,000', rating: '4.6', reviews: 241, eta: 'Get it as early as Oct 8', badge: 'Top Rated', colors: [R, K] },
+      { id: 'r2', title: 'Gango Pro 45W Charger', price: 'Rs.2,499', rating: '4.8', reviews: 512, eta: 'Get it as early as Oct 7', badge: 'New Arrival', colors: [O, B, W] },
+      { id: 'r3', title: 'PowerCore 20K', price: 'Rs.5,299', rating: '4.5', reviews: 188, eta: 'Get it as early as Oct 8', badge: '', colors: [K, W] },
+      { id: 'r4', title: 'Pulse Smart Watch', price: 'Rs.8,999', rating: '4.7', reviews: 96, eta: 'Get it as early as Oct 9', badge: 'Best Seller', colors: [K, B] },
+      { id: 'r5', title: 'Braided USB-C Cable', price: 'Rs.899', rating: '4.4', reviews: 1034, eta: 'Get it as early as Oct 7', badge: '', colors: [K, R, W] },
+      { id: 'r6', title: 'Boom Mini Speaker', price: 'Rs.3,499', rating: '4.6', reviews: 321, eta: 'Get it as early as Oct 8', badge: 'Top Rated', colors: [B, K] },
+      { id: 'r7', title: 'MagGrip Car Mount', price: 'Rs.1,799', rating: '4.3', reviews: 77, eta: 'Get it as early as Oct 9', badge: '', colors: [K] }
+    ];
+    return {
+      items, trackRef: this.trackRef,
+      onScroll: () => this.sync(),
+      prev: () => this.step(-1), next: () => this.step(1),
+      atStart: this.state.atStart, atEnd: this.state.atEnd,
+      prevOp: this.state.atStart ? 0.35 : 1, nextOp: this.state.atEnd ? 0.35 : 1
+    };
+  }
+}
+</script>
+</body>
+</html>

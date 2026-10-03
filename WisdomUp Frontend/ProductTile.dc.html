@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/base.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/styles/components.css">
+  <script src="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/_ds_bundle.js"></script>
+  <style>
+    a { color: #2350C8; text-decoration: none; }
+    a:hover { color: #1B3FA0; }
+  </style>
+</helmet>
+<article style="height: 100%; box-sizing: border-box; display: flex; flex-direction: column; gap: 0; min-width: 0; padding: 9px 9px 36px; border-radius: 16px; background: #fff; opacity: {{ dim }};">
+  <div onMouseEnter="{{ hoverOn }}" onMouseLeave="{{ hoverOff }}" onClick="{{ open }}" style="position: relative; aspect-ratio: 300 / 356; border-radius: 14px; background: #F8F9FA; overflow: hidden; cursor: pointer;">
+    <div style="position: absolute; inset: 22% 4% 32%; opacity: {{ aOp }}; transition: opacity 320ms cubic-bezier(.2,.7,.2,1);">
+      <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.ProductArt" name="{{ art }}" src="{{ src }}" alt="{{ title }}" style="width: 100%; height: 100%; filter: drop-shadow(0 18px 18px rgba(0,0,0,.14));" hint-size="100%,100%"></x-import>
+    </div>
+    <div style="position: absolute; inset: 22% 4% 32%; opacity: {{ bOp }}; transform: {{ bTf }}; transition: opacity 320ms cubic-bezier(.2,.7,.2,1), transform 320ms cubic-bezier(.2,.7,.2,1);">
+      <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.ProductArt" name="{{ art }}" src="{{ src2 }}" alt="{{ title }}" style="width: 100%; height: 100%; filter: drop-shadow(0 18px 18px rgba(0,0,0,.14));" hint-size="100%,100%"></x-import>
+    </div>
+    <sc-if value="{{ hasRibbon }}" hint-placeholder-val="{{ false }}">
+      <span style="position: absolute; top: 12px; left: 8px; padding: 4px 8px; border-radius: 999px; background: var(--aqua-band, #CEECF2);">
+        <span style="display: block; font: 700 13px/1 var(--font); letter-spacing: .02em; color: #464646;">{{ ribbon }}</span>
+      </span>
+    </sc-if>
+    <button aria-label="Add to wishlist" aria-pressed="{{ favAria }}" onClick="{{ toggleFav }}" style="position: absolute; top: 6px; right: 4px; width: 44px; height: 44px; padding: 0; border: 0; background: transparent; color: #464646; display: grid; place-items: center; cursor: pointer;">
+      <svg width="27" height="27" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3s-7.4-4.5-9.1-9.3C1.7 7.5 4 4.5 7.3 4.5c2 0 3.6 1.1 4.7 2.7 1.1-1.6 2.7-2.7 4.7-2.7 3.3 0 5.6 3 4.4 6.5-1.7 4.8-9.1 9.3-9.1 9.3z" fill="{{ heartFill }}" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path></svg>
+    </button>
+    <button onClick="{{ buy }}" disabled="{{ disabled }}" style="position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%); height: 38px; padding: 0 17px; display: flex; align-items: center; gap: 8px; white-space: nowrap; border: 1px solid #464646; border-radius: 999px; background: #fff; color: #464646; font: 700 15px/1 var(--font); cursor: pointer; transition: background-color 180ms cubic-bezier(.2,.7,.2,1);" style-hover="background: #F0F0F0;">
+      <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Icon" name="cart" size="{{ 18 }}" hint-size="18px,18px"></x-import>
+      <span>{{ ctaLabel }}</span>
+    </button>
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 14px; padding: 16px 0 0;">
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+      <span style="font: 800 17px/1 var(--font); color: #464646;">{{ price }}</span>
+      <sc-if value="{{ hasRating }}" hint-placeholder-val="{{ true }}">
+        <span style="display: flex; align-items: center; gap: 5px; font: 600 15px/1 var(--font); color: #464646; white-space: nowrap;">
+          <span style="color: var(--star, #F5C444); font-size: 22px; line-height: 15px;">★</span>
+          <span>{{ ratingText }}</span>
+          <span style="font-weight: 400; color: #6E7686;">({{ reviews }})</span>
+        </span>
+      </sc-if>
+    </div>
+    <h3 onClick="{{ open }}" style="margin: 0; font: 400 15px/1.2 var(--font); color: #464646; cursor: pointer; text-wrap: pretty;">{{ title }}</h3>
+    <sc-if value="{{ hasEta }}" hint-placeholder-val="{{ false }}">
+      <div style="font: 600 15px/1.2 var(--font); color: var(--promo-green, #3E8252);">{{ eta }}</div>
+    </sc-if>
+    <div style="display: flex; align-items: center; gap: 6px; margin-left: -5px;">
+      <sc-for list="{{ swatches }}" as="s" hint-placeholder-count="2">
+        <button aria-label="{{ s.label }}" aria-pressed="{{ s.on }}" onClick="{{ s.pick }}" style="width: 35px; height: 35px; padding: 0; border-radius: 999px; border: 1.5px solid {{ s.ring }}; background: transparent; display: grid; place-items: center; cursor: pointer; transition: border-color 180ms cubic-bezier(.2,.7,.2,1);">
+          <span style="width: 25px; height: 25px; border-radius: 999px; background: {{ s.c }}; box-shadow: inset 0 0 0 1px rgba(0,0,0,.08);"></span>
+        </button>
+      </sc-for>
+    </div>
+  </div>
+</article>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:300,&quot;height&quot;:520},&quot;id&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;os4&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;title&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;OS-4 Open Stereo Earbuds&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;price&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Rs.6,000&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;ribbon&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Newly launched&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;rating&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:5,&quot;min&quot;:0,&quot;max&quot;:5,&quot;tsType&quot;:&quot;number&quot;},&quot;reviews&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:null,&quot;tsType&quot;:&quot;number&quot;},&quot;colors&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;string[]&quot;},&quot;art&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;buds&quot;,&quot;phones&quot;,&quot;speaker&quot;,&quot;bank&quot;,&quot;bank-ice&quot;,&quot;watch&quot;],&quot;default&quot;:&quot;buds&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;src&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;src2&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;ctaLabel&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Add to cart&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;disabled&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;onBuy&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;() =&gt; void&quot;},&quot;onOpen&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;() =&gt; void&quot;}}">
+class Component extends DCLogic {
+  state = { hover: false, fav: false, sw: 0 };
+  renderVals() {
+    const p = this.props;
+    const title = p.title ?? 'OS-4 Open Stereo Earbuds';
+    const seed = [...String(p.id || title)].reduce((a, c) => a + c.charCodeAt(0), 0);
+    const h = this.state.hover, hasB = !!p.src2;
+    const rating = p.rating ?? null;
+    const colors = p.colors || [];
+    const d = new Date(); d.setDate(d.getDate() + 2 + (seed % 2));
+    const eta = 'Get it as early as ' + d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    return {
+      title,
+      price: p.price ?? 'Rs.6,000',
+      ribbon: p.ribbon, hasRibbon: !!p.ribbon,
+      hasRating: (rating ?? 0) > 0,
+      ratingText: rating ? (rating - (seed % 4) * 0.1).toFixed(1) : '',
+      reviews: p.reviews ?? (24 + (seed * 37) % 260),
+      eta, hasEta: !p.disabled && seed % 3 !== 0,
+      swatches: colors.map((c, i) => ({ c, label: 'Colour ' + (i + 1), on: this.state.sw === i ? 'true' : 'false', ring: this.state.sw === i ? '#464646' : 'transparent', pick: () => this.setState({ sw: i }) })),
+      art: p.art || 'buds', src: p.src, src2: p.src2 || p.src,
+      aOp: h ? 0 : 1, bOp: h ? 1 : 0,
+      bTf: hasB ? 'none' : (h ? 'scaleX(-1) rotate(-6deg) scale(1.04)' : 'scaleX(-1) rotate(-6deg) scale(.96)'),
+      hoverOn: () => this.setState({ hover: true }),
+      hoverOff: () => this.setState({ hover: false }),
+      open: () => p.onOpen && p.onOpen(),
+      favAria: this.state.fav ? 'true' : 'false',
+      heartFill: this.state.fav ? 'currentColor' : 'none',
+      toggleFav: e => { e.stopPropagation(); this.setState(s => ({ fav: !s.fav })); },
+      ctaLabel: p.ctaLabel ?? 'Add to cart',
+      disabled: !!p.disabled,
+      dim: p.disabled ? 0.55 : 1,
+      buy: e => { if (e) e.stopPropagation(); if (!p.disabled && p.onBuy) p.onBuy(); },
+    };
+  }
+}
+</script>
+</body>
+</html>

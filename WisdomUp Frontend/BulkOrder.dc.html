@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/base.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/styles/components.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/styles.css">
+  <script src="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/_ds_bundle.js"></script>
+  <script src="wu-data.js"></script>
+  <style>
+    body { margin: 0; background: #F0F0F0; color: #464646; font-family: var(--font, Inter, sans-serif); }
+    a { color: #2350C8; text-decoration: none; }
+    a:hover { color: #1B3FA0; }
+  </style>
+</helmet>
+
+<div style="min-height: 100vh; background: #F0F0F0; padding-bottom: 28px;">
+
+  <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.UtilityBar" links="{{ utility }}" hint-size="100%,44px"></x-import>
+  <dc-import name="SiteNav" start-top="{{ 64 }}" hint-size="100%,0px"></dc-import>
+  <div style="height: 110px;"></div>
+
+  <section style="margin: 24px var(--gutter, 28px) 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr)); gap: 48px; align-items: start;">
+    <div style="display: flex; flex-direction: column; gap: 28px; padding-top: 24px;">
+      <div style="font: 600 13px/1 var(--font); letter-spacing: .24em; text-transform: uppercase; color: #8B96A9;">WisdomUp Bulk Desk</div>
+      <h1 style="margin: 0; font: 400 clamp(40px, 5vw, 60px)/1.04 var(--font); letter-spacing: -.02em; color: #273F85; text-wrap: balance;">Stock premium tech accessories <span style="font-weight: 800;">at scale.</span></h1>
+      <p style="margin: 0; font: 400 18px/1.6 var(--font); color: #464646; max-width: 520px; text-wrap: pretty;">Become a WisdomUp distributor, wholesaler, retailer or corporate buyer. Send your details and our team will reply on WhatsApp with bulk pricing and next steps.</p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px; margin-top: 12px;">
+        <sc-for list="{{ perks }}" as="k" hint-placeholder-count="4">
+          <div style="display: flex; flex-direction: column; gap: 12px; padding: 24px; border-radius: 24px; background: #F8F8F8; box-shadow: 0 6px 18px rgba(0,0,0,.06);">
+            <span style="display: flex; width: 44px; height: 44px; border-radius: 12px; background: #fff; align-items: center; justify-content: center; color: #273F85;">
+              <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Icon" name="{{ k.icon }}" size="{{ 26 }}" style="width: 26px; height: 26px;" hint-size="26px,26px"></x-import>
+            </span>
+            <span style="font: 700 17px/1.3 var(--font); color: #464646;">{{ k.t }}</span>
+            <span style="font: 400 14px/1.55 var(--font); color: #464646;">{{ k.s }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div id="bulk-form" style="position: sticky; top: 120px; background: #fff; border-radius: 24px; padding: clamp(24px, 3.5vw, 40px); display: flex; flex-direction: column; gap: 22px; box-shadow: 0 14px 34px rgba(0,0,0,.07); box-sizing: border-box;">
+      <sc-if value="{{ notSent }}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; flex-direction: column; gap: 22px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+            <img src="img/wu-logo.png" alt="WisdomUp" style="height: 36px; width: auto; display: block;">
+            <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.GradBadge" hint-size="120px,28px">Partner inquiry</x-import>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <span style="font: 600 14px/1 var(--font); color: #464646;">I'm a</span>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+              <sc-for list="{{ types }}" as="t" hint-placeholder-count="4">
+                <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Chip" active="{{ t.active }}" on-click="{{ t.pick }}" hint-size="110px,43px">{{ t.label }}</x-import>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+            <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Field" label="Full name" required="{{ true }}" placeholder="Your full name" value="{{ f.name }}" on-change="{{ setName }}" hint-size="100%,72px"></x-import>
+            <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Field" label="WhatsApp number" required="{{ true }}" placeholder="+92 300 1234567" value="{{ f.phone }}" on-change="{{ setPhone }}" type="tel" hint-size="100%,72px"></x-import>
+            <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Field" label="Email" required="{{ true }}" placeholder="name@company.com" value="{{ f.email }}" on-change="{{ setEmail }}" type="email" hint-size="100%,72px"></x-import>
+            <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Field" label="City" required="{{ true }}" placeholder="Karachi" value="{{ f.city }}" on-change="{{ setCity }}" hint-size="100%,72px"></x-import>
+          </div>
+          <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Field" label="Business name or store link" placeholder="https://…" value="{{ f.store }}" on-change="{{ setStore }}" hint-size="100%,72px"></x-import>
+
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <span style="font: 600 14px/1 var(--font); color: #464646;">Interested in</span>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+              <sc-for list="{{ interests }}" as="c" hint-placeholder-count="5">
+                <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Chip" active="{{ c.active }}" on-click="{{ c.pick }}" hint-size="100px,43px">{{ c.label }}</x-import>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <span style="font: 600 14px/1 var(--font); color: #464646;">Estimated monthly quantity</span>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+              <sc-for list="{{ volumes }}" as="v" hint-placeholder-count="4">
+                <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Chip" active="{{ v.active }}" on-click="{{ v.pick }}" hint-size="100px,43px">{{ v.label }}</x-import>
+              </sc-for>
+            </div>
+          </div>
+
+          <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Field" label="Anything else?" placeholder="Models, branding, delivery timeline…" value="{{ f.note }}" on-change="{{ setNote }}" multiline="{{ true }}" hint-size="100%,120px"></x-import>
+
+          <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding-top: 4px;">
+            <span style="font: 500 13px/1.5 var(--font); color: {{ hintColor }}; max-width: 300px;">{{ hint }}</span>
+            <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Button" variant="pill" icon="{{ null }}" on-click="{{ submit }}" hint-size="170px,40px">Send bulk inquiry</x-import>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ sent }}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 16px; padding: 24px 0;">
+          <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.GradBadge" hint-size="120px,28px">Inquiry received</x-import>
+          <h2 style="margin: 0; font: 400 36px/1.1 var(--font); color: #273F85;">Thanks, <span style="font-weight: 800;">{{ firstName }}.</span></h2>
+          <p style="margin: 0; font: 400 16px/1.6 var(--font); color: #464646; max-width: 420px;">Our bulk desk will message you on WhatsApp at {{ f.phone }} within one working day with pricing for {{ interestText }}.</p>
+          <a href="#" onClick="{{ reset }}" style="font: 600 15px/1 var(--font); color: #2350C8;">Send another inquiry</a>
+        </div>
+      </sc-if>
+    </div>
+  </section>
+
+  <section style="margin: 140px var(--gutter, 28px) 0; display: flex; flex-direction: column; gap: 20px;">
+    <div style="font: 600 13px/1 var(--font); letter-spacing: .24em; text-transform: uppercase; color: #8B96A9;">What you can stock</div>
+    <h2 style="margin: 0; font: 300 clamp(34px, 4vw, 48px)/1.06 var(--font); letter-spacing: -.02em; color: #464646;">The full range, <span style="font-weight: 800;">at partner pricing.</span></h2>
+  </section>
+  <nav class="cats" style="flex-wrap: wrap; row-gap: 28px; padding-top: 56px;">
+    <sc-for list="{{ circles }}" as="c" hint-placeholder-count="6">
+      <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.CategoryCircle" label="{{ c.label }}" art="{{ c.art }}" hint-size="110px,130px"></x-import>
+    </sc-for>
+  </nav>
+
+  <section style="margin: 100px var(--gutter, 28px) 0; border-radius: 40px; background: #172248; color: #fff; padding: clamp(32px, 5vw, 64px) clamp(24px, 4.5vw, 56px); display: flex; flex-direction: column; gap: 48px; box-sizing: border-box;">
+    <h2 style="margin: 0; font: 300 clamp(32px, 3.6vw, 44px)/1.08 var(--font); letter-spacing: -.02em; color: #fff;">From inquiry <span style="font-weight: 800;">to stocked shelves.</span></h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 20px;">
+      <sc-for list="{{ steps }}" as="s" hint-placeholder-count="3">
+        <div style="display: flex; flex-direction: column; gap: 14px; padding: 28px; border-radius: 24px; background: rgba(255,255,255,.06);">
+          <span style="display: flex; color: #9FC0FF;">
+            <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Icon" name="{{ s.icon }}" size="{{ 30 }}" style="width: 30px; height: 30px;" hint-size="30px,30px"></x-import>
+          </span>
+          <span style="font: 700 18px/1.3 var(--font); color: #fff;">{{ s.t }}</span>
+          <span style="font: 400 15px/1.6 var(--font); color: #C9D2E6;">{{ s.s }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="margin: 120px var(--gutter, 28px) 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 40px; align-items: start;">
+    <h2 style="margin: 0; font: 800 clamp(30px, 3.6vw, 44px)/1.1 var(--font); letter-spacing: -.01em; text-transform: uppercase; background: var(--grad-heading); -webkit-background-clip: text; background-clip: text; color: transparent; width: fit-content;">Bulk FAQs</h2>
+    <div style="background: #fff; border-radius: 24px; padding: 8px 32px;">
+      <sc-for list="{{ faqs }}" as="q" hint-placeholder-count="4">
+        <div style="border-bottom: {{ q.border }};">
+          <button onClick="{{ q.toggle }}" style="all: unset; box-sizing: border-box; width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 22px 0; cursor: pointer; font: 600 16px/1.4 var(--font); color: #464646;">
+            <span>{{ q.q }}</span>
+            <span style="display: flex; color: #8B96A9; transform: rotate({{ q.rot }}); transition: transform 320ms cubic-bezier(.2,.7,.2,1);">
+              <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Icon" name="chev-r" size="{{ 18 }}" hint-size="18px,18px"></x-import>
+            </span>
+          </button>
+          <sc-if value="{{ q.open }}" hint-placeholder-val="{{ false }}">
+            <div style="padding: 0 0 22px; font: 400 15px/1.6 var(--font); color: #464646;">{{ q.a }}</div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <dc-import name="SeoBlock" hint-size="100%,300px"></dc-import>
+
+  <div style="margin-top: 88px;">
+    <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Footer" logo-src="img/wu-logo-white.png" brand="Wisdomup" columns="{{ footer }}" help-text="We're here to help." contact="support@wisdomup.pk · +92 327 9800153" newsletter-text="New launches and live-only deals, straight to your inbox." copyright="Copyright © 2026 WisdomUp. All rights reserved." sub-right="Visa · MasterCard · JazzCash · EasyPaisa · COD" hint-size="100%,360px"></x-import>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const TYPES = ['Distributor', 'Wholesaler', 'Retailer', 'Corporate buyer'];
+const INTERESTS = ['Earbuds', 'Neckbands', 'Speakers', 'Microphones', 'Chargers'];
+const VOLUMES = ['50–200 units', '200–1,000', '1,000–5,000', '5,000+'];
+const BFAQ = [
+  ['What is the minimum order quantity?', 'Bulk pricing starts at 50 units across any mix of products. Distributor terms start at higher volumes — tell us your estimate and we\'ll match the right tier.'],
+  ['Can you add our company branding?', 'Yes, for corporate orders we offer custom packaging and engraving on selected models. Lead time depends on quantity.'],
+  ['How fast can you deliver?', 'In-stock orders dispatch from Karachi within 2–3 working days and reach most cities in Pakistan within a week.'],
+  ['Do bulk orders carry the same warranty?', 'Every unit carries the standard WisdomUp warranty, and partners get a dedicated contact for claims.'],
+];
+
+class Component extends DCLogic {
+  state = { type: 0, interests: ['Earbuds'], vol: 0, f: { name: '', phone: '', email: '', city: '', store: '', note: '' }, sent: false, err: false, faq: 0 };
+  componentDidMount() { if (!window.WU_STORE) this._p = setInterval(() => { if (window.WU_STORE) { clearInterval(this._p); this.forceUpdate(); } }, 50); }
+  componentWillUnmount() { clearInterval(this._p); }
+  set(k) { return v => this.setState(s => ({ f: { ...s.f, [k]: v }, err: false })); }
+  renderVals() {
+    const D = window.WU_STORE;
+    if (!D) return {};
+    const { type, interests, vol, f, sent, err, faq } = this.state;
+    const valid = f.name.trim() && f.phone.trim() && /\S+@\S+\.\S+/.test(f.email) && f.city.trim();
+    return {
+      utility: D.utility, footer: D.footer,
+      perks: [
+        { icon: 'grid', t: 'Wide product range', s: 'Earbuds, neckbands, speakers, creator mics and charging.' },
+        { icon: 'medal', t: 'Brand-ready supply', s: 'Trusted WisdomUp branding on fast-moving accessories.' },
+        { icon: 'truck', t: 'Local fulfilment', s: 'Pakistan-ready stock flow from our Karachi warehouse.' },
+        { icon: 'shield', t: 'Warranty support', s: 'Warranty-backed products with a dedicated partner contact.' },
+      ],
+      types: TYPES.map((l, i) => ({ label: l, active: i === type, pick: () => this.setState({ type: i }) })),
+      interests: INTERESTS.map(l => ({ label: l, active: interests.includes(l), pick: () => this.setState(s => ({ interests: s.interests.includes(l) ? s.interests.filter(x => x !== l) : s.interests.concat(l) })) })),
+      volumes: VOLUMES.map((l, i) => ({ label: l, active: i === vol, pick: () => this.setState({ vol: i }) })),
+      f,
+      setName: this.set('name'), setPhone: this.set('phone'), setEmail: this.set('email'), setCity: this.set('city'), setStore: this.set('store'), setNote: this.set('note'),
+      hint: err ? 'Please fill in name, WhatsApp, a valid email and city.' : 'Inquiries go straight to our bulk desk.',
+      hintColor: err ? '#C0392B' : '#8B96A9',
+      submit: () => { if (valid) { this.setState({ sent: true }); const el = document.getElementById('bulk-form'); if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 140, behavior: 'smooth' }); } else this.setState({ err: true }); },
+      sent, notSent: !sent,
+      firstName: f.name.trim().split(' ')[0] || 'there',
+      interestText: interests.length ? interests.join(', ').toLowerCase() : 'the full range',
+      reset: e => { e.preventDefault(); this.setState({ sent: false, f: { name: '', phone: '', email: '', city: '', store: '', note: '' } }); },
+      circles: D.circles.map(([label, art]) => ({ label, art })),
+      steps: [
+        { icon: 'user', t: 'Tell us about your business', s: 'Share your type, city and the products you want to carry.' },
+        { icon: 'bag', t: 'Get partner pricing', s: 'We reply on WhatsApp within one working day with a tailored quote.' },
+        { icon: 'arrow', t: 'Receive your stock', s: 'Confirm the order and we dispatch from Karachi in 2–3 working days.' },
+      ],
+      faqs: BFAQ.map(([q, a], i) => ({ q, a, open: faq === i, rot: faq === i ? '90deg' : '0deg', border: i === BFAQ.length - 1 ? 'none' : '1px solid #E4E4E4', toggle: () => this.setState(s => ({ faq: s.faq === i ? -1 : i })) })),
+    };
+  }
+}
+</script>
+</body>
+</html>

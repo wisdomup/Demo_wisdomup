@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/base.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/styles/components.css">
+  <script src="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/_ds_bundle.js"></script>
+  <style>
+    a { color: #2350C8; text-decoration: none; }
+    a:hover { color: #1B3FA0; }
+  </style>
+</helmet>
+<section style="display: flex; flex-direction: column; gap: 20px; padding: 28px 0 32px; box-sizing: border-box; background: {{ bandBg }};">
+  <div style="margin: 0 var(--gutter, 28px); display: flex; align-items: flex-start; gap: 20px; flex-wrap: wrap;">
+    <h2 class="sec-title" style="margin: 0; flex: 1; min-width: 0; font-size: clamp(30px, 3.2vw, 48px); font-weight: 800; line-height: 1; letter-spacing: -.01em;">{{ title }}</h2>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <a href="#" onClick="{{ viewAll }}" style="height: 44px; padding: 0 20px; display: flex; align-items: center; border-radius: 999px; background: var(--navy-deep, #172248); color: #fff; font: 700 16px/1 var(--font); transition: filter 180ms cubic-bezier(.2,.7,.2,1);" style-hover="filter: brightness(1.2); color: #fff;">Shop all</a>
+      <button aria-label="Previous products" onClick="{{ prev }}" style="width: 44px; height: 44px; padding: 0; border: 0; border-radius: 999px; background: #fff; color: #464646; display: grid; place-items: center; cursor: pointer; opacity: {{ prevOp }}; transition: opacity 180ms cubic-bezier(.2,.7,.2,1);">
+        <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Icon" name="chev-l" size="{{ 18 }}" hint-size="18px,18px"></x-import>
+      </button>
+      <button aria-label="Next products" onClick="{{ next }}" style="width: 44px; height: 44px; padding: 0; border: 0; border-radius: 999px; background: #fff; color: #464646; display: grid; place-items: center; cursor: pointer; opacity: {{ nextOp }}; transition: opacity 180ms cubic-bezier(.2,.7,.2,1);">
+        <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Icon" name="chev-r" size="{{ 18 }}" hint-size="18px,18px"></x-import>
+      </button>
+    </div>
+  </div>
+  <div ref="{{ trackRef }}" onScroll="{{ onScroll }}" style="display: grid; grid-auto-flow: column; grid-auto-columns: 430px; gap: 20px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-left: var(--gutter, 28px); padding: 0 var(--gutter, 28px); scrollbar-width: none; scroll-behavior: smooth;">
+    <sc-for list="{{ items }}" as="p" hint-placeholder-count="5">
+      <div style="scroll-snap-align: start; min-width: 0;">
+        <dc-import name="WUProductCard" slot-id="{{ p.id }}" title="{{ p.title }}" price="{{ p.priceText }}" badge="{{ p.ribbon }}" rating="{{ p.rating }}" colors="{{ p.colors }}" art="{{ p.art }}" src="{{ p.src }}" src2="{{ p.src2 }}" cta-label="{{ p.cta }}" disabled="{{ p.soldOut }}" on-buy="{{ p.buy }}" on-open="{{ p.open }}" style="display: block;" hint-size="430px,720px"></dc-import>
+      </div>
+    </sc-for>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:680},&quot;title&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;New Arrivals&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;items&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;Product[]&quot;},&quot;tone&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;grey&quot;,&quot;ice&quot;,&quot;cream&quot;,&quot;none&quot;],&quot;default&quot;:&quot;grey&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;onViewAll&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(e) =&gt; void&quot;}}">
+class Component extends DCLogic {
+  state = { atStart: true, atEnd: false };
+  trackRef = React.createRef();
+  componentDidMount() { this.sync(); this._r = () => this.sync(); window.addEventListener('resize', this._r); }
+  componentWillUnmount() { window.removeEventListener('resize', this._r); }
+  sync() {
+    const t = this.trackRef.current; if (!t) return;
+    const atStart = t.scrollLeft < 4, atEnd = t.scrollLeft + t.clientWidth >= t.scrollWidth - 4;
+    if (atStart !== this.state.atStart || atEnd !== this.state.atEnd) this.setState({ atStart, atEnd });
+  }
+  step(dir) {
+    const t = this.trackRef.current; if (!t) return;
+    const card = t.firstElementChild ? t.firstElementChild.getBoundingClientRect().width + 20 : 300;
+    t.scrollBy({ left: dir * card * Math.max(1, Math.floor(t.clientWidth / card) - 1) });
+  }
+  renderVals() {
+    const p = this.props;
+    return {
+      title: p.title ?? 'New Arrivals',
+      bandBg: ({ grey: 'var(--aqua-band, #CEECF2)', ice: '#E9F3FC', cream: 'var(--cream, #FBF4E4)', none: 'transparent' })[p.tone || 'grey'],
+      items: (p.items || (window.WU_STORE ? window.WU_STORE.products.slice(0, 8) : [])).map(x => Object.assign({ cta: x.soldOut ? 'Sold out' : 'Add to cart' }, x)),
+      trackRef: this.trackRef,
+      onScroll: () => this.sync(),
+      prev: () => this.step(-1),
+      next: () => this.step(1),
+      prevOp: this.state.atStart ? 0.4 : 1,
+      nextOp: this.state.atEnd ? 0.4 : 1,
+      viewAll: e => { e.preventDefault(); p.onViewAll && p.onViewAll(e); },
+    };
+  }
+}
+</script>
+</body>
+</html>

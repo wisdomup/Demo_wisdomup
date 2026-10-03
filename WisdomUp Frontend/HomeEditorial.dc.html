@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/base.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/styles/components.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/styles.css">
+  <script src="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/_ds_bundle.js"></script>
+  <script src="wu-data.js"></script>
+  <style>
+    body { margin: 0; background: #fff; color: #464646; font-family: var(--font, Inter, sans-serif); }
+    a { color: #2350C8; text-decoration: none; }
+    a:hover { color: #1B3FA0; }
+    nav[aria-label="Quick filters"] .chip { height: 50px; padding: 0 22px 0 4px; background: var(--line, #E4E4E4); box-shadow: inset 0 0 0 1px rgba(70,70,70,0); font: 700 15px/1 var(--font); color: var(--ink, #464646); transition: box-shadow 320ms cubic-bezier(.2,.7,.2,1); }
+    nav[aria-label="Quick filters"] .chip:hover { box-shadow: inset 0 0 0 1px rgba(70,70,70,.85); }
+    nav[aria-label="Quick filters"] .chip:has([data-on="true"]) { box-shadow: inset 0 0 0 1px rgba(70,70,70,.85) !important; background: var(--line, #E4E4E4) !important; }
+    nav[aria-label="Quick filters"] .chip:focus-visible { outline: 2px solid #2350C8; outline-offset: 3px; }
+    .pcard { margin-top: 0; min-height: 0; padding: 12px 18px 18px; justify-content: flex-start; }
+    .pcard::before { transform: none; height: 100%; }
+    .pcard::after { display: none; }
+    .pcard__media { position: relative; inset: auto; height: auto; aspect-ratio: 1 / 1; margin: 0 -6px 14px; }
+    .pcard__body { margin-top: auto; }
+    .pcard .ribbon { top: 28px; }
+  </style>
+</helmet>
+
+<div style="min-height: 100vh; background: #fff; padding-bottom: 28px;">
+
+  <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.UtilityBar" links="{{ utility }}" hint-size="100%,44px"></x-import>
+  <dc-import name="SiteNav" start-top="{{ 140 }}" bag-count="{{ bagCount }}" on-shop-all="{{ toSeries }}" on-search="{{ toSeries }}" hint-size="100%,0px"></dc-import>
+
+  <nav aria-label="Quick filters" style="display: flex; justify-content: safe center; gap: 12px; height: 76px; box-sizing: border-box; padding: 6px var(--gutter, 28px) 20px; align-items: flex-start; overflow-x: auto; scrollbar-width: none;">
+    <sc-for list="{{ chips }}" as="c" hint-placeholder-count="10">
+      <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Chip" active="{{ c.active }}" on-click="{{ c.pick }}" hint-size="140px,43px">
+        <span data-on="{{ c.on }}" style="display: flex; align-items: center; gap: 10px; white-space: nowrap;">
+          <span style="width: 42px; height: 42px; border-radius: 999px; background: var(--white, #fff); display: grid; place-items: center; flex: none;">
+            <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.ProductArt" name="{{ c.art }}" style="width: 30px; height: 30px;" hint-size="30px,30px"></x-import>
+          </span>
+          <span>{{ c.label }}</span>
+        </span>
+      </x-import>
+    </sc-for>
+  </nav>
+  <dc-import name="LifestyleHero" slides="{{ heroSlides }}" autoplay="{{ 5000 }}" on-cta="{{ onHeroCta }}" style="display: block; height: max(457px, calc((100vh - 100px) * .86 - 76px));" hint-size="100%,calc((100vh - 100px) * .86 - 76px)"></dc-import>
+
+  <section style="margin: 72px var(--gutter, 28px) 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr)); gap: 48px; align-items: end;">
+    <div style="display: flex; flex-direction: column; gap: 20px;">
+      <div style="font: 600 13px/1 var(--font); letter-spacing: .24em; text-transform: uppercase; color: #8B96A9;">Open Stereo Series</div>
+      <h2 style="margin: 0; font: 300 clamp(40px, 5.2vw, 64px)/1.04 var(--font); letter-spacing: -.02em; color: #464646; text-wrap: balance;">Hear the city. <span style="font-weight: 800;">Keep the music.</span></h2>
+    </div>
+    <p style="margin: 0; font: 400 17px/1.6 var(--font); color: #464646; max-width: 460px; text-wrap: pretty;">Five open-ear designs that sit outside the ear canal — full situational awareness on the run, on the road, at your desk. Pick a model.</p>
+  </section>
+
+  <section id="series" style="position: relative; margin: 32px var(--gutter, 28px) 0; border-radius: 40px; background: linear-gradient(180deg, #F7F8F8 0%, #C9CDCD 100%); padding: 48px 56px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 40px; align-items: center; overflow: hidden; box-sizing: border-box;">
+    <div style="display: flex; flex-direction: column; gap: 28px;">
+      <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <sc-for list="{{ series }}" as="s" hint-placeholder-count="5">
+          <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Chip" active="{{ s.active }}" on-click="{{ s.pick }}" hint-size="70px,43px">{{ s.code }}</x-import>
+        </sc-for>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div style="font: 400 clamp(56px, 7vw, 88px)/1 var(--font-display); color: #464646; letter-spacing: .02em;">{{ cur.code }}</div>
+        <div style="font: 700 15px/1.3 var(--font); text-transform: uppercase; color: #464646;">{{ cur.title }}</div>
+        <div style="font: 600 13px/1.5 var(--font); color: #8B96A9;">{{ cur.meta }}</div>
+      </div>
+      <div style="display: flex; align-items: baseline; gap: 12px;">
+        <span style="font: 700 36px/1 var(--font); color: var(--accent-price, #2350C8);">{{ cur.priceText }}</span>
+        <span style="font: 500 16px/1 var(--font); color: #8B96A9; text-decoration: line-through;">{{ cur.wasText }}</span>
+        <span style="font: 700 13px/1 var(--font); background: var(--grad-heading); -webkit-background-clip: text; background-clip: text; color: transparent;">{{ cur.off }}</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; max-width: 460px;">
+        <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Button" variant="buy" on-click="{{ buyCur }}" hint-size="100%,52px">Buy Now</x-import>
+        <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Button" variant="cart" on-click="{{ buyCur }}" hint-size="100%,52px">Add to cart</x-import>
+      </div>
+    </div>
+    <div style="position: relative; display: flex; align-items: center; justify-content: center; min-height: 380px;">
+      <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.ProductArt" name="buds" style="width: 100%; max-height: 360px; filter: drop-shadow(0 18px 18px rgba(0,0,0,.14));" hint-size="100%,360px"></x-import>
+    </div>
+  </section>
+
+  <section style="margin: 72px var(--gutter, 28px) 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr)); gap: 20px;">
+    <div style="position: relative; border-radius: 40px; min-height: 520px; background: radial-gradient(90% 120% at 70% 40%, #3a3531 0%, #151312 60%, #0d0c0b 100%); color: #fff; padding: 48px; display: flex; flex-direction: column; justify-content: space-between; gap: 32px; box-sizing: border-box; overflow: visible;">
+      <div style="display: flex; flex-direction: column; gap: 18px;">
+        <div style="font: 600 13px/1 var(--font); letter-spacing: .24em; text-transform: uppercase; color: #D8D2CC;">Creator Tools</div>
+        <h2 style="margin: 0; font: 300 clamp(34px, 4vw, 48px)/1.06 var(--font); letter-spacing: -.02em; color: #fff; text-wrap: balance;">Clean audio, <span style="font-weight: 800;">straight from your phone.</span></h2>
+      </div>
+      <div style="height: 220px; display: flex; justify-content: center;">
+        <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.ProductArt" name="speaker" style="height: 100%;" hint-size="220px,220px"></x-import>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: rgba(255,255,255,.14); border-radius: 16px; overflow: hidden;">
+        <sc-for list="{{ mics }}" as="m" hint-placeholder-count="2">
+          <button onClick="{{ m.buy }}" style="all: unset; cursor: pointer; display: flex; flex-direction: column; gap: 8px; padding: 20px 22px; background: #1d1a18;">
+            <span style="font: 400 22px/1 var(--font-display); background: var(--grad-gold); -webkit-background-clip: text; background-clip: text; color: transparent;">{{ m.code }}</span>
+            <span style="font: 500 12px/1.4 var(--font); color: #D8D2CC;">{{ m.meta }}</span>
+            <span style="font: 700 17px/1 var(--font); color: #9FC0FF;">{{ m.priceText }}</span>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="position: relative; border-radius: 40px; min-height: 520px; background: linear-gradient(160deg, #2a1640 0%, #120a24 70%); color: #fff; padding: 48px; display: flex; flex-direction: column; justify-content: space-between; gap: 32px; box-sizing: border-box; overflow: hidden;">
+      <div style="display: flex; flex-direction: column; gap: 18px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="width: 10px; height: 10px; border-radius: 999px; background: #E3312D;"></span>
+          <span style="font: 600 13px/1 var(--font); letter-spacing: .24em; text-transform: uppercase; color: #D8D2CC;">WisdomUp Live</span>
+        </div>
+        <h2 style="margin: 0; font: 300 clamp(34px, 4vw, 48px)/1.06 var(--font); letter-spacing: -.02em; color: #fff; text-wrap: balance;">Watch it demoed. <span style="font-weight: 800;">Add it to cart mid-stream.</span></h2>
+        <p style="margin: 0; font: 400 16px/1.6 var(--font); color: #D8D2CC; max-width: 420px;">Live-only prices on whatever the host is holding. Next show starts in:</p>
+      </div>
+      <div style="display: flex; gap: 12px;">
+        <sc-for list="{{ countdown }}" as="c" hint-placeholder-count="4">
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 72px; padding: 16px 0; border-radius: 16px; background: rgba(255,255,255,.08);">
+            <span style="font: 400 30px/1 var(--font-display); color: #fff;">{{ c.v }}</span>
+            <span style="font: 600 11px/1 var(--font); letter-spacing: .16em; text-transform: uppercase; color: #D8D2CC;">{{ c.l }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+        <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Button" variant="pill" icon="{{ null }}" on-click="{{ remind }}" hint-size="160px,40px">{{ remindLabel }}</x-import>
+        <span style="font: 500 14px/1 var(--font); color: #D8D2CC;">Fridays · 8 PM PKT</span>
+      </div>
+    </div>
+  </section>
+
+  <dc-import name="ShopRail" title="New Arrivals" items="{{ newArrivals }}" on-view-all="{{ viewAll }}" style="display: block; margin-top: 72px;" hint-size="100%,66vh"></dc-import>
+
+  <section style="margin: 72px var(--gutter, 28px) 0; display: flex; flex-direction: column; gap: 20px;">
+    <div style="font: 600 13px/1 var(--font); letter-spacing: .24em; text-transform: uppercase; color: #8B96A9;">Shop the Range</div>
+    <h2 style="margin: 0; font: 300 clamp(34px, 4vw, 48px)/1.06 var(--font); letter-spacing: -.02em; color: #464646;">Charge it, play it, <span style="font-weight: 800;">take it everywhere.</span></h2>
+  </section>
+  <section onMouseEnter="{{ promoPause }}" onMouseLeave="{{ promoResume }}" style="margin: 0 var(--gutter, 28px); display: flex; flex-direction: column; gap: 28px;">
+    <div style="overflow: hidden; padding: 72px 6px 24px; margin: 0 -6px;">
+      <div style="display: flex; gap: 20px; transform: translateX({{ promoShift }}); transition: transform 640ms cubic-bezier(.2,.7,.2,1);">
+        <sc-for list="{{ promos }}" as="t" hint-placeholder-count="3">
+          <div style="flex: 0 0 calc((100% - 40px) / 3); min-width: 0;">
+            <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.PromoTile" kicker="{{ t.kicker }}" name="{{ t.name }}" chips="{{ t.chips }}" art="{{ t.art }}" background="{{ t.bg }}" on-click="{{ t.buy }}" hint-size="100%,210px"></x-import>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Dots" static="{{ true }}" count="{{ promoPages }}" active="{{ promoIdx }}" on-change="{{ setPromo }}" on-light="{{ true }}" hint-size="120px,10px"></x-import>
+  </section>
+
+  <dc-import name="ShopRail" title="Best Sellers" items="{{ bestsellers }}" on-view-all="{{ viewAll }}" style="display: block; margin-top: 72px;" hint-size="100%,66vh"></dc-import>
+
+  <section style="margin: 72px var(--gutter, 28px) 0; border-radius: 24px; background: #fff; padding: 56px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 40px; align-items: center; box-sizing: border-box;">
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+      <div style="font: 600 13px/1 var(--font); letter-spacing: .24em; text-transform: uppercase; color: #8B96A9;">WisdomUp Bulk Desk</div>
+      <h2 style="margin: 0; font: 400 40px/1.1 var(--font); color: #273F85; text-wrap: balance;">Stock premium tech accessories <span style="font-weight: 800;">at scale.</span></h2>
+      <p style="margin: 0; font: 400 16px/1.6 var(--font); color: #464646; max-width: 520px;">For distributors, wholesalers, retailers and corporate buyers. Send your details and we'll come back with bulk pricing.</p>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 14px; align-items: flex-start;">
+      <sc-for list="{{ bulkPoints }}" as="b" hint-placeholder-count="3">
+        <div style="display: flex; gap: 12px; align-items: center; font: 600 15px/1.4 var(--font); color: #464646;">
+          <span style="width: 6px; height: 6px; border-radius: 999px; background: #273F85;"></span>
+          <span>{{ b }}</span>
+        </div>
+      </sc-for>
+      <div style="margin-top: 10px;">
+        <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Button" variant="pill" icon="{{ null }}" hint-size="160px,40px">Order in bulk</x-import>
+      </div>
+    </div>
+  </section>
+
+  <div style="margin-top: 56px;">
+    <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.TrustBar" title="Why WisdomUp" items="{{ trust }}" hint-size="100%,96px"></x-import>
+  </div>
+
+  <dc-import name="SeoBlock" hint-size="100%,300px"></dc-import>
+
+  <div style="margin-top: 56px;">
+    <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Footer" logo-src="img/wu-logo-white.png" brand="Wisdomup" columns="{{ footer }}" help-text="We're here to help." contact="support@wisdomup.pk · +92 327 9800153" newsletter-text="New launches and live-only deals, straight to your inbox." copyright="Copyright © 2026 WisdomUp. All rights reserved." sub-right="Visa · MasterCard · JazzCash · EasyPaisa · COD" hint-size="100%,360px"></x-import>
+  </div>
+
+  <sc-if value="{{ toastOn }}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); z-index: 50; display: flex; align-items: center; gap: 10px; padding: 14px 22px; border-radius: 999px; background: rgba(208,212,212,.82); backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%); box-shadow: 0 10px 24px rgba(0,0,0,.08); font: 600 14px/1 var(--font); color: #464646;">
+      <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Icon" name="bag" size="{{ 18 }}" hint-size="18px,18px"></x-import>
+      <span>{{ toast }}</span>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const HERO_BG = "linear-gradient(90deg, rgba(14,8,40,.94) 0%, rgba(14,8,40,.6) 36%, rgba(14,8,40,0) 60%), url(img/hero-slide-web.png) 62% center / cover no-repeat";
+const CHIPS = [['Under Rs.3,000', 'buds'], ['New Arrivals', 'buds'], ['Best Sellers', 'speaker'], ['Top Rated', 'phones'], ['Earbuds', 'buds'], ['Speakers', 'speaker'], ['Neckbands', 'phones'], ['Microphones', 'speaker'], ['Chargers', 'bank-ice'], ['On Sale', 'bank']];
+const BLANK = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
+const SERIES = ['os1', 'os2', 'os3', 'os4', 'os5'];
+const PROMOS = [
+  { id: 'cj45', kicker: '15W wireless charger', name: 'CJ-45', chips: ['3-in-1', '15W'], art: 'bank-ice', bg: 'linear-gradient(120deg,#1c2a44,#0a0f1a)' },
+  { id: 'cj44', kicker: 'Magnetic wireless charger', name: 'CJ-44', chips: ['Magnetic', 'Foldable'], art: 'bank', bg: 'linear-gradient(120deg,#1b1b1b,#050505)' },
+  { id: 'cc16', kicker: 'Dual smart car charger', name: 'CC-16', chips: ['PD fast', 'Dual port'], art: 'bank', bg: 'linear-gradient(120deg,#4a2a18,#a4582a)' },
+  { id: 'cc14', kicker: 'USB + Type-C car charger', name: 'CC-14', chips: ['38W total', 'Dual output'], art: 'bank', bg: 'linear-gradient(120deg,#0f2d2a,#050a0a)' },
+  { id: 'os4', kicker: 'Open stereo earbuds', name: 'OS-4', chips: ['40+ hrs', 'IPX7'], art: 'buds', bg: 'linear-gradient(120deg,#3a0f12,#0d0505)' },
+  { id: 'ts10', kicker: 'True wireless earbuds', name: 'TS-10', chips: ['ANC', '30 hrs'], art: 'buds', bg: 'linear-gradient(120deg,#22304a,#0b0f18)' },
+  { id: 'mkf02', kicker: 'Creator wireless mic', name: 'MKF-02', chips: ['Dual mic', 'Noise reduction'], art: 'speaker', bg: 'linear-gradient(120deg,#2a2622,#0d0c0b)' },
+  { id: 'thunder', kicker: 'Party speaker', name: 'THUNDER', chips: ['RGB LED', 'IPX6'], art: 'speaker', bg: 'linear-gradient(120deg,#2a1640,#120a24)' },
+  { id: 'aip33', kicker: 'Wireless neckband', name: 'AIPLUS 33', chips: ['ENC', '45 hrs'], art: 'phones', bg: 'linear-gradient(120deg,#33401c,#0d1206)' },
+];
+
+class Component extends DCLogic {
+  state = { promo: 0, bag: 0, sel: 3, toast: '', now: Date.now(), reminded: false };
+  componentDidMount() {
+    this._c = setInterval(() => this.setState({ now: Date.now() }), 1000);
+    this._pr = setInterval(() => { if (!this._hover && !matchMedia('(prefers-reduced-motion: reduce)').matches) this.setState(s => ({ promo: (s.promo + 1) % (PROMOS.length - 2) })); }, 6000);
+    if (!window.WU_STORE) this._p = setInterval(() => { if (window.WU_STORE) { clearInterval(this._p); this.forceUpdate(); } }, 50);
+  }
+  componentWillUnmount() { clearInterval(this._pr); clearInterval(this._c); clearInterval(this._p); clearTimeout(this._t); }
+  add(id) {
+    const p = window.WU_STORE && window.WU_STORE.byId(id);
+    if (!p) return;
+    clearTimeout(this._t);
+    this.setState(s => ({ bag: s.bag + 1, toast: p.title + ' added to cart' }));
+    this._t = setTimeout(() => this.setState({ toast: '' }), 2400);
+  }
+  nextShow() {
+    const d = new Date(this.state.now);
+    const t = new Date(d); t.setHours(20, 0, 0, 0);
+    let add = (5 - d.getDay() + 7) % 7;
+    if (add === 0 && d >= t) add = 7;
+    t.setDate(t.getDate() + add);
+    return t - d;
+  }
+  renderVals() {
+    const D = window.WU_STORE;
+    if (!D) return {};
+    const { bag, sel, toast, reminded } = this.state;
+    const code = p => p.title.split(' ')[0];
+    const cur = D.byId(SERIES[sel]);
+    const ms = this.nextShow();
+    const pad = n => String(n).padStart(2, '0');
+    const withBuy = p => ({ ...p, buy: () => this.add(p.id) });
+    return {
+      utility: D.utility,
+      cats: D.cats,
+      bagCount: bag,
+      chips: CHIPS.map(([label, art]) => ({ label, art, active: this.state.chip === label, on: this.state.chip === label ? 'true' : 'false', pick: () => { this.setState({ chip: label }); const el = document.getElementById('series'); if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 40, behavior: 'smooth' }); } })),
+      heroSlides: D.lifestyle,
+      onHeroCta: s => this.add(s.pid),
+      viewAll: e => { e.preventDefault(); const el = document.getElementById('series'); if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 40, behavior: 'smooth' }); },
+      toSeries: () => { const el = document.getElementById('series'); if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 40, behavior: 'smooth' }); },
+      series: SERIES.map((id, i) => ({ code: code(D.byId(id)), active: i === sel, pick: () => this.setState({ sel: i }) })),
+      cur: { ...cur, code: code(cur) },
+      buyCur: () => this.add(cur.id),
+      mics: ['mkf02', 'mkf01'].map(id => { const p = D.byId(id); return { ...withBuy(p), code: code(p) }; }),
+      countdown: [
+        { v: pad(Math.floor(ms / 864e5)), l: 'Days' },
+        { v: pad(Math.floor(ms / 36e5) % 24), l: 'Hrs' },
+        { v: pad(Math.floor(ms / 6e4) % 60), l: 'Min' },
+        { v: pad(Math.floor(ms / 1e3) % 60), l: 'Sec' },
+      ],
+      remindLabel: reminded ? 'Reminder set' : 'Remind me',
+      remind: () => this.setState({ reminded: true }),
+      promos: PROMOS.map(t => ({ ...t, buy: () => this.add(t.id) })),
+      promoPages: PROMOS.length - 2,
+      promoIdx: this.state.promo,
+      promoShift: 'calc(' + (-this.state.promo) + ' * ((100% - 40px) / 3 + 20px))',
+      setPromo: i => this.setState({ promo: i }),
+      promoPause: () => { this._hover = true; },
+      promoResume: () => { this._hover = false; },
+      newArrivals: D.products.filter(p => (p.tabs || []).includes('new')).map(withBuy),
+      bestsellers: D.products.filter(p => p.tabs.includes('best')).map(withBuy),
+      bulkPoints: ['Earbuds, speakers, chargers, mics and neckbands', 'Pakistan-ready stock, local fulfilment', 'Warranty-backed, with customer care support'],
+      trust: D.trust,
+      footer: D.footer,
+      toastOn: !!toast, toast,
+    };
+  }
+}
+</script>
+</body>
+</html>

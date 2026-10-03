@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/typography.css">
+  <script src="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/_ds_bundle.js"></script>
+  <script src="./image-slot.js"></script>
+</helmet>
+<div style="width: 100%; container-type: inline-size; font-family: var(--font);">
+  <article style="opacity: {{ dim }}; box-sizing: border-box; padding: 2.326cqw 2.326cqw 3.721cqw; border-radius: 5.116cqw; background: #fff; display: flex; flex-direction: column;">
+    <div onMouseEnter="{{ imgOn }}" onMouseLeave="{{ imgOff }}" onClick="{{ open }}" style="cursor: pointer; position: relative; aspect-ratio: 410 / 484; border-radius: 3.721cqw; background: #F8F9FA; overflow: hidden;">
+      <sc-if value="{{ useSlots }}" hint-placeholder-val="{{ false }}">
+        <image-slot id="{{ slotMain }}" placeholder="Drop main image" style="position: absolute; inset: 0;"></image-slot>
+        <div style="position: absolute; inset: 0; opacity: {{ altOp }}; transform: {{ altTf }}; pointer-events: {{ altPe }}; transition: opacity 320ms cubic-bezier(.2,.7,.2,1), transform 420ms cubic-bezier(.2,.7,.2,1);">
+          <image-slot id="{{ slotAlt }}" placeholder="Drop hover image" style="position: absolute; inset: 0; background: #F8F9FA;"></image-slot>
+        </div>
+      </sc-if>
+      <sc-if value="{{ useArt }}" hint-placeholder-val="{{ true }}">
+        <div style="position: absolute; inset: 18% 8% 14%; opacity: {{ mainOp }}; transition: opacity 320ms cubic-bezier(.2,.7,.2,1);">
+          <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.ProductArt" name="{{ art }}" src="{{ src }}" alt="{{ title }}" style="width: 100%; height: 100%; filter: drop-shadow(0 18px 18px rgba(0,0,0,.14));" hint-size="100%,100%"></x-import>
+        </div>
+        <div style="position: absolute; inset: 18% 8% 14%; opacity: {{ altOp }}; transform: {{ artAltTf }}; transition: opacity 320ms cubic-bezier(.2,.7,.2,1), transform 420ms cubic-bezier(.2,.7,.2,1);">
+          <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.ProductArt" name="{{ art }}" src="{{ src2 }}" alt="{{ title }}" style="width: 100%; height: 100%; filter: drop-shadow(0 18px 18px rgba(0,0,0,.14));" hint-size="100%,100%"></x-import>
+        </div>
+      </sc-if>
+      <sc-if value="{{ hasBadge }}" hint-placeholder-val="{{ false }}">
+        <span style="position: absolute; top: 3.488cqw; left: 2.791cqw; display: inline-flex; align-items: center; height: 6.047cqw; padding: 0 2.326cqw; border-radius: 999px; background: #CEECF2; font: 700 3.488cqw/1 var(--font); color: #2B3A40; white-space: nowrap; pointer-events: none;">{{ badge }}</span>
+      </sc-if>
+    </div>
+    <div style="display: flex; flex-direction: column; padding: 5.814cqw 0.465cqw 0;">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 2.791cqw;">
+        <span style="font: 800 6.512cqw/1 var(--font); color: #111;">{{ price }}</span>
+        <span style="visibility: {{ ratingVis }}; display: flex; align-items: center; gap: 1.395cqw; font: 600 4.419cqw/1 var(--font); color: #2B2B2B; white-space: nowrap;">
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="display: block; width: 5.581cqw; height: 5.581cqw; margin: -0.465cqw 0;"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z" fill="#E2A92C"></path></svg>
+          <span>{{ rating }}</span>
+          <span style="font-weight: 400; color: #5A5A5A;">({{ reviews }})</span>
+        </span>
+      </div>
+      <h3 onClick="{{ open }}" style="cursor: pointer; margin: 5.814cqw 0 0; font: 400 4.651cqw/1 var(--font); color: #1A1A1A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ title }}</h3>
+      <div style="margin-top: 6.977cqw; min-height: 4.419cqw; font: 500 4.419cqw/1 var(--font); color: #1F5E3A;">{{ eta }}</div>
+      <div style="margin-top: 5.814cqw; display: flex; align-items: center; justify-content: space-between; gap: 2.791cqw;">
+        <div role="radiogroup" aria-label="Colour" style="display: flex; align-items: center; gap: 5.116cqw; padding-left: 0.93cqw;">
+          <sc-for list="{{ swatches }}" as="s" hint-placeholder-count="2">
+            <button role="radio" aria-label="{{ s.name }}" aria-checked="{{ s.on }}" onClick="{{ s.pick }}" style="width: 7.907cqw; height: 7.907cqw; padding: 0; border-radius: 50%; border: 0; background: {{ s.hex }}; box-shadow: {{ s.ring }}; cursor: pointer; transition: box-shadow 160ms ease;"></button>
+          </sc-for>
+        </div>
+        <button onClick="{{ addToCart }}" disabled="{{ disabled }}" onMouseEnter="{{ ctaOn }}" onMouseLeave="{{ ctaOff }}" style="height: 9.767cqw; min-width: 32.558cqw; padding: 0 5.116cqw; border: 0; border-radius: 999px; background: #000; color: #fff; display: flex; align-items: center; justify-content: center; gap: 1.86cqw; font: 700 3.721cqw/1 var(--font); white-space: nowrap; cursor: pointer; transform: {{ ctaTf }}; box-shadow: {{ ctaShadow }}; transition: transform 220ms cubic-bezier(.2,.7,.2,1), box-shadow 220ms cubic-bezier(.2,.7,.2,1), background-color 220ms ease;" style-hover="background: #1A1A1A;" style-active="transform: translateY(0) scale(.97);">
+          <span style="display: flex; transform: {{ iconTf }}; transition: transform 260ms cubic-bezier(.3,1.4,.5,1);"><x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Icon" name="cart" size="{{ 16 }}" hint-size="16px,16px"></x-import></span>
+          <span>{{ ctaText }}</span>
+        </button>
+      </div>
+    </div>
+  </article>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:430,&quot;height&quot;:720},&quot;title&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;OWS-02 Buds&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;price&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Rs.4,000&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;rating&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;4.6&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;reviews&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:241,&quot;tsType&quot;:&quot;number&quot;},&quot;eta&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Get it as early as Oct 8&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;badge&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Top Rated&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;ctaLabel&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Add to cart&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;slotId&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;wucard&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;colors&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;object[]&quot;},&quot;art&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;string&quot;},&quot;src&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;string&quot;},&quot;src2&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;string&quot;},&quot;disabled&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;onBuy&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;() =&gt; void&quot;},&quot;onOpen&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;() =&gt; void&quot;}}">
+class Component extends DCLogic {
+  state = { sel: 0, added: false, ctaHover: false, imgHover: false };
+  renderVals() {
+    const p = this.props;
+    const id = p.slotId ?? 'wucard';
+    const cols = (p.colors ?? [{ name: 'Red', hex: '#A80C0C' }, { name: 'Black', hex: '#000' }]).map((c, i) => typeof c === 'string' ? { name: 'Colour ' + (i + 1), hex: c } : c);
+    const title = p.title ?? 'OWS-02 Buds';
+    const seed = [...String(p.slotId || title)].reduce((a, c) => a + c.charCodeAt(0), 0);
+    const useArt = !!(p.src || p.art);
+    let eta = p.eta;
+    if (eta == null) { const d = new Date(); d.setDate(d.getDate() + 2 + (seed % 2)); eta = p.disabled ? '' : 'Get it as early as ' + d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); }
+    const rt = p.rating;
+    const rating = typeof rt === 'number' ? (rt >= 5 ? (rt - (seed % 4) * 0.1) : rt).toFixed(1) : (rt ?? '4.6');
+    const h = this.state.ctaHover, ih = this.state.imgHover;
+    return {
+      slotMain: id + '-main', slotAlt: id + '-alt',
+      hasBadge: !!p.badge, badge: p.badge,
+      price: p.price ?? 'Rs.4,000', rating, ratingVis: rt === 0 ? 'hidden' : 'visible', reviews: p.reviews ?? (p.slotId ? 24 + (seed * 37) % 260 : 241),
+      title, eta,
+      useArt, useSlots: !useArt, art: p.art || 'buds', src: p.src, src2: p.src2 || p.src,
+      mainOp: ih ? 0 : 1, artAltTf: p.src2 ? 'none' : (ih ? 'scaleX(-1) rotate(-6deg) scale(1.04)' : 'scaleX(-1) rotate(-6deg) scale(.96)'),
+      open: () => p.onOpen && p.onOpen(),
+      disabled: !!p.disabled, dim: p.disabled ? 0.55 : 1,
+      imgOn: () => this.setState({ imgHover: true }), imgOff: () => this.setState({ imgHover: false }),
+      altOp: ih ? 1 : 0, altTf: ih ? 'scale(1)' : 'scale(1.04)', altPe: ih ? 'auto' : 'none',
+      swatches: cols.map((c, i) => ({ ...c, on: i === this.state.sel,
+        ring: i === this.state.sel ? '0 0 0 2px #fff, 0 0 0 4px ' + c.hex : 'none',
+        pick: () => this.setState({ sel: i }) })),
+      ctaOn: () => this.setState({ ctaHover: true }), ctaOff: () => this.setState({ ctaHover: false }),
+      ctaTf: h ? 'translateY(-2px)' : 'none',
+      ctaShadow: h ? '0 0 0 2px #fff, 0 0 0 4px #E1251B' : '0 0 0 0 #fff, 0 0 0 0 #E1251B',
+      iconTf: h ? 'translateX(-2px) rotate(-12deg)' : 'none',
+      ctaText: this.state.added ? 'Added' : (p.ctaLabel ?? 'Add to cart'),
+      addToCart: e => { if (e) e.stopPropagation(); if (p.disabled) return; p.onBuy && p.onBuy(); this.setState({ added: true }); clearTimeout(this.t); this.t = setTimeout(() => this.setState({ added: false }), 1400); }
+    };
+  }
+}
+</script>
+</body>
+</html>

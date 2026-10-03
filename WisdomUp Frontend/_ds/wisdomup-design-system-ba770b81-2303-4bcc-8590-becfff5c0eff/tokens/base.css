@@ -1,0 +1,6 @@
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--page); font-family: var(--font); color: var(--ink); -webkit-font-smoothing: antialiased; }
+img, svg { max-width: 100%; }
+a { color: var(--focus); text-decoration: none; }
+a:hover { color: var(--navy); }
+.grad-text { background: var(--grad-heading); -webkit-background-clip: text; background-clip: text; color: transparent; }

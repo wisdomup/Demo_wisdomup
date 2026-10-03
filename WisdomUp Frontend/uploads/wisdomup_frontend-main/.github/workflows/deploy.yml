@@ -1,0 +1,29 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy over SSH
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          if echo "$SSH_KEY" | grep -q "BEGIN OPENSSH PRIVATE KEY\|BEGIN RSA PRIVATE KEY\|BEGIN EC PRIVATE KEY"; then
+            printf '%s\n' "$SSH_KEY" > ~/.ssh/id_ed25519
+          else
+            printf '%s' "$SSH_KEY" | tr -d '\r' | base64 -d > ~/.ssh/id_ed25519
+          fi
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keygen -y -f ~/.ssh/id_ed25519 > /dev/null
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" \
+            'bash /home/projects/deploy_wisdomup.sh frontend'

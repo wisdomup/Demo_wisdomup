@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/typography.css">
+  <script src="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/_ds_bundle.js"></script>
+  <script src="./image-slot.js"></script>
+  <style>
+    body { margin: 0; background: #D4EBF1; }
+    a { color: #2350C8; text-decoration: none; }
+    a:hover { color: #1B3FA0; }
+  </style>
+</helmet>
+<main style="min-height: 100vh; display: grid; place-items: center; padding: 60px 24px; box-sizing: border-box; font-family: var(--font);">
+  <article data-screen-label="Product Card" style="width: 430px; min-height: 700px; box-sizing: border-box; padding: 10px 10px 16px; border-radius: 22px; background: #fff; display: flex; flex-direction: column;">
+    <div onMouseEnter="{{ imgOn }}" onMouseLeave="{{ imgOff }}" style="position: relative; height: 484px; flex: none; border-radius: 16px; background: #F8F9FA; overflow: hidden;">
+      <image-slot id="pc-main" placeholder="Drop main product image (410×484)" style="position: absolute; inset: 0;"></image-slot>
+      <div style="position: absolute; inset: 0; opacity: {{ altOp }}; transform: {{ altTf }}; pointer-events: {{ altPe }}; transition: opacity 320ms cubic-bezier(.2,.7,.2,1), transform 420ms cubic-bezier(.2,.7,.2,1);">
+        <image-slot id="pc-alt" placeholder="Drop hover image (410×484)" style="position: absolute; inset: 0; background: #F8F9FA;"></image-slot>
+      </div>
+      <sc-if value="{{ showBadge }}" hint-placeholder-val="{{ true }}">
+        <span style="position: absolute; top: 15px; left: 12px; display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 999px; background: #CEECF2; font: 700 15px/1 var(--font); white-space: nowrap; color: #2B3A40; pointer-events: none;">{{ badge }}</span>
+      </sc-if>
+    </div>
+    <div style="display: flex; flex-direction: column; padding: 25px 2px 0;">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+        <span style="font: 800 28px/1 var(--font); color: #111;">Rs.4,000</span>
+        <span style="display: flex; align-items: center; gap: 6px; font: 600 19px/1 var(--font); color: #2B2B2B; white-space: nowrap;">
+          <svg width="24" height="24" style="display: block; margin: -2px 0;" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z" fill="#E2A92C"></path></svg>
+          <span>4.6</span>
+          <span style="font-weight: 400; color: #5A5A5A;">(241)</span>
+        </span>
+      </div>
+      <h3 style="margin: 25px 0 0; font: 400 20px/1 var(--font); color: #1A1A1A;">OWS-02 Buds</h3>
+      <sc-if value="{{ showEta }}" hint-placeholder-val="{{ true }}">
+        <div style="margin-top: 30px; font: 500 19px/1 var(--font); color: #1F5E3A;">Get it as early as Oct 8</div>
+      </sc-if>
+      <div style="margin-top: 25px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+        <div role="radiogroup" aria-label="Colour" style="display: flex; align-items: center; gap: 22px; padding-left: 4px;">
+          <sc-for list="{{ swatches }}" as="s" hint-placeholder-count="2">
+            <button role="radio" aria-label="{{ s.name }}" aria-checked="{{ s.on }}" onClick="{{ s.pick }}" style="width: 34px; height: 34px; padding: 0; border-radius: 50%; border: 0; background: {{ s.hex }}; box-shadow: {{ s.ring }}; cursor: pointer; transition: box-shadow 160ms ease;"></button>
+          </sc-for>
+        </div>
+        <button onClick="{{ addToCart }}" onMouseEnter="{{ ctaOn }}" onMouseLeave="{{ ctaOff }}" style="position: relative; overflow: hidden; height: 42px; min-width: 140px; padding: 0 22px; border: 0; border-radius: 999px; background: #000; color: #fff; display: flex; align-items: center; justify-content: center; gap: 8px; font: 700 16px/1 var(--font); cursor: pointer; transform: {{ ctaTf }}; box-shadow: {{ ctaShadow }}; transition: transform 220ms cubic-bezier(.2,.7,.2,1), box-shadow 220ms cubic-bezier(.2,.7,.2,1), background-color 220ms ease;" style-hover="background: #1A1A1A;" style-active="transform: translateY(0) scale(.97);">
+          <span style="display: flex; transform: {{ iconTf }}; transition: transform 260ms cubic-bezier(.3,1.4,.5,1);"><x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Icon" name="cart" size="{{ 18 }}" hint-size="18px,18px"></x-import></span>
+          <span>{{ ctaText }}</span>
+        </button>
+      </div>
+    </div>
+  </article>
+</main>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showBadge&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;badge&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Top Rated&quot;,&quot;New Arrival&quot;,&quot;Best Seller&quot;,&quot;Sale&quot;],&quot;default&quot;:&quot;Top Rated&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;showEta&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;ctaLabel&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Add to cart&quot;,&quot;Buy Now&quot;],&quot;default&quot;:&quot;Add to cart&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  state = { sel: 0, added: false, ctaHover: false, imgHover: false };
+  renderVals() {
+    const cols = [{ name: 'Red', hex: '#A80C0C' }, { name: 'Black', hex: '#000' }];
+    return {
+      showBadge: this.props.showBadge ?? true,
+      badge: this.props.badge ?? 'Top Rated',
+      showEta: this.props.showEta ?? true,
+      swatches: cols.map((c, i) => ({
+        ...c, on: i === this.state.sel,
+        ring: i === this.state.sel ? '0 0 0 2px #fff, 0 0 0 4px ' + c.hex : 'none',
+        pick: () => this.setState({ sel: i })
+      })),
+      imgOn: () => this.setState({ imgHover: true }),
+      imgOff: () => this.setState({ imgHover: false }),
+      altOp: this.state.imgHover ? 1 : 0,
+      altTf: this.state.imgHover ? 'scale(1)' : 'scale(1.04)',
+      altPe: this.state.imgHover ? 'auto' : 'none',
+      ctaOn: () => this.setState({ ctaHover: true }),
+      ctaOff: () => this.setState({ ctaHover: false }),
+      ctaTf: this.state.ctaHover ? 'translateY(-2px)' : 'none',
+      ctaShadow: this.state.ctaHover ? '0 0 0 2px #fff, 0 0 0 4px #E1251B' : '0 0 0 0 #fff, 0 0 0 0 #E1251B',
+      iconTf: this.state.ctaHover ? 'translateX(-2px) rotate(-12deg)' : 'none',
+      ctaText: this.state.added ? 'Added' : (this.props.ctaLabel ?? 'Add to cart'),
+      addToCart: () => { this.setState({ added: true }); clearTimeout(this.t); this.t = setTimeout(() => this.setState({ added: false }), 1400); }
+    };
+  }
+}
+</script>
+</body>
+</html>

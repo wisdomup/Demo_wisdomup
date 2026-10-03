@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/base.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/styles/components.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/styles.css">
+  <script src="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/_ds_bundle.js"></script>
+  <script src="wu-data.js"></script>
+  <style>
+    body { margin: 0; background: var(--page, #F0F0F0); color: var(--ink, #464646); font-family: var(--font, Inter, sans-serif); }
+    a { color: #2350C8; text-decoration: none; }
+    a:hover { color: #1B3FA0; }
+    .pcard { margin-top: 0; min-height: 0; padding: 12px 18px 18px; justify-content: flex-start; }
+    .pcard::before { transform: none; height: 100%; }
+    .pcard::after { display: none; }
+    .pcard__media { position: relative; inset: auto; height: auto; aspect-ratio: 1 / 1; margin: 0 -6px 14px; }
+    .pcard__body { margin-top: auto; }
+    .pcard .ribbon { top: 28px; }
+  </style>
+</helmet>
+
+<div style="min-height: 100vh; background: #F0F0F0; padding-bottom: 28px;">
+
+  <sc-if value="{{ showUtility }}" hint-placeholder-val="{{ true }}">
+    <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.UtilityBar" links="{{ utility }}" hint-size="100%,44px"></x-import>
+  </sc-if>
+  <dc-import name="SiteNav" start-top="{{ 64 }}" active="{{ cat }}" bag-count="{{ bagCount }}" on-category="{{ onCategory }}" on-shop-all="{{ onShopAll }}" on-search="{{ openSearch }}" hint-size="100%,0px"></dc-import>
+
+  <dc-import name="LifestyleHero" slides="{{ slides }}" autoplay="{{ autoplay }}" on-cta="{{ onHeroCta }}" style="display: block; height: 560px;" hint-size="100%,560px"></dc-import>
+
+  <nav class="cats" aria-label="Shop by category" style="flex-wrap: wrap; row-gap: 28px;">
+    <sc-for list="{{ circles }}" as="c" hint-placeholder-count="5">
+      <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.CategoryCircle" label="{{ c.label }}" art="{{ c.art }}" on-click="{{ c.pick }}" hint-size="110px,130px"></x-import>
+    </sc-for>
+  </nav>
+
+  <section style="position: relative; margin: 24px var(--gutter, 28px) 0; min-height: 130px; border-radius: 40px; background: linear-gradient(90deg, #151312 0%, #3a3531 100%); display: flex; flex-wrap: wrap; align-items: center; gap: 20px; padding: 24px 48px 24px 230px; color: #fff; box-sizing: border-box;">
+    <div style="position: absolute; left: 40px; top: -34px; width: 170px; height: 180px;">
+      <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.ProductArt" name="speaker" style="width: 100%; height: 100%;" hint-size="170px,180px"></x-import>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      <div style="font: 600 12px/1 var(--font); letter-spacing: .16em; text-transform: uppercase;">Sales live · Party speaker</div>
+      <div style="font: 400 36px/1 var(--font-display); background: var(--grad-gold); -webkit-background-clip: text; background-clip: text; color: transparent;">THUNDER PRO</div>
+      <div style="font: 500 13px/1.4 var(--font); color: #D8D2CC;">RGB LED Lights | Customized EQ Modes | IPX6 Splash Resistance</div>
+    </div>
+    <div style="margin-left: auto;">
+      <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Button" variant="pill" icon="{{ null }}" on-click="{{ buyThunder }}" hint-size="120px,40px">Shop now</x-import>
+    </div>
+  </section>
+
+  <div id="shop" style="margin-top: 56px;">
+    <div class="sec-head" style="margin: 48px var(--gutter, 28px) 8px; align-items: center;">
+      <h2 class="sec-title" style="font-size: 44px; line-height: 1.1; letter-spacing: -.01em;">{{ railTitle }}</h2>
+      <a class="viewall" href="#" onClick="{{ viewAll }}"><span>View All</span></a>
+    </div>
+  </div>
+  <div style="display: flex; flex-wrap: wrap; gap: 10px; margin: 4px var(--gutter, 28px) 36px;">
+    <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3">
+      <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Chip" active="{{ t.active }}" on-click="{{ t.pick }}" hint-size="130px,43px">{{ t.label }}</x-import>
+    </sc-for>
+  </div>
+
+  <sc-if value="{{ isRail }}" hint-placeholder-val="{{ true }}">
+    <dc-import name="ShopRail" title="" items="{{ railProducts }}" tone="none" style="display: block; padding-top: 16px;" hint-size="100%,780px"></dc-import>
+  </sc-if>
+  <sc-if value="{{ isGrid }}" hint-placeholder-val="{{ false }}">
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, 430px); justify-content: center; column-gap: 20px; row-gap: 32px; margin: 0 var(--gutter, 28px); padding: 16px 20px 0;">
+      <sc-for list="{{ railProducts }}" as="p" hint-placeholder-count="4">
+        <dc-import name="WUProductCard" slot-id="{{ p.id }}" title="{{ p.title }}" price="{{ p.priceText }}" badge="{{ p.ribbon }}" rating="{{ p.rating }}" colors="{{ p.colors }}" art="{{ p.art }}" on-buy="{{ p.buy }}" style="display: block;" hint-size="430px,720px"></dc-import>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <div style="margin-top: 48px;">
+    <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.TrustBar" title="Why WisdomUp" items="{{ trust }}" hint-size="100%,96px"></x-import>
+  </div>
+
+  <section class="promos" style="margin-top: 88px;">
+    <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.PromoTile" kicker="Open stereo series" name="OS-4" chips="{{ chipsPulse }}" art="buds" background="linear-gradient(120deg,#0f2d2a,#050a0a)" hint-size="100%,210px"></x-import>
+    <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.PromoTile" kicker="Creator wireless mic" name="MKF-02" chips="{{ chipsSurge }}" art="speaker" hint-size="100%,210px"></x-import>
+    <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.PromoTile" kicker="15W wireless charger" name="CJ-45" chips="{{ chipsEcho }}" art="bank-ice" background="linear-gradient(120deg,#4a2a18,#a4582a)" hint-size="100%,210px"></x-import>
+  </section>
+
+  <p style="text-align: center; margin: 64px 0 16px; font: 600 13px/1 var(--font); letter-spacing: .24em; text-transform: uppercase; color: #464646;">Best seller</p>
+  <section style="position: relative; margin: 0 var(--gutter, 28px); min-height: 300px; border-radius: 24px; background: {{ best.bg }}; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); align-items: center; gap: 24px; padding: 40px 64px 56px; overflow: hidden; transition: background 320ms cubic-bezier(.2,.7,.2,1); box-sizing: border-box;">
+    <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 14px;">
+      <div style="font: 600 13px/1 var(--font); letter-spacing: .16em; text-transform: uppercase; color: #464646;">{{ best.kicker }}</div>
+      <div style="font: 400 64px/1 var(--font-display); color: #464646;">{{ best.name }}</div>
+      <div style="font: 500 14px/1.4 var(--font); color: #464646;">{{ best.meta }}</div>
+      <div style="display: flex; align-items: baseline; gap: 10px; margin-top: 6px;">
+        <span style="font: 700 22px/1 var(--font); color: var(--accent-price, #2350C8);">{{ best.price }}</span>
+        <span style="font: 500 14px/1 var(--font); color: #8B96A9; text-decoration: line-through;">{{ best.was }}</span>
+      </div>
+      <a href="#" onClick="{{ buyBest }}" style="display: inline-flex; gap: 8px; align-items: center; margin-top: 8px; font: 600 17px/1 var(--font); color: #2350C8;">
+        <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Icon" name="cart" size="{{ 22 }}" hint-size="22px,22px"></x-import>
+        Add to cart
+      </a>
+    </div>
+    <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.ProductArt" name="{{ best.art }}" style="max-height: 250px; width: 100%;" hint-size="100%,250px"></x-import>
+    <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Dots" count="{{ bestCount }}" active="{{ bestIdx }}" on-change="{{ setBest }}" on-light="{{ true }}" hint-size="80px,10px"></x-import>
+  </section>
+
+  <section id="faq" style="margin: 88px var(--gutter, 28px) 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; align-items: start;">
+    <div style="display: flex; flex-direction: column; gap: 14px; padding-top: 8px;">
+      <div style="font: 800 44px/1.1 var(--font); letter-spacing: -.01em; text-transform: uppercase; background: var(--grad-heading); -webkit-background-clip: text; background-clip: text; color: transparent; width: fit-content;">Frequently asked</div>
+      <p style="margin: 0; font: 400 15px/1.6 var(--font); color: #464646; max-width: 380px; text-wrap: pretty;">Orders, shipping and warranty. Still stuck? We're here to help.</p>
+      <div style="display: flex; flex-direction: column; gap: 4px; font: 500 14px/1.6 var(--font); color: #8B96A9;">
+        <span>support@wisdomup.pk</span>
+        <span>+92 327 9800153 · Mon–Sun, 10 AM – 6 PM</span>
+      </div>
+    </div>
+    <div style="background: #fff; border-radius: 24px; padding: 8px 32px;">
+      <sc-for list="{{ faqs }}" as="f" hint-placeholder-count="5">
+        <div style="border-bottom: {{ f.border }};">
+          <button onClick="{{ f.toggle }}" style="all: unset; box-sizing: border-box; width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 22px 0; cursor: pointer; font: 600 16px/1.4 var(--font); color: #464646;">
+            <span>{{ f.q }}</span>
+            <span style="display: flex; color: #8B96A9; transform: rotate({{ f.rot }}); transition: transform 320ms cubic-bezier(.2,.7,.2,1);">
+              <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Icon" name="chev-r" size="{{ 18 }}" hint-size="18px,18px"></x-import>
+            </span>
+          </button>
+          <sc-if value="{{ f.open }}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; flex-direction: column; gap: 6px; padding: 0 0 22px; font: 400 15px/1.6 var(--font); color: #464646;">
+              <sc-for list="{{ f.lines }}" as="l">
+                <span>{{ l }}</span>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <dc-import name="SeoBlock" hint-size="100%,300px"></dc-import>
+
+  <div style="margin-top: 88px;">
+    <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Footer" logo-src="img/wu-logo-white.png" brand="Wisdomup" columns="{{ footer }}" help-text="We're here to help." contact="support@wisdomup.pk · +92 327 9800153" newsletter-text="New launches and offers, straight to your inbox." copyright="Copyright © 2026 WisdomUp. All rights reserved." sub-right="Visa · MasterCard · JazzCash · EasyPaisa · COD" hint-size="100%,360px"></x-import>
+  </div>
+
+  <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.SearchOverlay" open="{{ searchOpen }}" on-close="{{ closeSearch }}" query="{{ query }}" on-query="{{ setQuery }}" label="{{ searchLabel }}" hint-size="0px,0px">
+    <sc-for list="{{ searchResults }}" as="r">
+      <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.CompactCard" tag="{{ r.tag }}" title="{{ r.short }}" meta="{{ r.meta }}" price="{{ r.priceText }}" was="{{ r.wasText }}" art="{{ r.art }}" media-bg="{{ r.bg }}" on-click="{{ r.buy }}" hint-size="100%,220px"></x-import>
+    </sc-for>
+  </x-import>
+
+  <sc-if value="{{ toastOn }}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); z-index: 50; display: flex; align-items: center; gap: 10px; padding: 14px 22px; border-radius: 999px; background: rgba(208,212,212,.82); backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%); box-shadow: 0 10px 24px rgba(0,0,0,.08); font: 600 14px/1 var(--font); color: #464646;">
+      <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Icon" name="bag" size="{{ 18 }}" hint-size="18px,18px"></x-import>
+      <span>{{ toast }}</span>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;productLayout&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;rail&quot;,&quot;grid&quot;],&quot;default&quot;:&quot;rail&quot;,&quot;tsType&quot;:&quot;'rail' | 'grid'&quot;},&quot;heroAutoplay&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;showUtility&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+const HERO_BG = "linear-gradient(90deg, rgba(14,8,40,.92) 0%, rgba(14,8,40,.55) 34%, rgba(14,8,40,0) 58%), url(img/hero-slide-web.png) 62% center / cover no-repeat";
+const BLANK = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
+const TABS = [['new', 'New Arrivals'], ['best', 'Best Sellers'], ['trend', 'Top Trending']];
+const SLIDES = [
+  { tone: 'dark', kicker: 'Sales live', name: 'THUNDER PRO', nameSize: 64, specs: ['RGB LED\nlights', 'Customized\nEQ modes', 'IPX6 splash\nresistance'], src: BLANK, background: HERO_BG, ctaLabel: 'Shop now', pid: 'thunder' },
+  { tone: 'dark', kicker: 'Open stereo earbuds', name: 'OS-4', specs: ['40+ hrs\nbattery', 'RGB lights\nsync to beat', 'IPX7\nwaterproof'], art: 'buds', pid: 'os4' },
+  { tone: 'light', kicker: 'Creator wireless mic', name: 'MKF-02', specs: ['Dual\ntransmitters', 'Noise\nreduction'], art: 'speaker', pid: 'mkf02' },
+  { tone: 'blue', kicker: 'Wireless charging', name: 'CJ-45', specs: ['15W 3-in-1 wireless stand'], art: 'bank-ice', pid: 'cj45' },
+];
+const BEST = [
+  { pid: 'os4', name: 'OS-4', kicker: 'Open stereo earbuds', art: 'buds', bg: 'linear-gradient(180deg,#F7F8F8 0%,#C9CDCD 100%)' },
+  { pid: 'ts10', name: 'TS-10', kicker: 'True wireless earbuds', art: 'buds', bg: 'linear-gradient(135deg,#F4F8FC 0%,#C9DBEF 100%)' },
+  { pid: 'cj45', name: 'CJ-45', kicker: '15W wireless charger', art: 'bank-ice', bg: 'linear-gradient(135deg,#FBF4E4 0%,#E8D3A6 100%)' },
+];
+
+class Component extends DCLogic {
+  state = { tab: 'new', cat: null, bag: 0, best: 0, faq: 0, searchOpen: false, query: '', toast: '' };
+  componentDidMount() { if (!window.WU_STORE) this._p = setInterval(() => { if (window.WU_STORE) { clearInterval(this._p); this.forceUpdate(); } }, 50); }
+  componentWillUnmount() { clearTimeout(this._t); clearInterval(this._p); }
+  add(id) {
+    const p = window.WU_STORE && window.WU_STORE.byId(id);
+    if (!p) return;
+    clearTimeout(this._t);
+    this.setState(s => ({ bag: s.bag + 1, toast: p.title + ' added to cart', searchOpen: false }));
+    this._t = setTimeout(() => this.setState({ toast: '' }), 2400);
+  }
+  scrollToShop() {
+    const el = document.getElementById('shop');
+    if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 20, behavior: 'smooth' });
+  }
+  pickCat(label) { this.setState(s => ({ cat: s.cat === label ? null : label })); this.scrollToShop(); }
+
+  renderVals() {
+    const D = window.WU_STORE;
+    if (!D) return {};
+    const { tab, cat, bag, best, faq, searchOpen, query, toast } = this.state;
+    const layout = this.props.productLayout ?? 'rail';
+    const catMatch = p => p.cat === cat || (cat === 'Wireless Chargers' && p.cat === 'Chargers' && p.id.startsWith('cj')) || (cat === 'Car Chargers' && p.id.startsWith('cc'));
+    const list = cat ? D.products.filter(catMatch) : D.products.filter(p => p.tabs.includes(tab));
+    const withBuy = p => ({ ...p, buy: () => this.add(p.id) });
+    const b = BEST[best];
+    const bp = D.byId(b.pid);
+    const q = query.trim().toLowerCase();
+    const results = (q ? D.products.filter(p => (p.title + ' ' + p.meta + ' ' + p.cat).toLowerCase().includes(q)) : D.products.slice(0, 4))
+      .slice(0, 8).map((p, i) => ({ ...withBuy(p), tag: p.ribbon || p.cat, short: p.title.split(' ')[0], bg: D.media[i % 4] }));
+    return {
+      showUtility: this.props.showUtility ?? true,
+      autoplay: (this.props.heroAutoplay ?? true) ? 5000 : false,
+      utility: D.utility,
+      slides: D.lifestyle,
+      onHeroCta: s => this.add(s.pid),
+      cats: D.cats,
+      activeCat: cat ? D.cats.findIndex(c => c.label === cat) : -1,
+      onCategory: c => this.pickCat(c.label),
+      onShopAll: () => { this.setState({ cat: null }); this.scrollToShop(); },
+      viewAll: e => { e.preventDefault(); this.setState({ cat: null }); this.scrollToShop(); },
+      openSearch: () => this.setState({ searchOpen: true }),
+      closeSearch: () => this.setState({ searchOpen: false }),
+      setQuery: v => this.setState({ query: v }),
+      query, searchOpen,
+      searchLabel: q ? (results.length ? 'Results' : 'No matches') : 'Popular right now',
+      searchResults: results,
+      bagCount: bag,
+      cat,
+      circles: D.circles.map(([label, art]) => ({ label, art, pick: () => this.pickCat(label) })),
+      buyThunder: () => this.add('thunder'),
+      railTitle: cat || TABS.find(t => t[0] === tab)[1],
+      tabs: (cat ? [[null, 'All']] : []).concat(TABS).map(([id, label]) => ({
+        label: id === null ? '× ' + cat : label,
+        active: !cat && id === tab,
+        pick: () => this.setState({ tab: id || tab, cat: null }),
+      })),
+      isRail: layout === 'rail', isGrid: layout === 'grid',
+      railProducts: list.map(withBuy),
+      trust: D.trust,
+      chipsPulse: ['40+ hrs battery', 'IPX7'],
+      chipsSurge: ['Dual mic', 'Noise reduction'],
+      chipsEcho: ['3-in-1', '15W fast'],
+      best: { ...b, meta: bp.meta, price: bp.priceText, was: bp.wasText },
+      bestIdx: best, bestCount: BEST.length,
+      setBest: i => this.setState({ best: i }),
+      buyBest: e => { e.preventDefault(); this.add(b.pid); },
+      faqs: D.faqs.map(([q2, a], i) => ({
+        q: q2, lines: a.split('\n'), open: faq === i, rot: faq === i ? '90deg' : '0deg',
+        border: i === D.faqs.length - 1 ? 'none' : '1px solid #E4E4E4',
+        toggle: () => this.setState(s => ({ faq: s.faq === i ? -1 : i })),
+      })),
+      footer: D.footer,
+      toastOn: !!toast, toast,
+    };
+  }
+}
+</script>
+</body>
+</html>

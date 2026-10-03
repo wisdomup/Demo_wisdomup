@@ -1,0 +1,25 @@
+/* Wisdomup — type tokens */
+:root {
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-display: "Michroma", "Unbounded", "Inter", sans-serif;  /* banner product names only */
+  --fs-utility: 14px; /* @kind font */   --fw-utility: 500; /* @kind font */
+  --fs-cat: 15px; /* @kind font */       --fw-cat: 500; /* @kind font */
+  --fs-section: 22px; /* @kind font */   --fw-section: 800; /* @kind font */
+  --fs-card-title: 15px; /* @kind font */
+  --fs-card-meta: 11px; /* @kind font */
+  --fs-card-price: 17px; /* @kind font */
+  --fs-pdp-title: 28px; /* @kind font */
+  --fs-pdp-price: 36px; /* @kind font */
+  --fs-body: 15px; /* @kind font */
+  --fs-btn-lg: 21px; /* @kind font */
+  --fs-ribbon: 9.5px; /* @kind font */
+  --fs-navy-h: 40px; /* @kind font */
+  --fs-quote: 44px; /* @kind font */
+  --fs-display-hero: 76px; /* @kind font */
+  --fs-promo-name: 38px; /* @kind font */
+
+  /* semantic */
+  --text-section-title: var(--fw-section) var(--fs-section)/1.1 var(--font); /* @kind font */
+  --text-card-title: 700 var(--fs-card-title)/1.2 var(--font); /* @kind font */
+  --text-body-font: 400 var(--fs-body)/1.5 var(--font); /* @kind font */
+}

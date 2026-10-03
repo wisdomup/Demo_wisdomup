@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/base.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/styles/components.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/styles.css">
+  <script src="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/_ds_bundle.js"></script>
+  <script src="./image-slot.js"></script>
+  <style>
+    a { color: #2350C8; text-decoration: none; }
+    a:hover { color: #1B3FA0; }
+  </style>
+</helmet>
+<section aria-roledescription="carousel" onMouseEnter="{{ pause }}" onMouseLeave="{{ resume }}" style="position: relative; height: 100%; min-height: 460px; margin: 0 var(--gutter, 28px); border-radius: 40px; overflow: hidden; background: #151312;">
+  <sc-for list="{{ slides }}" as="s" hint-placeholder-count="1">
+    <div style="position: absolute; inset: 0; opacity: {{ s.op }}; z-index: {{ s.z }}; pointer-events: {{ s.pe }}; transition: opacity 640ms cubic-bezier(.2,.7,.2,1);">
+      <image-slot id="{{ s.slotId }}" shape="rect" src="{{ s.src }}" placeholder="{{ s.hint }}"></image-slot>
+      <div style="position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgba(13,12,11,.82) 0%, rgba(13,12,11,.45) 38%, rgba(13,12,11,0) 66%), linear-gradient(0deg, rgba(13,12,11,.55) 0%, rgba(13,12,11,0) 40%);"></div>
+      <div style="position: absolute; left: clamp(22px, 5vw, 64px); right: clamp(22px, 5vw, 64px); bottom: clamp(56px, 9vh, 96px); max-width: 620px; display: flex; flex-direction: column; gap: 18px; pointer-events: none;">
+        <div style="font: 600 13px/1 var(--font); letter-spacing: .24em; text-transform: uppercase; color: #D8D2CC;">{{ s.kicker }}</div>
+        <div style="font: 400 clamp(48px, 7vw, 96px)/1 var(--font-display); background: var(--grad-gold); -webkit-background-clip: text; background-clip: text; color: transparent;">{{ s.name }}</div>
+        <div style="font: 500 16px/1.5 var(--font); color: #fff; text-wrap: pretty;">{{ s.line }}</div>
+        <div style="display: flex; align-self: flex-start; width: max-content; min-width: 220px; pointer-events: auto; margin-top: 6px;">
+          <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Button" variant="buy" on-click="{{ s.cta }}" hint-size="200px,48px">{{ s.ctaLabel }}</x-import>
+        </div>
+      </div>
+    </div>
+  </sc-for>
+  <div style="position: absolute; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 3; height: 10px; width: 160px;">
+    <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Dots" static="{{ true }}" count="{{ count }}" active="{{ active }}" on-change="{{ setI }}" hint-size="120px,10px" style="display: flex; justify-content: center;"></x-import>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:640},&quot;slides&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;Array&lt;{slotId:string,kicker:string,name:string,line:string,ctaLabel:string,hint:string,src?:string,pid?:string}&gt;&quot;},&quot;autoplay&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:5000,&quot;tsType&quot;:&quot;number|false&quot;,&quot;min&quot;:0,&quot;step&quot;:500,&quot;unit&quot;:&quot;ms&quot;},&quot;onCta&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(slide:any,index:number)=&gt;void&quot;}}">
+class Component extends DCLogic {
+  state = { i: 0 };
+  componentDidMount() {
+    const ms = this.props.autoplay ?? 5000;
+    if (!ms || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    this._t = setInterval(() => {
+      const n = this.list().length;
+      if (!this._hover && n > 1) this.setState(s => ({ i: (s.i + 1) % n }));
+    }, ms);
+  }
+  componentWillUnmount() { clearInterval(this._t); }
+  list() {
+    return this.props.slides || [
+      { slotId: 'hero-demo', kicker: 'Newly launched · Open stereo', name: 'OS-4', line: '40+ Hrs Battery | RGB Lights | IPX7', ctaLabel: 'Shop now · Rs.6,000', hint: 'Lifestyle photo — person wearing OS-4' },
+    ];
+  }
+  renderVals() {
+    const list = this.list();
+    const i = this.state.i % Math.max(list.length, 1);
+    return {
+      slides: list.map((s, k) => Object.assign({}, s, {
+        op: k === i ? 1 : 0, z: k === i ? 1 : 0, pe: k === i ? 'auto' : 'none',
+        cta: () => this.props.onCta && this.props.onCta(s, k),
+      })),
+      count: list.length,
+      active: i,
+      setI: v => this.setState({ i: v }),
+      pause: () => { this._hover = true; },
+      resume: () => { this._hover = false; },
+    };
+  }
+}
+</script>
+</body>
+</html>

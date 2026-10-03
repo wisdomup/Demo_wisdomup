@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/base.css">
+  <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/styles/components.css">
+  <script src="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/_ds_bundle.js"></script>
+</helmet>
+<header class="nav" style="position: fixed; top: {{ top }}px; left: calc(var(--gutter, 28px) + 20px); right: calc(var(--gutter, 28px) + 20px); z-index: 40; height: 70px; padding: 0 10px 0 34px; gap: 34px; background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; isolation: isolate; transform: {{ shift }}; transition: transform 320ms cubic-bezier(.2,.7,.2,1);">
+  <div aria-hidden="true" style="position: absolute; inset: 0; z-index: -1; border-radius: 999px; background: rgba(208,210,210,.4); backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%); pointer-events: none;"></div>
+  <a href="#" onClick="{{ logoClick }}" aria-label="WisdomUp home" style="display: flex; align-items: center; flex: none;">
+    <img src="img/wu-logo.png" alt="WisdomUp" style="height: 43px; width: auto; display: block;">
+  </a>
+  <nav aria-label="Categories" style="flex: 1; display: flex; justify-content: center; align-items: center; gap: {{ gap }}px; min-width: 0; overflow: hidden;">
+    <sc-for list="{{ items }}" as="c" hint-placeholder-count="8">
+      <button class="navbtn" aria-expanded="{{ c.expanded }}" aria-label="{{ c.label }}" onClick="{{ c.pick }}" style="height: 50px; min-width: 50px;">
+        <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Icon" name="{{ c.icon }}" size="{{ 31 }}" style="width: 31px; height: 31px;" hint-size="31px,31px"></x-import>
+        <span>{{ c.label }}</span>
+      </button>
+    </sc-for>
+  </nav>
+  <div style="display: flex; align-items: center; gap: 8px; flex: none;">
+    <button class="navbtn navbtn--all" onClick="{{ shopAll }}" style="height: 50px; padding: 0 21px 0 13px; gap: 8px; margin-right: 5px; font-weight: 500; font-size: 17px; background: rgba(150,150,150,.35);">
+      <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Icon" name="grid" size="{{ 29 }}" style="width: 29px; height: 29px;" hint-size="29px,29px"></x-import>
+      <span>Shop All</span>
+    </button>
+    <button class="navbtn navbtn--util" aria-label="Search" onClick="{{ search }}" style="height: 50px; min-width: 50px;">
+      <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Icon" name="search" size="{{ 29 }}" style="width: 29px; height: 29px;" hint-size="29px,29px"></x-import>
+    </button>
+    <button class="navbtn navbtn--util" aria-label="Account" onClick="{{ account }}" style="height: 50px; min-width: 50px;">
+      <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Icon" name="user" size="{{ 29 }}" style="width: 29px; height: 29px;" hint-size="29px,29px"></x-import>
+    </button>
+    <button class="navbtn navbtn--util" aria-label="Cart" onClick="{{ bag }}" style="position: relative; height: 50px; min-width: 50px;">
+      <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Icon" name="bag" size="{{ 29 }}" style="width: 29px; height: 29px;" hint-size="29px,29px"></x-import>
+      <sc-if value="{{ hasBadge }}" hint-placeholder-val="{{ false }}">
+        <b style="position: absolute; top: 4px; right: 2px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 999px; background: var(--accent-red, #E3312D); color: #fff; font: 700 10px/16px var(--font); box-sizing: border-box;">{{ bagCount }}</b>
+      </sc-if>
+    </button>
+  </div>
+</header>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:140},&quot;active&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string | null&quot;},&quot;bagCount&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:2,&quot;tsType&quot;:&quot;number&quot;},&quot;startTop&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:20,&quot;tsType&quot;:&quot;number&quot;},&quot;onCategory&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(c, i) =&gt; void&quot;},&quot;onShopAll&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;() =&gt; void&quot;},&quot;onSearch&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;() =&gt; void&quot;},&quot;onAccount&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;() =&gt; void&quot;},&quot;onBag&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;() =&gt; void&quot;},&quot;onLogo&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;() =&gt; void&quot;}}">
+const CATS = [
+  { icon: 'buds', label: 'Earbuds' }, { icon: 'phones', label: 'Headphones' }, { icon: 'speaker', label: 'Speakers' },
+  { icon: 'cable', label: 'Neckbands' }, { icon: 'watch', label: 'Smart Watches' }, { icon: 'bank', label: 'Power Banks' },
+  { icon: 'plug', label: 'Chargers' }, { icon: 'mic', label: 'Microphones' },
+];
+
+class Component extends DCLogic {
+  state = { y: 0, w: 1440, hidden: false };
+  componentDidMount() {
+    this._last = window.scrollY;
+    this._s = () => {
+      const y = window.scrollY, d = y - this._last;
+      let hidden = this.state.hidden;
+      if (y < 120) hidden = false;
+      else if (d > 6) hidden = true;
+      else if (d < -6) hidden = false;
+      if (Math.abs(d) > 6 || y < 120) this._last = y;
+      if (hidden !== this.state.hidden) window.dispatchEvent(new CustomEvent('wu-nav', { detail: { hidden } }));
+      this.setState({ y, w: window.innerWidth, hidden });
+    };
+    window.addEventListener('scroll', this._s, { passive: true });
+    window.addEventListener('resize', this._s);
+    this._s();
+  }
+  componentWillUnmount() { window.removeEventListener('scroll', this._s); window.removeEventListener('resize', this._s); }
+  renderVals() {
+    const p = this.props;
+    const start = p.startTop ?? 20;
+    const active = p.active ?? null;
+    const bagCount = p.bagCount ?? 0;
+    const call = (fn, ...a) => e => { if (e && e.preventDefault) e.preventDefault(); fn && fn(...a); };
+    const w = this.state.w;
+    const count = w >= 1240 ? 8 : w >= 1080 ? 6 : w >= 940 ? 4 : 0;
+    return {
+      gap: w >= 1360 ? 13 : 5,
+      top: Math.max(16, start - this.state.y),
+      shift: this.state.hidden ? 'translateY(calc(-100% - 40px))' : 'none',
+      items: CATS.slice(0, count).map((c, i) => ({ ...c, expanded: c.label === active ? 'true' : 'false', pick: call(p.onCategory, c, i) })),
+      shopAll: call(p.onShopAll), search: call(p.onSearch), account: call(p.onAccount), bag: call(p.onBag), logoClick: call(p.onLogo),
+      bagCount, hasBadge: bagCount > 0,
+    };
+  }
+}
+</script>
+</body>
+</html>
