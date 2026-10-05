@@ -218,10 +218,17 @@
   if (bl) bl.innerHTML = POSTS.map((p, i) => postCard(p, i === 0)).join('');
   const ar = $('article');
   if (ar) {
-    const slug = location.hash.slice(1);
+    const slug = new URLSearchParams(location.search).get('p') || location.hash.slice(1); // ?p=slug (old #slug links still work)
     const p = POSTS.find(x => x.slug === slug) || POSTS[0];
-    document.title = p.title + ' | WisdomUp Blog';
-    document.querySelector('meta[name="description"]').setAttribute('content', p.excerpt);
+    WU.seo({
+      title: p.title + ' | WisdomUp Blog', description: p.excerpt, path: url.article(p.slug), type: 'article',
+      image: (p.products || []).map(id => (D.byId(id) || {}).src).filter(Boolean)[0],
+      ld: [
+        { '@context': 'https://schema.org', '@type': 'Article', headline: p.title, description: p.excerpt, articleSection: p.cat, mainEntityOfPage: WU.abs(url.article(p.slug)),
+          author: { '@type': 'Organization', name: 'WisdomUp' }, publisher: { '@type': 'Organization', name: 'WisdomUp', logo: { '@type': 'ImageObject', url: WU.abs('img/wu-logo.png') } } },
+        WU.ldCrumbs([['Home', url.home], ['Blog', url.blog], [p.title, url.article(p.slug)]]),
+      ],
+    });
     $('crumb-title').textContent = p.title;
     ar.innerHTML = `
       <header class="article__head"><span class="eyebrow">${esc(p.cat)}</span><h1>${esc(p.title)}</h1><span class="meta-line">${esc(p.date)} · ${p.mins} min read · WisdomUp team</span></header>

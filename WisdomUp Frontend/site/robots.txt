@@ -1,0 +1,12 @@
+# WisdomUp — written by tools/build_seo.py
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin.html
+# Sorted / faceted copies of category pages (their canonical is the plain category address)
+Disallow: /*sort=
+Disallow: /*price=
+Disallow: /*conn=
+Disallow: /*feat=
+
+Sitemap: https://wisdomup.pk/sitemap.xml

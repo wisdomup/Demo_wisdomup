@@ -19,7 +19,7 @@
     home: 'index.html',
     live: 'live.html',
     products: 'products.html',
-    cat: c => 'products.html#' + slug(c),
+    cat: c => 'products.html?cat=' + c, // a real address per category, so Google can index each one (old #cat-… links still work)
     dept: d => 'products.html?dept=' + d,
     filter: f => 'products.html?filter=' + f,
     product: id => 'product.html?id=' + encodeURIComponent(id),
@@ -29,7 +29,7 @@
     about: 'about.html',
     where: 'where-to-buy.html',
     blog: 'blog.html',
-    article: slug => 'article.html#' + slug,
+    article: slug => 'article.html?p=' + slug, // a real address per post (old #slug links still work)
     help: 'help.html',
     track: 'track.html',
     returns: 'returns.html',
@@ -100,6 +100,57 @@
   /* ---------- Cart: line items (sku + qty) kept on this device. Prices always come from the catalogue,
      and the order server recomputes them again, so a stale or edited cart can never change what is charged. ---------- */
   const SHOP = window.WU_SHOP || { freeDeliveryFrom: 40000, maxQty: 10, giftWrap: 490, delivery: { standard: { fee: 250, freeOver: true } } };
+  /* ---------- SEO: one place sets the tab title, description, canonical link, social preview and structured data.
+     Static pages get these tags in their HTML from tools/build_seo.py; pages built from the catalogue (a category,
+     a product, a blog post) call WU.seo() to describe themselves. Addresses always use the live domain (SHOP.siteUrl),
+     so the demo and local copies point search engines at the real site. ---------- */
+  const SITE = String(SHOP.siteUrl || location.origin + '/').replace(/\/?$/, '/');
+  const abs = path => new URL(path || '', SITE).href;
+  const YEAR = new Date().getFullYear();
+  const clip = (t, n) => { t = String(t || '').replace(/\s+/g, ' ').trim(); return t.length <= n ? t : t.slice(0, t.lastIndexOf(' ', n - 1)).replace(/[\s,;:—–-]+$/, '') + '…'; };
+  function seo({ title, description, path, image, type = 'website', noindex = false, ld, extra = {} } = {}) {
+    const head = document.head;
+    const tag = (sel, make, attr, val) => { let el = head.querySelector(sel); if (!el) { el = make(); head.append(el); } el.setAttribute(attr, val); };
+    const meta = (key, val, prop) => tag(`meta[${prop ? 'property' : 'name'}="${key}"]`, () => { const m = document.createElement('meta'); m.setAttribute(prop ? 'property' : 'name', key); return m; }, 'content', val);
+    if (title) document.title = title;
+    if (description) meta('description', clip(description, 160));
+    meta('robots', noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large');
+    if (path !== undefined) {
+      tag('link[rel="canonical"]', () => { const l = document.createElement('link'); l.rel = 'canonical'; return l; }, 'href', abs(path));
+      meta('og:url', abs(path), true);
+    }
+    meta('og:type', type, true);
+    meta('og:site_name', 'WisdomUp', true);
+    meta('og:locale', 'en_PK', true);
+    if (title) { meta('og:title', title.replace(/\s*\|\s*WisdomUp.*$/, ''), true); meta('twitter:title', title.replace(/\s*\|\s*WisdomUp.*$/, '')); }
+    if (description) { meta('og:description', clip(description, 200), true); meta('twitter:description', clip(description, 200)); }
+    const img = abs(image || 'img/og-default.jpg');
+    meta('og:image', img, true);
+    meta('twitter:image', img);
+    meta('twitter:card', 'summary_large_image');
+    Object.entries(extra).forEach(([k, v]) => meta(k, String(v), true));
+    if (ld) {
+      head.querySelectorAll('script[data-seo-ld]').forEach(n => n.remove());
+      [].concat(ld).filter(Boolean).forEach(o => { const sc = document.createElement('script'); sc.type = 'application/ld+json'; sc.dataset.seoLd = ''; sc.textContent = JSON.stringify(o); head.append(sc); });
+    }
+  }
+  // Structured-data helpers (schema.org)
+  const ldCrumbs = items => ({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: items.map(([name, path], i) => ({ '@type': 'ListItem', position: i + 1, name, item: abs(path) })) });
+  const ldFaq = items => items && items.length ? { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: items.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: String(a).replace(/\n/g, ' ') } })) } : null;
+
+  /* ---------- Meta (Facebook) Pixel. Off until SHOP.facebookPixelId holds your Pixel ID (digits only, in shop.js).
+     Sends the standard shop events: PageView, ViewContent, Search, AddToCart, AddToWishlist, InitiateCheckout,
+     Purchase and Lead — with product ids (sku), value and currency, so ads and catalogue matching work. ---------- */
+  const PIXEL_ID = /^\d{8,20}$/.test(String(SHOP.facebookPixelId || '').trim()) ? String(SHOP.facebookPixelId).trim() : '';
+  if (PIXEL_ID && !window.fbq) {
+    /* eslint-disable */
+    !function (f, b, e, v, n, t, s) { if (f.fbq) return; n = f.fbq = function () { n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments); }; if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0'; n.queue = []; t = b.createElement(e); t.async = !0; t.src = v; s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s); }(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+    /* eslint-enable */
+    window.fbq('init', PIXEL_ID);
+    window.fbq('track', 'PageView');
+  }
+  const px = (event, data, opts) => { if (PIXEL_ID && window.fbq) window.fbq('track', event, data || {}, opts); };
+  const pxItem = (p, sku, qty = 1) => { const v = (skuIndex[sku] || {}).v || {}; const price = v.price || p.price; return { content_ids: [sku || p.code], content_name: p.title, content_category: p.cat, content_type: 'product', contents: [{ id: sku || p.code, quantity: qty, item_price: price }], value: price * qty, currency: 'PKR' }; };
   const skuIndex = {};
   D.products.forEach(p => (p.variants.length ? p.variants : [{ sku: p.code, attrs: {}, price: p.price, thumb: p.thumb, bg: p.bg, ar: p.ar }])
     .forEach(v => { skuIndex[v.sku] = { p, v }; }));
@@ -133,6 +184,7 @@
     if (line) line.qty = Math.min(SHOP.maxQty, line.qty + n);
     else cart.push({ sku, qty: Math.min(SHOP.maxQty, n) });
     saveCart();
+    px('AddToCart', pxItem(p, sku, n));
     const attrs = Object.values(skuIndex[sku].v.attrs || {});
     toast(`${n > 1 ? n + ' × ' : ''}${p.code}${attrs.length ? ' (' + attrs.join(', ') + ')' : ''} added to cart`);
     if (opts.open && cartUI) cartUI.open();
@@ -204,6 +256,7 @@
     const on = !wished(id);
     wish = on ? wish.concat(id) : wish.filter(x => x !== id);
     store.set('wu-wish', wish);
+    if (on) px('AddToWishlist', pxItem(p, defaultSku(p)));
     paintWish();
     toast(on ? 'Saved to your wishlist' : 'Removed from your wishlist', heartSvg(18, on));
     window.dispatchEvent(new CustomEvent('wu-wish', { detail: { id, on } }));
@@ -272,6 +325,98 @@
     }
     paintBadge();
     paintWish();
+    mountNavEdge();
+  }
+  // Edge light: one rainbow arc glides clockwise round a pill's 1px edge (the nav, and the stuck filter capsule). Speed, length and colours are copied from
+  // the "Memory Updated" card on clickup.com/lp/brain — a conic gradient spun once every 4s whose lit arc covers ~40% of
+  // the border (short orange head, then magenta, blue, and a fade-out tail). Their card is nearly square, so a plain
+  // conic gradient works there; our bar is long and thin, so the same colours are placed by distance along the edge
+  // (the gradient's angles are recomputed each frame) — the light keeps one steady speed instead of racing at the ends.
+  const EDGE_LAP = 4000; // ms per lap on average (ClickUp: 4s linear infinite)
+  // Speed only: the light moves like a spring being drawn forward — it stretches ahead, eases, stretches again — and
+  // it NEVER runs backwards or bounces. A steady drift carries 35% of the pace; the other 65% arrives as a soft pull
+  // every 2s, smoothed twice (a low-pass, then a critically damped spring — both can only move forward), so the speed
+  // swells to ~1.9x the average and relaxes to ~0.4x with no jolt at either end. Average: still one lap per 4s.
+  // Colours, arc length and the 1px line are untouched.
+  const EDGE_PULL = 2000, EDGE_SHARE = .65; // ms between pulls; share of the pace that comes from the pulls
+  const EDGE_FREQ = 4, EDGE_SOFT = 5;       // spring frequency (rad/s, critically damped); low-pass rate (1/s)
+  const EDGE_STOPS = [   // [share of the edge behind the head, r, g, b, alpha] — ClickUp's conic stops as fractions of a turn
+    [0, 237, 95, 0, .09], [.035, 237, 95, 0, 1], [.168, 255, 2, 240, 1], [.3004, 0, 145, 255, 1], [.3993, 0, 145, 255, 0], [1, 237, 95, 0, .09],
+  ];
+  const edgeColor = u => {
+    let i = 1;
+    while (i < EDGE_STOPS.length - 1 && u > EDGE_STOPS[i][0]) i++;
+    const A = EDGE_STOPS[i - 1], B = EDGE_STOPS[i], t = (u - A[0]) / (B[0] - A[0]), a = A[4] + (B[4] - A[4]) * t;
+    const ch = k => a > 0 ? Math.round((A[k] * A[4] + (B[k] * B[4] - A[k] * A[4]) * t) / a) : B[k]; // premultiplied, like CSS
+    return `rgba(${ch(1)},${ch(2)},${ch(3)},${a.toFixed(3)})`;
+  };
+  // Every pill that carries the light: host element → { el: its .wu-edge ring, on: () => should it glow now }
+  const edges = new Map();
+  function addEdge(host, on) {
+    if (!host || reduced()) return;
+    let el = [...host.children].find(c => c.classList.contains('wu-edge'));
+    if (!el) { host.insertAdjacentHTML('beforeend', '<span class="wu-edge" aria-hidden="true"></span>'); el = host.lastElementChild; }
+    edges.set(host, { el, on });
+  }
+  const mountNavEdge = () => addEdge(nav, () => !navHidden);
+  function runEdges() {
+    if (reduced()) return;
+    const SAMPLES = 96;
+    // Point on the pill outline at distance d, clockwise from the left end of the top edge
+    const at = (d, h, line, arc) => {
+      const r = h / 2;
+      if (d < line) return [r + d, 0];
+      if (d < line + arc) { const t = (d - line) / r; return [r + line + r * Math.sin(t), r - r * Math.cos(t)]; }
+      if (d < 2 * line + arc) return [r + line - (d - line - arc), h];
+      const t = (d - 2 * line - arc) / r;
+      return [r - r * Math.sin(t), r + r * Math.cos(t)];
+    };
+    const paint = (el, w, h, lap) => {
+        const line = Math.max(0, w - h), arc = Math.PI * h / 2, total = 2 * line + 2 * arc;
+        const wrap = q => (q % total + total) % total;
+        const head = lap * total; // head's distance, clockwise from the top centre
+        const qs = EDGE_STOPS.map(st => wrap(head - st[0] * total)); // exact colour points…
+        for (let i = 0; i < SAMPLES; i++) qs.push(i * total / SAMPLES); // …plus even samples so angles follow the outline
+        qs.sort((a, b) => a - b);
+        let prev = 0;
+        const stops = qs.map((q, i) => {
+          const [x, y] = at(wrap(q + line / 2), h, line, arc);
+          let deg = i ? Math.atan2(x - w / 2, h / 2 - y) * 180 / Math.PI : 0; // the first point is the top centre = 0deg
+          if (deg < 0) deg += 360;
+          // Angles must never run backwards: a rounding error at the top-centre seam would otherwise put a stop at
+          // 360deg/0deg out of order and CSS would collapse the whole ring to one colour.
+          if (deg < prev) deg = prev - deg > 180 ? 360 : prev;
+          prev = deg;
+          return `${edgeColor(wrap(head - q) / total)} ${deg.toFixed(2)}deg`;
+        });
+        stops.push(`${edgeColor(head / total)} 360deg`);
+        el.style.backgroundImage = `conic-gradient(from 0deg at 50% 50%, ${stops.join(',')})`;
+    };
+    let pos = 0, vel = 0, soft = 0, last = 0; // head position (laps), speed (laps/s), smoothed target (laps)
+    const goal = now => { // where the pull wants the head: a steady drift plus a step every EDGE_PULL
+      const perMs = 1 / EDGE_LAP;
+      return now * perMs * (1 - EDGE_SHARE) + Math.floor(now / EDGE_PULL) * EDGE_PULL * perMs * EDGE_SHARE;
+    };
+    const step = now => {
+      const target = goal(now), dt = (now - last) / 1000;
+      last = now;
+      if (!(dt > 0) || dt > .25) { pos = soft = target; vel = 0; } // first frame / tab was in the background: no catching up
+      else for (let rem = dt; rem > 0; rem -= .004) {              // small fixed steps keep it stable at any frame rate
+        const h = Math.min(rem, .004);
+        soft += (target - soft) * Math.min(1, EDGE_SOFT * h);
+        vel += (-EDGE_FREQ * EDGE_FREQ * (pos - soft) - 2 * EDGE_FREQ * vel) * h; // damping ratio 1: no overshoot, ever
+        pos += vel * h;
+      }
+      const lap = (pos % 1 + 1) % 1;
+      edges.forEach(({ el, on }, host) => {
+        if (!host.isConnected || !el.isConnected) { edges.delete(host); return; }
+        if (!on()) return;
+        const w = host.offsetWidth, h = host.offsetHeight;
+        if (w && h) paint(el, w, h, lap);
+      });
+      requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
   }
   function setActiveCat(label) {
     if (label === activeCat) return;
@@ -337,9 +482,17 @@
     else if (d < -6) navHidden = false;
     if (Math.abs(d) > 6 || y < 120) lastY = y;
     // Priority bar: hold the nav back until there is room for it above the bar (nav bottom + 6px gap)
-    held = !!priorityBar() && barNatural() < top + nav.offsetHeight + 6;
+    const pb = priorityBar();
+    held = !!pb && barNatural() < top + nav.offsetHeight + 6;
+    if (pb) {
+      // .is-stuck = the bar has left its place. Sticky bars (product tabs): pinned at the top. In-flow bars (All Products
+      // filters): scrolled completely out of view plus a little more — their floating twin then drops in; the two
+      // thresholds stop it flickering when you hover around that point.
+      const nat = barNatural(), was = pb.classList.contains('is-stuck');
+      pb.classList.toggle('is-stuck', getComputedStyle(pb).position === 'sticky' ? nat < barStuckTop() - .5 : nat + pb.offsetHeight < (was ? -24 : -48));
+    }
     if (held) navHidden = true;
-    if (toTop) toTop.classList.toggle('is-on', held && y > innerHeight * .8);
+    if (toTop) toTop.classList.toggle('is-on', y > innerHeight * .8); // back-to-top on every page once you're a screen down
     nav.style.top = top + 'px';
     nav.style.transform = navHidden ? 'translateY(calc(-100% - 40px))' : 'none';
     toneNav();
@@ -405,6 +558,8 @@
     const open = () => { host.hidden = false; document.documentElement.style.overflow = 'hidden'; paint(); setTimeout(() => input.focus(), 30); };
     const close = () => { host.hidden = true; document.documentElement.style.overflow = ''; };
     input.addEventListener('input', paint);
+    let sentQ = ''; // tell the pixel what was searched, once per finished query
+    input.addEventListener('change', () => { const q = input.value.trim(); if (q.length > 1 && q !== sentQ) { sentQ = q; px('Search', { search_string: q }); } });
     input.addEventListener('keydown', e => { if (e.key === 'Enter') { const a = grid.querySelector('a') || pagesEl.querySelector('a'); if (a) location.href = a.href; } });
     host.addEventListener('click', e => { if (e.target === host || e.target.closest('.search__close')) close(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && !host.hidden) close(); });
@@ -549,7 +704,21 @@
   }
 
   /* ---------- Accordion (FAQ pattern: one open at a time) ---------- */
-  function mountAccordion(listEl, items, { first = -1, idPrefix = 'acc' } = {}) {
+  const faqSeen = [];
+  // FAQ lists written straight into a page's HTML ([data-faq-ld]) get the same structured data
+  function faqFromPage() {
+    const items = [...document.querySelectorAll('[data-faq-ld] .faq__item')].map(it => [(it.querySelector('.faq__q span') || {}).textContent, (it.querySelector('.faq__a') || {}).textContent]).filter(x => x[0] && x[1]).map(x => x.map(t => t.replace(/\s+/g, ' ').trim()));
+    if (!items.length || [...document.querySelectorAll('script[type="application/ld+json"]')].some(n => n.textContent.includes('"FAQPage"'))) return;
+    const sc = document.createElement('script'); sc.type = 'application/ld+json'; sc.dataset.faqLd = ''; sc.textContent = JSON.stringify(ldFaq(items)); document.head.append(sc);
+  }
+  function mountAccordion(listEl, items, { first = -1, idPrefix = 'acc', ldReset = false } = {}) {
+    if (ldReset) faqSeen.length = 0; // a page that swaps its FAQ (the listing's buying guide) starts its FAQ data afresh
+    // Structured data so Google can show these questions under the search result (one FAQPage per page)
+    if (items.length && ![...document.querySelectorAll('script[type="application/ld+json"]:not([data-faq-ld])')].some(n => n.textContent.includes('"FAQPage"'))) {
+      items.forEach(it => { if (!faqSeen.some(x => x[0] === it[0])) faqSeen.push(it); });
+      document.head.querySelectorAll('script[data-faq-ld]').forEach(n => n.remove());
+      const sc = document.createElement('script'); sc.type = 'application/ld+json'; sc.dataset.faqLd = ''; sc.textContent = JSON.stringify(ldFaq(faqSeen)); document.head.append(sc);
+    }
     listEl.innerHTML = items.map(([q, a], i) => `
       <div class="faq__item">
         <button type="button" class="faq__q" aria-expanded="${i === first}" aria-controls="${idPrefix}-a${i}"><span>${esc(q)}</span><span class="faq__chev">${icon('chev-r', 18)}</span></button>
@@ -632,7 +801,7 @@
     // With a priority bar, anything at or below it lands under the stuck bar (the nav is hidden there)
     if (priorityBar()) {
       const natural = barNatural() + window.scrollY, stuck = barStuckTop();
-      if (el === pBar) { window.scrollTo({ top: natural - stuck, behavior: reduced() ? 'auto' : 'smooth' }); return; }
+      if (el === pBar) { window.scrollTo({ top: natural - (stuck || 12), behavior: reduced() ? 'auto' : 'smooth' }); return; } // in-flow bars land 12px below the top
       const t = el.getBoundingClientRect().top + window.scrollY;
       if (t >= natural) { window.scrollTo({ top: t - stuck - pBar.offsetHeight - extra, behavior: reduced() ? 'auto' : 'smooth' }); return; }
     }
@@ -736,6 +905,10 @@
     cartUI = mountCart();
     initMotion();
     mountToTop();
+    runEdges();
+    faqFromPage();
+    // A floating capsule ([data-edge], e.g. the All Products filters' twin) glows only while its bar is away
+    document.querySelectorAll('[data-edge]').forEach(cap => addEdge(cap, () => !!pBar && pBar.classList.contains('is-stuck')));
     if (nav) nav.addEventListener('click', e => {
       const a = e.target.closest('[data-act]');
       if (!a) return;
@@ -926,14 +1099,20 @@
       if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
       else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
     });
-    // Swipe the panel left to close
-    drawer.addEventListener('touchstart', e => { sx = e.touches[0].clientX; dx = 0; }, { passive: true });
+    // Swipe the panel left to close — only for a clearly sideways swipe. Vertical scrolling, and swipes
+    // that start on a sideways-scrolling row (tiles, chips), never move the panel.
+    let sy = null, axis = null;
+    const scrollsX = el => { for (let n = el; n && n !== drawer; n = n.parentElement) if (n.scrollWidth > n.clientWidth + 1 && /auto|scroll/.test(getComputedStyle(n).overflowX)) return true; return false; };
+    drawer.addEventListener('touchstart', e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; dx = 0; axis = scrollsX(e.target) ? 'y' : null; }, { passive: true });
     drawer.addEventListener('touchmove', e => {
-      if (sx == null) return;
-      dx = Math.min(0, e.touches[0].clientX - sx);
-      if (dx < -6) { drawer.classList.add('is-dragging'); drawer.style.transform = `translateX(${dx}px)`; }
+      if (sx == null || axis === 'y') return;
+      const mx = e.touches[0].clientX - sx, my = e.touches[0].clientY - sy;
+      if (!axis) { if (Math.abs(mx) < 10 && Math.abs(my) < 10) return; axis = Math.abs(mx) > Math.abs(my) * 1.5 ? 'x' : 'y'; if (axis === 'y') return; }
+      dx = Math.min(0, mx);
+      drawer.classList.add('is-dragging'); drawer.style.transform = `translateX(${dx}px)`;
     }, { passive: true });
-    drawer.addEventListener('touchend', () => { drawer.classList.remove('is-dragging'); if (dx < -70) close(); else drawer.style.transform = ''; sx = null; });
+    drawer.addEventListener('touchend', () => { drawer.classList.remove('is-dragging'); if (axis === 'x' && dx < -70) close(); else drawer.style.transform = ''; sx = null; axis = null; dx = 0; });
+    drawer.addEventListener('touchcancel', () => { drawer.classList.remove('is-dragging'); drawer.style.transform = ''; sx = null; axis = null; dx = 0; });
     window.addEventListener('resize', () => { if (!drawer.hidden && vw() >= 640 && !document.querySelector('[data-act="menu"]')?.offsetParent) close(); });
     return { open, close };
   }
@@ -946,5 +1125,6 @@
     productCard, colorsOf, photoBg, photoFit, ratingOf, reviewsOf, seedOf, mountRail, mountHero, mountAccordion, DEPTS, typeLabel,
     initChrome, placeNav, setActiveCat, navOffset, scrollToEl,
     openSearch: () => search && search.open(),
+    seo, abs, clip, ldCrumbs, ldFaq, px, pxItem, YEAR, SITE,
   };
 })();

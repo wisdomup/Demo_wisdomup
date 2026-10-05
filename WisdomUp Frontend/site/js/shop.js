@@ -1,7 +1,11 @@
 // WisdomUp shop settings — read by the website (cart, checkout) AND by the order server (api/orders.py),
 // so prices, fees and payment options can never disagree. Keep this file valid JSON after the "=".
+// siteUrl = the live address (used for canonical links, the sitemap and social previews; re-run tools/build_seo.py after
+// changing it). facebookPixelId = your Meta Pixel ID (digits only); leave "" to keep the pixel switched off.
 window.WU_SHOP = {
   "currency": "PKR",
+  "siteUrl": "https://wisdomup.pk/",
+  "facebookPixelId": "",
   "freeDeliveryFrom": 40000,
   "delivery": {
     "standard": { "label": "Standard delivery", "eta": "3–5 working days", "fee": 250, "freeOver": true },

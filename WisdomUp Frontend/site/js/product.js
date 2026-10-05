@@ -73,19 +73,26 @@
   const available = (axis, val) => V.some(v => v.attrs[axis] === val && p.axes.every(k => k === axis || v.attrs[k] === V[cur].attrs[k]));
   const images = V.map(v => v.img).filter((x, i, a) => x && a.indexOf(x) === i);
 
-  document.querySelector('meta[name="description"]').setAttribute('content', `${p.title}: ${parts.join(', ')}. ${p.priceText} in Pakistan with Cash on Delivery, warranty and nationwide delivery from WisdomUp.`);
-  document.title = `${p.title} — Price in Pakistan | WisdomUp`;
-  // Structured data for search results (price in PKR, availability)
-  const ld = document.createElement('script');
-  ld.type = 'application/ld+json';
-  ld.textContent = JSON.stringify({
-    '@context': 'https://schema.org', '@type': 'Product', name: p.title, sku: V[cur].sku, brand: { '@type': 'Brand', name: 'WisdomUp' },
-    image: images.map(i => new URL(i, location.href).href), description: DESC, category: p.cat,
-    offers: V.length > 1
-      ? { '@type': 'AggregateOffer', priceCurrency: 'PKR', lowPrice: Math.min(...V.map(v => v.price)), highPrice: Math.max(...V.map(v => v.price)), offerCount: V.length, availability: 'https://schema.org/InStock' }
-      : { '@type': 'Offer', priceCurrency: 'PKR', price: V[0].price, availability: 'https://schema.org/InStock' },
+  // ---- SEO: title, description, canonical address, social preview and structured data for this product ----
+  const canon = url.product(p.id);
+  const stock = p.soldOut ? 'OutOfStock' : 'InStock';
+  const offerBase = { priceCurrency: 'PKR', availability: 'https://schema.org/' + stock, itemCondition: 'https://schema.org/NewCondition', url: WU.abs(canon), seller: { '@type': 'Organization', name: 'WisdomUp' },
+    hasMerchantReturnPolicy: { '@type': 'MerchantReturnPolicy', applicableCountry: 'PK', returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow', merchantReturnDays: 7 } };
+  WU.seo({
+    title: `${p.title} Price in Pakistan | WisdomUp`,
+    description: `Buy the WisdomUp ${p.title} in Pakistan ${V.length > 1 ? 'from' : 'for'} ${WU.D.rs(Math.min(...V.map(v => v.price)))}: ${parts.join(', ')}. Cash on Delivery, 7-day money-back guarantee and brand warranty.`,
+    path: canon, image: images[0] || p.src, type: 'product',
+    extra: { 'product:brand': 'WisdomUp', 'product:price:amount': V[cur].price, 'product:price:currency': 'PKR', 'product:availability': p.soldOut ? 'out of stock' : 'in stock', 'product:condition': 'new', 'product:retailer_item_id': V[cur].sku },
+    ld: [
+      { '@context': 'https://schema.org', '@type': 'Product', name: `WisdomUp ${p.title}`, sku: V[cur].sku, mpn: p.code, brand: { '@type': 'Brand', name: 'WisdomUp' },
+        image: images.map(i => WU.abs(i)), description: DESC, category: p.cat, url: WU.abs(canon),
+        offers: V.length > 1
+          ? { '@type': 'AggregateOffer', lowPrice: Math.min(...V.map(v => v.price)), highPrice: Math.max(...V.map(v => v.price)), offerCount: V.length, ...offerBase }
+          : { '@type': 'Offer', price: V[0].price, ...offerBase } },
+      WU.ldCrumbs([['Home', url.home], [dept.label, url.dept(dept.id)], [typeLabel(p.type), url.cat(p.type)], [p.title, canon]]),
+    ],
   });
-  document.head.append(ld);
+  WU.px('ViewContent', WU.pxItem(p, V[cur].sku));
 
   /* ---------- Markup ---------- */
   const colours = colorsOf(p);
@@ -160,6 +167,13 @@
     <section class="split pdsec" id="pd-faqs" aria-labelledby="fq-h">
       <h2 class="grad-h" id="fq-h">FAQs</h2>
       <div><div class="panel-list" id="pd-faq-list"></div><p class="meta-line" style="margin: 14px 0 0;">More answers in the <a href="${url.help}">Help Center</a> · <a href="${url.manuals}">e-Manuals</a></p></div>
+    </section>
+
+    <!-- Price and delivery summary in plain words (what people search: "<product> price in Pakistan") -->
+    <section class="seo-lite pd-seo" aria-labelledby="pk-h">
+      <h2 id="pk-h">${esc(p.title)} price in Pakistan</h2>
+      <p>The WisdomUp ${esc(p.title)} costs ${V.length > 1 ? 'from ' : ''}${esc(WU.D.rs(Math.min(...V.map(v => v.price))))} in Pakistan. Order online with Cash on Delivery, JazzCash, EasyPaisa or bank transfer — we deliver to Karachi, Lahore, Islamabad, Rawalpindi, Faisalabad, Multan, Peshawar, Quetta and every other city in ${esc(WU.SHOP.delivery.standard.eta)} (express: ${esc(WU.SHOP.delivery.express.eta)}). Every order has a 7-day money-back guarantee and WisdomUp brand warranty.</p>
+      <nav class="policy__links seo-lite__links" aria-label="More from this category"><a href="${url.cat(p.type)}">All ${esc(typeLabel(p.type))}</a><a href="${url.dept(dept.id)}">${esc(dept.label)}</a><a href="${url.shipping}">Shipping</a><a href="${url.returns}">Returns</a><a href="${url.warranty}">Warranty</a></nav>
     </section>
 
     <div class="rail-wrap" id="related"></div>

@@ -19,7 +19,7 @@ a.promo:focus-visible { outline: 2px solid #2350C8; outline-offset: 4px; }
 a.ccard, a.ccard:hover { display: block; color: inherit; text-decoration: none; }
 a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset: 3px; }
 .footer-wrap .footer a[href="#"] { cursor: default; }
-.site-nav a.navbtn[aria-current="true"] { background: rgba(255,255,255,.28); gap: 8px; }
+.site-nav a.navbtn[aria-current="true"] { gap: 8px; }
 .site-nav a.navbtn[aria-current="true"] span { max-width: 140px; }
 
 /* Search overlay polish (DS .search / .scrim) */
@@ -57,6 +57,12 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
 .seo-lite { margin: var(--sec) var(--gutter, 28px) 0; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
 .seo-lite h2 { margin: 0; max-width: 28em; font: 700 clamp(20px, 2.2vw, 28px)/1.3 var(--font); color: #273F85; text-wrap: balance; }
 .seo-lite p { margin: 0; max-width: 78ch; font: 400 16px/1.7 var(--font); color: #464646; text-wrap: pretty; }
+.seo-lite__more { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.seo-lite__more[hidden] { display: none; }
+.seo-lite__rest { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.seo-lite__h { margin: 14px 0 0; font: 700 18px/1.3 var(--font); color: #172248; }
+.seo-lite__faq { width: min(100%, 860px); text-align: left; }
+.seo-lite__links { justify-content: center; }
 
 /* ==========================================================================
    All Products
@@ -237,11 +243,7 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
 /* Nav icons follow the surface underneath, like the logo: white over dark, ink over light.
    Colour only animates once the first tone is applied (.is-toned), so there is no flash on load. */
 .site-nav.is-toned .navbtn, .site-nav.is-toned .site-nav__icon, .site-nav.is-toned svg, .site-nav.is-toned svg * { transition: color 320ms cubic-bezier(.2,.7,.2,1), fill 320ms cubic-bezier(.2,.7,.2,1), stroke 320ms cubic-bezier(.2,.7,.2,1); }
-.site-nav:not(.on-dark) a.navbtn, .site-nav:not(.on-dark) .navbtn, .site-nav:not(.on-dark) .site-nav__icon { color: #1F2633; }
-.site-nav:not(.on-dark) svg[fill="#fff"], .site-nav:not(.on-dark) svg [fill="#fff"] { fill: #1F2633; }
-.site-nav:not(.on-dark) svg[stroke="#fff"], .site-nav:not(.on-dark) svg [stroke="#fff"] { stroke: #1F2633; }
-.site-nav:not(.on-dark) .navbtn svg { filter: none; }
-.site-nav:not(.on-dark) .navbtn:hover, .site-nav:not(.on-dark) a.navbtn[aria-current="true"] { background: rgba(31,38,51,.08); }
+/* (The nav is smoked glass on every background now — icons stay white; see home.css) */
 
 /* ==========================================================================
    All Products — compact page banner (every screen size; replaces the hero carousel).
@@ -286,36 +288,68 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
 .mview { display: none; }
 
 /* Listing header (Zenni-style): breadcrumb → title → one-line blurb → pills → count + sort */
-.mhead { display: flex; flex-direction: column; gap: 10px; margin: 20px var(--gutter, 12px) 0; padding-bottom: 18px; border-bottom: 1px solid var(--line, #E4E4E4); }
-.mcrumbs { display: flex; align-items: center; gap: 12px; font: 500 16px/1 var(--font); color: #111; }
-.mcrumbs a { display: inline-flex; color: #464646; }
+/* Listing header — one centred stack that leads the eye down to the centred filter capsule:
+   small quiet breadcrumb → big title → one-line blurb (read more) → capsule → grid toolbar (count left, sort right). */
+.mhead { display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 22px var(--gutter, 12px) 0; padding-bottom: 10px; text-align: center; }
+.mcrumbs { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 8px; max-width: 100%; font: 500 13px/1 var(--font); letter-spacing: .01em; color: var(--muted); }
+.mcrumbs a { display: inline-flex; color: var(--muted); }
 .mcrumbs a:hover { color: #172248; }
-.mcrumbs__sep { color: #464646; flex: none; }
-.mcrumbs #mcrumbs-tail { display: inline-flex; align-items: center; gap: 12px; min-width: 0; }
-.mcrumbs #mcrumbs-tail a { color: #111; text-decoration: underline; text-underline-offset: 4px; }
-.mcrumbs b { font-weight: 700; color: #111; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.mtitle { margin: 6px 0 0; font: 800 24px/1.2 var(--font); letter-spacing: -.01em; color: #111; }
-.mdesc { margin: 0; display: flex; align-items: baseline; gap: 6px; font: 400 15px/1.5 var(--font); color: #464646; }
-.mdesc__t { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mcrumbs a svg { width: 16px; height: 16px; }
+.mcrumbs__sep { width: 12px; height: 12px; color: #B4B9C3; flex: none; }
+.mcrumbs #mcrumbs-tail { display: contents; } /* its links and arrows wrap as part of the one centred row */
+.mcrumbs #mcrumbs-tail a { color: var(--muted); text-decoration: none; }
+.mcrumbs #mcrumbs-tail a:hover { color: #172248; text-decoration: underline; text-underline-offset: 3px; }
+.mcrumbs #mcrumbs-tail svg { width: 12px; height: 12px; color: #B4B9C3; flex: none; }
+.mcrumbs b { max-width: 100%; font-weight: 600; color: #111; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mtitle { margin: 2px 0 0; font: 800 clamp(28px, 7.4vw, 34px)/1.1 var(--font); letter-spacing: -.02em; color: #111; text-wrap: balance; }
+.mdesc { margin: 0; display: flex; align-items: baseline; justify-content: center; gap: 6px; width: 100%; max-width: 640px; font: 400 15px/1.5 var(--font); color: #5E6A82; }
+.mdesc__t { flex: 0 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mdesc.is-open { display: block; }
 .mdesc.is-open .mdesc__t { white-space: normal; }
-.mdesc__more { flex: none; padding: 6px 0; border: 0; background: none; font: 500 15px/1 var(--font); color: #111; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.mdesc__more { flex: none; padding: 6px 0; border: 0; background: none; font: 600 14px/1 var(--font); color: #111; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .mdesc.is-open .mdesc__more { margin-left: 6px; }
-.mbar { position: sticky; top: 0; z-index: 6; display: block; padding: 14px 0; background: rgba(255,255,255,.92); backdrop-filter: blur(16px) saturate(140%); -webkit-backdrop-filter: blur(16px) saturate(140%); border-bottom: 1px solid var(--line, #E4E4E4); transition: top 320ms cubic-bezier(.2,.7,.2,1); }
-.mbar.is-up { top: 0; }
-.mbar__pills { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; padding: 0 var(--gutter, 12px); scroll-padding-inline: var(--gutter, 12px); }
+/* Filter bar — a capsule of chips, the same component as the product page's section tabs (.pdtabs).
+   In the page (.mbar): the tabs' exact look and sizes — light grey glass capsule 48px tall (8px padding, 4px gaps),
+   32px chips with 12px/600 text and 13px side padding, the chosen filter as a white pill. It is NOT sticky: it scrolls
+   away with the page like everything else.
+   Floating twin (.mfloat): once the capsule has scrolled fully out of view (+ a little more; placeNav in common.js sets
+   .is-stuck on .mbar) the twin drops in smoothly from above the screen to the nav's spot, wearing the nav's skin at the
+   nav's height (56px at 16px from the top; phones 43px at 10px) — dark glass, 0.5px hairline, edge light (shared in
+   home.css). Scrolling back, it slides out upward just before the original comes back into view. Nothing ever snaps. */
+.mbar { position: relative; z-index: 6; display: flex; align-items: center; justify-content: center; height: 56px; margin-top: 8px; padding: 0 var(--gutter, 12px); pointer-events: none; }
+.mfloat { position: fixed; top: 16px; left: 0; right: 0; z-index: 38; display: flex; justify-content: center; padding: 0 var(--gutter, 12px); pointer-events: none; transform: translateY(calc(-100% - 48px)); visibility: hidden; transition: transform 320ms cubic-bezier(.4,0,.7,.2), visibility 0s linear 320ms; }
+.mbar.is-stuck + .mfloat { transform: none; visibility: visible; transition: transform 560ms cubic-bezier(.16,.84,.3,1), visibility 0s; }
+.mbar__cap { position: relative; pointer-events: auto; max-width: 100%; box-sizing: border-box; padding: 8px; border-radius: 999px; background: rgba(208,212,212,.62); backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%); box-shadow: 0 10px 24px rgba(0,0,0,.08); }
+.mbar__pills { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; border-radius: 999px; }
 .mbar__pills::-webkit-scrollbar { display: none; }
-.fbtn--dd { gap: 6px; padding: 0 12px 0 16px; }
-.fbtn--dd.is-set { background: #172248; border-color: #172248; color: #fff; }
-.mcount { display: flex; align-items: center; gap: 12px; margin: 0 var(--gutter, 12px); padding: 12px 0 4px; font: 400 15px/1.3 var(--font); color: #464646; }
-.mcount__n { margin-left: auto; font: 500 14px/1 var(--font); color: var(--muted); white-space: nowrap; }
+/* A sideways-scrolling row also clips vertically — 6px of spare room keeps focus rings and the white pill's shadow from being cut */
+:is(.mbar, .mfloat) .mbar__pills { padding: 6px; margin: -6px; gap: 4px; }
+:is(.mbar, .mfloat) .fbtn { position: relative; height: 32px; min-width: 0; padding: 0 13px; gap: 6px; border: 0; background: transparent; box-shadow: none; color: var(--ink, #464646); font: 600 12px/1 var(--font); letter-spacing: .01em; }
+:is(.mbar, .mfloat) .fbtn.fbtn:not(.fbtn--dd) { padding: 0 13px 0 11px; }
+:is(.mbar, .mfloat) .fbtn svg { width: 15px; height: 15px; }
+:is(.mbar, .mfloat) .fbtn::after { content: ""; position: absolute; inset: -4px 0; } /* keeps a 40px tap area */
+.mbar .fbtn:active { background: rgba(255,255,255,.5); }
+.mbar .fbtn--dd.is-set { background: #fff; box-shadow: var(--shadow-soft); color: var(--ink, #464646); }
+:is(.mbar, .mfloat) .fbtn__n { min-width: 16px; height: 16px; padding: 0 4px; font: 700 10px/16px var(--font); }
+/* The floating twin: nav height, nav skin */
+.mfloat .mbar__cap { padding: 12px; }
+.mfloat .fbtn { color: #fff; }
+.mfloat .fbtn:active { background: rgba(255,255,255,.14); }
+.mfloat .fbtn--dd.is-set { background: #fff; box-shadow: none; color: #172248; }
+.mfloat .fbtn__n { background: #fff; color: #172248; }
+/* Chips wider than the capsule (small phones, long filter names): fade the ends so the cut-off reads as scrollable */
+:is(.mbar, .mfloat) .mbar__pills.is-scroll { -webkit-mask: linear-gradient(90deg, transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%); mask: linear-gradient(90deg, transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%); }
+/* Grid toolbar: how many on the left, how they're ordered (and per-row toggle on phones) on the right */
+.mcount { display: flex; align-items: center; gap: 8px; margin: 0 var(--gutter, 12px); padding: 10px 0 4px; font: 400 15px/1.3 var(--font); color: #464646; }
+.mcount__n { margin-right: auto; font: 500 14px/1 var(--font); color: var(--muted); white-space: nowrap; }
+.mcount__n b { font-weight: 700; color: #111; }
 /* Sort dropdown (popover under the button, ✓ on the active option) */
 .msort { position: relative; }
 .msort__btn { display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 2px; border: 0; background: none; font: 500 15px/1 var(--font); color: var(--muted); cursor: pointer; }
 .msort__cur { font-weight: 700; color: #111; max-width: 46vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .msort__btn svg { color: #111; transition: transform 240ms cubic-bezier(.2,.7,.2,1); }
 .msort__btn[aria-expanded="true"] svg { transform: rotate(180deg); }
-.msort__list { position: absolute; left: 0; top: calc(100% + 6px); z-index: 20; min-width: 248px; margin: 0; padding: 8px; list-style: none; border-radius: 22px; background: #F2F2F2; box-shadow: 0 18px 40px rgba(0,0,0,.16); transform-origin: top left; animation: msort-in 200ms cubic-bezier(.2,.7,.2,1); }
+.msort__list { position: absolute; right: 0; top: calc(100% + 6px); z-index: 20; min-width: 248px; margin: 0; padding: 8px; list-style: none; border-radius: 22px; background: #F2F2F2; box-shadow: 0 18px 40px rgba(0,0,0,.16); transform-origin: top right; animation: msort-in 200ms cubic-bezier(.2,.7,.2,1); }
 .msort__list[hidden] { display: none; }
 .msort__list:focus { outline: none; } /* keyboard position is shown by the highlighted option */
 @keyframes msort-in { from { opacity: 0; transform: scale(.96) translateY(-4px); } }
@@ -329,8 +363,8 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
 .mview__b { width: 40px; height: 40px; border: 0; border-radius: 10px; background: none; color: #8B8B8B; display: grid; place-items: center; cursor: pointer; transition: background-color 180ms ease, color 180ms ease; }
 .mview__b[aria-pressed="true"] { background: #EDEEF0; color: #111; }
 .mview__b:focus-visible { outline: 2px solid #2350C8; outline-offset: 2px; }
-.fbtn { flex: none; display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 18px 0 14px; border: 1.5px solid #111; border-radius: 999px; background: #fff; color: #111; font: 700 15px/1 var(--font); cursor: pointer; transition: background-color 180ms ease, transform 160ms ease; }
-.fbtn:active { transform: scale(.97); background: #F3F3F3; }
+.fbtn { flex: none; display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 18px 0 14px; border: 1.5px solid #111; border-radius: 999px; background: #fff; color: #111; font: 700 15px/1 var(--font); cursor: pointer; transition: none; }
+.fbtn:active { background: #F3F3F3; }
 .fbtn:focus-visible { outline: 2px solid #2350C8; outline-offset: 3px; }
 .fbtn__n { min-width: 20px; height: 20px; padding: 0 6px; box-sizing: border-box; border-radius: 999px; background: #172248; color: #fff; font: 700 11px/20px var(--font); text-align: center; }
 
@@ -384,18 +418,20 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
 
 /* Wider screens: same components, roomier sizes */
 @media (min-width: 640px) {
-  .mhead { margin: 28px var(--gutter, 28px) 0; gap: 12px; padding-bottom: 22px; }
-  .mtitle { font-size: clamp(28px, 3vw, 40px); }
-  .mdesc { max-width: 980px; font-size: 16px; }
-  .mdesc__more { font-size: 16px; }
-  .mbar { padding: 16px 0; }
-  .mbar__pills { padding: 0 var(--gutter, 28px); scroll-padding-inline: var(--gutter, 28px); }
+  .mhead { margin: 34px var(--gutter, 28px) 0; gap: 12px; padding-bottom: 14px; }
+  .mtitle { font-size: clamp(34px, 3.4vw, 48px); }
+  .mdesc { max-width: 720px; font-size: 16px; }
+  .mdesc__more { font-size: 15px; }
+  .mbar { padding: 0 var(--gutter, 28px); }
   .mcount { margin: 0 var(--gutter, 28px); padding-top: 14px; }
   .msort__cur { max-width: none; }
   .fdrawer { width: 400px; }
 }
 @media (max-width: 639px) {
-  .mbar { top: 0; }
+  /* Phones: 48px row; the floating twin is the phone nav's 43px at the nav's 10px */
+  .mbar { height: 48px; margin-top: 6px; padding: 0 8px; }
+  .mfloat { top: 10px; padding: 0 8px; }
+  .mfloat .mbar__cap { padding: 5.5px; }
   .mview { display: flex; }
 
   .mgrid-band { margin-top: 14px; padding: 14px var(--gutter, 12px) 20px; }

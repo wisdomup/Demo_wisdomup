@@ -67,7 +67,7 @@
 /* Filter pills: outlined, navy when a filter is set */
 .fbtn { gap: var(--gap-2); border-width: 1px; border-color: var(--ctl-ink); color: var(--ctl-ink); }
 .fbtn:not(.fbtn--dd) { padding: 0 var(--ctl-pad) 0 11px; }
-.fbtn--dd { gap: 6px; padding: 0 12px 0 var(--ctl-pad); }
+.fbtn--dd { gap: 6px; padding: 0 var(--ctl-pad); }
 .fbtn--dd.is-set { background: var(--ctl-ink); border-color: var(--ctl-ink); }
 .fbtn svg { width: 18px; height: 18px; }
 .search__pages a { border-width: 1px; }
@@ -105,7 +105,6 @@
 .qty output { min-width: 28px; font: 700 15px/1 var(--font); }
 
 /* ---------- Bars — 56px (40px control + 8px padding), like the nav pill ---------- */
-.mbar { padding: var(--gap-2) 0; }
 .search__field { height: var(--bar); }
 .hsearch { height: var(--bar); }
 .newsletter, .footer-wrap .newsletter { height: var(--bar); padding: 0 var(--gap-2) 0 20px; }
@@ -191,3 +190,24 @@ button.link-arrow { height: var(--ctl); padding: 0; border: 0; background: none;
   box-shadow: 0 4px 20px rgba(70, 70, 70, .15);
 }
 .buybar::before { display: none; }
+
+/* ---------- Chips are 20% smaller than buttons (requested 2026-10-06) ----------
+   40px → 32px tall, 16px → 13px side padding, 14px → 12px text (11.2px rounded up so it stays readable).
+   Applies to every chip: home quick chips, product section tabs, series chips, form choice chips,
+   Help topic chips, policy link chips, search page chips and the menu's quick chips.
+   Buttons, filter pills and product option pickers stay 40px. */
+:root { --chip: 32px; --chip-pad: 13px; --chip-font: 600 12px/1 var(--font); }
+.chip, .quick .chip, .series .chip, .pdtabs .chip, .bk-chips .chip, .policy__links a, .search__pages a, .mnav__chip {
+  height: var(--chip); padding: 0 var(--chip-pad); font: var(--chip-font); letter-spacing: var(--ctl-track);
+}
+/* Quick chips: the product photo shrinks with the chip (32px → 26px, 3px inside the pill) */
+.quick .chip { padding: 0 var(--chip-pad) 0 3px; }
+.quick__art { width: 26px; height: 26px; }
+.quick__in { gap: 6px; }
+/* The chip strip above the hero hugs the smaller chips (8px shorter; the hero itself is unchanged) */
+.quick { height: 64px; }
+@media (max-width: 639px) { .quick { height: 56px; } }
+/* Product section tabs bar: 32px chips + 8px padding = 48px */
+/* Smaller chips keep a comfortable 40px tap area */
+.chip, .policy__links a, .search__pages a, .mnav__chip { position: relative; }
+.chip::after, .policy__links a::after, .search__pages a::after, .mnav__chip::after { content: ""; position: absolute; inset: -4px 0; }

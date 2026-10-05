@@ -25,6 +25,8 @@
   function checkout() {
     const form = $('ck-form');
     let delivery = 'standard', payment = 'cod', busy = false;
+    // Pixel: someone with a cart reached checkout
+    if (cart.count()) WU.px('InitiateCheckout', { content_ids: cart.lines().map(l => l.sku), contents: cart.lines().map(l => ({ id: l.sku, quantity: l.qty, item_price: l.price })), content_type: 'product', num_items: cart.count(), value: cart.totals().subtotal, currency: 'PKR' });
 
     const deliveryFee = key => { const t = cart.totals(key); return t.delivery; };
     function paintOptions() {
@@ -162,6 +164,12 @@
       return;
     }
     document.title = `Order ${o.number} confirmed | WisdomUp`;
+    // Pixel: a purchase, sent once per order (a refresh of this page must not count it twice). No customer details are sent.
+    const sent = store.get('wu-px-orders', []);
+    if (!sent.includes(o.number)) {
+      WU.px('Purchase', { content_ids: o.items.map(l => l.sku), contents: o.items.map(l => ({ id: l.sku, quantity: l.qty, item_price: l.price })), content_type: 'product', num_items: o.items.reduce((n, l) => n + l.qty, 0), value: o.totals.total, currency: 'PKR' }, { eventID: o.number });
+      store.set('wu-px-orders', sent.concat(o.number).slice(-30));
+    }
     const pay = SHOP.payments[o.payment] || { label: o.payment };
     const transfer = o.payment !== 'cod';
     const account = pay.accountNumber ? `<div class="kv"><b>Account title</b><span>${esc(pay.accountTitle)}</span><b>${o.payment === 'bank' ? 'IBAN' : 'Account number'}</b><span>${esc(pay.accountNumber || pay.iban)}</span>${pay.bank ? `<b>Bank</b><span>${esc(pay.bank)}</span>` : ''}<b>Amount</b><span>${esc(rs(o.totals.total))}</span><b>Reference</b><span>${esc(o.number)}</span></div>`

@@ -3,8 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>All Products — Earbuds, Chargers, Cables, Speakers & More | WisdomUp</title>
-<meta name="description" content="Shop every WisdomUp product in Pakistan: wireless earbuds, neckbands, headphones, speakers, chargers, power banks, cables, car holders, computer accessories, storage and grooming. Cash on Delivery and brand warranty.">
+<!-- SEO:start (written by tools/build_seo.py — edit that file, not this block) -->
+<title>Mobile Accessories Online in Pakistan — Prices 2026 | WisdomUp</title>
+<meta name="description" content="Shop every WisdomUp product in Pakistan: earbuds, neckbands, handsfree, headphones, speakers, chargers, power banks, cables and car holders. Cash on Delivery.">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="canonical" href="https://wisdomup.pk/products.html">
+<meta property="og:site_name" content="WisdomUp">
+<meta property="og:locale" content="en_PK">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Mobile Accessories Online in Pakistan — Prices 2026">
+<meta property="og:description" content="Shop every WisdomUp product in Pakistan: earbuds, neckbands, handsfree, headphones, speakers, chargers, power banks, cables and car holders. Cash on Delivery.">
+<meta property="og:url" content="https://wisdomup.pk/products.html">
+<meta property="og:image" content="https://wisdomup.pk/img/og-default.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Mobile Accessories Online in Pakistan — Prices 2026">
+<meta name="twitter:description" content="Shop every WisdomUp product in Pakistan: earbuds, neckbands, handsfree, headphones, speakers, chargers, power banks, cables and car holders. Cash on Delivery.">
+<meta name="twitter:image" content="https://wisdomup.pk/img/og-default.jpg">
+<!-- SEO:end -->
 <link rel="icon" href="img/wu-logo.png">
 <link rel="stylesheet" href="css/ds/tokens/fonts.css">
 <link rel="stylesheet" href="css/ds/tokens/colors.css">
@@ -48,22 +65,28 @@
     <p class="mdesc" id="mdesc"><span class="mdesc__t" id="mdesc-t"></span><button type="button" class="mdesc__more" id="mdesc-more" aria-expanded="false">read more</button></p>
   </div>
   <div class="mbar" id="mbar" data-sticky-offset data-priority-bar>
+    <div class="mbar__cap">
     <div class="mbar__pills">
       <button type="button" class="fbtn" id="open-filters" aria-haspopup="dialog" aria-controls="fdrawer" aria-expanded="false">
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M2.5 5h12l-4.6 5.8v5.6l-2.8 1.8v-7.4z" fill="currentColor"/><path d="M17 6.5h4.5M17 11.5h4.5M13.5 16.5h8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
         <span>Filters</span><b class="fbtn__n" id="fbtn-n" hidden></b>
       </button>
-      <button type="button" class="fbtn fbtn--dd" data-open="fsec-cat" id="pill-cat" aria-haspopup="dialog"><span>Category</span><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 9.5l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      <button type="button" class="fbtn fbtn--dd" data-open="fsec-show" id="pill-show" aria-haspopup="dialog"><span>Show</span><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 9.5l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      <button type="button" class="fbtn fbtn--dd" data-open="fsec-price" id="pill-sort" aria-haspopup="dialog"><span>Price</span><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 9.5l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button type="button" class="fbtn fbtn--dd" data-open="fsec-cat" id="pill-cat" aria-haspopup="dialog"><span>Category</span></button>
+      <button type="button" class="fbtn fbtn--dd" data-open="fsec-show" id="pill-show" aria-haspopup="dialog"><span>Show</span></button>
+      <button type="button" class="fbtn fbtn--dd" data-open="fsec-price" id="pill-sort" aria-haspopup="dialog"><span>Price</span></button>
+    </div>
     </div>
   </div>
+  <!-- Floating twin of the filter capsule. The capsule above scrolls away with the page; once it is fully out of view
+       this one drops in from the top (and slides back out before the original returns). Its chips are copies made by
+       products.js that pass clicks to the real ones, so it is hidden from assistive tech and the tab order. -->
+  <div class="mfloat" id="mfloat" aria-hidden="true"><div class="mbar__cap" data-edge><div class="mbar__pills"></div></div></div>
   <div class="mcount">
+    <span class="mcount__n" id="mbar-info" aria-live="polite"></span>
     <div class="msort" id="msort">
       <button type="button" class="msort__btn" id="msort-btn" aria-haspopup="listbox" aria-expanded="false" aria-controls="msort-list">Sort <span class="msort__cur" id="msort-label"></span><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 9.5l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <ul class="msort__list" id="msort-list" role="listbox" aria-label="Sort products" tabindex="-1" hidden></ul>
     </div>
-    <span class="mcount__n" id="mbar-info" aria-live="polite"></span>
     <div class="mview" role="group" aria-label="Products per row">
       <button type="button" class="mview__b" data-cols="1" aria-pressed="false" aria-label="1 product per row"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="6" y="3.5" width="12" height="17" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
       <button type="button" class="mview__b" data-cols="2" aria-pressed="true" aria-label="2 products per row"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
@@ -75,10 +98,19 @@
 
   <div class="trust-wrap" id="trust"></div>
 
-  <section class="seo-lite" aria-labelledby="seo-h">
-    <div class="eyebrow">The full WisdomUp range</div>
-    <h2 id="seo-h">Earbuds, chargers, cables, speakers and more — all in one place</h2>
-    <p>Browse every WisdomUp product sold in Pakistan: true wireless and open-ear earbuds, neckbands and handsfree, headphones, Bluetooth and party speakers, wall and car chargers, power banks, fast-charging cables and adapters, car phone holders, keyboards and mice, memory cards and grooming tools. Every order ships nationwide with Cash on Delivery, JazzCash, EasyPaisa or bank transfer, backed by brand warranty and a 7-day money-back guarantee.</p>
+  <!-- Buying guide for the category on show (copy from js/seo-content.js, painted by products.js) -->
+  <section class="seo-lite" id="seo-guide" aria-labelledby="seo-h">
+    <div class="eyebrow">Buying guide</div>
+    <h2 id="seo-h">Mobile accessories in Pakistan</h2>
+    <p id="seo-lead"></p>
+    <div class="seo-lite__more" id="seo-more-wrap" hidden>
+      <div class="seo-lite__rest" id="seo-rest"></div>
+      <h3 class="seo-lite__h" id="seo-faq-h">Common questions</h3>
+      <div class="seo-lite__faq" id="seo-faq-wrap"></div>
+      <h3 class="seo-lite__h">Related categories</h3>
+      <nav class="policy__links seo-lite__links" id="seo-links" aria-label="Related categories"></nav>
+    </div>
+    <button type="button" class="seo__toggle" id="seo-guide-toggle" aria-expanded="false" aria-controls="seo-more-wrap"><span class="seo__toggle-t">Read more</span><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 9.5l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   </section>
 
   <div class="footer-wrap" id="footer"></div>
@@ -127,6 +159,7 @@
 <script src="js/wu-data.js"></script>
 <script src="js/ds-icons.js"></script>
 <script src="js/shop.js"></script>
+<script src="js/seo-content.js"></script>
 <script src="js/common.js"></script>
 <script src="js/products.js"></script>
 </body>

@@ -103,6 +103,32 @@
     $('show-more').textContent = `Show ${Math.min(PAGE, left)} more`;
     WU.paintWish();
   }
+  /* ---------- Buying guide under the grid: the category's copy, common questions and related categories.
+     One short paragraph shows; the rest opens with "Read more" (never hidden from people — only folded). ---------- */
+  let guideKey = null;
+  function paintGuide(key, entry, fill, d) {
+    if (!$('seo-guide') || key === guideKey) return;
+    guideKey = key;
+    $('seo-h').textContent = entry.guide || entry.h1 || entry.name;
+    $('seo-lead').textContent = fill(entry.intro[0]);
+    $('seo-rest').innerHTML = entry.intro.slice(1).map(t => `<p>${esc(fill(t))}</p>`).join('');
+    const faqs = (entry.faqs || []).map(([q, a]) => [fill(q), fill(a)]);
+    $('seo-faq-h').hidden = !faqs.length;
+    $('seo-faq-wrap').innerHTML = '<div class="panel-list" id="seo-faq"></div>'; // fresh node each time: no stacked click handlers
+    if (faqs.length) WU.mountAccordion($('seo-faq'), faqs, { idPrefix: 'seofaq', ldReset: true });
+    // Related categories: links between sibling categories help people and search engines find the whole range
+    const K = window.WU_SEO || {}, nm = t => ((K.types || {})[t] || {}).name || typeLabel(t);
+    const links = state.cat && d ? d.types.filter(t => t !== state.cat && CATS.includes(t)).map(t => [nm(t), url.cat(t)]).concat([[`All ${d.label}`, url.dept(d.id)]])
+      : state.dept && d ? d.types.filter(t => CATS.includes(t)).map(t => [nm(t), url.cat(t)])
+      : DEPTS.map(x => [((K.depts || {})[x.id] || {}).name || x.label, url.dept(x.id)]);
+    $('seo-links').innerHTML = links.map(([t, h]) => `<a href="${h}">${esc(t)}</a>`).join('');
+  }
+  if ($('seo-guide-toggle')) $('seo-guide-toggle').addEventListener('click', e => {
+    const b = e.currentTarget, more = $('seo-more-wrap'), open = more.hidden;
+    more.hidden = !open;
+    b.setAttribute('aria-expanded', open);
+    b.querySelector('.seo__toggle-t').textContent = open ? 'Read less' : 'Read more';
+  });
   function render() {
     all = order(matching(state), state.sort);
     shown = PAGE;
@@ -112,12 +138,32 @@
     const n = activeCount(state);
     $('fbtn-n').hidden = !n;
     $('fbtn-n').textContent = n;
-    $('mbar-info').textContent = `${total} ${total === 1 ? 'item' : 'items'}`;
+    $('mbar-info').innerHTML = `<b>${total}</b> ${total === 1 ? 'item' : 'items'}`;
     const scope = scopeLabel(state);
     const d = state.cat ? deptOf(state.cat) : state.dept ? DEPTS.find(x => x.id === state.dept) : null;
-    $('mtitle').textContent = scope ? `Shop ${scope.toLowerCase()}` : state.filter ? `Shop ${FILTERS[state.filter].label.toLowerCase()}` : 'Shop all products';
-    $('mdesc-t').textContent = d ? DEPT_COPY[d.id] : ALL_COPY;
-    document.title = (scope ? `${scope} — Price in Pakistan` : 'All Products — Earbuds, Chargers, Cables, Speakers & More') + ' | WisdomUp';
+    // ---- SEO: this view describes itself to Google — title, H1, description, canonical address, structured data.
+    //      The wording lives in js/seo-content.js; counts and prices are filled in from the live catalogue. ----
+    const K = window.WU_SEO || {};
+    const pure = !state.cat && !state.dept && !!state.filter && !state.price && !state.conns.length && !state.feats.length; // a plain New / Best sellers page
+    const entry = (state.cat ? (K.types || {})[state.cat] : state.dept ? (K.depts || {})[state.dept] : pure ? (K.filters || {})[state.filter] : K.all) || { name: scope || 'All Products', intro: [d ? DEPT_COPY[d.id] : ALL_COPY], faqs: [] };
+    const scopeItems = D.products.filter(p => inScope(p, state) && (!pure || FILTERS[state.filter].test(p)));
+    const prices = scopeItems.map(p => p.price);
+    const fill = t => String(t || '').replace(/\{n\}/g, scopeItems.length).replace(/\{min\}/g, prices.length ? D.rs(Math.min(...prices)) : '').replace(/\{max\}/g, prices.length ? D.rs(Math.max(...prices)) : '').replace(/\{year\}/g, WU.YEAR);
+    const h1 = entry.h1 || (state.cat ? `${entry.name} Price in Pakistan` : `${entry.name} in Pakistan`);
+    const path = state.cat ? url.cat(state.cat) : state.dept ? url.dept(state.dept) : pure ? url.filter(state.filter) : url.products;
+    $('mtitle').textContent = h1;
+    $('mdesc-t').textContent = fill(entry.intro[0]);
+    WU.seo({
+      title: entry.title ? fill(entry.title) : state.cat ? `${entry.name} Price in Pakistan ${WU.YEAR} | WisdomUp` : `${entry.name} in Pakistan — Prices ${WU.YEAR} | WisdomUp`,
+      description: fill(entry.intro[0]),
+      path, // extra filters and sorting keep the category's own address as the canonical one
+      image: all[0] && all[0].src,
+      ld: [
+        WU.ldCrumbs([['Home', url.home], ['All Products', url.products]].concat(d && state.cat ? [[d.label, url.dept(d.id)]] : []).concat(path !== url.products ? [[entry.name, path]] : [])),
+        { '@context': 'https://schema.org', '@type': 'ItemList', name: h1, numberOfItems: all.length, itemListElement: all.slice(0, PAGE).map((p, i) => ({ '@type': 'ListItem', position: i + 1, name: p.title, url: WU.abs(url.product(p.id)) })) },
+      ],
+    });
+    paintGuide(path, entry, fill, d);
     // Breadcrumb: All Products › Department › Type · filters
     const crumbs = [];
     if (d && state.cat) crumbs.push(`<a href="${url.dept(d.id)}">${esc(d.label)}</a>`);
@@ -130,6 +176,8 @@
     pill('pill-show', state.filter ? FILTERS[state.filter].label : 'Show', !!state.filter);
     pill('pill-sort', state.price ? PRICES[state.price].label : 'Price', !!state.price);
     $('msort-label').textContent = SORTS[state.sort];
+    syncFloat();
+    markPillScroll();
     paintSortList();
     spy();
   }
@@ -140,6 +188,25 @@
     const next = $('mgrid').children[first];
     if (next) { const a = next.querySelector('.wpc__title a'); if (a) a.focus({ preventScroll: true }); }
   });
+
+  // Floating twin of the filter capsule (#mfloat): copies of the chips that pass clicks to the real ones.
+  // Copies carry no ids / ARIA and never take focus — keyboard and screen-reader users use the real chips.
+  const mfloat = $('mfloat');
+  const syncFloat = () => {
+    mfloat.querySelector('.mbar__pills').innerHTML = [...document.querySelectorAll('#mbar .fbtn')].map(b => {
+      const c = b.cloneNode(true);
+      c.dataset.proxy = b.id;
+      ['id', 'aria-controls', 'aria-expanded', 'aria-haspopup', 'data-open'].forEach(k => c.removeAttribute(k));
+      c.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
+      c.tabIndex = -1;
+      return c.outerHTML;
+    }).join('');
+  };
+  mfloat.addEventListener('mousedown', e => e.preventDefault()); // a click must not move focus onto a copy
+  mfloat.addEventListener('click', e => { const b = e.target.closest('[data-proxy]'); if (b) $(b.dataset.proxy).click(); });
+  // Flag a chip row that is wider than its capsule, so its ends can fade
+  const markPillScroll = () => document.querySelectorAll('.mbar__pills').forEach(p => p.classList.toggle('is-scroll', p.scrollWidth > p.clientWidth + 1));
+  window.addEventListener('resize', markPillScroll);
 
   /* ---------- Site nav: highlight the filtered category once scrolled ---------- */
   const spy = () => setActiveCat(window.scrollY > 200 ? state.cat : null);
@@ -273,7 +340,7 @@
     Object.assign(state, copyState(draft));
     history.replaceState(null, '', location.pathname + location.search);
     syncUrl(); render();
-    closeDrawer(() => { scrollToEl($('mbar'), 0); openBtn.focus(); });
+    closeDrawer(() => { scrollToEl($('mbar'), 0); openBtn.focus({ preventScroll: true }); });
   });
   // Keyboard: Escape closes, Tab stays inside the panel
   drawer.addEventListener('keydown', e => {
@@ -285,19 +352,20 @@
     if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
     else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
   });
-  // Touch: swipe the panel left to close it
-  let sx = null, dx = 0;
-  drawer.addEventListener('touchstart', e => { sx = e.touches[0].clientX; dx = 0; }, { passive: true });
+  // Swipe the panel left to close — only for a clearly sideways swipe. Vertical scrolling, and swipes
+  // that start on a sideways-scrolling row (tiles, chips), never move the panel.
+  let sx = null, sy = null, dx = 0, axis = null;
+  const scrollsX = el => { for (let n = el; n && n !== drawer; n = n.parentElement) if (n.scrollWidth > n.clientWidth + 1 && /auto|scroll/.test(getComputedStyle(n).overflowX)) return true; return false; };
+  drawer.addEventListener('touchstart', e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; dx = 0; axis = scrollsX(e.target) ? 'y' : null; }, { passive: true });
   drawer.addEventListener('touchmove', e => {
-    if (sx == null) return;
-    dx = Math.min(0, e.touches[0].clientX - sx);
-    if (dx < -6) { drawer.classList.add('is-dragging'); drawer.style.transform = `translateX(${dx}px)`; }
+    if (sx == null || axis === 'y') return;
+    const mx = e.touches[0].clientX - sx, my = e.touches[0].clientY - sy;
+    if (!axis) { if (Math.abs(mx) < 10 && Math.abs(my) < 10) return; axis = Math.abs(mx) > Math.abs(my) * 1.5 ? 'x' : 'y'; if (axis === 'y') return; }
+    dx = Math.min(0, mx);
+    drawer.classList.add('is-dragging'); drawer.style.transform = `translateX(${dx}px)`;
   }, { passive: true });
-  drawer.addEventListener('touchend', () => {
-    drawer.classList.remove('is-dragging');
-    if (dx < -70) closeDrawer(); else drawer.style.transform = '';
-    sx = null;
-  });
+  drawer.addEventListener('touchend', () => { drawer.classList.remove('is-dragging'); if (axis === 'x' && dx < -70) closeDrawer(); else drawer.style.transform = ''; sx = null; axis = null; dx = 0; });
+  drawer.addEventListener('touchcancel', () => { drawer.classList.remove('is-dragging'); drawer.style.transform = ''; sx = null; axis = null; dx = 0; });
 
   render();
   if (catFromHash()) setTimeout(() => scrollToEl($('mbar'), 0), 80);

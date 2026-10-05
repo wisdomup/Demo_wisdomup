@@ -25,13 +25,13 @@
 
 /* ---------- Controls: lift on hover, settle on press ---------- */
 .btn-pill, .btn-buy, .btn-navy, .btn-outline, .btn-cart, .shop-rail__all, .loop__cta, .pp__cta, .seo__toggle,
-.chip, .fbtn, .opt-chip, .policy__links a, .search__pages a, .mnav__chip, .rv__help, .cline__rm, .totop,
+.chip, .opt-chip, .policy__links a, .search__pages a, .mnav__chip, .rv__help, .cline__rm, .totop,
 .shop-rail__step, .hero__arrow, .loop__btn, .pdp2__chev, .pdp2__wish, .wpc__wish, .wpc__cta, .navbtn {
   transition: transform var(--t-fast) var(--ease-soft), box-shadow var(--t-med) var(--ease-soft), background-color var(--t-med) var(--ease-soft), color var(--t-med) var(--ease-soft), border-color var(--t-med) var(--ease-soft), opacity var(--t-med) var(--ease-soft);
 }
 @media (hover: hover) {
   .btn-pill:hover, .btn-buy:not(:disabled):hover, .btn-navy:hover, .btn-outline:hover, .btn-cart:not(:disabled):hover,
-  .shop-rail__all:hover, .loop__cta:hover, .seo__toggle:hover, .fbtn:hover, .opt-chip:hover {
+  .shop-rail__all:hover, .loop__cta:hover, .seo__toggle:hover, .opt-chip:hover {
     transform: translateY(-1px);
     box-shadow: 0 6px 16px rgba(23, 34, 72, .12);
   }
@@ -47,7 +47,7 @@
   .tile:hover { transform: translateY(-2px); }
 }
 .btn-pill:active, .btn-buy:not(:disabled):active, .btn-navy:active, .btn-outline:active, .btn-cart:not(:disabled):active,
-.shop-rail__all:active, .loop__cta:active, .chip:active, .fbtn:active, .opt-chip:active, .policy__links a:active,
+.shop-rail__all:active, .loop__cta:active, .chip:active, .opt-chip:active, .policy__links a:active,
 .mnav__chip:active, .rv__help:active, .pdp2__wish:active, .wpc__wish:active, .wpc__cta:active, .totop:active, .loop__btn:active {
   transform: scale(.98);
   transition-duration: 90ms;

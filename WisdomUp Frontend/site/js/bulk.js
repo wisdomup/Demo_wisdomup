@@ -48,6 +48,7 @@
     $('bk-done-text').textContent = `Our bulk desk will message you on WhatsApp at ${form.elements.phone.value.trim()} within one working day with ${picked('types')[0].toLowerCase()} pricing for ${interests.length ? interests.join(', ').toLowerCase() : 'the full range'} (${picked('volumes')[0]} a month).`;
     $('bk-fill').hidden = true;
     $('bk-done').hidden = false;
+    WU.px('Lead', { content_name: 'Bulk order inquiry' }); // pixel: a wholesale lead (no personal details are sent)
     WU.scrollToEl(form, 0);
   });
   $('bk-reset').addEventListener('click', () => {
