@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WisdomUp Live — Live Shopping Every Friday</title>
+<meta name="description" content="Watch WisdomUp products demoed live every Friday at 8 PM PKT and add them to cart mid-stream at live-only prices.">
+<link rel="icon" href="img/wu-logo.png">
+<link rel="stylesheet" href="css/ds/tokens/fonts.css">
+<link rel="stylesheet" href="css/ds/tokens/colors.css">
+<link rel="stylesheet" href="css/ds/tokens/typography.css">
+<link rel="stylesheet" href="css/ds/tokens/spacing.css">
+<link rel="stylesheet" href="css/ds/tokens/base.css">
+<link rel="stylesheet" href="css/ds/styles/components.css">
+<link rel="stylesheet" href="css/wu-rail.css">
+<link rel="stylesheet" href="css/home.css">
+<link rel="stylesheet" href="css/pages.css">
+<link rel="stylesheet" href="css/info.css">
+</head>
+<body>
+<div class="page page--info">
+
+  <div class="wu-util"><nav class="utility" aria-label="Utility" id="utility"></nav></div>
+  <header class="nav site-nav" id="site-nav"></header>
+  <div class="nav-spacer"></div>
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Home</a><span aria-hidden="true">›</span><span aria-current="page">Live Shopping</span></nav>
+  <section class="ihero ihero--plain ihero--dark">
+    <div class="ihero__copy">
+      <div class="live-pill"><i></i>WisdomUp Live</div>
+      <h1>Watch it demoed. <b>Add it to cart mid-stream.</b></h1>
+      <p class="ihero__lede">Live-only prices on whatever the host is holding. A new show every Friday at 8 PM PKT.</p>
+      <div class="live-cd" data-countdown role="timer" aria-label="Time until the next live show"></div><span class="meta-line" style="color: #D8D2CC;">Next show: <b id="live-next" style="color: #fff;"></b></span>
+      <div class="ihero__actions"><button type="button" class="btn-pill" data-remind>Remind me</button><a class="btn-outline" href="products.html?filter=new">Shop new arrivals</a></div>
+    </div>
+    
+  </section>
+  <section class="isec" aria-labelledby="how-it-works-h">
+    <div class="isec__head">
+      <div class="eyebrow">How it works</div>
+      <h2 class="h-light" id="how-it-works-h">Shopping, <b>but live.</b></h2>
+      
+    </div>
+    <div class="tiles" aria-label="How Live Shopping works"><div class="tile"><span class="tile__ic" data-icon="search"></span><b>Tune in on Friday</b><p>The show starts at 8 PM PKT every Friday.</p></div><div class="tile"><span class="tile__ic" data-icon="user"></span><b>Ask the host anything</b><p>Fit, battery, sound — get answers in real time.</p></div><a class="tile" href="products.html?filter=new"><span class="tile__ic" data-icon="cart"></span><b>Add to cart mid-stream</b><p>Live-only prices apply to orders placed during the show.</p><span class="tile__go">See what's new ›</span></a></div>
+  </section>
+  <div class="rail-wrap"><section id="live-rail" data-rail="new" data-title="Often on the show" data-all="products.html?filter=new"></section></div>
+  <section class="split" aria-labelledby="live-h">
+    <h2 class="grad-h" id="live-h">Live FAQs</h2>
+    <div>
+      <div class="panel-list" data-accordion>
+      <div class="faq__item">
+        <button type="button" class="faq__q" aria-expanded="true" aria-controls="live-a0"><span>When is the show?</span><span class="faq__chev" data-icon="chev-r" data-size="18"></span></button>
+        <div class="faq__a" id="live-a0"><span>Every Friday at 8 PM Pakistan time. Tap “Remind me” and we'll remind you before it starts.</span></div>
+      </div>
+      <div class="faq__item">
+        <button type="button" class="faq__q" aria-expanded="false" aria-controls="live-a1"><span>How long do live prices last?</span><span class="faq__chev" data-icon="chev-r" data-size="18"></span></button>
+        <div class="faq__a" id="live-a1" hidden><span>Live-only prices apply to orders placed while the show is on air.</span></div>
+      </div>
+      <div class="faq__item">
+        <button type="button" class="faq__q" aria-expanded="false" aria-controls="live-a2"><span>Can I pay cash on delivery?</span><span class="faq__chev" data-icon="chev-r" data-size="18"></span></button>
+        <div class="faq__a" id="live-a2" hidden><span>Yes. Live orders use the same checkout, with Cash on Delivery, JazzCash, EasyPaisa and cards. See the <a href="shipping.html">Shipping Policy</a>.</span></div>
+      </div>
+      <div class="faq__item">
+        <button type="button" class="faq__q" aria-expanded="false" aria-controls="live-a3"><span>Can I return something I bought live?</span><span class="faq__chev" data-icon="chev-r" data-size="18"></span></button>
+        <div class="faq__a" id="live-a3" hidden><span>Yes. Live orders have the same <a href="returns.html">30-day money-back guarantee</a>.</span></div>
+      </div>
+      </div>
+      <p class="meta-line" style="margin: 14px 0 0;">More answers in the <a href="help.html">Help Center</a>.</p>
+    </div>
+  </section>
+
+  <div class="trust-wrap" id="trust"></div>
+  <div class="footer-wrap" id="footer"></div>
+  <div class="toast" id="toast" role="status" hidden></div>
+</div>
+
+<script src="js/wu-data.js"></script>
+<script src="js/ds-icons.js"></script>
+<script src="js/common.js"></script>
+<script src="js/info.js"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+/* LOCKED product-card rail layout: 4.2 (≥1024) · 3.2 (768–1023) · 2.2 (600–767) · 1.2 (<600). Do not override. */
+.wu-rail { --n: 4.2; --gaps: 4; --g: 20px; --pad: var(--gutter, 28px);
+  display: grid !important; grid-auto-flow: column !important; grid-template-columns: none !important; grid-template-rows: none !important;
+  grid-auto-columns: calc((100% + var(--pad) - var(--gaps) * var(--g)) / var(--n)) !important;
+  column-gap: var(--g) !important; gap: var(--g) !important;
+  overflow-x: auto !important; overflow-y: hidden; scroll-snap-type: x mandatory !important; scroll-padding-left: var(--pad) !important;
+  margin-left: 0 !important; margin-right: 0 !important; padding-left: var(--pad) !important; padding-right: var(--pad) !important;
+  scrollbar-width: none; scroll-behavior: smooth; }
+.wu-rail::-webkit-scrollbar { display: none; }
+.wu-rail > * { min-width: 0 !important; width: auto !important; max-width: none !important; flex: none !important; scroll-snap-align: start; }
+@media (max-width: 1023px) { .wu-rail { --n: 3.2; --gaps: 3; } }
+@media (max-width: 767px) { .wu-rail { --n: 2.2; --gaps: 2; } }
+@media (max-width: 599px) { .wu-rail { --n: 1.2; --gaps: 1; --g: 12px; } }

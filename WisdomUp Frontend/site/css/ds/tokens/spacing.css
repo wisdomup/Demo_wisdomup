@@ -1,0 +1,53 @@
+/* Wisdomup — radius, geometry, elevation, motion */
+:root {
+  /* Radius hierarchy — bigger surface = rounder */
+  --r-shell: 40px;
+  --r-promo: 28px;
+  --r-panel: 24px;
+  --r-card: 24px;
+  --r-card-compact: 18px;
+  --r-modal: 16px;
+  --r-box: 12px;
+  --r-swatch: 10px;
+  --r-btn: 10px;
+  --r-btn-sm: 8px;
+  --r-input: 6px;
+  --r-label: 6px;
+  --r-pill: 999px;
+
+  /* Geometry */
+  --slant: 15deg; /* @kind other */
+  --promo-skew: -2.5deg; /* @kind other */
+  --gutter: 28px;
+  --gap-panel: 20px;
+  --nav-h: 56px;
+  --nav-inset: 20px;
+  --cat-size: 94px;
+  --swatch: 62px;
+  --thumb: 92px;
+  --rail-gap: 22px;
+  --grid-row-gap: 72px;
+
+  /* Pagination */
+  --dot: 10px;
+  --dot-active-w: 26px;
+  --dot-gap: 6px;
+  --dot-idle-dark: rgba(240, 240, 240, 0.95);
+  --dot-idle-light: rgba(206, 199, 192, 0.95);
+
+  /* Elevation — soft, wide, low-opacity */
+  --shadow-nav: 0 10px 24px rgba(0, 0, 0, 0.08);
+  --shadow-float: 0 14px 34px rgba(0, 0, 0, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  --shadow-soft: 0 6px 18px rgba(0, 0, 0, 0.06);
+  --shadow-icon: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.28));
+  --shadow-product: drop-shadow(0 18px 18px rgba(0, 0, 0, 0.14));
+
+  /* Motion */
+  --ease: cubic-bezier(.2, .7, .2, 1); /* @kind other */
+  --t-fast: 180ms; /* @kind other */
+  --t-med: 320ms; /* @kind other */
+  --autoplay: 4500ms; /* @kind other */
+}
+@media (prefers-reduced-motion: reduce) {
+  :root { --t-fast: 0ms; /* @kind other */ --t-med: 0ms; /* @kind other */ }
+}

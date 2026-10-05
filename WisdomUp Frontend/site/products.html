@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>All Products — Earbuds, Speakers, Mics & Chargers | WisdomUp</title>
+<meta name="description" content="Shop every WisdomUp product: open-ear and true wireless earbuds, neckbands, Bluetooth speakers, creator microphones and chargers. Prices in Pakistan with COD and warranty.">
+<link rel="icon" href="img/wu-logo.png">
+<link rel="stylesheet" href="css/ds/tokens/fonts.css">
+<link rel="stylesheet" href="css/ds/tokens/colors.css">
+<link rel="stylesheet" href="css/ds/tokens/typography.css">
+<link rel="stylesheet" href="css/ds/tokens/spacing.css">
+<link rel="stylesheet" href="css/ds/tokens/base.css">
+<link rel="stylesheet" href="css/ds/styles/components.css">
+<link rel="stylesheet" href="css/wu-rail.css">
+<link rel="stylesheet" href="css/home.css">
+<link rel="stylesheet" href="css/pages.css">
+<link rel="stylesheet" href="css/info.css">
+</head>
+<body>
+<div class="page page--products">
+
+  <div class="wu-util"><nav class="utility" aria-label="Utility" id="utility"></nav></div>
+  <header class="nav site-nav" id="site-nav"></header>
+
+  <div class="hero-anchor" data-nav-anchor>
+    <section class="hero" id="hero" aria-roledescription="carousel" aria-label="Featured launches"></section>
+  </div>
+
+  <h1 class="visually-hidden pbanner-alt">All WisdomUp products</h1>
+
+  <!-- Phone-only page banner (replaces the hero carousel under 640px); height matches a product card photo. -->
+  <div class="pbanner-wrap">
+    <section class="pbanner" aria-label="All products">
+      <div class="pbanner__copy">
+        <div class="eyebrow eyebrow--warm">All products</div>
+        <div class="pbanner__h">Shop the <b>full range.</b></div>
+        <p class="pbanner__sub" id="pbanner-sub"></p>
+      </div>
+      <div class="pbanner__art" id="pbanner-art" aria-hidden="true"></div>
+    </section>
+  </div>
+
+  <div class="jumpbar" id="jumpbar" data-sticky-offset>
+    <nav class="jumpbar__chips" id="jump-chips" aria-label="Jump to category"></nav>
+    <label class="sortbox"><span>Sort</span>
+      <select id="sort" aria-label="Sort products">
+        <option value="featured">Featured</option>
+        <option value="relevant">Most relevant</option>
+        <option value="best">Best selling</option>
+        <option value="az">Alphabetically, A-Z</option>
+        <option value="za">Alphabetically, Z-A</option>
+        <option value="low">Price, low to high</option>
+        <option value="high">Price, high to low</option>
+        <option value="old">Date, old to new</option>
+        <option value="new">Date, new to old</option>
+        <option value="off">Biggest discount</option>
+      </select>
+    </label>
+  </div>
+  <!-- Phones: listing header (breadcrumb, title, read-more blurb, filter pills, count + sort) -->
+  <div class="mhead">
+    <nav class="mcrumbs" aria-label="Breadcrumb">
+      <a href="index.html" aria-label="Home"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 3.2 2.5 11.4h2.7V20h5.2v-5.4h3.2V20h5.2v-8.6h2.7z" fill="currentColor"/></svg></a>
+      <svg class="mcrumbs__sep" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M9 5.5 15.5 12 9 18.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span id="mcrumbs-tail"></span>
+    </nav>
+    <h1 class="mtitle" id="mtitle">Shop all products</h1>
+    <p class="mdesc" id="mdesc"><span class="mdesc__t" id="mdesc-t"></span><button type="button" class="mdesc__more" id="mdesc-more" aria-expanded="false">read more</button></p>
+  </div>
+  <div class="mbar" id="mbar" data-sticky-offset>
+    <div class="mbar__pills">
+      <button type="button" class="fbtn" id="open-filters" aria-haspopup="dialog" aria-controls="fdrawer" aria-expanded="false">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M2.5 5h12l-4.6 5.8v5.6l-2.8 1.8v-7.4z" fill="currentColor"/><path d="M17 6.5h4.5M17 11.5h4.5M13.5 16.5h8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+        <span>Filters</span><b class="fbtn__n" id="fbtn-n" hidden></b>
+      </button>
+      <button type="button" class="fbtn fbtn--dd" data-open="fsec-cat" id="pill-cat" aria-haspopup="dialog"><span>Category</span><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 9.5l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button type="button" class="fbtn fbtn--dd" data-open="fsec-show" id="pill-show" aria-haspopup="dialog"><span>Show</span><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 9.5l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button type="button" class="fbtn fbtn--dd" data-open="fsec-price" id="pill-sort" aria-haspopup="dialog"><span>Price</span><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 9.5l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+  </div>
+  <div class="mcount">
+    <div class="msort" id="msort">
+      <button type="button" class="msort__btn" id="msort-btn" aria-haspopup="listbox" aria-expanded="false" aria-controls="msort-list">Sort <span class="msort__cur" id="msort-label"></span><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 9.5l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <ul class="msort__list" id="msort-list" role="listbox" aria-label="Sort products" tabindex="-1" hidden></ul>
+    </div>
+    <span class="mcount__n" id="mbar-info" aria-live="polite"></span>
+    <div class="mview" role="group" aria-label="Products per row">
+      <button type="button" class="mview__b" data-cols="1" aria-pressed="false" aria-label="1 product per row"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="6" y="3.5" width="12" height="17" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
+      <button type="button" class="mview__b" data-cols="2" aria-pressed="true" aria-label="2 products per row"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
+    </div>
+  </div>
+  <div class="filterbar" id="filterbar" hidden></div>
+
+  <!-- Phones: every product in one grid (1 or 2 per row). Desktop keeps the category rails below. -->
+  <section class="mgrid-band" aria-label="Products"><div class="mgrid mgrid--2" id="mgrid"></div></section>
+  <div id="groups"></div>
+
+  <div class="trust-wrap" id="trust"></div>
+
+  <section class="seo-lite" aria-labelledby="seo-h">
+    <div class="eyebrow">The full WisdomUp range</div>
+    <h2 id="seo-h">Wireless earbuds, speakers, mics and chargers — trusted in 50+ countries</h2>
+    <p>Browse every WisdomUp product in one place: OS open-ear and TS true wireless earbuds, ENC neckbands, the Thunder Pro party speaker, MKF creator microphones and fast wireless and car chargers. Every order ships across Pakistan with Cash on Delivery, JazzCash, EasyPaisa or card, backed by brand warranty and a 30-day money-back guarantee.</p>
+  </section>
+
+  <div class="footer-wrap" id="footer"></div>
+
+  <div class="fscrim" id="fscrim" hidden></div>
+  <aside class="fdrawer" id="fdrawer" role="dialog" aria-modal="true" aria-labelledby="fdrawer-h" hidden>
+    <header class="fdrawer__head">
+      <h2 id="fdrawer-h">Filters</h2>
+      <button type="button" class="fdrawer__clear" id="clear-filters">Clear all</button>
+      <button type="button" class="fdrawer__x" id="close-filters" aria-label="Close filters"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/></svg></button>
+    </header>
+    <div class="fdrawer__body">
+      <div class="facc" id="fsec-show">
+        <h3 class="facc__t"><button type="button" class="facc__h" aria-expanded="false" aria-controls="fsec-show-p"><span>Filter by</span><span class="facc__v" id="fsec-show-v"></span><svg class="facc__chev" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M5.5 9l6.5 6.5L18.5 9" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></h3>
+        <div class="facc__p" id="fsec-show-p" hidden><div class="fopts" id="f-show" role="radiogroup" aria-label="Filter by"></div></div>
+      </div>
+      <div class="facc" id="fsec-cat">
+        <h3 class="facc__t"><button type="button" class="facc__h" aria-expanded="false" aria-controls="fsec-cat-p"><span>Category</span><span class="facc__v" id="fsec-cat-v"></span><svg class="facc__chev" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M5.5 9l6.5 6.5L18.5 9" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></h3>
+        <div class="facc__p" id="fsec-cat-p" hidden><div class="fopts" id="f-cats" role="radiogroup" aria-label="Category"></div></div>
+      </div>
+      <div class="facc" id="fsec-price">
+        <h3 class="facc__t"><button type="button" class="facc__h" aria-expanded="false" aria-controls="fsec-price-p"><span>Price</span><span class="facc__v" id="fsec-price-v"></span><svg class="facc__chev" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M5.5 9l6.5 6.5L18.5 9" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></h3>
+        <div class="facc__p" id="fsec-price-p" hidden><div class="fopts" id="f-price" role="radiogroup" aria-label="Price"></div></div>
+      </div>
+      <div class="facc" id="fsec-color">
+        <h3 class="facc__t"><button type="button" class="facc__h" aria-expanded="false" aria-controls="fsec-color-p"><span>Colour</span><span class="facc__v" id="fsec-color-v"></span><svg class="facc__chev" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M5.5 9l6.5 6.5L18.5 9" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></h3>
+        <div class="facc__p" id="fsec-color-p" hidden><div class="fopts" id="f-color" role="group" aria-label="Colour"></div></div>
+      </div>
+      <div class="facc" id="fsec-feat">
+        <h3 class="facc__t"><button type="button" class="facc__h" aria-expanded="false" aria-controls="fsec-feat-p"><span>Features</span><span class="facc__v" id="fsec-feat-v"></span><svg class="facc__chev" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M5.5 9l6.5 6.5L18.5 9" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></h3>
+        <div class="facc__p" id="fsec-feat-p" hidden><div class="fopts" id="f-feat" role="group" aria-label="Features"></div></div>
+      </div>
+      <div class="facc" id="fsec-sort">
+        <h3 class="facc__t"><button type="button" class="facc__h" aria-expanded="false" aria-controls="fsec-sort-p"><span>Sort by</span><span class="facc__v" id="fsec-sort-v"></span><svg class="facc__chev" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M5.5 9l6.5 6.5L18.5 9" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></h3>
+        <div class="facc__p" id="fsec-sort-p" hidden><div class="fopts" id="f-sort" role="radiogroup" aria-label="Sort by"></div></div>
+      </div>
+    </div>
+    <footer class="fdrawer__foot">
+      <button type="button" class="fdrawer__apply" id="apply-filters">Show results</button>
+    </footer>
+  </aside>
+  <div class="toast" id="toast" role="status" hidden></div>
+</div>
+
+<script src="js/wu-data.js"></script>
+<script src="js/ds-icons.js"></script>
+<script src="js/common.js"></script>
+<script src="js/products.js"></script>
+</body>
+</html>

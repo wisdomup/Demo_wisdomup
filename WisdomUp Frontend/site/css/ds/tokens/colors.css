@@ -1,0 +1,74 @@
+/* Wisdomup — colour tokens. Values from the Premium Tech Store source (styles/tokens.css) + Wisdomup logo colours. */
+:root {
+  /* ---- Brand (sampled from assets/logo.png) ---- */
+  --brand-red: #D91E05;       /* logo red — wordmark + chevron stripes */
+  --brand-purple: #5C2C88;    /* logo purple — left bars of the mark */
+
+  /* ---- Surfaces (light, soft-grey world) ---- */
+  --page: #F0F0F0;
+  --panel: #F8F8F8;
+  --card: #F9F9F9;
+  --white: #FFFFFF;
+  --chip: #F3F3F3;
+  --field: #D9D9D9;
+  --line: #E4E4E4;
+
+  /* ---- Ink (soft charcoal, never #000) ---- */
+  --ink: #464646;
+  --ink-2: #555555;
+  --ink-body: #656464;
+  --ink-muted: #7B7B7B;
+  --ink-meta: #9F9F9F;
+  --ink-strike: #B1B1B1;
+
+  /* ---- Gradients ---- */
+  --grad-heading: linear-gradient(90deg, #585772 0%, #301D9A 38%, #8B305C 70%, #C2403C 100%); /* @kind color */
+  --grad-cta: linear-gradient(90deg, #52AFE2 0%, #2350C8 100%); /* @kind color */
+  --grad-cta-soft: linear-gradient(90deg, #8FA8FA 0%, #5F83F4 100%); /* @kind color */
+  --grad-ribbon: linear-gradient(180deg, #0661D4 0%, #03AEE6 100%); /* @kind color */
+  --grad-gold: linear-gradient(90deg, #8C6A2A 0%, #DDC265 45%, #F3E39A 60%, #A2813A 100%); /* @kind color */
+  --grad-cream: linear-gradient(90deg, #F1DCAF 0%, #FBF3E3 100%); /* @kind color */
+
+  /* ---- Accents ---- */
+  --accent-red: #DF1C20;
+  --accent-price: #4264E9;
+  --navy: #273F85;
+  --navy-deep: #172248;
+  --navy-link: #8896AB;
+  --utility: #8B96A9;
+  --promo-green: #3E8252;
+  --star: #F5C444;
+  --ring: #97B899;
+  --cream: #FBF4E4;
+  --cream-line: #F1DCAF;
+  --aqua-band: #CEECF2; /* product-rail section band */
+  --form-label: #333F51;
+  --form-line: #D5DAE2;
+  --form-required: #1D51EE;
+  --focus: #2350C8;
+  --frame-selected: #909090;
+
+  /* ---- Glass ---- */
+  --glass: rgba(208, 212, 212, 0.62);
+  --glass-strong: rgba(160, 167, 166, 0.62);
+  --glass-card: rgba(255, 255, 255, 0.30);
+  --glass-blur: blur(18px) saturate(140%); /* @kind other */
+  --scrim: rgba(40, 40, 40, 0.42);
+
+  /* ---- Semantic aliases ---- */
+  --surface-page: var(--page);
+  --surface-panel: var(--panel);
+  --surface-card: var(--card);
+  --surface-info: var(--white);
+  --surface-footer: var(--navy-deep);
+  --text-strong: var(--ink);
+  --text-body: var(--ink-body);
+  --text-muted: var(--ink-muted);
+  --text-meta: var(--ink-meta);
+  --text-heading-trust: var(--navy);
+  --action-primary: var(--grad-cta);
+  --action-secondary: var(--grad-cta-soft);
+  --state-current: var(--accent-red);
+  --border-divider: var(--line);
+  --border-input: var(--form-line);
+}

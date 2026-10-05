@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bulk & Corporate Orders — Partner Pricing | WisdomUp</title>
+<meta name="description" content="Become a WisdomUp distributor, wholesaler, retailer or corporate buyer. Bulk pricing on earbuds, neckbands, speakers, mics and chargers with local fulfilment and warranty.">
+<link rel="icon" href="img/wu-logo.png">
+<link rel="stylesheet" href="css/ds/tokens/fonts.css">
+<link rel="stylesheet" href="css/ds/tokens/colors.css">
+<link rel="stylesheet" href="css/ds/tokens/typography.css">
+<link rel="stylesheet" href="css/ds/tokens/spacing.css">
+<link rel="stylesheet" href="css/ds/tokens/base.css">
+<link rel="stylesheet" href="css/ds/styles/components.css">
+<link rel="stylesheet" href="css/wu-rail.css">
+<link rel="stylesheet" href="css/home.css">
+<link rel="stylesheet" href="css/pages.css">
+<link rel="stylesheet" href="css/info.css">
+</head>
+<body>
+<div class="page page--bulk">
+
+  <div class="wu-util"><nav class="utility" aria-label="Utility" id="utility"></nav></div>
+  <header class="nav site-nav" id="site-nav"></header>
+  <div class="nav-spacer"></div>
+
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Home</a><span aria-hidden="true">›</span><span aria-current="page">Bulk &amp; Corporate Orders</span></nav>
+
+  <section class="bk-hero">
+    <div class="bk-intro">
+      <div class="eyebrow">WisdomUp Bulk Desk</div>
+      <h1>Stock premium tech accessories <b>at scale.</b></h1>
+      <p>Become a WisdomUp distributor, wholesaler or retailer — or, for company gifts, see <a href="corporate.html">Corporate Orders</a>. Send your details and our team will reply on WhatsApp with bulk pricing and next steps.</p>
+      <div class="perks" id="perks"></div>
+    </div>
+
+    <form class="bk-form" id="bulk-form" novalidate aria-labelledby="bk-form-h">
+      <div id="bk-fill">
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          <div class="bk-form__top"><img src="img/wu-logo.png" alt="WisdomUp"><span class="badge-grad" id="bk-form-h">Partner inquiry</span></div>
+          <fieldset class="bk-group"><legend>I'm a</legend><div class="bk-chips" id="types" data-single></div></fieldset>
+          <div class="bk-fields">
+            <div class="field"><label for="f-name">Full name<i>*</i></label><input id="f-name" name="name" autocomplete="name" placeholder="Your full name" required></div>
+            <div class="field"><label for="f-phone">WhatsApp number<i>*</i></label><input id="f-phone" name="phone" type="tel" autocomplete="tel" placeholder="+92 300 1234567" required></div>
+            <div class="field"><label for="f-email">Email<i>*</i></label><input id="f-email" name="email" type="email" autocomplete="email" placeholder="name@company.com" required></div>
+            <div class="field"><label for="f-city">City<i>*</i></label><input id="f-city" name="city" autocomplete="address-level2" placeholder="Karachi" required></div>
+          </div>
+          <div class="field"><label for="f-store">Business name or store link</label><input id="f-store" name="store" placeholder="https://…"></div>
+          <fieldset class="bk-group"><legend>Interested in</legend><div class="bk-chips" id="interests"></div></fieldset>
+          <fieldset class="bk-group"><legend>Estimated monthly quantity</legend><div class="bk-chips" id="volumes" data-single></div></fieldset>
+          <div class="field"><label for="f-note">Anything else?</label><textarea id="f-note" name="note" placeholder="Models, branding, delivery timeline…"></textarea></div>
+          <div class="bk-foot"><span class="bk-hint" id="bk-hint" aria-live="polite">Inquiries go straight to our bulk desk.</span><button type="submit" class="btn-pill">Send bulk inquiry</button></div>
+        </div>
+      </div>
+      <div class="bk-done" id="bk-done" hidden>
+        <span class="badge-grad">Inquiry received</span>
+        <h2>Thanks, <b id="bk-first">there.</b></h2>
+        <p id="bk-done-text"></p>
+        <button type="button" id="bk-reset">Send another inquiry</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="bk-range">
+    <div class="eyebrow">What you can stock</div>
+    <h2 class="h-light">The full range, <b>at partner pricing.</b></h2>
+  </section>
+  <nav class="bk-cats" id="bk-cats" aria-label="Product categories"></nav>
+
+  <section class="bulk-steps" aria-labelledby="steps-h">
+    <h2 id="steps-h">From inquiry <b>to stocked shelves.</b></h2>
+    <div class="steps" id="steps"></div>
+  </section>
+
+  <section class="split" aria-labelledby="bfaq-h">
+    <h2 class="grad-h" id="bfaq-h">Bulk FAQs</h2>
+    <div><div class="panel-list" id="bulk-faq"></div><p class="meta-line" style="margin: 14px 0 0;">Buying gifts for your company? See <a href="corporate.html">Corporate Orders</a>. More answers in the <a href="help.html">Help Center</a>.</p></div>
+  </section>
+
+  <div class="trust-wrap" id="trust"></div>
+  <div class="footer-wrap" id="footer"></div>
+  <div class="toast" id="toast" role="status" hidden></div>
+</div>
+
+<script src="js/wu-data.js"></script>
+<script src="js/ds-icons.js"></script>
+<script src="js/common.js"></script>
+<script src="js/bulk.js"></script>
+</body>
+</html>
