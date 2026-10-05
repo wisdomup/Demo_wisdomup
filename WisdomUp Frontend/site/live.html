@@ -16,6 +16,8 @@
 <link rel="stylesheet" href="css/home.css">
 <link rel="stylesheet" href="css/pages.css">
 <link rel="stylesheet" href="css/info.css">
+<link rel="stylesheet" href="css/controls.css">
+<link rel="stylesheet" href="css/motion.css">
 </head>
 <body>
 <div class="page page--info">
@@ -48,8 +50,8 @@
     <div>
       <div class="panel-list" data-accordion>
       <div class="faq__item">
-        <button type="button" class="faq__q" aria-expanded="true" aria-controls="live-a0"><span>When is the show?</span><span class="faq__chev" data-icon="chev-r" data-size="18"></span></button>
-        <div class="faq__a" id="live-a0"><span>Every Friday at 8 PM Pakistan time. Tap “Remind me” and we'll remind you before it starts.</span></div>
+        <button type="button" class="faq__q" aria-expanded="false" aria-controls="live-a0"><span>When is the show?</span><span class="faq__chev" data-icon="chev-r" data-size="18"></span></button>
+        <div class="faq__a" id="live-a0" hidden><span>Every Friday at 8 PM Pakistan time. Tap “Remind me” and we'll remind you before it starts.</span></div>
       </div>
       <div class="faq__item">
         <button type="button" class="faq__q" aria-expanded="false" aria-controls="live-a1"><span>How long do live prices last?</span><span class="faq__chev" data-icon="chev-r" data-size="18"></span></button>
@@ -61,7 +63,7 @@
       </div>
       <div class="faq__item">
         <button type="button" class="faq__q" aria-expanded="false" aria-controls="live-a3"><span>Can I return something I bought live?</span><span class="faq__chev" data-icon="chev-r" data-size="18"></span></button>
-        <div class="faq__a" id="live-a3" hidden><span>Yes. Live orders have the same <a href="returns.html">30-day money-back guarantee</a>.</span></div>
+        <div class="faq__a" id="live-a3" hidden><span>Yes. Live orders have the same <a href="returns.html">7-day money-back guarantee</a>.</span></div>
       </div>
       </div>
       <p class="meta-line" style="margin: 14px 0 0;">More answers in the <a href="help.html">Help Center</a>.</p>
@@ -73,8 +75,10 @@
   <div class="toast" id="toast" role="status" hidden></div>
 </div>
 
+<script src="js/catalog.js"></script>
 <script src="js/wu-data.js"></script>
 <script src="js/ds-icons.js"></script>
+<script src="js/shop.js"></script>
 <script src="js/common.js"></script>
 <script src="js/info.js"></script>
 </body>

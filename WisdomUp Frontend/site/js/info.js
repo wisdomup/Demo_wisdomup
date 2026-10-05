@@ -13,9 +13,29 @@
   });
   document.querySelectorAll('[data-rail]').forEach(el => {
     const ids = el.dataset.rail.split(',').map(s => s.trim());
-    const items = ids[0] === 'new' || ids[0] === 'best' ? D.products.filter(p => p.tabs.includes(ids[0])) : ids.map(id => D.byId(id)).filter(Boolean);
+    // 'new' / 'best' pick one product per type first (variety), capped at 16 cards
+    const tagged = ids[0] === 'new' || ids[0] === 'best' ? D.products.filter(p => p.tabs.includes(ids[0])) : null;
+    const items = tagged ? tagged.filter((p, i) => tagged.findIndex(x => x.type === p.type) === i).concat(tagged).filter((p, i, a) => a.indexOf(p) === i).slice(0, 16)
+      : ids.map(id => D.byId(id)).filter(Boolean);
     WU.mountRail(el, { title: el.dataset.title || 'Shop the range', items, allHref: el.dataset.all || url.products, allLabel: el.dataset.allLabel || 'Shop all' });
   });
+
+  /* ---------- Wishlist page: saved products (newest first) as a rail, or an empty state ---------- */
+  const wl = $('wish-list');
+  if (wl) {
+    const paintList = () => {
+      const items = WU.wishList().reverse().map(id => D.byId(id)).filter(Boolean);
+      $('wish-count').textContent = items.length ? `${items.length} saved ${items.length === 1 ? 'item' : 'items'}.` : '';
+      if (!items.length) {
+        wl.innerHTML = `<div class="empty wish-empty"><span class="wish-empty__ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="30" height="30"><path d="M12 20.2l-1.3-1.2C6.1 14.9 3.2 12.3 3.2 9a4.6 4.6 0 0 1 4.7-4.7c1.6 0 3.1.7 4.1 1.9a5.4 5.4 0 0 1 4.1-1.9A4.6 4.6 0 0 1 20.8 9c0 3.3-2.9 5.9-7.5 10z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></span><h2>Your wishlist is empty</h2><p>Tap the heart on any product to save it here.</p><a class="btn-pill" href="${url.products}">Shop all products</a></div>`;
+        return;
+      }
+      wl.innerHTML = '<div class="rail-wrap"><section id="wish-rail"></section></div>';
+      WU.mountRail($('wish-rail'), { title: 'Your wishlist', items, allHref: url.products, allLabel: 'Keep shopping' });
+    };
+    paintList();
+    window.addEventListener('wu-wish', paintList);
+  }
 
   /* ---------- Static FAQ lists: one open at a time ---------- */
   document.querySelectorAll('[data-accordion]').forEach(list => {
@@ -121,33 +141,50 @@
     document.querySelectorAll('[data-help-q]').forEach(b => b.addEventListener('click', () => { hs.value = b.dataset.helpQ; run(); hs.focus(); }));
   }
 
-  /* ---------- Order tracker (preview: real tracking connects to the order system at launch) ---------- */
+  /* ---------- Order tracker: live status from /api/orders (order number + the phone used to order) ---------- */
   const tf = $('track-form');
   if (tf) {
     const res = $('track-result');
-    const SAMPLE = 'WU-10245';
-    tf.addEventListener('submit', e => {
+    const STEPS = [['new', 'Order placed'], ['confirmed', 'Confirmed by our team'], ['paid', 'Payment received'], ['shipped', 'Handed to the courier'], ['delivered', 'Delivered']];
+    const when = iso => new Date(iso).toLocaleString('en-PK', { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+    const phoneNorm = v => { let d = String(v || '').replace(/\D/g, ''); if (d.startsWith('0092')) d = d.slice(4); else if (d.startsWith('92')) d = d.slice(2); if (d.startsWith('0')) d = d.slice(1); return /^3\d{9}$/.test(d) ? '0' + d : null; };
+    const shop = window.WU_SHOP || { payments: {}, delivery: {} };
+    function render(o) {
+      const steps = STEPS.filter(([k]) => k !== 'paid' || o.payment !== 'cod');
+      const reached = Object.fromEntries((o.history || []).map(h => [h.status, h.at]));
+      const order = steps.map(([k]) => k), at = order.indexOf(o.status);
+      const cancelled = o.status === 'cancelled';
+      res.innerHTML = `<div class="track__head"><b>${esc(o.number)}</b><span class="badge-soft${cancelled ? ' badge-soft--bad' : ''}">${cancelled ? 'Cancelled' : esc((STEPS.find(([k]) => k === o.status) || [, o.status])[1])}</span></div>
+        ${cancelled ? '<p style="margin: 0; font: 400 15px/1.6 var(--font); color: #3D4656;">This order was cancelled. If you didn\'t ask for this, please contact support.</p>' : `<ol class="timeline">${steps.map(([k, t], i) => `<li class="${i < at ? 'is-done' : i === at ? 'is-now' : ''}"><i aria-hidden="true"></i><div><b>${t}</b><span>${reached[k] ? when(reached[k]) : i === steps.length - 1 ? 'Expected in ' + esc((shop.delivery[o.delivery] || {}).eta || '3–5 working days') : 'Waiting'}</span></div></li>`).join('')}</ol>`}
+        <div class="kv"><b>Items</b><span>${o.items.map(l => `${esc(l.title)}${Object.keys(l.attrs || {}).length ? ' (' + esc(Object.values(l.attrs).join(', ')) + ')' : ''} × ${l.qty}`).join('<br>')}</span><b>Ship to</b><span>${esc(o.city)}</span><b>Total</b><span>${esc(WU.D.rs(o.totals.total))} · ${esc((shop.payments[o.payment] || {}).label || o.payment)}</span></div>`;
+    }
+    tf.addEventListener('submit', async e => {
       e.preventDefault();
-      const no = tf.elements.order.value.trim().toUpperCase().replace(/\s+/g, ''), phone = tf.elements.phone.value.replace(/\D/g, '');
-      const field = tf.elements.order.closest('.field');
-      field.classList.toggle('is-bad', !no);
-      if (!no) { tf.elements.order.focus(); return; }
+      const no = tf.elements.order.value.trim().toUpperCase().replace(/\s+/g, ''), phone = phoneNorm(tf.elements.phone.value);
+      tf.elements.order.closest('.field').classList.toggle('is-bad', !/^WU-\d{5,}$/.test(no));
+      tf.elements.phone.closest('.field').classList.toggle('is-bad', !phone);
+      if (!/^WU-\d{5,}$/.test(no)) { tf.elements.order.focus(); return; }
+      if (!phone) { tf.elements.phone.focus(); return; }
       res.hidden = false;
-      if (no !== SAMPLE) {
-        res.innerHTML = `<div class="track__head"><b>${esc(no)}</b><span class="badge-soft">Not found</span></div>
-          <p style="margin: 0; font: 400 15px/1.6 var(--font); color: #3D4656;">We couldn't find an order with that number${phone ? ' and phone number' : ''}. Check the number in your confirmation SMS or email (it looks like <b>WU-10245</b>), or contact support and we'll look it up for you.</p>
+      res.innerHTML = '<p class="meta-line">Looking up your order…</p>';
+      try {
+        const r = await fetch(`/api/orders?number=${encodeURIComponent(no)}&phone=${encodeURIComponent(phone)}`);
+        const data = await r.json().catch(() => ({}));
+        if (r.ok && data.ok) render(data.order);
+        else res.innerHTML = `<div class="track__head"><b>${esc(no)}</b><span class="badge-soft">Not found</span></div>
+          <p style="margin: 0; font: 400 15px/1.6 var(--font); color: #3D4656;">${esc(data.error || 'We could not look up orders right now.')} Check the number on your confirmation page, or contact support and we'll find it for you.</p>
           <div class="policy__links"><a href="${url.help}">Contact support</a><a href="${url.shipping}">Delivery times</a></div>`;
-        return;
+      } catch (err) {
+        res.innerHTML = '<p style="margin: 0; font: 400 15px/1.6 var(--font); color: #3D4656;">We could not reach the order system. Please try again in a moment.</p>';
       }
-      const d = n => { const x = new Date(); x.setDate(x.getDate() + n); return x.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }); };
-      const steps = [['Order confirmed', d(-2) + ' · Cash on Delivery', 'done'], ['Packed at our Karachi warehouse', d(-1), 'done'], ['Handed to courier', d(-1) + ' · Standard delivery', 'done'], ['Out for delivery', 'Expected ' + d(1), 'now'], ['Delivered', 'Pay the rider in cash or by card', '']];
-      res.innerHTML = `<div class="track__head"><b>${SAMPLE}</b><span class="badge-soft">Sample order</span></div>
-        <p class="meta-line" style="margin: -8px 0 0;">This is a preview of how tracking will look. Live order tracking connects to our order system at launch.</p>
-        <ol class="timeline">${steps.map(([t, s, st]) => `<li class="${st ? 'is-' + st : ''}"><i aria-hidden="true"></i><div><b>${t}</b><span>${s}</span></div></li>`).join('')}</ol>
-        <div class="kv"><b>Items</b><span>OS-4 Open Stereo Earbuds × 1</span><b>Ship to</b><span>Lahore, Punjab</span><b>Total</b><span>Rs.6,000 · Cash on Delivery</span></div>`;
       scrollToEl(res, 0);
     });
-    document.querySelectorAll('[data-sample-order]').forEach(b => b.addEventListener('click', () => { tf.elements.order.value = SAMPLE; tf.requestSubmit(); }));
+    // Recent orders placed on this device: one tap to track
+    const recent = (WU.store.get('wu-orders', []) || []).slice(0, 3);
+    if ($('track-recent') && recent.length) $('track-recent').innerHTML = 'Recent: ' + recent.map(o => `<button type="button" class="link-arrow" data-track="${esc(o.number)}" data-phone="${esc(o.customer.phone)}">${esc(o.number)}</button>`).join(' ');
+    tf.addEventListener('click', e => { const b = e.target.closest('[data-track]'); if (b) { tf.elements.order.value = b.dataset.track; tf.elements.phone.value = b.dataset.phone; tf.requestSubmit(); } });
+    const q = new URLSearchParams(location.search);
+    if (q.get('n')) { tf.elements.order.value = q.get('n'); if (q.get('p')) { tf.elements.phone.value = q.get('p'); tf.requestSubmit(); } }
   }
 
   /* ---------- Live: countdown to Friday 8 PM PKT + reminder ---------- */

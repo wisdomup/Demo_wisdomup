@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Checkout | WisdomUp</title>
+<meta name="description" content="Complete your WisdomUp order — Cash on Delivery, JazzCash, EasyPaisa or bank transfer, delivered across Pakistan.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="img/wu-logo.png">
+<link rel="stylesheet" href="css/ds/tokens/fonts.css">
+<link rel="stylesheet" href="css/ds/tokens/colors.css">
+<link rel="stylesheet" href="css/ds/tokens/typography.css">
+<link rel="stylesheet" href="css/ds/tokens/spacing.css">
+<link rel="stylesheet" href="css/ds/tokens/base.css">
+<link rel="stylesheet" href="css/ds/styles/components.css">
+<link rel="stylesheet" href="css/wu-rail.css">
+<link rel="stylesheet" href="css/home.css">
+<link rel="stylesheet" href="css/pages.css">
+<link rel="stylesheet" href="css/info.css">
+<link rel="stylesheet" href="css/controls.css">
+<link rel="stylesheet" href="css/motion.css">
+</head>
+<body>
+<div class="page page--info page--checkout">
+
+  <div class="wu-util"><nav class="utility" aria-label="Utility" id="utility"></nav></div>
+  <header class="nav site-nav" id="site-nav"></header>
+  <div class="nav-spacer"></div>
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Home</a><span aria-hidden="true">›</span><button type="button" class="crumbs__btn" data-open-cart>Cart</button><span aria-hidden="true">›</span><span aria-current="page">Checkout</span></nav>
+  <main class="ck" id="ck">
+    <header class="ck__top">
+      <h1 class="ck__h">Checkout</h1>
+      <p class="ck__secure"><span data-icon="shield" data-size="18"></span>Secure checkout · Cash on Delivery available · 7-day money-back guarantee</p>
+    </header>
+    <form class="ck__form" id="ck-form" novalidate>
+      <div class="ck__err" id="ck-err" role="alert" hidden></div>
+
+      <section class="ck__sec" aria-labelledby="ck-s1">
+        <h2 id="ck-s1"><span>1</span>Contact</h2>
+        <div class="ck__grid">
+          <div class="field"><label for="c-name">Full name<i>*</i></label><input id="c-name" name="name" autocomplete="name" placeholder="Your full name" required maxlength="80"></div>
+          <div class="field"><label for="c-phone">Mobile number<i>*</i></label><input id="c-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="0300 1234567" required><small>We'll call or WhatsApp to confirm your order.</small></div>
+          <div class="field ck__wide"><label for="c-email">Email (optional)</label><input id="c-email" name="email" type="email" autocomplete="email" placeholder="name@example.com" maxlength="120"></div>
+        </div>
+      </section>
+
+      <section class="ck__sec" aria-labelledby="ck-s2">
+        <h2 id="ck-s2"><span>2</span>Delivery address</h2>
+        <div class="ck__grid">
+          <div class="field"><label for="a-city">City<i>*</i></label><input id="a-city" name="city" list="ck-cities" autocomplete="address-level2" placeholder="e.g. Lahore" required maxlength="60"><datalist id="ck-cities"><option value="Karachi"><option value="Lahore"><option value="Islamabad"><option value="Rawalpindi"><option value="Faisalabad"><option value="Multan"><option value="Peshawar"><option value="Quetta"><option value="Sialkot"><option value="Gujranwala"><option value="Hyderabad"><option value="Bahawalpur"><option value="Sargodha"><option value="Sukkur"><option value="Abbottabad"><option value="Mardan"><option value="Sahiwal"><option value="Okara"><option value="Rahim Yar Khan"><option value="Gujrat"><option value="Jhelum"><option value="Sheikhupura"><option value="Larkana"><option value="Dera Ghazi Khan"><option value="Mirpur"><option value="Muzaffarabad"><option value="Gilgit"><option value="Swat"><option value="Kasur"><option value="Chiniot"></datalist></div>
+          <div class="field"><label for="a-area">Area / locality<i>*</i></label><input id="a-area" name="area" autocomplete="address-level3" placeholder="e.g. DHA Phase 5" required maxlength="80"></div>
+          <div class="field ck__wide"><label for="a-line">Full address<i>*</i></label><input id="a-line" name="line" autocomplete="street-address" placeholder="House / flat, street, block" required maxlength="200"></div>
+          <div class="field ck__wide"><label for="a-notes">Delivery notes (optional)</label><input id="a-notes" name="notes" placeholder="Landmark, best time to call…" maxlength="300"></div>
+        </div>
+      </section>
+
+      <section class="ck__sec" aria-labelledby="ck-s3">
+        <h2 id="ck-s3"><span>3</span>Delivery</h2>
+        <div class="ck__opts" id="ck-delivery" role="radiogroup" aria-labelledby="ck-s3"></div>
+      </section>
+
+      <section class="ck__sec" aria-labelledby="ck-s4">
+        <h2 id="ck-s4"><span>4</span>Payment</h2>
+        <div class="ck__opts" id="ck-payment" role="radiogroup" aria-labelledby="ck-s4"></div>
+      </section>
+
+      <div class="ck__hp" aria-hidden="true"><label>Website<input name="website" tabindex="-1" autocomplete="off"></label></div>
+      <button type="submit" class="btn-buy ck__place ck__place--form" id="ck-place-form">Place order</button>
+      <p class="ck__terms">By placing your order you agree to our <a href="shipping.html">Shipping</a>, <a href="returns.html">Exchange &amp; Refund</a> and <a href="warranty.html">Warranty</a> policies.</p>
+    </form>
+
+    <aside class="ck__sum" aria-labelledby="ck-sum-h">
+      <div class="ck__sumcard">
+        <div class="ck__sumhead"><h2 id="ck-sum-h">Order summary</h2><button type="button" class="link-arrow" data-open-cart>Edit cart</button></div>
+        <div id="ck-lines"></div>
+        <label class="cartd__gift ck__gift"><input type="checkbox" id="ck-gift"><span>Add gift wrapping</span><b id="ck-gift-p"></b></label>
+        <dl class="ck__tot" id="ck-tot"></dl>
+        <button type="submit" form="ck-form" class="btn-buy ck__place" id="ck-place">Place order</button>
+        <p class="ck__fine">Prices include all taxes. Your order is confirmed by phone or WhatsApp before dispatch.</p>
+      </div>
+    </aside>
+  </main>
+  <section class="ck-empty" id="ck-empty" hidden>
+    <div class="empty"><h1 class="grad-h">Your cart is empty</h1><p>Add something you love, then come back to check out.</p><a class="btn-pill" href="products.html">Shop all products</a></div>
+  </section>
+
+  <div class="footer-wrap" id="footer"></div>
+  <div class="toast" id="toast" role="status" hidden></div>
+</div>
+
+<script src="js/catalog.js"></script>
+<script src="js/wu-data.js"></script>
+<script src="js/ds-icons.js"></script>
+<script src="js/shop.js"></script>
+<script src="js/common.js"></script>
+<script src="js/checkout.js"></script>
+</body>
+</html>

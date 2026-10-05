@@ -6,17 +6,21 @@
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
   const vw = () => window.innerWidth;
-  const code = p => p.title.split(' ')[0];
+  const code = p => p.code || p.title.split(' ')[0];
   const EASE = 'cubic-bezier(.2,.7,.2,1)';
 
   /* ---------- Routes ---------- */
-  const CATS = ['Earbuds', 'Neckbands', 'Speakers', 'Microphones', 'Chargers'];
-  const slug = c => 'cat-' + c.toLowerCase();
+  // Product types (e.g. 'earbuds') grouped into departments (e.g. 'audio') — both come from the catalogue.
+  const DEPTS = D.depts;
+  const CATS = DEPTS.flatMap(d => d.types).filter((t, i, a) => a.indexOf(t) === i && D.products.some(p => p.type === t));
+  const typeLabel = D.typeLabel;
+  const slug = c => 'cat-' + c;
   const url = {
     home: 'index.html',
     live: 'live.html',
     products: 'products.html',
     cat: c => 'products.html#' + slug(c),
+    dept: d => 'products.html?dept=' + d,
     filter: f => 'products.html?filter=' + f,
     product: id => 'product.html?id=' + encodeURIComponent(id),
     bulk: 'bulk-order.html',
@@ -33,13 +37,12 @@
     shipping: 'shipping.html',
     express: 'shipping.html#express',
     manuals: 'manuals.html',
+    wishlist: 'wishlist.html',
   };
-  // Nav categories without their own collection fall back to the closest one (or the full catalogue).
-  const NAV_MAP = { 'Power Banks': 'Chargers', Cables: 'Chargers', 'USB Cables': 'Chargers', Handsfree: 'Neckbands', Headphones: 'Neckbands' };
-  const catHref = label => CATS.includes(label) ? url.cat(label) : NAV_MAP[label] ? url.cat(NAV_MAP[label]) : url.products;
+  const catHref = t => CATS.includes(t) ? url.cat(t) : DEPTS.some(d => d.id === t) ? url.dept(t) : url.products;
   const LINKS = {
-    'All Items': url.products, 'Audio & Sound': url.cat('Earbuds'), Powerbanks: url.cat('Chargers'), 'Charging Devices': url.cat('Chargers'),
-    'Car Electronics': url.cat('Chargers'), 'Smart Life Devices': url.products, 'Creator Tools': url.cat('Microphones'),
+    'All Items': url.products, Audio: url.dept('audio'), Charging: url.dept('charging'), 'Cables & Adapters': url.dept('cables'),
+    'Car Accessories': url.dept('car'), Computer: url.dept('computer'), 'Personal Care': url.dept('care'),
     'Bulk Order': url.bulk, 'Corporate Order': url.corporate, 'Content Creators Program': url.creators, 'Live Shopping': url.live,
     'About Us': url.about, 'Where to Buy': url.where, Blog: url.blog,
     'Smart Help Center': url.help, 'Help Center': url.help, 'Order Tracker': url.track, 'Express Delivery': url.express,
@@ -51,26 +54,30 @@
   const isHere = href => href.split('#')[0].split('?')[0] === here() && !href.includes('#');
 
   /* ---------- Shared icon paths ---------- */
+  // Desktop nav icons: product types (or a whole department for Car / Computer / Grooming / Storage)
   const NAV_CATS = [
-    { label: 'Earbuds', d: 'M7.6 2.6a1.9 1.9 0 1 1 0 3.8a1.9 1.9 0 1 1 0-3.8zM7 5.5h1.3v4.3H7zM16.4 2.6a1.9 1.9 0 1 1 0 3.8a1.9 1.9 0 1 1 0-3.8zM15.7 5.5H17v4.3h-1.3zM3.5 11h17v4.5a6 6 0 0 1-6 6h-5a6 6 0 0 1-6-6zM11 15.6a1 1 0 1 0 2 0a1 1 0 1 0-2 0z', s: '', w: 2.2 },
-    { label: 'Headphones', d: 'M5 13h2a1.5 1.5 0 0 1 1.5 1.5v5A1.5 1.5 0 0 1 7 21H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2zM5.1 15.1h1.4v3.8H5.1zM17 13h2a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2a1.5 1.5 0 0 1-1.5-1.5v-5A1.5 1.5 0 0 1 17 13zM17.5 15.1h1.4v3.8h-1.4z', s: 'M4 15v-3a8 8 0 0 1 16 0v3', w: 2.4 },
-    { label: 'Speakers', d: 'M8 2.5h8a2 2 0 0 1 2 2v15a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-15a2 2 0 0 1 2-2zM9.4 8a2.6 2.6 0 1 0 5.2 0a2.6 2.6 0 1 0-5.2 0zM10.9 8a1.1 1.1 0 1 0 2.2 0a1.1 1.1 0 1 0-2.2 0zM9 15.5a3 3 0 1 0 6 0a3 3 0 1 0-6 0zM10.8 15.5a1.2 1.2 0 1 0 2.4 0a1.2 1.2 0 1 0-2.4 0z', s: 'M3.6 8.6L2.2 7.8M3.6 12H2M3.6 15.4l-1.4.8M20.4 8.6l1.4-.8M20.4 12H22M20.4 15.4l1.4.8', w: 1.4 },
-    { label: 'Neckbands', d: 'M8 2.7a1.9 1.9 0 1 1 0 3.8a1.9 1.9 0 1 1 0-3.8zM7.3 6h1.4l.4 3.2H7.5zM16 2.7a1.9 1.9 0 1 1 0 3.8a1.9 1.9 0 1 1 0-3.8zM15.3 6h1.4l-.2 3.2h-1.6zM2.2 13.2Q5 17.2 10.6 19.7Q16.6 21.6 20.3 15.6A1.3 1.3 0 0 0 18.1 14.4Q15.8 18.4 11.4 17.3Q7 15 4.2 11.8A1.3 1.3 0 0 0 2.2 13.2Z', s: 'M8.3 9.2c.3 2.6.1 4-.9 5.6M15.7 9.2c.4 3 .5 5.6.3 8.4', w: 1.1 },
-    { label: 'Handsfree', d: 'M8 5.8a2.4 2.4 0 1 1 0 4.8a2.4 2.4 0 1 1 0-4.8zM16 3.4a2.4 2.4 0 1 1 0 4.8a2.4 2.4 0 1 1 0-4.8z', s: 'M8 10.6V22M16 8.2V22', w: 1.6 },
-    { label: 'Smart Watches', d: 'M9 6h6a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3zM8.8 5.4l.7-3h5l.7 3zM8.8 18.6l.7 3h5l.7-3zM18.6 10h1v2.6h-1z', s: '', w: 2.2 },
-    { label: 'Power Banks', d: 'M8 2h8a2.5 2.5 0 0 1 2.5 2.5v15A2.5 2.5 0 0 1 16 22H8a2.5 2.5 0 0 1-2.5-2.5v-15A2.5 2.5 0 0 1 8 2zM13 5.5l-3.3 5h2.6l-1.3 4l3.3-5h-2.6zM8.5 17.6h7v1.4h-7z', s: '', w: 2.2 },
-    { label: 'Chargers', d: 'M7 9h10a1.5 1.5 0 0 1 1.5 1.5V20a2 2 0 0 1-2 2h-9a2 2 0 0 1-2-2v-9.5A1.5 1.5 0 0 1 7 9zM12.8 12l-2.6 4h2l-1 3.2l2.6-4h-2zM9 2.5h1.4V9H9zM13.6 2.5H15V9h-1.4z', s: '', w: 2.2 },
-    { label: 'Cables', d: 'M15 4h4.5a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H15zM20.5 4.8h2v1.4h-2zM4.5 17H9v3H4.5a1 1 0 0 1-1-1v-1a1 1 0 0 1 1-1zM1.5 17.8h2v1.4h-2z', s: 'M15 5.5H7a3.2 3.2 0 0 0 0 6.4h10a3.2 3.2 0 0 1 0 6.4H9', w: 2 },
-    { label: 'Microphones', d: 'M12 2a3.2 3.2 0 0 1 3.2 3.2v6.1a3.2 3.2 0 0 1-6.4 0V5.2A3.2 3.2 0 0 1 12 2z', s: 'M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5v4M8.5 21.5h7', w: 2 },
-    { label: 'Smart Home', d: 'M12 1.5a10.5 10.5 0 1 1 0 21a10.5 10.5 0 1 1 0-21zM12 2.9a9.1 9.1 0 1 0 0 18.2a9.1 9.1 0 1 0 0-18.2zM12 3.9a8.1 8.1 0 1 1 0 16.2a8.1 8.1 0 1 1 0-16.2zM12 15a1.4 1.4 0 1 0 0 2.8a1.4 1.4 0 1 0 0-2.8z', s: '', w: 2.2 },
-    { label: 'USB Cables', d: 'M8 1.5h5v5H8zM9.3 2.8h.9v.9h-.9zM10.8 2.8h.9v.9h-.9zM7.5 6.5h6v3h-6z', s: 'M10.5 9.5v8a2.5 2.5 0 0 0 5 0V12a2.5 2.5 0 0 1 5 0v10', w: 1.8 },
+    { label: 'Earbuds', type: 'earbuds', d: 'M7.6 2.6a1.9 1.9 0 1 1 0 3.8a1.9 1.9 0 1 1 0-3.8zM7 5.5h1.3v4.3H7zM16.4 2.6a1.9 1.9 0 1 1 0 3.8a1.9 1.9 0 1 1 0-3.8zM15.7 5.5H17v4.3h-1.3zM3.5 11h17v4.5a6 6 0 0 1-6 6h-5a6 6 0 0 1-6-6zM11 15.6a1 1 0 1 0 2 0a1 1 0 1 0-2 0z', s: '', w: 2.2 },
+    { label: 'Headphones', type: 'headphones', d: 'M5 13h2a1.5 1.5 0 0 1 1.5 1.5v5A1.5 1.5 0 0 1 7 21H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2zM5.1 15.1h1.4v3.8H5.1zM17 13h2a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2a1.5 1.5 0 0 1-1.5-1.5v-5A1.5 1.5 0 0 1 17 13zM17.5 15.1h1.4v3.8h-1.4z', s: 'M4 15v-3a8 8 0 0 1 16 0v3', w: 2.4 },
+    { label: 'Speakers', type: 'speakers', d: 'M8 2.5h8a2 2 0 0 1 2 2v15a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-15a2 2 0 0 1 2-2zM9.4 8a2.6 2.6 0 1 0 5.2 0a2.6 2.6 0 1 0-5.2 0zM10.9 8a1.1 1.1 0 1 0 2.2 0a1.1 1.1 0 1 0-2.2 0zM9 15.5a3 3 0 1 0 6 0a3 3 0 1 0-6 0zM10.8 15.5a1.2 1.2 0 1 0 2.4 0a1.2 1.2 0 1 0-2.4 0z', s: 'M3.6 8.6L2.2 7.8M3.6 12H2M3.6 15.4l-1.4.8M20.4 8.6l1.4-.8M20.4 12H22M20.4 15.4l1.4.8', w: 1.4 },
+    { label: 'Neckbands', type: 'neckbands', d: 'M8 2.7a1.9 1.9 0 1 1 0 3.8a1.9 1.9 0 1 1 0-3.8zM7.3 6h1.4l.4 3.2H7.5zM16 2.7a1.9 1.9 0 1 1 0 3.8a1.9 1.9 0 1 1 0-3.8zM15.3 6h1.4l-.2 3.2h-1.6zM2.2 13.2Q5 17.2 10.6 19.7Q16.6 21.6 20.3 15.6A1.3 1.3 0 0 0 18.1 14.4Q15.8 18.4 11.4 17.3Q7 15 4.2 11.8A1.3 1.3 0 0 0 2.2 13.2Z', s: 'M8.3 9.2c.3 2.6.1 4-.9 5.6M15.7 9.2c.4 3 .5 5.6.3 8.4', w: 1.1 },
+    { label: 'Handsfree', type: 'handsfree', d: 'M8 5.8a2.4 2.4 0 1 1 0 4.8a2.4 2.4 0 1 1 0-4.8zM16 3.4a2.4 2.4 0 1 1 0 4.8a2.4 2.4 0 1 1 0-4.8z', s: 'M8 10.6V22M16 8.2V22', w: 1.6 },
+    { label: 'Chargers', type: 'wall-chargers', d: 'M7 9h10a1.5 1.5 0 0 1 1.5 1.5V20a2 2 0 0 1-2 2h-9a2 2 0 0 1-2-2v-9.5A1.5 1.5 0 0 1 7 9zM12.8 12l-2.6 4h2l-1 3.2l2.6-4h-2zM9 2.5h1.4V9H9zM13.6 2.5H15V9h-1.4z', s: '', w: 2.2 },
+    { label: 'Power Banks', type: 'power-banks', d: 'M8 2h8a2.5 2.5 0 0 1 2.5 2.5v15A2.5 2.5 0 0 1 16 22H8a2.5 2.5 0 0 1-2.5-2.5v-15A2.5 2.5 0 0 1 8 2zM13 5.5l-3.3 5h2.6l-1.3 4l3.3-5h-2.6zM8.5 17.6h7v1.4h-7z', s: '', w: 2.2 },
+    { label: 'Cables', type: 'charging-cables', d: 'M15 4h4.5a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H15zM20.5 4.8h2v1.4h-2zM4.5 17H9v3H4.5a1 1 0 0 1-1-1v-1a1 1 0 0 1 1-1zM1.5 17.8h2v1.4h-2z', s: 'M15 5.5H7a3.2 3.2 0 0 0 0 6.4h10a3.2 3.2 0 0 1 0 6.4H9', w: 2 },
+    { label: 'Car', type: 'car', d: 'M9 3.5h6a1.5 1.5 0 0 1 1.5 1.5v10a1.5 1.5 0 0 1-1.5 1.5H9A1.5 1.5 0 0 1 7.5 15V5A1.5 1.5 0 0 1 9 3.5zM9 5v10h6V5z', s: 'M5 7.5v5M19 7.5v5M12 16.5V21M8.5 21h7', w: 2 },
+    { label: 'Microphones', type: 'microphones', d: 'M12 2a3.2 3.2 0 0 1 3.2 3.2v6.1a3.2 3.2 0 0 1-6.4 0V5.2A3.2 3.2 0 0 1 12 2z', s: 'M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5v4M8.5 21.5h7', w: 2 },
+    { label: 'Computer', type: 'computer', d: 'M3 7h18a1.5 1.5 0 0 1 1.5 1.5v8A1.5 1.5 0 0 1 21 18H3a1.5 1.5 0 0 1-1.5-1.5v-8A1.5 1.5 0 0 1 3 7zM3 8.5v8h18v-8z', s: 'M5.5 11h1M9 11h1M12.5 11h1M16 11h2.5M7 14.5h10', w: 1.8 },
+    { label: 'Grooming', type: 'care', d: 'M8 2.5h8a1 1 0 0 1 1 1v3H7v-3a1 1 0 0 1 1-1zM7.6 8h8.8l-.9 12a1.6 1.6 0 0 1-1.6 1.5h-3.8a1.6 1.6 0 0 1-1.6-1.5zM11.2 11h1.6v3.6h-1.6z', s: '', w: 2 },
+    { label: 'Storage', type: 'storage', d: 'M8 2.5h7.5l3.5 3.5v14a1.5 1.5 0 0 1-1.5 1.5h-9.5A1.5 1.5 0 0 1 6.5 20V4A1.5 1.5 0 0 1 8 2.5zM9.2 5.2v3.2h1.3V5.2zM11.6 5.2v3.2h1.3V5.2zM14 5.2v3.2h1.3V5.2z', s: '', w: 2 },
   ];
+
   const navSvg = (d, s, w, size) => `<svg viewBox="0 0 24 24" aria-hidden="true" style="width: ${size}px; height: ${size}px;"><path d="${d}" fill="#fff" fill-rule="evenodd"></path><path d="${s}" fill="none" stroke="#fff" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
   const P_GRID = 'M5.5 3.5h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-3a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2zM15.5 3.5h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-3a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2zM5.5 13.5h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-3a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2zM15.5 13.5h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-3a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2z';
   const P_SEARCH = 'M11 4.5a6.5 6.5 0 1 1 0 13a6.5 6.5 0 1 1 0-13zM16 16l4.5 4.5';
   const P_USER = 'M12 2.5a4.3 4.3 0 1 1 0 8.6a4.3 4.3 0 1 1 0-8.6zM3.5 21.5a8.5 8.5 0 0 1 17 0z';
   const P_BAG = 'M5.2 8h13.6a1 1 0 0 1 1 1.1l-1 11a1.6 1.6 0 0 1-1.6 1.4H6.8a1.6 1.6 0 0 1-1.6-1.4l-1-11A1 1 0 0 1 5.2 8z';
   const P_HANDLE = 'M8.8 8V6.5a3.2 3.2 0 0 1 6.4 0V8';
+  const P_HEART = 'M12 20.2l-1.3-1.2C6.1 14.9 3.2 12.3 3.2 9a4.6 4.6 0 0 1 4.7-4.7c1.6 0 3.1.7 4.1 1.9a5.4 5.4 0 0 1 4.1-1.9A4.6 4.6 0 0 1 20.8 9c0 3.3-2.9 5.9-7.5 10z';
   const STAR_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z" fill="#E2A92C"></path></svg>';
   const btnBuy = (label, href) => href
     ? `<a class="btn-buy" href="${href}">${icon('cart', 30)}${esc(label)}</a>`
@@ -81,23 +88,134 @@
     get: (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
     set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } },
   };
-  let bag = store.get('wu-bag', 0), toastT;
-  function toast(msg) {
+  let toastT;
+  function toast(msg, svg) {
     const t = $('toast');
     if (!t) return;
-    t.innerHTML = icon('bag', 18) + '<span>' + esc(msg) + '</span>';
+    t.innerHTML = (svg || icon('bag', 18)) + '<span>' + esc(msg) + '</span>';
     t.hidden = false;
     clearTimeout(toastT);
     toastT = setTimeout(() => { t.hidden = true; }, 2400);
   }
-  function add(id, n = 1) {
+  /* ---------- Cart: line items (sku + qty) kept on this device. Prices always come from the catalogue,
+     and the order server recomputes them again, so a stale or edited cart can never change what is charged. ---------- */
+  const SHOP = window.WU_SHOP || { freeDeliveryFrom: 40000, maxQty: 10, giftWrap: 490, delivery: { standard: { fee: 250, freeOver: true } } };
+  const skuIndex = {};
+  D.products.forEach(p => (p.variants.length ? p.variants : [{ sku: p.code, attrs: {}, price: p.price, thumb: p.thumb, bg: p.bg, ar: p.ar }])
+    .forEach(v => { skuIndex[v.sku] = { p, v }; }));
+  const defaultSku = p => (p.variants.length ? p.variants[0].sku : p.code);
+  let cart = store.get('wu-cart', []).filter(l => skuIndex[l.sku] && l.qty > 0);
+  let giftWrap = !!store.get('wu-gift', false);
+  const cartCount = () => cart.reduce((n, l) => n + l.qty, 0);
+  const cartLines = () => cart.map(l => {
+    const { p, v } = skuIndex[l.sku];
+    return { sku: l.sku, qty: l.qty, p, v, attrs: v.attrs || {}, price: v.price, total: v.price * l.qty };
+  });
+  // Totals for a delivery option; free standard delivery from SHOP.freeDeliveryFrom
+  function cartTotals(delivery = 'standard') {
+    const subtotal = cartLines().reduce((n, l) => n + l.total, 0);
+    const opt = (SHOP.delivery || {})[delivery] || { fee: 0, freeOver: true };
+    const fee = !cart.length ? 0 : opt.freeOver && subtotal >= SHOP.freeDeliveryFrom ? 0 : opt.fee;
+    const gift = giftWrap && cart.length ? SHOP.giftWrap : 0;
+    return { subtotal, delivery: fee, giftWrap: gift, total: subtotal + fee + gift };
+  }
+  function saveCart() {
+    store.set('wu-cart', cart);
+    store.set('wu-gift', giftWrap);
+    paintBadge();
+    window.dispatchEvent(new CustomEvent('wu-cart'));
+  }
+  function add(id, n = 1, sku, opts = {}) {
     const p = D.byId(id);
     if (!p || p.soldOut) return;
-    bag += n;
-    store.set('wu-bag', bag);
-    paintBadge();
-    toast((n > 1 ? n + ' × ' : '') + p.title + ' added to cart');
+    sku = skuIndex[sku] ? sku : defaultSku(p);
+    const line = cart.find(l => l.sku === sku);
+    if (line) line.qty = Math.min(SHOP.maxQty, line.qty + n);
+    else cart.push({ sku, qty: Math.min(SHOP.maxQty, n) });
+    saveCart();
+    const attrs = Object.values(skuIndex[sku].v.attrs || {});
+    toast(`${n > 1 ? n + ' × ' : ''}${p.code}${attrs.length ? ' (' + attrs.join(', ') + ')' : ''} added to cart`);
+    if (opts.open && cartUI) cartUI.open();
   }
+  const setQty = (sku, q) => {
+    const line = cart.find(l => l.sku === sku);
+    if (!line) return;
+    line.qty = Math.max(0, Math.min(SHOP.maxQty, q));
+    cart = cart.filter(l => l.qty > 0);
+    saveCart();
+  };
+  const setGift = on => { giftWrap = !!on; saveCart(); };
+  const clearCart = () => { cart = []; giftWrap = false; saveCart(); };
+  let cartUI = null;
+
+  /* ---------- Reviews: written by shoppers, stored on this device until a shared review database is connected.
+     No invented ratings anywhere: stars only appear when a product has real reviews. ---------- */
+  const REV_KEY = 'wu-reviews', HELP_KEY = 'wu-helpful';
+  const revAll = () => store.get(REV_KEY, {}) || {};
+  const reviews = {
+    list: pid => (revAll()[pid] || []).slice(),
+    summary(pid) {
+      const l = reviews.list(pid), dist = [0, 0, 0, 0, 0];
+      l.forEach(r => { dist[5 - r.rating] += 1; });
+      return { count: l.length, avg: l.length ? l.reduce((n, r) => n + r.rating, 0) / l.length : 0, dist };
+    },
+    // Verified buyer: this product is in an order placed from this device
+    verified: pid => (store.get('wu-orders', []) || []).some(o => (o.items || []).some(i => i.id === pid)),
+    add(pid, r) {
+      const all = revAll();
+      const rev = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), rating: Math.max(1, Math.min(5, r.rating | 0)), title: r.title, text: r.text, name: r.name, city: r.city, sku: r.sku, verified: reviews.verified(pid), helpful: 0, createdAt: new Date().toISOString() };
+      all[pid] = [rev].concat(all[pid] || []);
+      store.set(REV_KEY, all);
+      window.dispatchEvent(new CustomEvent('wu-reviews', { detail: { pid } }));
+      return rev;
+    },
+    helpful(pid, id) {
+      const done = store.get(HELP_KEY, []);
+      if (done.includes(id)) return false;
+      const all = revAll(), r = (all[pid] || []).find(x => x.id === id);
+      if (!r) return false;
+      r.helpful += 1;
+      store.set(REV_KEY, all);
+      store.set(HELP_KEY, done.concat(id));
+      return true;
+    },
+  };
+  const starsSvg = (val, size = 16) => [1, 2, 3, 4, 5].map(i => {
+    const fill = Math.max(0, Math.min(1, val - i + 1));
+    return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true"><defs><linearGradient id="sg${i}-${Math.round(fill * 100)}"><stop offset="${fill * 100}%" stop-color="#E2A92C"/><stop offset="${fill * 100}%" stop-color="#D9DCE1"/></linearGradient></defs><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z" fill="url(#sg${i}-${Math.round(fill * 100)})"/></svg>`;
+  }).join('');
+
+  /* ---------- Wishlist (saved product ids persist across pages; every [data-wish] heart stays in sync) ---------- */
+  const heartSvg = (size, filled) => `<svg viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true"><path d="${P_HEART}" fill="${filled ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>`;
+  let wish = store.get('wu-wish', []).filter(id => D.byId(id));
+  const wished = id => wish.includes(id);
+  const wishBtn = (p, cls) => `<button type="button" class="${cls}" data-wish="${p.id}" aria-pressed="${wished(p.id)}" aria-label="Save ${esc(p.title)} to wishlist">${heartSvg(20)}</button>`;
+  function paintWish() {
+    document.querySelectorAll('[data-wish]').forEach(b => {
+      const on = wished(b.dataset.wish), p = D.byId(b.dataset.wish);
+      b.setAttribute('aria-pressed', on);
+      if (p) b.setAttribute('aria-label', (on ? 'Remove ' + p.title + ' from' : 'Save ' + p.title + ' to') + ' wishlist');
+    });
+    document.querySelectorAll('.site-nav__wbadge').forEach(b => { b.hidden = !wish.length; b.textContent = wish.length; });
+  }
+  function toggleWish(id) {
+    const p = D.byId(id);
+    if (!p) return;
+    const on = !wished(id);
+    wish = on ? wish.concat(id) : wish.filter(x => x !== id);
+    store.set('wu-wish', wish);
+    paintWish();
+    toast(on ? 'Saved to your wishlist' : 'Removed from your wishlist', heartSvg(18, on));
+    window.dispatchEvent(new CustomEvent('wu-wish', { detail: { id, on } }));
+  }
+  document.addEventListener('click', e => {
+    const b = e.target.closest('[data-wish]');
+    if (!b) return;
+    e.preventDefault();
+    toggleWish(b.dataset.wish);
+  });
+  // Another tab changed the list
+  window.addEventListener('storage', e => { if (e.key === 'wu-wish') { wish = store.get('wu-wish', []).filter(id => D.byId(id)); paintWish(); window.dispatchEvent(new CustomEvent('wu-wish', { detail: {} })); } });
 
   /* ---------- Utility bar ---------- */
   function renderUtility() {
@@ -108,52 +226,59 @@
 
   /* ---------- Site nav ---------- */
   const nav = $('site-nav');
-  const NAV_INSET = 12, NAV_START = 64;
+  // Slim nav (Ronin-style proportions): 56px pill = 40px row + 8px padding, 22px inside the hero on desktop
+  const NAV_INSET = 22, NAV_START = 64;
   let navMode = '', navHidden = false, lastY = window.scrollY, activeCat = null;
+  // A nav icon is "on" for its own type, or for any type inside the department it stands for
+  const navOn = t => !!activeCat && (t === activeCat || (DEPTS.find(d => d.id === t) || { types: [] }).types.includes(activeCat));
   const logoImgs = h => `<span class="site-nav__logo" style="height: ${h}px;"><img src="img/wu-logo.png" alt="WisdomUp"><img src="img/wu-logo-white.png" alt="" aria-hidden="true"></span>`;
   const DARK = '.hero, .pbanner, .loop__slide, .duo__card, .promo, .footer, .pd-stat--dark, .bulk-steps';
   function renderNav(force) {
     if (!nav) return;
     const w = vw(), wide = w >= 640;
-    const count = w >= 1560 ? 12 : w >= 1420 ? 10 : w >= 1240 ? 8 : w >= 1080 ? 6 : w >= 940 ? 4 : 0;
-    const gap = w >= 1360 ? 13 : 5;
+    // Category icons that fit beside the logo and tools (each ~46px + 4px gap)
+    const count = w >= 1240 ? NAV_CATS.length : w >= 1120 ? 11 : w >= 1000 ? 9 : w >= 880 ? 6 : w >= 760 ? 4 : 0;
+    const gap = 4;
     const mode = wide ? 'w' + count + '-' + gap : 'n';
     if (mode === navMode && !force) return;
     navMode = mode;
     Object.assign(nav.style, wide
-      ? { left: 'calc(var(--gutter, 28px) + 20px)', right: 'calc(var(--gutter, 28px) + 20px)', height: '70px', padding: '0 10px 0 34px', gap: '34px' }
+      ? { left: 'calc(var(--gutter, 28px) + 20px)', right: 'calc(var(--gutter, 28px) + 20px)', height: '56px', padding: '0 22px 0 28px', gap: '11px' }
       : { left: 'calc(var(--gutter, 16px) + 10px)', right: 'calc(var(--gutter, 16px) + 10px)', height: '43px', padding: '0 4px', gap: '0px' });
     if (wide) {
       nav.innerHTML = `
-        <a href="${url.home}" aria-label="WisdomUp home" style="display: flex; align-items: center; flex: none;">${logoImgs(43)}</a>
+        <a href="${url.home}" aria-label="WisdomUp home" style="display: flex; align-items: center; flex: none;">${logoImgs(30)}</a>
         <nav class="site-nav__cats" aria-label="Categories" style="gap: ${gap}px;">
-          ${NAV_CATS.slice(0, count).map(c => `<a class="navbtn navbtn--cat" href="${catHref(c.label)}" aria-label="${c.label}"${activeCat === c.label ? ' aria-current="true" aria-expanded="true"' : ''}>${navSvg(c.d, c.s, c.w, 31)}<span>${c.label}</span></a>`).join('')}
+          ${NAV_CATS.slice(0, count).map(c => `<a class="navbtn navbtn--cat" href="${catHref(c.type)}" aria-label="${c.label}" data-type="${c.type}"${navOn(c.type) ? ' aria-current="true" aria-expanded="true"' : ''}>${navSvg(c.d, c.s, c.w, 24)}<span>${c.label}</span></a>`).join('')}
         </nav>
         <div class="site-nav__tools">
-          <a class="navbtn navbtn--all" href="${url.products}" style="padding: 0 21px 0 13px; margin-right: 5px;">${navSvg(P_GRID, '', 2.2, 29)}<span>Shop All</span></a>
-          <button type="button" class="navbtn navbtn--util" data-act="search" aria-label="Search">${navSvg('', P_SEARCH, 2.2, 29)}</button>
-          <button type="button" class="navbtn navbtn--util" data-act="account" aria-label="Account">${navSvg(P_USER, '', 2.2, 29)}</button>
-          <button type="button" class="navbtn navbtn--util" data-act="bag" aria-label="Cart" style="position: relative;">${navSvg(P_BAG, P_HANDLE, 2.2, 29)}<b class="site-nav__badge" hidden></b></button>
+          <a class="navbtn navbtn--all" href="${url.products}" style="padding: 0 16px 0 11px; margin-right: 6px;">${navSvg(P_GRID, '', 2.2, 22)}<span>Shop All</span></a>
+          <button type="button" class="navbtn navbtn--util" data-act="search" aria-label="Search">${navSvg('', P_SEARCH, 2.2, 22)}</button>
+          <button type="button" class="navbtn navbtn--util" data-act="account" aria-label="Account">${navSvg(P_USER, '', 2.2, 22)}</button>
+          <a class="navbtn navbtn--util" href="${url.wishlist}" aria-label="Wishlist" style="position: relative;"${here() === url.wishlist ? ' aria-current="true"' : ''}>${navSvg('', P_HEART, 2.2, 22)}<b class="site-nav__badge site-nav__wbadge" hidden></b></a>
+          <button type="button" class="navbtn navbtn--util" data-act="bag" aria-label="Cart" style="position: relative;">${navSvg(P_BAG, P_HANDLE, 2.2, 22)}<b class="site-nav__badge" hidden></b></button>
         </div>`;
     } else {
       nav.innerHTML = `
         <div class="site-nav__narrow">
-          <a class="site-nav__icon" href="${url.products}" aria-label="Shop all products" style="justify-self: start;"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M4 6.5h16M4 12h16M4 17.5h16"></path></svg></a>
+          <button type="button" class="site-nav__icon" data-act="menu" aria-label="Menu" aria-haspopup="dialog" aria-controls="mnav" aria-expanded="false" style="justify-self: start;"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M4 6.5h16M4 12h16M4 17.5h16"></path></svg></button>
           <a href="${url.home}" aria-label="WisdomUp home" style="display: flex; align-items: center; justify-content: center;">${logoImgs(26)}</a>
           <div style="justify-self: end; display: flex; align-items: center; gap: 2px;">
             <button type="button" class="site-nav__icon" data-act="search" aria-label="Search"><svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="${P_SEARCH}"></path></svg></button>
+            <a class="site-nav__icon" href="${url.wishlist}" aria-label="Wishlist" style="position: relative;"><svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true" fill="none" stroke="#fff" stroke-width="2.1" stroke-linejoin="round"><path d="${P_HEART}"></path></svg><b class="site-nav__badge site-nav__wbadge" hidden></b></a>
             <button type="button" class="site-nav__icon" data-act="bag" aria-label="Cart"><svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${P_BAG}${P_HANDLE}"></path></svg><b class="site-nav__badge" hidden></b></button>
           </div>
         </div>`;
     }
     paintBadge();
+    paintWish();
   }
   function setActiveCat(label) {
     if (label === activeCat) return;
     activeCat = label;
     if (!nav) return;
     nav.querySelectorAll('.navbtn--cat').forEach(a => {
-      const on = a.getAttribute('aria-label') === label;
+      const on = navOn(a.dataset.type);
       a.toggleAttribute('aria-current', on);
       a.setAttribute('aria-expanded', on);
     });
@@ -169,23 +294,52 @@
     if (!nav.classList.contains('is-toned')) requestAnimationFrame(() => nav.classList.add('is-toned'));
   }
   function paintBadge() {
-    const b = nav && nav.querySelector('.site-nav__badge');
+    const b = nav && nav.querySelector('[data-act="bag"] .site-nav__badge');
     if (!b) return;
-    b.hidden = bag <= 0;
-    b.textContent = bag;
+    const n = cartCount();
+    b.hidden = n <= 0;
+    b.textContent = n;
   }
+  /* ---------- Priority bar rule: only one fixed bar on screen ----------
+     A page's own sticky bar (data-priority-bar: All Products filters, product section tabs) outranks the nav.
+     While that bar is stuck at the top, the nav stays hidden even when scrolling up; the nav returns only once
+     the bar is back in its normal place with room for the nav above it. Pages without one keep the usual
+     hide-on-scroll-down / show-on-scroll-up nav. A zero-height marker before the bar gives its natural position. */
+  let pBar = null, pMark = null, held = false;
+  function priorityBar() {
+    if (!pBar || !pBar.isConnected) {
+      pBar = document.querySelector('[data-priority-bar]');
+      pMark = null;
+    }
+    if (!pBar || pBar.offsetParent === null) return null;
+    if (!pMark) {
+      pMark = document.createElement('div');
+      pMark.setAttribute('aria-hidden', 'true');
+      pMark.style.cssText = 'height: 0; margin: 0; padding: 0;';
+      pBar.before(pMark);
+    }
+    return pBar;
+  }
+  // Where the bar would sit if it were not stuck (viewport px), and where it sits when stuck
+  const barNatural = () => pMark.getBoundingClientRect().top + (parseFloat(getComputedStyle(pBar).marginTop) || 0);
+  const barStuckTop = () => parseFloat(getComputedStyle(pBar).top) || 0;
+
   function placeNav() {
     if (!nav) return;
     const y = window.scrollY, d = y - lastY, was = navHidden;
-    if (y < 120) navHidden = false;
-    else if (d > 6) navHidden = true;
-    else if (d < -6) navHidden = false;
-    if (Math.abs(d) > 6 || y < 120) lastY = y;
     // Pages with a hero tuck the nav 12px inside it; other pages park it under the utility bar.
     const anchor = [...document.querySelectorAll('[data-nav-anchor]')].find(el => el.offsetParent !== null); // first visible anchor
     let top;
     if (vw() < 640) top = anchor ? Math.max(10, anchor.getBoundingClientRect().top + 10) : 10;
     else top = Math.max(16, (anchor ? anchor.getBoundingClientRect().top + y + NAV_INSET : NAV_START) - y);
+    if (y < 120) navHidden = false;
+    else if (d > 6) navHidden = true;
+    else if (d < -6) navHidden = false;
+    if (Math.abs(d) > 6 || y < 120) lastY = y;
+    // Priority bar: hold the nav back until there is room for it above the bar (nav bottom + 6px gap)
+    held = !!priorityBar() && barNatural() < top + nav.offsetHeight + 6;
+    if (held) navHidden = true;
+    if (toTop) toTop.classList.toggle('is-on', held && y > innerHeight * .8);
     nav.style.top = top + 'px';
     nav.style.transform = navHidden ? 'translateY(calc(-100% - 40px))' : 'none';
     toneNav();
@@ -213,8 +367,9 @@
     const input = host.querySelector('input'), grid = host.querySelector('.search__grid'), label = host.querySelector('.search__label b'), pagesEl = host.querySelector('.search__pages');
     // Help and company pages are searchable too ("warranty", "return", "track", "bulk"…)
     const PAGES = [
+      ['Wishlist', url.wishlist, 'wishlist saved favourites favorites hearts liked save for later'],
       ['Shipping Policy', url.shipping, 'shipping delivery express courier free cod cash on delivery time days'],
-      ['Exchange & Refund Policy', url.returns, 'return refund exchange money back 30-day guarantee'],
+      ['Exchange & Refund Policy', url.returns, 'return refund exchange money back 7-day guarantee'],
       ['Warranty Policy', url.warranty, 'warranty repair replacement claim defect guarantee'],
       ['Order Tracker', url.track, 'track tracking order status where parcel'],
       ['Help Center', url.help, 'help support contact faq question phone email'],
@@ -233,11 +388,16 @@
       const pages = q.length > 1 ? PAGES.filter(([t, , k]) => (t + ' ' + k).toLowerCase().split(/\s+/).some(w => w.startsWith(q) || q.split(/\s+/).some(x => x.length > 2 && w.startsWith(x)))).slice(0, 4) : [];
       pagesEl.hidden = !pages.length;
       pagesEl.innerHTML = pages.map(([t, h]) => `<a href="${h}">${esc(t)} ›</a>`).join('');
-      const res = (q ? D.products.filter(p => (p.title + ' ' + p.meta + ' ' + p.cat).toLowerCase().includes(q)) : D.products.filter(p => p.tabs.includes('best'))).slice(0, 8);
-      label.textContent = q ? (res.length ? res.length + ' result' + (res.length > 1 ? 's' : '') : 'No matches — try “earbuds” or “charger”') : 'Popular right now';
+      const words = q.split(/\s+/).filter(Boolean);
+      const hay = p => p._s || (p._s = [p.title, p.meta, p.cat, (p.skus || []).join(' '), (p.connectors || []).join(' '), DEPTS.filter(d => d.types.includes(p.type)).map(d => d.label).join(' '), (p.highlights || []).join(' ')].join(' ').toLowerCase());
+      // Rank: words in the product name and category count most, then specs/highlights
+      const score = p => words.reduce((n, w) => n + (p.title.toLowerCase().includes(w) ? 3 : 0) + (p.cat.toLowerCase().includes(w) ? 4 : 0), 0);
+      const hits = q ? D.products.filter(p => words.every(w => hay(p).includes(w))).sort((a, b) => score(b) - score(a)) : D.products.filter(p => p.tabs.includes('best') || p.tabs.includes('new'));
+      const res = hits.slice(0, 8);
+      label.textContent = q ? (hits.length ? (hits.length > res.length ? `Top ${res.length} of ${hits.length} results` : hits.length + ' result' + (hits.length > 1 ? 's' : '')) : 'No matches — try “earbuds”, “charger” or “cable”') : 'Popular right now';
       grid.innerHTML = res.map((p, i) => `
         <a class="ccard" href="${url.product(p.id)}">
-          <div class="ccard__media" style="background: ${BG[i % BG.length]};">${art(p.art, { alt: p.title, style: 'width: 100%; height: 100%;' })}${p.ribbon || p.cat ? `<div class="ccard__tag"><span>${esc(p.ribbon || p.cat)}</span></div>` : ''}</div>
+          <div class="ccard__media" style="background: ${p.thumb ? photoBg(p) : BG[i % BG.length]};">${p.thumb ? `<img src="${p.thumb}" alt="${esc(p.title)}" loading="lazy" style="width: 100%; height: 100%; ${photoFit(p)}">` : art(p.art, { alt: p.title, style: 'width: 100%; height: 100%;' })}${p.ribbon || p.cat ? `<div class="ccard__tag"><span>${esc(p.ribbon || p.cat)}</span></div>` : ''}</div>
           <div class="ccard__body"><div class="ccard__title">${esc(code(p))}</div><p class="ccard__meta">${esc(p.meta)}</p></div>
           <div class="ccard__foot"><span class="ccard__price">${esc(p.priceText)}</span>${p.wasText ? `<s class="ccard__was">${esc(p.wasText)}</s>` : ''}</div>
         </a>`).join('');
@@ -252,9 +412,12 @@
   }
 
   /* ---------- WUProductCard (designed at 430px, scales with cqw) ---------- */
-  const COLOR_NAMES = { '#1b1b1b': 'Midnight Black', '#f2f2f2': 'Arctic White', '#ede6da': 'Sand Beige', '#c9a24a': 'Gold', '#5c3fa8': 'Royal Purple' };
-  const colorsOf = p => (p.colors && p.colors.length ? p.colors : ['#1b1b1b'])
-    .map((c, i) => typeof c === 'string' ? { name: COLOR_NAMES[c.toLowerCase()] || 'Colour ' + (i + 1), hex: c } : c);
+  // Colours only when the supplier sheet lists them (no invented swatches)
+  const colorsOf = p => (p.colors || []).map((c, i) => typeof c === 'string' ? { name: 'Colour ' + (i + 1), hex: c } : c);
+  // Studio photo on a background sampled from the photo itself, so landscape packshots blend into portrait frames
+  const photoBg = p => p.bg ? `radial-gradient(110% 80% at 50% 45%, ${p.bg[0]} 0%, ${p.bg[1]} 100%)` : '#F8F9FA';
+  // Packshots show the product on the left and its box on the right: frame the product, unless the shot is very wide
+  const photoFit = p => (p.ar || 1) >= 2.1 ? 'object-fit: contain;' : 'object-fit: cover; object-position: 6% 50%;';
   const seedOf = p => [...p.id].reduce((a, c) => a + c.charCodeAt(0), 0);
   const ratingOf = p => { const rt = p.rating, s = seedOf(p); return typeof rt === 'number' ? (rt >= 5 ? rt - (s % 4) * 0.1 : rt).toFixed(1) : '4.6'; };
   const reviewsOf = p => 24 + (seedOf(p) * 37) % 260;
@@ -265,31 +428,33 @@
   };
   function productCard(p, opts = {}) {
     const seed = seedOf(p), off = !!p.soldOut, href = url.product(p.id);
-    const badge = off ? 'Sold out' : (opts.badge !== undefined ? opts.badge : p.ribbon);
-    const usePhoto = !!p.src && !p.src2;
-    const media = usePhoto
-      ? `<img class="wpc__photo" src="${p.src}" alt="${esc(p.title)}" loading="lazy">`
-      : `<div class="wpc__art wpc__art--main">${art(p.art, { src: p.src, alt: p.title })}</div>
-         <div class="wpc__art wpc__art--alt"${p.src2 ? ' style="transform: none;"' : ''}>${art(p.art, { src: p.src2 || p.src, alt: '' })}</div>`;
+    const badge = opts.badge !== undefined ? opts.badge : p.ribbon;
+    const opts_n = p.variants ? p.variants.length : 0, colours = colorsOf(p);
+    const media = p.thumb
+      ? `<img class="wpc__photo" src="${p.thumb}" alt="${esc(p.title)}" loading="lazy" style="${photoFit(p)}">`
+      : `<div class="wpc__art wpc__art--main">${art(p.art, { alt: p.title })}</div>`;
     return `
       <div class="wpc${off ? ' wpc--off' : ''}" data-pid="${p.id}">
         <article class="wpc__card">
-          <a class="wpc__media" href="${href}" tabindex="-1" aria-hidden="true">
+          <a class="wpc__media" href="${href}" tabindex="-1" aria-hidden="true" style="background: ${photoBg(p)};">
             ${media}
             ${badge ? `<span class="wpc__badge">${esc(badge)}</span>` : ''}
           </a>
+          ${wishBtn(p, 'wpc__wish')}
           <div class="wpc__body">
             <div class="wpc__row">
               <span class="wpc__price">${esc(p.priceText)}</span>
-              <span class="wpc__rating" style="visibility: ${p.rating === 0 ? 'hidden' : 'visible'};">${STAR_SVG}<span>${ratingOf(p)}</span><small>(${reviewsOf(p)})</small></span>
+              ${(() => { const rv = reviews.summary(p.id); return rv.count ? `<span class="wpc__rating" aria-label="Rated ${rv.avg.toFixed(1)} out of 5 from ${rv.count} review${rv.count > 1 ? 's' : ''}">${STAR_SVG}<span>${rv.avg.toFixed(1)}</span><small>(${rv.count})</small></span>` : `<span class="wpc__kind">${esc(p.cat)}</span>`; })()}
             </div>
             <h3 class="wpc__title"><a href="${href}">${esc(p.title)}</a></h3>
             <div class="wpc__eta">${etaFor(seed, off)}</div>
             <div class="wpc__row wpc__foot">
-              <div class="wpc__swatches" role="radiogroup" aria-label="Colour">
-                ${colorsOf(p).map((c, i) => `<button type="button" class="wpc__swatch" role="radio" aria-label="${esc(c.name)}" aria-checked="${i === 0}" style="background: ${c.hex}; --sw: ${c.hex};"></button>`).join('')}
-              </div>
-              <button type="button" class="wpc__cta"${off ? ' disabled' : ''}><span class="wpc__cta-ic">${icon('cart', 16)}</span><span class="wpc__cta-t">${off ? 'Sold out' : 'Add to cart'}</span></button>
+              ${colours.length > 1 ? `<div class="wpc__swatches" role="radiogroup" aria-label="Colour">
+                ${colours.map((c, i) => `<button type="button" class="wpc__swatch" role="radio" aria-label="${esc(c.name)}" aria-checked="${i === 0}" style="background: ${c.hex}; --sw: ${c.hex};"></button>`).join('')}
+              </div>` : opts_n ? `<span class="wpc__opts">${opts_n} options</span>` : '<span></span>'}
+              ${opts_n
+                ? `<a class="wpc__cta" href="${href}"${off ? ' aria-disabled="true"' : ''}><span class="wpc__cta-t">${off ? 'Sold out' : 'Choose'}</span><span class="wpc__cta-ic">${icon('chev-r', 16)}</span></a>`
+                : `<button type="button" class="wpc__cta"${off ? ' disabled aria-disabled="true"' : ''}><span class="wpc__cta-ic">${icon('cart', 16)}</span><span class="wpc__cta-t">${off ? 'Sold out' : 'Add to cart'}</span></button>`}
             </div>
           </div>
         </article>
@@ -298,7 +463,7 @@
   document.addEventListener('click', e => {
     const sw = e.target.closest('.wpc__swatch');
     if (sw) { sw.parentElement.querySelectorAll('.wpc__swatch').forEach(x => x.setAttribute('aria-checked', x === sw)); return; }
-    const cta = e.target.closest('.wpc__cta');
+    const cta = e.target.closest('button.wpc__cta');
     if (!cta || cta.disabled) return;
     add(cta.closest('.wpc').dataset.pid);
     const t = cta.querySelector('.wpc__cta-t');
@@ -345,13 +510,15 @@
     const n = slides.length;
     let i = 0, hover = false;
     el.innerHTML = slides.map((s, k) => `
-      <div class="hero__slide${k === 0 ? ' is-on' : ''}" aria-roledescription="slide" aria-label="${k + 1} of ${n}">
-        ${s.src ? `<img class="hero__img" src="${s.src}" alt="${esc(s.hint)}"${HERO_POS[s.slotId] ? ` style="object-position: ${HERO_POS[s.slotId]};"` : ''}${k ? ' loading="lazy"' : ''}>` : ''}
+      <div class="hero__slide${s.pack ? ' hero__slide--pack' : ''}${k === 0 ? ' is-on' : ''}" aria-roledescription="slide" aria-label="${k + 1} of ${n}">
+        ${s.pack && s.src ? `<a class="hero__pack" href="${url.product(s.pid)}" tabindex="-1" aria-hidden="true" style="background: radial-gradient(110% 80% at 50% 45%, ${s.bg[0]}, ${s.bg[1]});"><img src="${s.src}" alt=""${k ? ' loading="lazy"' : ''}></a>`
+          : s.src ? `<img class="hero__img" src="${s.src}" alt="${esc(s.hint)}"${HERO_POS[s.slotId] ? ` style="object-position: ${HERO_POS[s.slotId]};"` : ''}${k ? ' loading="lazy"' : ''}>` : ''}
         <div class="hero__scrim"></div>
         <div class="hero__copy">
           <div class="eyebrow eyebrow--warm">${esc(s.kicker)}</div>
           <div class="hero__name">${esc(s.name)}</div>
           <div class="hero__line">${esc(s.line)}</div>
+          ${s.sub ? `<div class="hero__sub">${esc(s.sub)}</div>` : ''}
           <div class="hero__cta">${btnBuy(s.ctaLabel, url.product(s.pid))}</div>
         </div>
       </div>`).join('') + `
@@ -372,13 +539,17 @@
       else if (t.closest('.hero__arrow--next')) go(i + 1);
       else if (t.closest('.dot')) go([...dots].indexOf(t.closest('.dot')));
     });
+    // Touch: swipe left/right (touch screens have no arrow buttons)
+    let hx = null;
+    el.addEventListener('touchstart', e => { hx = e.touches[0].clientX; }, { passive: true });
+    el.addEventListener('touchend', e => { if (hx == null) return; const dx = e.changedTouches[0].clientX - hx; if (Math.abs(dx) > 40) go(i + (dx < 0 ? 1 : -1)); hx = null; });
     el.addEventListener('mouseenter', () => { hover = true; });
     el.addEventListener('mouseleave', () => { hover = false; });
     if (!reduced()) setInterval(() => { if (!hover) go(i + 1); }, 5000);
   }
 
   /* ---------- Accordion (FAQ pattern: one open at a time) ---------- */
-  function mountAccordion(listEl, items, { first = 0, idPrefix = 'acc' } = {}) {
+  function mountAccordion(listEl, items, { first = -1, idPrefix = 'acc' } = {}) {
     listEl.innerHTML = items.map(([q, a], i) => `
       <div class="faq__item">
         <button type="button" class="faq__q" aria-expanded="${i === first}" aria-controls="${idPrefix}-a${i}"><span>${esc(q)}</span><span class="faq__chev">${icon('chev-r', 18)}</span></button>
@@ -431,7 +602,7 @@
           <form class="newsletter"><input type="email" placeholder="Email address" aria-label="Email address"><button aria-label="Subscribe" type="submit">${icon('arrow', 18)}</button></form>
         </div>
       </footer>
-      <div class="subfooter"><span>Copyright © 2026 WisdomUp. All rights reserved.</span><span>Visa · MasterCard · JazzCash · EasyPaisa · COD</span></div>`;
+      <div class="subfooter"><span>Copyright © 2026 WisdomUp. All rights reserved.</span><span>Cash on Delivery · JazzCash · EasyPaisa · Bank transfer</span></div>`;
     el.addEventListener('click', e => { const a = e.target.closest('.footer a[href="#"]'); if (a) e.preventDefault(); });
     // Link groups collapse into a one-open-at-a-time accordion (same behaviour as the FAQ) when the footer stacks.
     const FT_ACC = matchMedia('(max-width: 767px)');
@@ -458,19 +629,101 @@
   /* ---------- Smooth in-page scrolling that clears the fixed nav + any sticky bar ---------- */
   function scrollToEl(el, extra = 20) {
     if (!el) return;
+    // With a priority bar, anything at or below it lands under the stuck bar (the nav is hidden there)
+    if (priorityBar()) {
+      const natural = barNatural() + window.scrollY, stuck = barStuckTop();
+      if (el === pBar) { window.scrollTo({ top: natural - stuck, behavior: reduced() ? 'auto' : 'smooth' }); return; }
+      const t = el.getBoundingClientRect().top + window.scrollY;
+      if (t >= natural) { window.scrollTo({ top: t - stuck - pBar.offsetHeight - extra, behavior: reduced() ? 'auto' : 'smooth' }); return; }
+    }
     // Scrolling down hides the nav (sticky bars slide up to 16px); scrolling up reveals it again.
     const mobile = vw() < 640;
     const target = el.getBoundingClientRect().top + window.scrollY;
     const down = target > window.scrollY;
     const sticky = [...document.querySelectorAll('[data-sticky-offset]')].find(x => x.offsetParent !== null); // visible sticky bar only
-    const topEdge = down ? (mobile ? 10 : 16) : (mobile ? 63 : 96);
+    const topEdge = down ? (mobile ? 10 : 16) : (mobile ? 63 : 82);
     const stickyH = sticky ? sticky.getBoundingClientRect().height + 12 : 0;
     window.scrollTo({ top: target - topEdge - stickyH - extra, behavior: reduced() ? 'auto' : 'smooth' });
   }
 
 
   /* ---------- Init chrome on every page ---------- */
-  let search;
+  let search, toTop = null;
+  // Back to top: the way back to the nav (search, cart, menu) while a priority bar holds it back
+  function mountToTop() {
+    toTop = document.createElement('button');
+    toTop.type = 'button';
+    toTop.className = 'totop';
+    toTop.setAttribute('aria-label', 'Back to top');
+    toTop.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 19V5.5M5.5 12 12 5.5 18.5 12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    toTop.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: reduced() ? 'auto' : 'smooth' });
+      toTop.blur();
+    });
+    document.body.append(toTop);
+  }
+  let menu;
+  /* ---------- Motion: quiet scroll reveal (text rises 8px and un-blurs; blocks rise and fade; siblings stagger) ---------- */
+  const RV_TEXT = 'h1, h2, .sec-title, .eyebrow, .ihero__lede, .overview__head p, .seo__head p, .mdesc, .pbanner__copy';
+  const RV_BLOCK = '.wpc, .tile, .post, .stat, .pd-stat, .ck__sec, .ord__card, .rv__sum, .rv__item, .faq__item, .seo__card, .duo__card, '
+    + '.promo-band, .loop, .series, .bulk, .pp, .trust__item, .step, .manual, .panel-list, .cta-band, .ck__sumcard, .mgrid__more, .empty, .ord__hero, .track__form, .iform, .bk-form';
+  const RV_SKIP = '#site-nav, .mnav, .cartd, .fdrawer, .search, .hero, .buybar, .toast, .wu-util, .quick, .visually-hidden, .seo__more';
+  let revealer = null;
+  function initMotion() {
+    if (reduced() || !('IntersectionObserver' in window)) return;
+    document.documentElement.classList.add('wu-motion');
+    revealer = new IntersectionObserver(entries => {
+      const byParent = new Map();
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        const list = byParent.get(e.target.parentElement) || [];
+        list.push(e.target);
+        byParent.set(e.target.parentElement, list);
+      });
+      byParent.forEach(list => list.forEach((el, i) => {
+        el.style.setProperty('--rv-d', Math.min(i, 4) * 60 + 'ms');
+        el.classList.add('is-in');
+        revealer.unobserve(el);
+      }));
+    }, { rootMargin: '0px 0px -6% 0px', threshold: 0.08 });
+    const mark = root => {
+      if (!root.querySelectorAll) return;
+      const add = (el, kind) => {
+        // once per element; never inside fixed chrome; never inside something that already reveals (no double fades)
+        if (el.hasAttribute('data-rv') || el.closest(RV_SKIP) || (el.parentElement && el.parentElement.closest('[data-rv]'))) return;
+        el.setAttribute('data-rv', kind);
+        revealer.observe(el);
+      };
+      const pick = (sel, kind) => { if (root.matches && root.matches(sel)) add(root, kind); root.querySelectorAll(sel).forEach(el => add(el, kind)); };
+      pick(RV_BLOCK, 'block');
+      pick(RV_TEXT, 'text');
+    };
+    mark(document.body);
+    // Safety net: also reveal by position on scroll/resize, so content can never stay invisible
+    // (e.g. embedded previews where the browser doesn't report visibility)
+    let tick = 0;
+    const sweep = () => {
+      tick = 0;
+      const H = innerHeight, W = innerWidth;
+      document.querySelectorAll('[data-rv]:not(.is-in)').forEach(el => {
+        const b = el.getBoundingClientRect();
+        if (b.top < H && b.left < W && b.right > 0) { el.classList.add('is-in'); revealer.unobserve(el); } // in view or already scrolled past
+      });
+    };
+    const soon = () => { if (!tick) tick = requestAnimationFrame(sweep); };
+    window.addEventListener('scroll', soon, { passive: true });
+    window.addEventListener('resize', soon);
+    document.addEventListener('scroll', soon, { passive: true, capture: true }); // horizontal rails
+    requestAnimationFrame(() => requestAnimationFrame(sweep));
+    setTimeout(sweep, 900);
+    // Content rendered later (filters, "Show more", reviews, rails) reveals the same way
+    let queued = [];
+    new MutationObserver(muts => {
+      muts.forEach(m => m.addedNodes.forEach(n => { if (n.nodeType === 1) queued.push(n); }));
+      if (queued.length) requestAnimationFrame(() => { const q = queued; queued = []; q.forEach(n => n.isConnected && mark(n)); setTimeout(sweep, 700); });
+    }).observe(document.body, { childList: true, subtree: true });
+  }
+
   function initChrome({ active = null } = {}) {
     activeCat = active;
     renderUtility();
@@ -479,11 +732,16 @@
     renderFooter();
     wireSeo();
     search = mountSearch();
+    menu = mountMenu();
+    cartUI = mountCart();
+    initMotion();
+    mountToTop();
     if (nav) nav.addEventListener('click', e => {
       const a = e.target.closest('[data-act]');
       if (!a) return;
       if (a.dataset.act === 'search') search.open();
-      if (a.dataset.act === 'bag') toast(bag ? bag + (bag === 1 ? ' item' : ' items') + ' in your bag · checkout coming soon' : 'Your bag is empty');
+      if (a.dataset.act === 'menu') menu.open(a);
+      if (a.dataset.act === 'bag') cartUI.open(a);
       if (a.dataset.act === 'account') toast('Accounts are coming soon');
     });
     window.addEventListener('resize', () => { renderNav(); placeNav(); });
@@ -491,12 +749,201 @@
     placeNav();
   }
 
+  /* ---------- Cart panel: slides in from the right (the menu owns the left) ---------- */
+  function mountCart() {
+    const el = document.createElement('div');
+    el.innerHTML = `
+      <div class="cartd-scrim" hidden></div>
+      <aside class="cartd" id="cartd" role="dialog" aria-modal="true" aria-labelledby="cartd-h" hidden>
+        <header class="cartd__head">
+          <h2 id="cartd-h">Your cart <span id="cartd-n"></span></h2>
+          <button type="button" class="cartd__x mnav__x" aria-label="Close cart"><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/></svg></button>
+        </header>
+        <div class="cartd__ship" id="cartd-ship"></div>
+        <div class="cartd__body" id="cartd-body"></div>
+        <footer class="cartd__foot" id="cartd-foot">
+          <label class="cartd__gift"><input type="checkbox" id="cartd-gift"><span>Add gift wrapping</span><b>${esc(D.rs(SHOP.giftWrap))}</b></label>
+          <div class="cartd__row"><span>Subtotal</span><b id="cartd-sub"></b></div>
+          <p class="cartd__note">Delivery and payment are chosen at checkout · Cash on Delivery available</p>
+          <a class="btn-buy cartd__go" href="checkout.html" id="cartd-go">Checkout</a>
+        </footer>
+      </aside>`;
+    document.body.append(...el.children);
+    const drawer = $('cartd'), scrim = drawer.previousElementSibling;
+    let opener = null;
+    const qtyBtns = l => `<div class="qty qty--s" role="group" aria-label="Quantity for ${esc(l.p.code)}"><button type="button" data-q="-1" data-sku="${esc(l.sku)}" aria-label="Decrease">−</button><output>${l.qty}</output><button type="button" data-q="1" data-sku="${esc(l.sku)}" aria-label="Increase"${l.qty >= SHOP.maxQty ? ' disabled' : ''}>+</button></div>`;
+    function paint() {
+      const lines = cartLines(), t = cartTotals('standard'), n = cartCount();
+      $('cartd-n').textContent = n ? `(${n})` : '';
+      const left = SHOP.freeDeliveryFrom - t.subtotal;
+      $('cartd-ship').innerHTML = !lines.length ? '' : left > 0
+        ? `<p>Add <b>${esc(D.rs(left))}</b> more for free standard delivery</p><i style="--pct: ${Math.min(100, Math.round(t.subtotal / SHOP.freeDeliveryFrom * 100))}%;"></i>`
+        : '<p><b>Free standard delivery</b> unlocked</p><i style="--pct: 100%;"></i>';
+      $('cartd-body').innerHTML = lines.length ? lines.map(l => `
+        <div class="cline">
+          <a class="cline__img" href="${url.product(l.p.id)}${l.p.variants.length ? '&sku=' + encodeURIComponent(l.sku) : ''}" style="background: ${photoBg(l.v.bg ? l.v : l.p)};"><img src="${l.v.thumb || l.p.thumb}" alt="" style="${photoFit(l.v.ar ? l.v : l.p)}"></a>
+          <div class="cline__info">
+            <a class="cline__t" href="${url.product(l.p.id)}">${esc(l.p.title)}</a>
+            ${Object.keys(l.attrs).length ? `<span class="cline__a">${esc(Object.values(l.attrs).join(' · '))}</span>` : ''}
+            <span class="cline__p">${esc(D.rs(l.price))}${l.qty > 1 ? ` <small>× ${l.qty} = ${esc(D.rs(l.total))}</small>` : ''}</span>
+            <div class="cline__row">${qtyBtns(l)}<button type="button" class="cline__rm" data-rm="${esc(l.sku)}">Remove</button></div>
+          </div>
+        </div>`).join('')
+        : `<div class="cartd__empty">${icon('bag', 28)}<b>Your cart is empty</b><p>Earbuds, chargers, cables and more — delivered across Pakistan.</p><a class="btn-pill" href="${url.products}">Shop all products</a></div>`;
+      $('cartd-foot').hidden = !lines.length;
+      $('cartd-gift').checked = giftWrap;
+      $('cartd-sub').textContent = D.rs(t.subtotal + t.giftWrap);
+      $('cartd-go').textContent = `Checkout · ${D.rs(t.subtotal + t.giftWrap)}`;
+    }
+    function open(btn) {
+      opener = btn || document.activeElement;
+      paint();
+      drawer.hidden = scrim.hidden = false;
+      document.documentElement.style.overflow = 'hidden';
+      requestAnimationFrame(() => { drawer.classList.add('is-open'); scrim.classList.add('is-open'); });
+      setTimeout(() => drawer.querySelector('.cartd__x').focus(), 60);
+    }
+    function close() {
+      drawer.classList.remove('is-open'); scrim.classList.remove('is-open');
+      document.documentElement.style.overflow = '';
+      const done = () => { drawer.hidden = scrim.hidden = true; if (opener && opener.isConnected) opener.focus(); };
+      if (reduced()) done(); else setTimeout(done, 360);
+    }
+    drawer.addEventListener('click', e => {
+      if (e.target.closest('.cartd__x')) return close();
+      const q = e.target.closest('[data-q]');
+      if (q) { const l = cart.find(x => x.sku === q.dataset.sku); if (l) setQty(l.sku, l.qty + +q.dataset.q); return; }
+      const rm = e.target.closest('[data-rm]');
+      if (rm) { setQty(rm.dataset.rm, 0); toast('Removed from cart'); }
+    });
+    $('cartd-gift').addEventListener('change', e => setGift(e.target.checked));
+    scrim.addEventListener('click', close);
+    drawer.addEventListener('keydown', e => {
+      if (e.key === 'Escape') return close();
+      if (e.key !== 'Tab') return;
+      const f = [...drawer.querySelectorAll('a[href], button:not([disabled]), input')].filter(x => x.offsetParent !== null);
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+    window.addEventListener('wu-cart', () => { if (!drawer.hidden) paint(); });
+    return { open, close, paint };
+  }
+
+  /* ---------- Menu drawer (burger, narrow nav): slides in from the left like the Filters panel.
+     Built from the catalogue, so new categories and products appear without editing this. ---------- */
+  function mountMenu() {
+    const chev = '<svg class="mnav__chev" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M5.5 9l6.5 6.5L18.5 9" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    const arrow = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M9 5.5 15.5 12 9 18.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    const STAND = { d: 'M8.5 2.5h7a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 7 13V4a1.5 1.5 0 0 1 1.5-1.5zM8.5 4v9h7V4z', s: 'M12 14.5v4.5M7 21h10', w: 2 };
+    const DEPT_ICON = { audio: 'Earbuds', charging: 'Chargers', cables: 'Cables', car: 'Car', computer: 'Computer', storage: 'Storage', care: 'Grooming' };
+    const DEPT_SHORT = { cables: 'Cables', car: 'Car', stands: 'Stands', care: 'Grooming' };
+    const deptIcon = id => { const n = id === 'stands' ? STAND : NAV_CATS.find(x => x.label === DEPT_ICON[id]); return n ? `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${n.d}" fill="currentColor" fill-rule="evenodd"/><path d="${n.s}" fill="none" stroke="currentColor" stroke-width="${n.w}" stroke-linecap="round" stroke-linejoin="round"/></svg>` : ''; };
+    const inType = t => D.products.filter(p => p.type === t);
+    const depts = DEPTS.map(d => ({ ...d, types: d.types.filter(t => inType(t).length) })).filter(d => d.types.length);
+    // Representative product: newest with a photo
+    const rep = list => list.find(p => p.thumb && p.tabs.includes('new')) || list.find(p => p.thumb) || list[0];
+    const lead = D.byId('ts-11anc') || D.products.find(p => p.src && p.tabs.includes('new'));
+    const thumb = p => p ? `<span class="mnav__thumb" style="background: ${photoBg(p)};">${p.thumb ? `<img src="${p.thumb}" alt="" loading="lazy" style="${photoFit(p)}">` : art(p.art, { alt: '' })}</span>` : '';
+    const quick = [['New for 2026', url.filter('new')], ['Best sellers', url.filter('best')], ['Under Rs.1,000', url.products + '?price=u1'], ['Fast charging', url.products + '?feat=fast']];
+    const groups = [
+      ['For business', [['Corporate gifts', url.corporate], ['Bulk & wholesale', url.bulk], ['Content creators', url.creators], ['WisdomUp Live', url.live]]],
+      ['Support', [['Help Center', url.help], ['Track your order', url.track], ['Shipping', url.shipping], ['Returns & refunds', url.returns], ['Warranty', url.warranty]]],
+    ];
+    const el = document.createElement('div');
+    el.innerHTML = `
+      <div class="mnav-scrim" hidden></div>
+      <aside class="mnav" id="mnav" role="dialog" aria-modal="true" aria-label="Menu" hidden>
+        <header class="mnav__head">
+          <a href="${url.home}" class="mnav__logo" aria-label="WisdomUp home"><img src="img/wu-logo.png" alt="WisdomUp"></a>
+          <button type="button" class="mnav__x" aria-label="Close menu"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/></svg></button>
+        </header>
+        <div class="mnav__body">
+          ${lead ? `<a class="mnav__promo" href="${url.product(lead.id)}">
+            <span class="mnav__promo-copy"><span class="mnav__eyebrow">${esc(lead.ribbon || 'Featured')}</span><b>${esc(lead.code)} ${esc(lead.cat)}</b><span class="mnav__promo-price">${esc(lead.priceText)}</span><span class="mnav__promo-cta">Shop now ${arrow}</span></span>
+            <span class="mnav__promo-art" style="background: ${photoBg(lead)};">${lead.src ? `<img src="${lead.thumb || lead.src}" alt="" loading="lazy" style="${photoFit(lead)}">` : art(lead.art, { alt: '' })}</span>
+          </a>` : ''}
+          <nav class="mnav__tiles" aria-label="Shop by category">
+            ${depts.map(d => `<a class="mnav__tile" href="${url.dept(d.id)}"><span class="mnav__tile-art">${thumb(rep(d.types.flatMap(inType)))}</span><span class="mnav__tile-t">${esc(DEPT_SHORT[d.id] || d.label)}</span></a>`).join('')}
+            <a class="mnav__tile mnav__tile--all" href="${url.products}"><span class="mnav__tile-art"><span class="mnav__thumb">${navSvg(P_GRID, '', 2.2, 30)}</span></span><span class="mnav__tile-t">Shop all</span></a>
+          </nav>
+          <div class="mnav__quick">${quick.map(([t, h]) => `<a class="mnav__chip" href="${h}">${esc(t)}</a>`).join('')}</div>
+          <div class="mnav__cats">
+            ${depts.map((d, i) => `<div class="mnav__acc">
+              <h3 class="mnav__acc-t"><button type="button" class="mnav__acc-h" aria-expanded="false" aria-controls="mnav-c${i}"><span class="mnav__ic">${deptIcon(d.id)}</span><span>${esc(d.label)}</span>${chev}</button></h3>
+              <div class="mnav__acc-p" id="mnav-c${i}" hidden>
+                ${d.types.map(t => `<a class="mnav__prod" href="${url.cat(t)}">${thumb(rep(inType(t)))}<span><b>${esc(typeLabel(t))}</b><small>From ${esc(D.rs(Math.min(...inType(t).map(p => p.price))))}</small></span></a>`).join('')}
+                <a class="mnav__all" href="${url.dept(d.id)}">Shop all ${esc(d.label.toLowerCase())} ${arrow}</a>
+              </div>
+            </div>`).join('')}
+          </div>
+          ${groups.map(([h, links]) => `<div class="mnav__group"><div class="mnav__label">${esc(h)}</div>${links.map(([t, href]) => `<a href="${href}"${here() === href ? ' aria-current="page"' : ''}>${esc(t)}</a>`).join('')}</div>`).join('')}
+        </div>
+        <footer class="mnav__foot">
+          <a href="${url.wishlist}">${heartSvg(18)}Wishlist<b class="mnav__n" data-wcount hidden></b></a>
+          <a href="${url.where}"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11A6.5 6.5 0 0 1 18.5 10c0 5.4-6.5 11-6.5 11z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.3" fill="none" stroke="currentColor" stroke-width="2"/></svg>Where to buy</a>
+        </footer>
+      </aside>`;
+    document.body.append(...el.children);
+    const drawer = $('mnav'), scrim = drawer.previousElementSibling;
+    let opener = null, sx = null, dx = 0;
+    const setAcc = (h, open) => { h.setAttribute('aria-expanded', open); $(h.getAttribute('aria-controls')).hidden = !open; };
+    function open(btn) {
+      opener = btn || document.activeElement;
+      const n = drawer.querySelector('[data-wcount]'), w = wish.length;
+      n.hidden = !w; n.textContent = w;
+      drawer.hidden = scrim.hidden = false;
+      document.documentElement.style.overflow = 'hidden';
+      if (btn) btn.setAttribute('aria-expanded', 'true');
+      requestAnimationFrame(() => { drawer.classList.add('is-open'); scrim.classList.add('is-open'); });
+      setTimeout(() => drawer.querySelector('.mnav__x').focus(), 60);
+    }
+    function close() {
+      drawer.classList.remove('is-open'); scrim.classList.remove('is-open');
+      document.documentElement.style.overflow = '';
+      if (opener && opener.setAttribute) opener.setAttribute('aria-expanded', 'false');
+      const done = () => { drawer.hidden = scrim.hidden = true; drawer.style.transform = ''; if (opener && opener.isConnected) opener.focus(); };
+      if (reduced()) done(); else setTimeout(done, 360);
+    }
+    drawer.addEventListener('click', e => {
+      if (e.target.closest('.mnav__x')) return close();
+      const h = e.target.closest('.mnav__acc-h');
+      if (h) {
+        const opening = h.getAttribute('aria-expanded') !== 'true';
+        drawer.querySelectorAll('.mnav__acc-h').forEach(x => setAcc(x, x === h && opening)); // one open at a time
+        return;
+      }
+      // Same-page category links (#cat-…) only change the hash: close so the page can react
+      const a = e.target.closest('a');
+      if (a && a.pathname === location.pathname) close();
+    });
+    scrim.addEventListener('click', close);
+    drawer.addEventListener('keydown', e => {
+      if (e.key === 'Escape') return close();
+      if (e.key !== 'Tab') return;
+      const f = [...drawer.querySelectorAll('a[href], button')].filter(x => x.offsetParent !== null);
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+    // Swipe the panel left to close
+    drawer.addEventListener('touchstart', e => { sx = e.touches[0].clientX; dx = 0; }, { passive: true });
+    drawer.addEventListener('touchmove', e => {
+      if (sx == null) return;
+      dx = Math.min(0, e.touches[0].clientX - sx);
+      if (dx < -6) { drawer.classList.add('is-dragging'); drawer.style.transform = `translateX(${dx}px)`; }
+    }, { passive: true });
+    drawer.addEventListener('touchend', () => { drawer.classList.remove('is-dragging'); if (dx < -70) close(); else drawer.style.transform = ''; sx = null; });
+    window.addEventListener('resize', () => { if (!drawer.hidden && vw() >= 640 && !document.querySelector('[data-act="menu"]')?.offsetParent) close(); });
+    return { open, close };
+  }
+
   window.WU = {
     D, $, esc, reduced, vw, code, EASE, SLIDE_T: 'transform 640ms ' + EASE,
     CATS, slug, url, catHref, linkFor,
     icons: { STAR_SVG }, btnBuy,
-    store, add, toast,
-    productCard, colorsOf, ratingOf, reviewsOf, seedOf, mountRail, mountHero, mountAccordion,
+    store, add, toast, reviews, starsSvg, cart: { lines: cartLines, count: cartCount, totals: cartTotals, setQty, clear: clearCart, setGift, gift: () => giftWrap, open: b => cartUI && cartUI.open(b), skuInfo: sku => skuIndex[sku] }, SHOP, wished, toggleWish, wishBtn, paintWish, wishList: () => wish.slice(),
+    productCard, colorsOf, photoBg, photoFit, ratingOf, reviewsOf, seedOf, mountRail, mountHero, mountAccordion, DEPTS, typeLabel,
     initChrome, placeNav, setActiveCat, navOffset, scrollToEl,
     openSearch: () => search && search.open(),
   };

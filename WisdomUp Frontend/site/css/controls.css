@@ -1,0 +1,193 @@
+/* ==========================================================================
+   WisdomUp control geometry — every button, chip, tab, arrow and bar follows the nav.
+   Loaded last on every page so it is the single source of truth for control sizes.
+
+   Nav geometry (measured to match ronin.pk):
+     bar     56px  = 40px control + 8px padding top/bottom, pill radius
+     control 40px  pill · 14px semibold text · 16px side padding (11px beside a leading icon) · 22px icons
+     small   34px  icon-only tools (close, rail arrows) · 22px icons
+     gaps    4px inside a tight group · 8px between chips · 11px between groups
+   Banners and product cards keep their own (larger) sizes and are not touched here.
+   ========================================================================== */
+:root {
+  --ctl: 40px;
+  --ctl-s: 34px;
+  --bar: 56px;
+  --ctl-pad: 16px;
+  --ctl-ic: 22px;
+  --gap-1: 4px;
+  --gap-2: 8px;
+  --gap-3: 11px;
+  --ctl-font: 600 14px/1 var(--font);
+  --ctl-track: .01em;
+  --ctl-ink: #172248;
+  --chip-bg: #F1F2F4;
+  --chip-bg-hover: #E8EAEE;
+  --chip-line: rgba(23, 34, 72, .08);
+  --chip-line-hover: rgba(23, 34, 72, .22);
+}
+
+/* ---------- Buttons: primary (filled), secondary (outlined) — 40px pills ---------- */
+.btn-pill, .btn-navy, .btn-outline, .btn-buy, .btn-cart, .seo__toggle, .shop-rail__all, .loop__cta, .pp__cta, .fdrawer__apply,
+.series__btns .btn-buy, .series__btns .btn-cart, .buybar .btn-buy {
+  height: var(--ctl); min-height: 0; padding: 0 var(--ctl-pad); gap: var(--gap-2);
+  border-radius: 999px; font: var(--ctl-font); letter-spacing: var(--ctl-track); white-space: nowrap;
+}
+.btn-buy svg, .btn-pill svg, .btn-navy svg, .btn-outline svg { width: 20px; height: 20px; flex: none; }
+.btn-cart { margin-top: 0; box-shadow: inset 0 0 0 1px var(--chip-line-hover); }
+.btn-cart .plus { width: 20px; height: 20px; font-size: 15px; }
+.btn-outline, .seo__toggle { border-width: 1px; }
+.hero__cta { min-width: 0; }
+.hero__cta .btn-buy { padding: 0 20px 0 14px; }
+.pp__cta b { font-weight: 800; margin: 0; }
+.pp__cta svg { width: 16px; height: 16px; }
+.fdrawer__apply { width: 100%; }
+.fdrawer__clear { height: var(--ctl); font: var(--ctl-font); letter-spacing: var(--ctl-track); }
+.mnav__foot a { height: var(--ctl); font: var(--ctl-font); letter-spacing: var(--ctl-track); border-width: 1px; }
+
+/* ---------- Chips and tabs — 40px pills, soft fill + hairline, navy when chosen ---------- */
+.chip, .quick .chip, .series .chip, .pdtabs .chip, .bk-chips .chip, .policy__links a, .search__pages a, .opt-chip, .fbtn {
+  height: var(--ctl); min-height: 0; padding: 0 var(--ctl-pad); border-radius: 999px;
+  font: var(--ctl-font); letter-spacing: var(--ctl-track); white-space: nowrap;
+}
+.chip, .series .chip, .bk-chips .chip, .policy__links a {
+  background: var(--chip-bg); box-shadow: inset 0 0 0 1px var(--chip-line); color: var(--ctl-ink);
+  transition: background-color 180ms ease, box-shadow 180ms ease, color 180ms ease;
+}
+.chip:hover, .series .chip:hover, .bk-chips .chip:hover, .policy__links a:hover { background: var(--chip-bg-hover); box-shadow: inset 0 0 0 1px var(--chip-line-hover); color: var(--ctl-ink); }
+.series .chip[aria-pressed="true"], .bk-chips .chip[aria-pressed="true"] { background: var(--ctl-ink); box-shadow: none; color: #fff; }
+/* Quick chips keep their photo; the 32px photo sits 4px inside the 40px pill */
+.quick .chip { padding: 0 var(--ctl-pad) 0 4px; background: var(--chip-bg); box-shadow: inset 0 0 0 1px var(--chip-line); color: #1A1A1A; }
+.quick .chip:hover { box-shadow: inset 0 0 0 1px var(--chip-line-hover); }
+.quick__in { gap: var(--gap-2); }
+/* Product section tabs: chips inside a 56px glass bar (8px padding, 4px between) */
+.pdtabs__in { padding: var(--gap-2); gap: var(--gap-1); }
+.pdtabs .chip { background: transparent; box-shadow: none; }
+.pdtabs .chip[aria-current="true"] { background: #fff; box-shadow: var(--shadow-soft); }
+/* Filter pills: outlined, navy when a filter is set */
+.fbtn { gap: var(--gap-2); border-width: 1px; border-color: var(--ctl-ink); color: var(--ctl-ink); }
+.fbtn:not(.fbtn--dd) { padding: 0 var(--ctl-pad) 0 11px; }
+.fbtn--dd { gap: 6px; padding: 0 12px 0 var(--ctl-pad); }
+.fbtn--dd.is-set { background: var(--ctl-ink); border-color: var(--ctl-ink); }
+.fbtn svg { width: 18px; height: 18px; }
+.search__pages a { border-width: 1px; }
+.opt-chip { border-width: 1px; }
+.opt-chip[aria-checked="true"] { background: var(--ctl-ink); border-color: var(--ctl-ink); color: #fff; box-shadow: none; }
+.opt-chip.is-na[aria-checked="true"] { color: #fff; }
+
+/* Small chips (compact menu) — the nav's 34px tool size */
+.mnav__chip { height: var(--ctl-s); padding: 0 14px; font: 600 13px/1 var(--font); letter-spacing: var(--ctl-track); background: var(--chip-bg); box-shadow: inset 0 0 0 1px var(--chip-line); color: var(--ctl-ink); }
+
+/* ---------- Icon buttons — 40px circles (arrows, wishlist, back to top) ---------- */
+.hero__arrow, .loop__btn, .pdp2__chev, .totop {
+  width: var(--ctl); height: var(--ctl); min-width: 0; margin-top: 0; padding: 0; border-radius: 50%;
+}
+.hero__arrow { margin-top: calc(var(--ctl) / -2); }
+.pdp2__chev { margin-top: calc(var(--ctl) / -2); }
+.hero__arrow svg, .loop__btn svg, .pdp2__chev svg, .totop svg { width: 18px; height: 18px; }
+.pdp2__wish { width: var(--ctl); height: var(--ctl); border-radius: 50%; }
+.pdp2__wish svg { width: 20px; height: 20px; }
+.mview__b { width: var(--ctl); height: var(--ctl); border-radius: 999px; }
+.mview__b svg { width: 20px; height: 20px; }
+
+/* Small tools — 34px (close buttons, rail arrows beside "Shop all", like the nav's search/cart) */
+.shop-rail__step, .fdrawer__x, .mnav__x, .search__close {
+  width: var(--ctl-s); height: var(--ctl-s); padding: 0; border-radius: 50%; display: grid; place-items: center;
+}
+.shop-rail__step svg { width: 18px; height: 18px; }
+.fdrawer__x, .mnav__x { border-width: 1.5px; }
+.fdrawer__x svg, .mnav__x svg { width: 14px; height: 14px; }
+.search__close { font-size: 22px; line-height: 1; }
+
+/* ---------- Quantity stepper — one 40px pill ---------- */
+.qty { height: var(--ctl); border-radius: 999px; }
+.qty button { width: var(--ctl); height: var(--ctl); font-size: 18px; }
+.qty output { min-width: 28px; font: 700 15px/1 var(--font); }
+
+/* ---------- Bars — 56px (40px control + 8px padding), like the nav pill ---------- */
+.mbar { padding: var(--gap-2) 0; }
+.search__field { height: var(--bar); }
+.hsearch { height: var(--bar); }
+.newsletter, .footer-wrap .newsletter { height: var(--bar); padding: 0 var(--gap-2) 0 20px; }
+.newsletter button, .footer-wrap .newsletter button { width: var(--ctl); height: var(--ctl); }
+
+/* ---------- Gaps: 4px tight groups · 8px chip rows · 11px between groups ---------- */
+.mbar__pills, .policy__links, .search__pages, .bk-chips, .opt-chips, .series__chips, .series__btns, .cta-band__actions { gap: var(--gap-2); }
+.buybox { gap: var(--gap-2); }
+.shop-rail__ctrls { gap: var(--gap-1); }
+.shop-rail__all { margin-right: 6px; }
+.loop__ctrls { gap: var(--gap-3); }
+.duo__foot, .bk-foot, .bulk__cta { gap: var(--gap-3); }
+.mcount { font: 500 14px/1.3 var(--font); }
+.msort__btn { height: var(--ctl); font: 500 14px/1 var(--font); }
+.mnav__quick { gap: 6px; }
+@media (max-width: 639px) {
+  /* Phones use the same 40px controls (the phone nav buttons are 40px too) */
+  .pdtabs .chip, .bk-chips .chip, .series .chip { height: var(--ctl); padding: 0 14px; font-size: 14px; }
+  .series__btns .btn-buy, .series__btns .btn-cart, .buybar .btn-buy { height: var(--ctl); font-size: 14px; }
+  .loop__btn { width: var(--ctl); height: var(--ctl); }
+}
+/* Text-style buttons sitting beside a 40px button share its height so the row aligns */
+button.link-arrow { height: var(--ctl); padding: 0; border: 0; background: none; cursor: pointer; font: 700 14px/1 var(--font); letter-spacing: var(--ctl-track); }
+/* Product buy row: quantity · Add to cart · wishlist always share one 40px row */
+.buybox { flex-wrap: nowrap; }
+.buybox .btn-cart { min-width: 0; }
+.buybox .qty, .buybox .pdp2__wish { flex: none; }
+
+/* ---------- Spacing rule (phones, tablets, desktop): 8px between buttons/chips in a row,
+   4px inside tight icon-only groups (rail arrows, product tabs bar, view toggle) ---------- */
+.wu-chip-track { gap: var(--gap-2) !important; }            /* home quick chips (also the marquee) */
+@media (max-width: 639px) and (hover: hover) { .wu-chip-track { padding-right: var(--gap-2); } }  /* marquee loop stays seamless: end padding = gap */
+.loop__ctrls { gap: var(--gap-2); }                          /* carousel prev · pause · next */
+.shop-rail__all { margin-right: var(--gap-1); }              /* "Shop all" → arrows = 4 + 4 = 8px */
+.mview { gap: var(--gap-1); }                                /* 1 / 2 per row toggle */
+.ihero__actions, .mnav__quick, .rv__actions, .ord__actions, .cta-band__actions, .mnav__foot { gap: var(--gap-2); }
+.quick { gap: var(--gap-2); }                                /* quick chips on wide screens */
+.cline__rm { height: var(--ctl); }                            /* cart row: stepper and Remove share 40px */
+/* Phones: no left/right arrows anywhere — carousels and the product gallery are swiped instead */
+@media (max-width: 639px) {
+  .hero__arrow, .shop-rail__step, .loop__btn[data-go], .pdp2__chev { display: none !important; }
+}
+/* Touch screens (phones AND tablets): no left/right arrows — rails scroll and carousels/gallery swipe with a finger */
+@media (hover: none) and (pointer: coarse) {
+  .hero__arrow, .shop-rail__step, .loop__btn[data-go], .pdp2__chev { display: none !important; }
+  .shop-rail__all { margin-right: 0; }
+}
+
+/* ---------- Floating add-to-cart capsule (product page) — glass, measured to match ronin.pk ----------
+   Desktop: 400 × 68px pill, 20px above the bottom edge, centred · photo 52px · 40px button.
+   Phone:   full width minus ~19px each side, 10px above the bottom · photo 36px.
+   Glass: blurred, translucent fill with a light gradient edge (Ronin's is dark-on-dark; ours is light for light pages). */
+.buybar {
+  width: 400px; max-width: calc(100% - 38px); height: 68px; box-sizing: border-box; bottom: 20px;
+  gap: var(--gap-3); padding: 8px 11px 8px 8px; border: 0; border-radius: 999px;
+  background: rgba(255, 255, 255, .58);
+  backdrop-filter: blur(16px) saturate(160%); -webkit-backdrop-filter: blur(16px) saturate(160%);
+  box-shadow: 0 4px 20px rgba(70, 70, 70, .15), inset 0 0 0 1px rgba(255, 255, 255, .7);
+  isolation: isolate;
+}
+.buybar::before {   /* glossy gradient rim, like Ronin's */
+  content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(90deg, rgba(255,255,255,.55), rgba(255,255,255,.12) 45%, rgba(0,180,255,.08) 75%, rgba(255,255,255,.3));
+}
+.buybar__art { width: 52px; height: 52px; border-radius: 50%; background: #F1F2F4; }
+.buybar__txt { gap: 3px; }
+.buybar__t { font: 600 14px/1.2 var(--font); text-transform: none; letter-spacing: .01em; color: #0B0B0B; }
+.buybar__p b { font: 700 14px/1 var(--font); color: var(--accent-price, #2350C8); }
+.buybar .btn-buy { height: var(--ctl); padding: 0 var(--ctl-pad) 0 12px; font-size: 14px; }
+.buybar .btn-buy svg { display: block; width: 18px; height: 18px; }
+@media (max-width: 639px) {
+  .buybar { bottom: calc(10px + env(safe-area-inset-bottom)); padding: 8px 8px 8px 12px; }
+  .buybar__art { width: 36px; height: 36px; }
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .buybar { background: rgba(255, 255, 255, .94); } }
+.buybar__t small { font: 500 12px/1 var(--font); color: var(--muted); letter-spacing: 0; }
+.pd-stat__v { font-size: clamp(24px, 2.3vw, 40px); overflow-wrap: anywhere; } /* long values (18,000mAh, Warranty) fit their card */
+/* Glass opacity matched exactly to ronin.pk's sticky add-to-cart: no solid fill, a faint white→blue gradient
+   (18% → 5% → 8% blue → 3%) over a 16px blur, no rim line, shadow 0 4px 20px rgba(70,70,70,.15). */
+.buybar {
+  background: linear-gradient(90deg, rgba(255, 255, 255, .18), rgba(255, 255, 255, .05), rgba(0, 180, 255, .08), rgba(255, 255, 255, .03));
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 4px 20px rgba(70, 70, 70, .15);
+}
+.buybar::before { display: none; }

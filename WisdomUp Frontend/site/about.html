@@ -16,6 +16,8 @@
 <link rel="stylesheet" href="css/home.css">
 <link rel="stylesheet" href="css/pages.css">
 <link rel="stylesheet" href="css/info.css">
+<link rel="stylesheet" href="css/controls.css">
+<link rel="stylesheet" href="css/motion.css">
 </head>
 <body>
 <div class="page page--info">
@@ -40,13 +42,13 @@
       <h2 class="h-light" id="what-we-make-h">Five families, <b>one standard.</b></h2>
       <p>The same products, the same specs and the same quality checks in every market we sell in.</p>
     </div>
-    <div class="tiles" aria-label="Product families"><a class="tile" href="products.html#cat-earbuds"><span class="tile__ic" data-icon="buds"></span><b>Earbuds</b><p>OS open-ear and TS true wireless earbuds, from everyday buds to ANC.</p><span class="tile__go">Shop earbuds ›</span></a><a class="tile" href="products.html#cat-neckbands"><span class="tile__ic" data-icon="phones"></span><b>Neckbands</b><p>Magnetic buds, ENC calling and all-day battery.</p><span class="tile__go">Shop neckbands ›</span></a><a class="tile" href="products.html#cat-speakers"><span class="tile__ic" data-icon="speaker"></span><b>Speakers</b><p>The Thunder Pro party speaker with RGB lights and IPX6.</p><span class="tile__go">Shop speakers ›</span></a><a class="tile" href="products.html#cat-microphones"><span class="tile__ic" data-icon="mic"></span><b>Microphones</b><p>MKF clip-on wireless mics for reels, vlogs and live streams.</p><span class="tile__go">Shop microphones ›</span></a><a class="tile" href="products.html#cat-chargers"><span class="tile__ic" data-icon="plug"></span><b>Chargers</b><p>15W wireless stands and fast car chargers.</p><span class="tile__go">Shop chargers ›</span></a></div>
+    <div class="tiles" aria-label="Product families"><a class="tile" href="products.html?dept=audio"><span class="tile__ic" data-icon="buds"></span><b>Audio</b><p>Wireless and open-ear earbuds, neckbands, handsfree, headphones, speakers and wireless mics.</p><span class="tile__go">Shop audio ›</span></a><a class="tile" href="products.html?dept=charging"><span class="tile__ic" data-icon="plug"></span><b>Charging</b><p>Wall chargers with cable, power banks, wireless and car chargers and power strips.</p><span class="tile__go">Shop charging ›</span></a><a class="tile" href="products.html?dept=cables"><span class="tile__ic" data-icon="cable"></span><b>Cables & Adapters</b><p>Fast-charging, AUX and HDMI cables, OTG adapters and Bluetooth receivers.</p><span class="tile__go">Shop cables ›</span></a><a class="tile" href="products.html?dept=car"><span class="tile__ic" data-icon="bank"></span><b>Car Accessories</b><p>Magnetic car holders, car chargers and Bluetooth FM transmitters.</p><span class="tile__go">Shop car accessories ›</span></a><a class="tile" href="products.html?dept=computer"><span class="tile__ic" data-icon="grid"></span><b>Computer & Storage</b><p>Keyboard and mouse sets, mice, mouse pads, memory cards and flash drives.</p><span class="tile__go">Shop computer ›</span></a><a class="tile" href="products.html?dept=care"><span class="tile__ic" data-icon="smile"></span><b>Personal Care</b><p>Electric shavers and cordless hair clippers.</p><span class="tile__go">Shop personal care ›</span></a></div>
   </section>
   <section class="isec" aria-label="WisdomUp in numbers">
     <div class="stats4">
       <div class="stat"><span class="stat__v">50+</span><span class="stat__l">countries where WisdomUp is sold</span></div>
       <div class="stat"><span class="stat__v">5</span><span class="stat__l">product families, one quality standard</span></div>
-      <div class="stat"><span class="stat__v">30-day</span><span class="stat__l">money-back guarantee on every order</span></div>
+      <div class="stat"><span class="stat__v">7-day</span><span class="stat__l">money-back guarantee on every order</span></div>
       <div class="stat"><span class="stat__v">7 days</span><span class="stat__l">a week customer support, 10 AM – 6 PM</span></div>
     </div>
   </section>
@@ -67,8 +69,10 @@
   <div class="toast" id="toast" role="status" hidden></div>
 </div>
 
+<script src="js/catalog.js"></script>
 <script src="js/wu-data.js"></script>
 <script src="js/ds-icons.js"></script>
+<script src="js/shop.js"></script>
 <script src="js/common.js"></script>
 <script src="js/info.js"></script>
 </body>

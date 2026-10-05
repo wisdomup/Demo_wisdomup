@@ -226,3 +226,10 @@ a.trust__item:hover span { text-decoration: underline; text-underline-offset: 3p
 .faq__a a, .assure a, .offer a { color: #2350C8; }
 a.assure__i { text-decoration: none; transition: background-color 180ms ease; }
 a.assure__i:hover { background: #EEF3FA !important; }
+
+/* Wishlist page */
+.wish-count { font-weight: 600; color: #172248; }
+.wish-empty__ic { width: 64px; height: 64px; border-radius: 50%; background: #fff; color: #E1251B; display: grid; place-items: center; box-shadow: var(--shadow-soft, 0 4px 14px rgba(0,0,0,.08)); }
+.track__recent { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font: 500 13px/1 var(--font); color: var(--muted); }
+.track__recent .link-arrow { border: 0; background: none; padding: 0; cursor: pointer; }
+.badge-soft--bad { background: #FEF3F2 !important; color: #B42318 !important; }

@@ -1,198 +1,155 @@
-// WisdomUp — All Products page: category rails + jump bar (desktop) / product grid + Filters panel (phones),
-// scroll-spy, sorting and URL filters (?filter=…&cat=…&price=…&color=…&feat=…&sort=…).
+// WisdomUp — All Products page: one product grid (4 / 3 / 2 per row; 1-or-2 toggle on phones), Filters panel,
+// sort dropdown and URL filters (?dept=…&cat=…&filter=…&price=…&conn=…&feat=…&sort=…). Data: js/catalog.js.
 (function () {
-  const { D, $, esc, CATS, slug, url, mountRail, mountHero, scrollToEl, setActiveCat, colorsOf } = WU;
+  const { D, $, esc, CATS, DEPTS, typeLabel, slug, url, scrollToEl, setActiveCat } = WU;
 
-  /* ---------- Filter dimensions ---------- */
+  /* ---------- Filter dimensions (all derived from catalogue fields) ---------- */
   const FILTERS = {
-    new: { label: 'New arrivals', test: p => p.tabs.includes('new') },
+    new: { label: 'New for 2026', test: p => p.tabs.includes('new') },
     best: { label: 'Best sellers', test: p => p.tabs.includes('best') },
-    top: { label: 'Top rated', test: p => p.rating >= 5 },
-    sale: { label: 'On sale', test: p => !!p.was && p.was > p.price },
   };
   const PRICES = {
-    u3: { label: 'Under Rs.3,000', test: p => p.price < 3000 },
-    m6: { label: 'Rs.3,000 – 5,999', test: p => p.price >= 3000 && p.price < 6000 },
-    m10: { label: 'Rs.6,000 – 9,999', test: p => p.price >= 6000 && p.price < 10000 },
+    u1: { label: 'Under Rs.1,000', test: p => p.price < 1000 },
+    m3: { label: 'Rs.1,000 – 2,999', test: p => p.price >= 1000 && p.price < 3000 },
+    m10: { label: 'Rs.3,000 – 9,999', test: p => p.price >= 3000 && p.price < 10000 },
     p10: { label: 'Rs.10,000 & above', test: p => p.price >= 10000 },
   };
-  const hours = p => { const m = p.meta.match(/(\d+)\+?\s*Hrs/i); return m ? +m[1] : 0; };
+  const CONNS = ['USB-C', 'Lightning', 'Micro-USB', '3.5mm', 'HDMI'];
   const FEATS = {
-    anc: { label: 'Active noise cancelling', test: p => /\bANC\b/i.test(p.meta) },
-    enc: { label: 'ENC call mics', test: p => /\bENC\b/i.test(p.meta) },
-    water: { label: 'Water resistant (IPX)', test: p => /IPX\d/i.test(p.meta) },
-    battery: { label: '30+ hours battery', test: p => hours(p) >= 30 },
-    fast: { label: 'Fast charging', test: p => /fast|\bPD\b/i.test(p.meta) },
-    wireless: { label: 'Wireless / magnetic charging', test: p => /15W Wireless|Magnetic \||Wireless Charging/i.test(p.meta) },
-    rgb: { label: 'RGB lights', test: p => /RGB/i.test(p.meta) },
+    fast: 'Fast charging', wireless: 'Wireless charging', anc: 'Active noise cancelling',
+    magnetic: 'Magnetic', lights: 'Lights / RGB', water: 'Water resistant',
   };
-  const colorNames = p => colorsOf(p).map(c => c.name);
-  const COLORS = [...new Set(D.products.flatMap(colorNames))].map(name => ({ name, key: name.toLowerCase().replace(/\s+/g, '-'), hex: D.products.map(colorsOf).flat().find(c => c.name === name).hex }));
-  const SORTS = {
-    featured: 'Featured', relevant: 'Most relevant', best: 'Best selling', az: 'Alphabetically, A-Z', za: 'Alphabetically, Z-A',
-    low: 'Price, low to high', high: 'Price, high to low', old: 'Date, old to new', new: 'Date, new to old', off: 'Biggest discount',
+  const SORTS = { featured: 'Featured', new: 'Newest first', best: 'Best selling', low: 'Price, low to high', high: 'Price, high to low', az: 'Alphabetically, A-Z', za: 'Alphabetically, Z-A' };
+  // Listing header copy: per department (types reuse their department's line)
+  const DEPT_COPY = {
+    audio: 'Wireless and open-ear earbuds, neckbands, handsfree, headphones, speakers and wireless mics — tuned for clear calls and full bass.',
+    charging: 'Wall chargers with cables, power banks, wireless and car chargers and power strips — fast, protected charging for every device.',
+    cables: 'Fast-charging USB-C, Lightning and Micro-USB cables, AUX and HDMI cables, OTG adapters and Bluetooth receivers.',
+    car: 'Magnetic and clamp car phone holders, car chargers, wireless car mounts and Bluetooth FM transmitters for every drive.',
+    stands: 'Desk, laptop and tablet stands, bike and motorbike mounts and Bluetooth selfie sticks.',
+    computer: 'Wired and wireless keyboard and mouse sets, wireless mice and wrist-rest mouse pads.',
+    storage: 'microSD memory cards, USB 3.0 flash drives and card readers for phones, cameras and laptops.',
+    care: 'Electric shavers and cordless hair clippers with long-lasting batteries and USB-C charging.',
   };
-  // Phone listing header copy per view (title + one-line blurb, expandable)
-  const COPY = {
-    all: ['Shop all products', 'Every WisdomUp product in one place — open-ear and true wireless earbuds, ENC neckbands, the Thunder Pro party speaker, MKF creator mics and fast wireless and car chargers, all backed by brand warranty and delivered across Pakistan.'],
-    new: ['Shop new arrivals', 'The latest WisdomUp launches, from the OS-4 and OS-5 open-ear earbuds to the TS-10 with ANC and the MKF creator mics — fresh stock, ready to ship.'],
-    best: ['Shop best sellers', 'The earbuds, speakers and chargers our customers in 50+ countries buy most — tested favourites with warranty and 30-day money-back cover.'],
-    top: ['Shop top-rated tech', 'Five-star rated WisdomUp products, picked by real buyers for sound, battery life and build quality.'],
-    sale: ['Shop tech on sale', 'Earbuds, speakers and more at reduced prices — while stock lasts, with the same warranty and nationwide delivery.'],
-    u3: ['Shop tech under Rs.3,000', 'Wireless earbuds, neckbands and car chargers under Rs.3,000 — budget-friendly tech that still comes with WisdomUp warranty and support.'],
-  };
+  const ALL_COPY = 'Every WisdomUp product sold in Pakistan — earbuds and headphones, speakers, chargers and power banks, cables and adapters, car and desk accessories, computer gear, storage and grooming — with brand warranty and nationwide delivery.';
+  const deptOf = t => DEPTS.find(d => d.types.includes(t));
 
-  /* ---------- State (from the URL) ---------- */
+  /* ---------- State (from the URL; old links keep working) ---------- */
   const params = new URLSearchParams(location.search);
   const list = k => (params.get(k) || '').split(',').filter(Boolean);
   const state = {
     filter: FILTERS[params.get('filter')] ? params.get('filter') : null,
-    cat: CATS.find(c => c.toLowerCase() === (params.get('cat') || '').toLowerCase()) || null,
+    dept: DEPTS.some(d => d.id === params.get('dept')) ? params.get('dept') : null,
+    cat: CATS.includes(params.get('cat')) ? params.get('cat') : null,
     price: PRICES[params.get('price')] ? params.get('price') : null,
-    colors: list('color').filter(k => COLORS.some(c => c.key === k)),
+    conns: list('conn').filter(k => CONNS.includes(k)),
     feats: list('feat').filter(k => FEATS[k]),
     sort: SORTS[params.get('sort')] ? params.get('sort') : 'featured',
   };
-  if (params.get('filter') === 'under3000') state.price = 'u3'; // old home-page chip link
-  const PHONE = matchMedia('(max-width: 639px)');
-  // On phones the listing is one grid, so a category link (#cat-earbuds) filters it instead of jumping to a rail.
+  // A category link (#cat-earbuds) filters the grid
   const catFromHash = () => CATS.find(c => '#' + slug(c) === location.hash) || null;
-  if (PHONE.matches && !state.cat && catFromHash()) state.cat = catFromHash();
-  const sortSel = $('sort');
-  sortSel.value = state.sort;
+  if (catFromHash()) { state.cat = catFromHash(); state.dept = null; }
+  const PAGE = 24;
+  let shown = PAGE;
 
   WU.initChrome();
-  mountHero($('hero'));
-  $('pbanner-sub').textContent = `${D.products.length} products · earbuds, speakers, mics & chargers`;
-  $('pbanner-art').innerHTML = ['speaker', 'buds', 'bank-ice'].map((a, i) => `<span class="pbanner__a pbanner__a--${i + 1}">${art(a)}</span>`).join('');
+  $('pbanner-sub').textContent = `${D.products.length} products · earbuds, chargers, cables, speakers & more`;
+  const bannerPicks = ['yx-28', 'ts-11anc', 'cdb-18'].map(D.byId).filter(Boolean);
+  $('pbanner-art').innerHTML = bannerPicks.map((p, i) => `<span class="pbanner__a pbanner__a--${i + 1} pbanner__a--photo" style="background: ${WU.photoBg(p)};"><img src="${p.thumb}" alt="" style="${WU.photoFit(p)}"></span>`).join('');
 
   /* ---------- Matching + sorting ---------- */
+  const inScope = (p, st) => st.cat ? p.type === st.cat : st.dept ? DEPTS.find(d => d.id === st.dept).types.includes(p.type) : true;
   const matches = (p, st) => (!st.filter || FILTERS[st.filter].test(p))
-    && (!st.cat || p.cat === st.cat)
+    && inScope(p, st)
     && (!st.price || PRICES[st.price].test(p))
-    && (!st.colors.length || colorNames(p).some(n => st.colors.includes(COLORS.find(c => c.name === n).key)))
-    && (!st.feats.length || st.feats.some(k => FEATS[k].test(p)));
+    && (!st.conns.length || st.conns.some(k => p.connectors.includes(k)))
+    && (!st.feats.length || st.feats.some(k => p.features.includes(k)));
   const matching = st => D.products.filter(p => matches(p, st));
-  const discount = p => p.was ? (p.was - p.price) / p.was : 0;
-  // No launch dates in the catalogue: "Newly launched" / new-tab items count as newest, then catalogue order.
   const idx = p => D.products.indexOf(p);
-  const age = p => ((p.ribbon === 'Newly launched' || p.tabs.includes('new')) ? 0 : 1000) + idx(p);
-  const relevance = p => (p.tabs.includes('best') ? 2 : 0) + (p.tabs.includes('new') ? 1 : 0) + (p.rating >= 5 ? 1 : 0);
   const SORTERS = {
     featured: (a, b) => idx(a) - idx(b),
-    relevant: (a, b) => relevance(b) - relevance(a) || idx(a) - idx(b),
-    best: (a, b) => (b.tabs.includes('best') - a.tabs.includes('best')) || ((b.rating || 0) - (a.rating || 0)) || idx(a) - idx(b),
-    az: (a, b) => a.title.localeCompare(b.title),
-    za: (a, b) => b.title.localeCompare(a.title),
+    new: (a, b) => (b.year || 0) - (a.year || 0) || idx(a) - idx(b),
+    best: (a, b) => (b.tabs.includes('best') - a.tabs.includes('best')) || (b.tabs.includes('new') - a.tabs.includes('new')) || idx(a) - idx(b),
+    az: (a, b) => a.title.localeCompare(b.title, 'en', { numeric: true }),
+    za: (a, b) => b.title.localeCompare(a.title, 'en', { numeric: true }),
     low: (a, b) => a.price - b.price,
     high: (a, b) => b.price - a.price,
-    old: (a, b) => age(b) - age(a),
-    new: (a, b) => age(a) - age(b),
-    off: (a, b) => discount(b) - discount(a),
   };
-  const order = (items, s) => items.slice().sort(SORTERS[s] || SORTERS.featured).sort((a, b) => (a.soldOut ? 1 : 0) - (b.soldOut ? 1 : 0)); // stable: sold-out items sink
-  const activeCount = st => (st.filter ? 1 : 0) + (st.cat ? 1 : 0) + (st.price ? 1 : 0) + st.colors.length + st.feats.length;
+  const order = (items, s) => items.slice().sort(SORTERS[s] || SORTERS.featured).sort((a, b) => (a.soldOut ? 1 : 0) - (b.soldOut ? 1 : 0));
+  const activeCount = st => (st.filter ? 1 : 0) + (st.cat || st.dept ? 1 : 0) + (st.price ? 1 : 0) + st.conns.length + st.feats.length;
   function syncUrl() {
     const p = new URLSearchParams();
+    if (state.dept) p.set('dept', state.dept);
+    if (state.cat) p.set('cat', state.cat);
     if (state.filter) p.set('filter', state.filter);
-    if (state.cat) p.set('cat', state.cat.toLowerCase());
     if (state.price) p.set('price', state.price);
-    if (state.colors.length) p.set('color', state.colors.join(','));
+    if (state.conns.length) p.set('conn', state.conns.join(','));
     if (state.feats.length) p.set('feat', state.feats.join(','));
     if (state.sort !== 'featured') p.set('sort', state.sort);
-    history.replaceState(null, '', location.pathname + (p.toString() ? '?' + p : '') + location.hash);
+    history.replaceState(null, '', location.pathname + (p.toString() ? '?' + p : ''));
   }
+  const scopeLabel = st => st.cat ? typeLabel(st.cat) : st.dept ? DEPTS.find(d => d.id === st.dept).label : null;
 
   /* ---------- Render ---------- */
-  let groups = [];
   const SEP = '<svg class="mcrumbs__sep" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M9 5.5 15.5 12 9 18.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  function render() {
-    const pool = matching(state);
-    groups = CATS.map(c => ({ cat: c, items: order(pool.filter(p => p.cat === c), state.sort) })).filter(g => g.items.length);
-    const total = pool.length;
-
-    // Desktop: category rails
-    $('groups').innerHTML = groups.length ? groups.map(g => `<section class="pgroup" id="${slug(g.cat)}" aria-labelledby="${slug(g.cat)}-h"><div class="pg-rail"></div></section>`).join('')
-      : `<div class="empty"><h2>No products match this filter yet</h2><p>New launches land every month. Browse the full range in the meantime.</p><a class="btn-pill" href="${url.products}">See all products</a></div>`;
-    groups.forEach(g => {
-      const host = document.querySelector('#' + slug(g.cat) + ' .pg-rail');
-      mountRail(host, { title: g.cat, items: g.items, allHref: null, id: slug(g.cat) + '-h' });
-      host.querySelector('.shop-rail__title').insertAdjacentHTML('beforeend', `<span class="pgroup__count">${g.items.length} ${g.items.length === 1 ? 'product' : 'products'}</span>`);
-    });
-    $('jump-chips').innerHTML = groups.map(g => `<a class="chip" href="#${slug(g.cat)}" data-cat="${g.cat}">${esc(g.cat)}<span class="jumpbar__chip-n">${g.items.length}</span></a>`).join('');
-    const labels = [state.filter && FILTERS[state.filter].label, state.price && PRICES[state.price].label, ...state.colors.map(k => COLORS.find(c => c.key === k).name), ...state.feats.map(k => FEATS[k].label)].filter(Boolean);
-    const fb = $('filterbar');
-    fb.hidden = !labels.length;
-    if (labels.length) fb.innerHTML = `<span>Showing <b>${esc(labels.join(', '))}</b> · ${total} ${total === 1 ? 'product' : 'products'}</span><a href="${url.products}" data-clear aria-label="Clear filters">${icon('chev-l', 14)} Clear filters</a>`;
-
-    // Phones: every matching product in one grid, sorted across categories
-    const all = order(pool, state.sort);
-    $('mgrid').innerHTML = all.length ? all.map(p => WU.productCard(p)).join('')
+  let all = [];
+  function paintGrid() {
+    const slice = all.slice(0, shown);
+    $('mgrid').innerHTML = slice.length ? slice.map(p => WU.productCard(p)).join('')
       : `<div class="empty"><h2>No products match yet</h2><p>Try removing a filter.</p><a class="btn-pill" href="${url.products}">See all products</a></div>`;
-
+    const left = all.length - slice.length;
+    $('mgrid-more').hidden = left <= 0;
+    $('mgrid-shown').textContent = `Showing ${slice.length} of ${all.length}`;
+    $('show-more').textContent = `Show ${Math.min(PAGE, left)} more`;
+    WU.paintWish();
+  }
+  function render() {
+    all = order(matching(state), state.sort);
+    shown = PAGE;
+    paintGrid();
+    const total = all.length;
+    const labels = [state.filter && FILTERS[state.filter].label, state.price && PRICES[state.price].label, ...state.conns, ...state.feats.map(k => FEATS[k])].filter(Boolean);
     const n = activeCount(state);
     $('fbtn-n').hidden = !n;
     $('fbtn-n').textContent = n;
     $('mbar-info').textContent = `${total} ${total === 1 ? 'item' : 'items'}`;
-    const key = state.filter || (state.price === 'u3' && !state.cat ? 'u3' : 'all');
-    $('mtitle').textContent = state.cat ? `Shop ${state.cat.toLowerCase()}` : COPY[key][0];
-    $('mdesc-t').textContent = COPY[key][1];
-    const tail = [state.cat, ...labels].filter(Boolean);
+    const scope = scopeLabel(state);
+    const d = state.cat ? deptOf(state.cat) : state.dept ? DEPTS.find(x => x.id === state.dept) : null;
+    $('mtitle').textContent = scope ? `Shop ${scope.toLowerCase()}` : state.filter ? `Shop ${FILTERS[state.filter].label.toLowerCase()}` : 'Shop all products';
+    $('mdesc-t').textContent = d ? DEPT_COPY[d.id] : ALL_COPY;
+    document.title = (scope ? `${scope} — Price in Pakistan` : 'All Products — Earbuds, Chargers, Cables, Speakers & More') + ' | WisdomUp';
+    // Breadcrumb: All Products › Department › Type · filters
+    const crumbs = [];
+    if (d && state.cat) crumbs.push(`<a href="${url.dept(d.id)}">${esc(d.label)}</a>`);
+    const tail = [scope, ...labels].filter(Boolean);
     $('mcrumbs-tail').innerHTML = tail.length
-      ? `<a href="${url.products}">All Products</a>${SEP}<b aria-current="page">${esc(tail.length > 2 ? tail.slice(0, 2).join(' · ') + ' +' + (tail.length - 2) : tail.join(' · '))}</b>`
+      ? `<a href="${url.products}">All Products</a>${SEP}${crumbs.map(c => c + SEP).join('')}<b aria-current="page">${esc(tail.length > 2 ? tail.slice(0, 2).join(' · ') + ' +' + (tail.length - 2) : tail.join(' · '))}</b>`
       : '<b aria-current="page">All Products</b>';
     const pill = (id, text, on) => { $(id).querySelector('span').textContent = text; $(id).classList.toggle('is-set', on); };
-    pill('pill-cat', state.cat || 'Category', !!state.cat);
+    pill('pill-cat', scope || 'Category', !!scope);
     pill('pill-show', state.filter ? FILTERS[state.filter].label : 'Show', !!state.filter);
     pill('pill-sort', state.price ? PRICES[state.price].label : 'Price', !!state.price);
     $('msort-label').textContent = SORTS[state.sort];
     paintSortList();
     spy();
   }
+  $('show-more').addEventListener('click', () => {
+    const first = shown;
+    shown += PAGE;
+    paintGrid();
+    const next = $('mgrid').children[first];
+    if (next) { const a = next.querySelector('.wpc__title a'); if (a) a.focus({ preventScroll: true }); }
+  });
 
-  /* ---------- Scroll-spy: highlight the category in view (jump bar + site nav) ---------- */
-  const stickyBar = () => [$('jumpbar'), $('mbar')].find(el => el.offsetParent !== null);
-  function spy() {
-    const bar = stickyBar() ? stickyBar().getBoundingClientRect().bottom : 0;
-    let cur = groups[0] ? groups[0].cat : null;
-    const line = Math.max(bar + 80, innerHeight * .35);
-    groups.forEach(g => { const el = $(slug(g.cat)); if (el && el.getBoundingClientRect().top < line) cur = g.cat; });
-    $('jump-chips').querySelectorAll('.chip').forEach(c => {
-      const on = c.dataset.cat === cur;
-      c.setAttribute('aria-current', on);
-      if (on && c.offsetParent) {
-        const box = c.parentElement, r = c.getBoundingClientRect(), b = box.getBoundingClientRect();
-        if (r.left < b.left || r.right > b.right) box.scrollTo({ left: c.offsetLeft - 8, behavior: 'smooth' });
-      }
-    });
-    setActiveCat(window.scrollY > 200 ? (PHONE.matches ? state.cat : cur) : null);
-  }
+  /* ---------- Site nav: highlight the filtered category once scrolled ---------- */
+  const spy = () => setActiveCat(window.scrollY > 200 ? state.cat : null);
   window.addEventListener('scroll', spy, { passive: true });
-  window.addEventListener('wu-nav', e => { $('jumpbar').classList.toggle('is-up', e.detail.hidden); $('mbar').classList.toggle('is-up', e.detail.hidden); });
-  $('jumpbar').addEventListener('transitionend', spy); // re-check once the bar finishes sliding
-
-  /* ---------- Desktop jump bar + sort ---------- */
-  $('jump-chips').addEventListener('click', e => {
-    const a = e.target.closest('a');
-    if (!a) return;
-    e.preventDefault();
-    history.replaceState(null, '', a.getAttribute('href'));
-    scrollToEl($(a.getAttribute('href').slice(1)));
-  });
+  window.addEventListener('wu-nav', e => $('mbar').classList.toggle('is-up', e.detail.hidden));
   window.addEventListener('hashchange', () => {
-    if (PHONE.matches && catFromHash()) { state.cat = catFromHash(); syncUrl(); render(); scrollToEl($('mbar'), 0); return; }
-    scrollToEl($(location.hash.slice(1)));
-  });
-  sortSel.addEventListener('change', () => { state.sort = sortSel.value; syncUrl(); render(); });
-  document.addEventListener('click', e => {
-    const c = e.target.closest('#filterbar [data-clear]');
-    if (!c) return;
-    e.preventDefault();
-    Object.assign(state, { filter: null, price: null, colors: [], feats: [] });
-    syncUrl(); render();
+    if (catFromHash()) { state.cat = catFromHash(); state.dept = null; syncUrl(); render(); scrollToEl($('mbar'), 0); }
   });
 
-  /* ---------- Phone sort dropdown (popover with ✓ on the active option) ---------- */
+  /* ---------- Sort dropdown (popover with ✓ on the active option) ---------- */
   const sortBtn = $('msort-btn'), sortList = $('msort-list');
   function paintSortList() {
     sortList.innerHTML = Object.entries(SORTS).map(([k, l]) => `<li class="msort__opt" role="option" id="so-${k}" data-sort="${k}" aria-selected="${k === state.sort}">${esc(l)}</li>`).join('');
@@ -202,7 +159,7 @@
   const markActive = i => { const o = sortOpts(); sortActive = (i + o.length) % o.length; o.forEach((x, k) => x.classList.toggle('is-active', k === sortActive)); sortList.setAttribute('aria-activedescendant', o[sortActive].id); o[sortActive].scrollIntoView({ block: 'nearest' }); };
   function openSort() { sortList.hidden = false; sortBtn.setAttribute('aria-expanded', 'true'); sortList.focus(); markActive(Object.keys(SORTS).indexOf(state.sort)); }
   function closeSort(focusBtn) { sortList.hidden = true; sortBtn.setAttribute('aria-expanded', 'false'); if (focusBtn) sortBtn.focus(); }
-  function pickSort(k) { state.sort = k; sortSel.value = k; syncUrl(); render(); closeSort(true); }
+  function pickSort(k) { state.sort = k; syncUrl(); render(); closeSort(true); }
   sortBtn.addEventListener('click', () => (sortList.hidden ? openSort() : closeSort()));
   sortList.addEventListener('click', e => { const o = e.target.closest('[data-sort]'); if (o) pickSort(o.dataset.sort); });
   sortList.addEventListener('keydown', e => {
@@ -228,10 +185,10 @@
     e.currentTarget.setAttribute('aria-expanded', open);
   });
 
-  /* ---------- Phone filter panel (slides in from the left; accordion sections) ---------- */
+  /* ---------- Filter panel (slides in from the left; accordion sections) ---------- */
   const drawer = $('fdrawer'), scrim = $('fscrim'), openBtn = $('open-filters');
   let draft = null;
-  const copyState = st => ({ ...st, colors: st.colors.slice(), feats: st.feats.slice() });
+  const copyState = st => ({ ...st, conns: st.conns.slice(), feats: st.feats.slice() });
   const opt = (type, name, value, label, checked, count, extra = '') =>
     `<label class="fopt${count === 0 && !checked ? ' is-empty' : ''}"><input type="${type}" name="${name}" value="${value}"${checked ? ' checked' : ''}><i aria-hidden="true"></i>${extra}<span>${esc(label)}</span>${count != null ? `<small>${count}</small>` : ''}</label>`;
   // Facet counts: how many products you'd get if this option were chosen, keeping every other choice.
@@ -239,20 +196,22 @@
   function paintDrawer() {
     $('f-show').innerHTML = opt('radio', 'f-show', '', 'All products', !draft.filter, countWith({ filter: null }))
       + Object.entries(FILTERS).map(([k, f]) => opt('radio', 'f-show', k, f.label, draft.filter === k, countWith({ filter: k }))).join('');
-    $('f-cats').innerHTML = opt('radio', 'f-cat', '', 'All categories', !draft.cat, countWith({ cat: null }))
-      + CATS.map(c => opt('radio', 'f-cat', c, c, draft.cat === c, countWith({ cat: c }))).join('');
+    // Category: departments with their types indented beneath (one choice)
+    $('f-cats').innerHTML = opt('radio', 'f-cat', '', 'All categories', !draft.cat && !draft.dept, countWith({ cat: null, dept: null }))
+      + DEPTS.map(d => `<div class="fopt-group">${opt('radio', 'f-cat', 'd:' + d.id, 'All ' + d.label.toLowerCase(), draft.dept === d.id && !draft.cat, countWith({ dept: d.id, cat: null }))}`
+        + d.types.filter(t => CATS.includes(t)).map(t => opt('radio', 'f-cat', 't:' + t, typeLabel(t), draft.cat === t && draft.catDept === d.id, countWith({ cat: t, dept: null }))).join('') + '</div>').join('');
     $('f-price').innerHTML = opt('radio', 'f-price', '', 'Any price', !draft.price, countWith({ price: null }))
       + Object.entries(PRICES).map(([k, pr]) => opt('radio', 'f-price', k, pr.label, draft.price === k, countWith({ price: k }))).join('');
-    $('f-color').innerHTML = COLORS.map(c => opt('checkbox', 'f-color', c.key, c.name, draft.colors.includes(c.key), countWith({ colors: [c.key] }), `<span class="fopt__sw" style="background: ${c.hex};"></span>`)).join('');
-    $('f-feat').innerHTML = Object.entries(FEATS).map(([k, f]) => opt('checkbox', 'f-feat', k, f.label, draft.feats.includes(k), countWith({ feats: [k] }))).join('');
+    $('f-conn').innerHTML = CONNS.map(k => opt('checkbox', 'f-conn', k, k === 'Lightning' ? 'Lightning (iPhone)' : k, draft.conns.includes(k), countWith({ conns: [k] }))).join('');
+    $('f-feat').innerHTML = Object.entries(FEATS).map(([k, l]) => opt('checkbox', 'f-feat', k, l, draft.feats.includes(k), countWith({ feats: [k] }))).join('');
     $('f-sort').innerHTML = Object.entries(SORTS).map(([k, l]) => opt('radio', 'f-sort', k, l, draft.sort === k)).join('');
     // Current choice shown on each row, like "On sale" or "2 selected"
     const val = (id, t) => { $(id + '-v').textContent = t || ''; };
     val('fsec-show', draft.filter && FILTERS[draft.filter].label);
-    val('fsec-cat', draft.cat);
+    val('fsec-cat', scopeLabel(draft));
     val('fsec-price', draft.price && PRICES[draft.price].label);
-    val('fsec-color', draft.colors.length ? (draft.colors.length === 1 ? COLORS.find(c => c.key === draft.colors[0]).name : draft.colors.length + ' selected') : '');
-    val('fsec-feat', draft.feats.length ? (draft.feats.length === 1 ? FEATS[draft.feats[0]].label : draft.feats.length + ' selected') : '');
+    val('fsec-conn', draft.conns.length ? (draft.conns.length === 1 ? draft.conns[0] : draft.conns.length + ' selected') : '');
+    val('fsec-feat', draft.feats.length ? (draft.feats.length === 1 ? FEATS[draft.feats[0]] : draft.feats.length + ' selected') : '');
     val('fsec-sort', draft.sort !== 'featured' && SORTS[draft.sort]);
     const n = matching(draft).length;
     $('apply-filters').textContent = n ? `Show ${n} ${n === 1 ? 'result' : 'results'}` : 'No results';
@@ -267,6 +226,7 @@
   let lastFocus = null;
   function openDrawer(section) {
     draft = copyState(state);
+    draft.catDept = state.cat ? (deptOf(state.cat) || {}).id : null;
     paintDrawer();
     drawer.querySelectorAll('.facc').forEach(s => setSection(s, s.id === section));
     lastFocus = document.activeElement;
@@ -294,19 +254,23 @@
   drawer.addEventListener('change', e => {
     const { name, value, checked } = e.target;
     if (name === 'f-show') draft.filter = value || null;
-    if (name === 'f-cat') draft.cat = value || null;
+    if (name === 'f-cat') {
+      draft.dept = value.startsWith('d:') ? value.slice(2) : null;
+      draft.cat = value.startsWith('t:') ? value.slice(2) : null;
+      // A type can sit in two departments (e.g. car chargers): remember which row was ticked
+      draft.catDept = draft.cat ? e.target.closest('.fopt-group').querySelector('input').value.slice(2) : null;
+    }
     if (name === 'f-price') draft.price = value || null;
     if (name === 'f-sort') draft.sort = value;
-    if (name === 'f-color') draft.colors = checked ? draft.colors.concat(value) : draft.colors.filter(k => k !== value);
+    if (name === 'f-conn') draft.conns = checked ? draft.conns.concat(value) : draft.conns.filter(k => k !== value);
     if (name === 'f-feat') draft.feats = checked ? draft.feats.concat(value) : draft.feats.filter(k => k !== value);
     paintDrawer();
     const again = drawer.querySelector(`input[name="${name}"][value="${value}"]`);
     if (again) again.focus();
   });
-  $('clear-filters').addEventListener('click', () => { draft = { filter: null, cat: null, price: null, colors: [], feats: [], sort: 'featured' }; paintDrawer(); });
+  $('clear-filters').addEventListener('click', () => { draft = { filter: null, dept: null, cat: null, catDept: null, price: null, conns: [], feats: [], sort: 'featured' }; paintDrawer(); });
   $('apply-filters').addEventListener('click', () => {
     Object.assign(state, copyState(draft));
-    sortSel.value = state.sort;
     history.replaceState(null, '', location.pathname + location.search);
     syncUrl(); render();
     closeDrawer(() => { scrollToEl($('mbar'), 0); openBtn.focus(); });
@@ -334,8 +298,7 @@
     if (dx < -70) closeDrawer(); else drawer.style.transform = '';
     sx = null;
   });
-  window.addEventListener('resize', () => { if (!drawer.hidden && innerWidth >= 640) closeDrawer(); });
 
   render();
-  if (location.hash) setTimeout(() => scrollToEl(PHONE.matches ? $('mbar') : $(location.hash.slice(1)), PHONE.matches ? 0 : 20), 80);
+  if (catFromHash()) setTimeout(() => scrollToEl($('mbar'), 0), 80);
 })();

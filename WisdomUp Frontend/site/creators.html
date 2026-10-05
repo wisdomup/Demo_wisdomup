@@ -16,6 +16,8 @@
 <link rel="stylesheet" href="css/home.css">
 <link rel="stylesheet" href="css/pages.css">
 <link rel="stylesheet" href="css/info.css">
+<link rel="stylesheet" href="css/controls.css">
+<link rel="stylesheet" href="css/motion.css">
 </head>
 <body>
 <div class="page page--info">
@@ -67,8 +69,8 @@
     <div>
       <div class="panel-list" data-accordion>
       <div class="faq__item">
-        <button type="button" class="faq__q" aria-expanded="true" aria-controls="cr-a0"><span>Do I need a large following?</span><span class="faq__chev" data-icon="chev-r" data-size="18"></span></button>
-        <div class="faq__a" id="cr-a0"><span>No. We look at engagement and how well your content fits WisdomUp, not just follower count.</span></div>
+        <button type="button" class="faq__q" aria-expanded="false" aria-controls="cr-a0"><span>Do I need a large following?</span><span class="faq__chev" data-icon="chev-r" data-size="18"></span></button>
+        <div class="faq__a" id="cr-a0" hidden><span>No. We look at engagement and how well your content fits WisdomUp, not just follower count.</span></div>
       </div>
       <div class="faq__item">
         <button type="button" class="faq__q" aria-expanded="false" aria-controls="cr-a1"><span>Is it free to join?</span><span class="faq__chev" data-icon="chev-r" data-size="18"></span></button>
@@ -92,8 +94,10 @@
   <div class="toast" id="toast" role="status" hidden></div>
 </div>
 
+<script src="js/catalog.js"></script>
 <script src="js/wu-data.js"></script>
 <script src="js/ds-icons.js"></script>
+<script src="js/shop.js"></script>
 <script src="js/common.js"></script>
 <script src="js/info.js"></script>
 </body>

@@ -6,7 +6,6 @@
   const TYPES = ['Distributor', 'Wholesaler', 'Retailer', 'Corporate buyer'];
   const INTERESTS = ['Earbuds', 'Neckbands', 'Speakers', 'Microphones', 'Chargers'];
   const VOLUMES = ['50–200 units', '200–1,000', '1,000–5,000', '5,000+'];
-  const CIRCLE_CAT = { Earbuds: 'Earbuds', Speakers: 'Speakers', Headphones: 'Neckbands', Microphones: 'Microphones', 'Wireless Chargers': 'Chargers', 'Car Chargers': 'Chargers' };
 
   $('perks').innerHTML = [
     ['grid', 'Wide product range', 'Earbuds, neckbands, speakers, creator mics and charging.'],
@@ -59,7 +58,12 @@
   });
 
   /* ---------- Categories, steps, FAQs ---------- */
-  $('bk-cats').innerHTML = D.circles.map(([label, a]) => `<a class="cat" href="${url.cat(CIRCLE_CAT[label] || 'Earbuds')}"><span class="cat__ring">${art(a, { alt: '' })}</span>${esc(label)}</a>`).join('');
+  // Departments, each shown with a representative product photo
+  $('bk-cats').innerHTML = WU.DEPTS.map(d => {
+    const items = D.products.filter(p => d.types.includes(p.type));
+    const p = items.find(x => x.thumb && x.tabs.includes('new')) || items[0];
+    return p ? `<a class="cat" href="${url.dept(d.id)}"><span class="cat__ring" style="background: ${WU.photoBg(p)};"><img src="${p.thumb}" alt="" style="width: 100%; height: 100%; border-radius: 50%; ${WU.photoFit(p)}"></span>${esc(d.label)}</a>` : '';
+  }).join('');
   $('steps').innerHTML = [
     ['Tell us about your business', 'Share your type, city and the products you want to carry.'],
     ['Get partner pricing', 'We reply on WhatsApp within one working day with a tailored quote.'],

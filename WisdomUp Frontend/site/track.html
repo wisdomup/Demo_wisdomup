@@ -16,6 +16,8 @@
 <link rel="stylesheet" href="css/home.css">
 <link rel="stylesheet" href="css/pages.css">
 <link rel="stylesheet" href="css/info.css">
+<link rel="stylesheet" href="css/controls.css">
+<link rel="stylesheet" href="css/motion.css">
 </head>
 <body>
 <div class="page page--info">
@@ -28,10 +30,10 @@
     <form class="track__form" id="track-form" novalidate>
       <div class="eyebrow">Order tracker</div>
       <h1 class="h-light" style="color: #172248; font-size: clamp(30px, 4vw, 44px);">Track <b>your order.</b></h1>
-      <p style="margin: 0; font: 400 16px/1.6 var(--font); color: #3D4656;">Enter the order number from your confirmation SMS or email.</p>
-      <div class="field"><label for="t-order">Order number<i>*</i></label><input id="t-order" name="order" placeholder="e.g. WU-10245" autocomplete="off" required></div>
-      <div class="field"><label for="t-phone">Phone number (optional)</label><input id="t-phone" name="phone" type="tel" placeholder="+92 300 1234567" autocomplete="tel"></div>
-      <div class="bk-foot"><button type="button" class="link-arrow" style="border: 0; background: none; padding: 8px 0; cursor: pointer;" data-sample-order>Try sample order WU-10245</button><button type="submit" class="btn-navy">Track order</button></div>
+      <p style="margin: 0; font: 400 16px/1.6 var(--font); color: #3D4656;">Enter the order number from your confirmation page or message, and the mobile number you ordered with.</p>
+      <div class="field"><label for="t-order">Order number<i>*</i></label><input id="t-order" name="order" placeholder="e.g. WU-10001" autocomplete="off" required></div>
+      <div class="field"><label for="t-phone">Mobile number used for the order<i>*</i></label><input id="t-phone" name="phone" type="tel" inputmode="tel" placeholder="0300 1234567" autocomplete="tel" required></div>
+      <div class="bk-foot"><span class="track__recent" id="track-recent"></span><button type="submit" class="btn-navy">Track order</button></div>
     </form>
     <div class="track__result" id="track-result" aria-live="polite" hidden></div>
   </section>
@@ -41,7 +43,7 @@
       <h2 class="h-light" id="need-more-help?-h">Delivery questions, <b>answered.</b></h2>
       
     </div>
-    <div class="tiles" aria-label="Help with your order"><a class="tile" href="shipping.html"><span class="tile__ic" data-icon="truck"></span><b>Delivery times</b><p>Standard 3–5 working days, express 1–2.</p><span class="tile__go">Shipping Policy ›</span></a><a class="tile" href="returns.html"><span class="tile__ic" data-icon="smile"></span><b>Returns &amp; exchanges</b><p>30 days from delivery.</p><span class="tile__go">Returns ›</span></a><a class="tile" href="help.html#contact"><span class="tile__ic" data-icon="user"></span><b>Contact support</b><p>We can look up your order for you.</p><span class="tile__go">Get help ›</span></a></div>
+    <div class="tiles" aria-label="Help with your order"><a class="tile" href="shipping.html"><span class="tile__ic" data-icon="truck"></span><b>Delivery times</b><p>Standard 3–5 working days, express 1–2.</p><span class="tile__go">Shipping Policy ›</span></a><a class="tile" href="returns.html"><span class="tile__ic" data-icon="smile"></span><b>Returns &amp; exchanges</b><p>7 days from delivery.</p><span class="tile__go">Returns ›</span></a><a class="tile" href="help.html#contact"><span class="tile__ic" data-icon="user"></span><b>Contact support</b><p>We can look up your order for you.</p><span class="tile__go">Get help ›</span></a></div>
   </section>
 
   <div class="trust-wrap" id="trust"></div>
@@ -49,8 +51,10 @@
   <div class="toast" id="toast" role="status" hidden></div>
 </div>
 
+<script src="js/catalog.js"></script>
 <script src="js/wu-data.js"></script>
 <script src="js/ds-icons.js"></script>
+<script src="js/shop.js"></script>
 <script src="js/common.js"></script>
 <script src="js/info.js"></script>
 </body>

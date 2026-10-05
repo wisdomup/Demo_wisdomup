@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>All Products — Earbuds, Speakers, Mics & Chargers | WisdomUp</title>
-<meta name="description" content="Shop every WisdomUp product: open-ear and true wireless earbuds, neckbands, Bluetooth speakers, creator microphones and chargers. Prices in Pakistan with COD and warranty.">
+<title>All Products — Earbuds, Chargers, Cables, Speakers & More | WisdomUp</title>
+<meta name="description" content="Shop every WisdomUp product in Pakistan: wireless earbuds, neckbands, headphones, speakers, chargers, power banks, cables, car holders, computer accessories, storage and grooming. Cash on Delivery and brand warranty.">
 <link rel="icon" href="img/wu-logo.png">
 <link rel="stylesheet" href="css/ds/tokens/fonts.css">
 <link rel="stylesheet" href="css/ds/tokens/colors.css">
@@ -16,6 +16,8 @@
 <link rel="stylesheet" href="css/home.css">
 <link rel="stylesheet" href="css/pages.css">
 <link rel="stylesheet" href="css/info.css">
+<link rel="stylesheet" href="css/controls.css">
+<link rel="stylesheet" href="css/motion.css">
 </head>
 <body>
 <div class="page page--products">
@@ -23,13 +25,7 @@
   <div class="wu-util"><nav class="utility" aria-label="Utility" id="utility"></nav></div>
   <header class="nav site-nav" id="site-nav"></header>
 
-  <div class="hero-anchor" data-nav-anchor>
-    <section class="hero" id="hero" aria-roledescription="carousel" aria-label="Featured launches"></section>
-  </div>
-
-  <h1 class="visually-hidden pbanner-alt">All WisdomUp products</h1>
-
-  <!-- Phone-only page banner (replaces the hero carousel under 640px); height matches a product card photo. -->
+  <!-- Compact page banner; height matches a product-card photo at each breakpoint. -->
   <div class="pbanner-wrap">
     <section class="pbanner" aria-label="All products">
       <div class="pbanner__copy">
@@ -41,24 +37,7 @@
     </section>
   </div>
 
-  <div class="jumpbar" id="jumpbar" data-sticky-offset>
-    <nav class="jumpbar__chips" id="jump-chips" aria-label="Jump to category"></nav>
-    <label class="sortbox"><span>Sort</span>
-      <select id="sort" aria-label="Sort products">
-        <option value="featured">Featured</option>
-        <option value="relevant">Most relevant</option>
-        <option value="best">Best selling</option>
-        <option value="az">Alphabetically, A-Z</option>
-        <option value="za">Alphabetically, Z-A</option>
-        <option value="low">Price, low to high</option>
-        <option value="high">Price, high to low</option>
-        <option value="old">Date, old to new</option>
-        <option value="new">Date, new to old</option>
-        <option value="off">Biggest discount</option>
-      </select>
-    </label>
-  </div>
-  <!-- Phones: listing header (breadcrumb, title, read-more blurb, filter pills, count + sort) -->
+  <!-- Listing header (breadcrumb, title, read-more blurb, filter pills, count + sort) -->
   <div class="mhead">
     <nav class="mcrumbs" aria-label="Breadcrumb">
       <a href="index.html" aria-label="Home"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 3.2 2.5 11.4h2.7V20h5.2v-5.4h3.2V20h5.2v-8.6h2.7z" fill="currentColor"/></svg></a>
@@ -68,7 +47,7 @@
     <h1 class="mtitle" id="mtitle">Shop all products</h1>
     <p class="mdesc" id="mdesc"><span class="mdesc__t" id="mdesc-t"></span><button type="button" class="mdesc__more" id="mdesc-more" aria-expanded="false">read more</button></p>
   </div>
-  <div class="mbar" id="mbar" data-sticky-offset>
+  <div class="mbar" id="mbar" data-sticky-offset data-priority-bar>
     <div class="mbar__pills">
       <button type="button" class="fbtn" id="open-filters" aria-haspopup="dialog" aria-controls="fdrawer" aria-expanded="false">
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M2.5 5h12l-4.6 5.8v5.6l-2.8 1.8v-7.4z" fill="currentColor"/><path d="M17 6.5h4.5M17 11.5h4.5M13.5 16.5h8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
@@ -90,18 +69,16 @@
       <button type="button" class="mview__b" data-cols="2" aria-pressed="true" aria-label="2 products per row"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
     </div>
   </div>
-  <div class="filterbar" id="filterbar" hidden></div>
 
-  <!-- Phones: every product in one grid (1 or 2 per row). Desktop keeps the category rails below. -->
-  <section class="mgrid-band" aria-label="Products"><div class="mgrid mgrid--2" id="mgrid"></div></section>
-  <div id="groups"></div>
+  <!-- Every matching product in one grid: 4 / 3 / 2 per row by width; phones toggle 1 or 2 per row. -->
+  <section class="mgrid-band" aria-label="Products"><div class="mgrid mgrid--2" id="mgrid"></div><div class="mgrid__more" id="mgrid-more" hidden><p id="mgrid-shown"></p><button type="button" class="btn-pill" id="show-more">Show more</button></div></section>
 
   <div class="trust-wrap" id="trust"></div>
 
   <section class="seo-lite" aria-labelledby="seo-h">
     <div class="eyebrow">The full WisdomUp range</div>
-    <h2 id="seo-h">Wireless earbuds, speakers, mics and chargers — trusted in 50+ countries</h2>
-    <p>Browse every WisdomUp product in one place: OS open-ear and TS true wireless earbuds, ENC neckbands, the Thunder Pro party speaker, MKF creator microphones and fast wireless and car chargers. Every order ships across Pakistan with Cash on Delivery, JazzCash, EasyPaisa or card, backed by brand warranty and a 30-day money-back guarantee.</p>
+    <h2 id="seo-h">Earbuds, chargers, cables, speakers and more — all in one place</h2>
+    <p>Browse every WisdomUp product sold in Pakistan: true wireless and open-ear earbuds, neckbands and handsfree, headphones, Bluetooth and party speakers, wall and car chargers, power banks, fast-charging cables and adapters, car phone holders, keyboards and mice, memory cards and grooming tools. Every order ships nationwide with Cash on Delivery, JazzCash, EasyPaisa or bank transfer, backed by brand warranty and a 7-day money-back guarantee.</p>
   </section>
 
   <div class="footer-wrap" id="footer"></div>
@@ -126,9 +103,9 @@
         <h3 class="facc__t"><button type="button" class="facc__h" aria-expanded="false" aria-controls="fsec-price-p"><span>Price</span><span class="facc__v" id="fsec-price-v"></span><svg class="facc__chev" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M5.5 9l6.5 6.5L18.5 9" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></h3>
         <div class="facc__p" id="fsec-price-p" hidden><div class="fopts" id="f-price" role="radiogroup" aria-label="Price"></div></div>
       </div>
-      <div class="facc" id="fsec-color">
-        <h3 class="facc__t"><button type="button" class="facc__h" aria-expanded="false" aria-controls="fsec-color-p"><span>Colour</span><span class="facc__v" id="fsec-color-v"></span><svg class="facc__chev" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M5.5 9l6.5 6.5L18.5 9" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></h3>
-        <div class="facc__p" id="fsec-color-p" hidden><div class="fopts" id="f-color" role="group" aria-label="Colour"></div></div>
+      <div class="facc" id="fsec-conn">
+        <h3 class="facc__t"><button type="button" class="facc__h" aria-expanded="false" aria-controls="fsec-conn-p"><span>Connector</span><span class="facc__v" id="fsec-conn-v"></span><svg class="facc__chev" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M5.5 9l6.5 6.5L18.5 9" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></h3>
+        <div class="facc__p" id="fsec-conn-p" hidden><div class="fopts" id="f-conn" role="group" aria-label="Connector"></div></div>
       </div>
       <div class="facc" id="fsec-feat">
         <h3 class="facc__t"><button type="button" class="facc__h" aria-expanded="false" aria-controls="fsec-feat-p"><span>Features</span><span class="facc__v" id="fsec-feat-v"></span><svg class="facc__chev" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M5.5 9l6.5 6.5L18.5 9" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></h3>
@@ -146,8 +123,10 @@
   <div class="toast" id="toast" role="status" hidden></div>
 </div>
 
+<script src="js/catalog.js"></script>
 <script src="js/wu-data.js"></script>
 <script src="js/ds-icons.js"></script>
+<script src="js/shop.js"></script>
 <script src="js/common.js"></script>
 <script src="js/products.js"></script>
 </body>

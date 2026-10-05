@@ -16,6 +16,8 @@
 <link rel="stylesheet" href="css/home.css">
 <link rel="stylesheet" href="css/pages.css">
 <link rel="stylesheet" href="css/info.css">
+<link rel="stylesheet" href="css/controls.css">
+<link rel="stylesheet" href="css/motion.css">
 </head>
 <body>
 <div class="page page--info">
@@ -67,8 +69,8 @@
     <div>
       <div class="panel-list" data-accordion>
       <div class="faq__item">
-        <button type="button" class="faq__q" aria-expanded="true" aria-controls="corp-a0"><span>What is the minimum order?</span><span class="faq__chev" data-icon="chev-r" data-size="18"></span></button>
-        <div class="faq__a" id="corp-a0"><span>Corporate pricing starts at 50 units across any mix of products. Tell us your quantity and we'll match the right tier.</span></div>
+        <button type="button" class="faq__q" aria-expanded="false" aria-controls="corp-a0"><span>What is the minimum order?</span><span class="faq__chev" data-icon="chev-r" data-size="18"></span></button>
+        <div class="faq__a" id="corp-a0" hidden><span>Corporate pricing starts at 50 units across any mix of products. Tell us your quantity and we'll match the right tier.</span></div>
       </div>
       <div class="faq__item">
         <button type="button" class="faq__q" aria-expanded="false" aria-controls="corp-a1"><span>Can you add our logo?</span><span class="faq__chev" data-icon="chev-r" data-size="18"></span></button>
@@ -96,8 +98,10 @@
   <div class="toast" id="toast" role="status" hidden></div>
 </div>
 
+<script src="js/catalog.js"></script>
 <script src="js/wu-data.js"></script>
 <script src="js/ds-icons.js"></script>
+<script src="js/shop.js"></script>
 <script src="js/common.js"></script>
 <script src="js/info.js"></script>
 </body>

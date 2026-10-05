@@ -16,6 +16,8 @@
 <link rel="stylesheet" href="css/home.css">
 <link rel="stylesheet" href="css/pages.css">
 <link rel="stylesheet" href="css/info.css">
+<link rel="stylesheet" href="css/controls.css">
+<link rel="stylesheet" href="css/motion.css">
 </head>
 <body>
 <div class="page page--info">
@@ -29,7 +31,7 @@
       <div class="eyebrow">Smart Help Center</div>
       <h1>How can we <b>help?</b></h1>
       <p class="ihero__lede">Search our answers, or contact the team — we're here Mon–Sun, 10 AM – 6 PM.</p>
-      <label class="hsearch"><span data-icon="search" data-size="20"></span><input type="search" id="help-search" placeholder="Search: delivery, returns, warranty…" aria-label="Search help articles" autocomplete="off"></label><div class="policy__links"><button type="button" class="chip" style="border: 0; height: 36px; cursor: pointer;" data-help-q="delivery">delivery</button><button type="button" class="chip" style="border: 0; height: 36px; cursor: pointer;" data-help-q="return">return</button><button type="button" class="chip" style="border: 0; height: 36px; cursor: pointer;" data-help-q="warranty">warranty</button><button type="button" class="chip" style="border: 0; height: 36px; cursor: pointer;" data-help-q="pair">pair</button><button type="button" class="chip" style="border: 0; height: 36px; cursor: pointer;" data-help-q="payment">payment</button></div>
+      <label class="hsearch"><span data-icon="search" data-size="20"></span><input type="search" id="help-search" placeholder="Search: delivery, returns, warranty…" aria-label="Search help articles" autocomplete="off"></label><div class="policy__links"><button type="button" class="chip" style="border: 0; cursor: pointer;" data-help-q="delivery">delivery</button><button type="button" class="chip" style="border: 0; cursor: pointer;" data-help-q="return">return</button><button type="button" class="chip" style="border: 0; cursor: pointer;" data-help-q="warranty">warranty</button><button type="button" class="chip" style="border: 0; cursor: pointer;" data-help-q="pair">pair</button><button type="button" class="chip" style="border: 0; cursor: pointer;" data-help-q="payment">payment</button></div>
       
     </div>
     
@@ -40,7 +42,7 @@
       <h2 class="h-light" id="popular-topics-h">Jump straight <b>to an answer.</b></h2>
       
     </div>
-    <div class="tiles" aria-label="Help topics"><a class="tile" href="track.html"><span class="tile__ic" data-icon="search"></span><b>Track an order</b><p>See where your parcel is.</p><span class="tile__go">Track order ›</span></a><a class="tile" href="shipping.html"><span class="tile__ic" data-icon="truck"></span><b>Shipping &amp; delivery</b><p>Delivery times, charges and express.</p><span class="tile__go">Shipping Policy ›</span></a><a class="tile" href="returns.html"><span class="tile__ic" data-icon="smile"></span><b>Exchanges &amp; refunds</b><p>30-day money-back guarantee.</p><span class="tile__go">Returns ›</span></a><a class="tile" href="warranty.html"><span class="tile__ic" data-icon="medal"></span><b>Warranty</b><p>What's covered and how to claim.</p><span class="tile__go">Warranty Policy ›</span></a><a class="tile" href="manuals.html"><span class="tile__ic" data-icon="grid"></span><b>Manuals &amp; pairing</b><p>Quick-start guides for every product.</p><span class="tile__go">e-Manuals ›</span></a><a class="tile" href="bulk-order.html"><span class="tile__ic" data-icon="bag"></span><b>Bulk &amp; corporate</b><p>Partner pricing and company gifts.</p><span class="tile__go">Bulk orders ›</span></a></div>
+    <div class="tiles" aria-label="Help topics"><a class="tile" href="track.html"><span class="tile__ic" data-icon="search"></span><b>Track an order</b><p>See where your parcel is.</p><span class="tile__go">Track order ›</span></a><a class="tile" href="shipping.html"><span class="tile__ic" data-icon="truck"></span><b>Shipping &amp; delivery</b><p>Delivery times, charges and express.</p><span class="tile__go">Shipping Policy ›</span></a><a class="tile" href="returns.html"><span class="tile__ic" data-icon="smile"></span><b>Exchanges &amp; refunds</b><p>7-day money-back guarantee.</p><span class="tile__go">Returns ›</span></a><a class="tile" href="warranty.html"><span class="tile__ic" data-icon="medal"></span><b>Warranty</b><p>What's covered and how to claim.</p><span class="tile__go">Warranty Policy ›</span></a><a class="tile" href="manuals.html"><span class="tile__ic" data-icon="grid"></span><b>Manuals &amp; pairing</b><p>Quick-start guides for every product.</p><span class="tile__go">e-Manuals ›</span></a><a class="tile" href="bulk-order.html"><span class="tile__ic" data-icon="bag"></span><b>Bulk &amp; corporate</b><p>Partner pricing and company gifts.</p><span class="tile__go">Bulk orders ›</span></a></div>
   </section>
   <section class="split" aria-labelledby="hfaq-h">
     <div style="display: flex; flex-direction: column; gap: 10px;"><h2 class="grad-h" id="hfaq-h">Frequently asked</h2><p class="meta-line" id="help-count" aria-live="polite"></p></div>
@@ -66,11 +68,11 @@
       <div class="hgroup"><h3>Returns &amp; exchanges</h3>
         <div class="faq__item">
           <button type="button" class="faq__q" aria-expanded="false" aria-controls="hfaq-a4"><span>What is your return policy?</span><span class="faq__chev" data-icon="chev-r" data-size="18"></span></button>
-          <div class="faq__a" id="hfaq-a4" hidden><span>We offer a 30-day money-back guarantee from the date of delivery. Products must be in original condition and packaging. See the <a href="returns.html">Exchange &amp; Refund Policy</a>.</span></div>
+          <div class="faq__a" id="hfaq-a4" hidden><span>We offer a 7-day money-back guarantee from the date of delivery. Products must be in original condition and packaging. See the <a href="returns.html">Exchange &amp; Refund Policy</a>.</span></div>
         </div>
         <div class="faq__item">
           <button type="button" class="faq__q" aria-expanded="false" aria-controls="hfaq-a5"><span>Can I exchange for a different colour or model?</span><span class="faq__chev" data-icon="chev-r" data-size="18"></span></button>
-          <div class="faq__a" id="hfaq-a5" hidden><span>Yes, within 30 days. If the new item costs more, you pay the difference; if it costs less, we refund it.</span></div>
+          <div class="faq__a" id="hfaq-a5" hidden><span>Yes, within 7 days. If the new item costs more, you pay the difference; if it costs less, we refund it.</span></div>
         </div>
         <div class="faq__item">
           <button type="button" class="faq__q" aria-expanded="false" aria-controls="hfaq-a6"><span>How do I start a return?</span><span class="faq__chev" data-icon="chev-r" data-size="18"></span></button>
@@ -108,7 +110,7 @@
       <div class="hgroup"><h3>Payments</h3>
         <div class="faq__item">
           <button type="button" class="faq__q" aria-expanded="false" aria-controls="hfaq-a13"><span>Which payment methods do you accept?</span><span class="faq__chev" data-icon="chev-r" data-size="18"></span></button>
-          <div class="faq__a" id="hfaq-a13" hidden><span>Visa and MasterCard, JazzCash, EasyPaisa, bank transfer and Cash on Delivery.</span></div>
+          <div class="faq__a" id="hfaq-a13" hidden><span>Cash on Delivery, JazzCash, EasyPaisa and bank transfer.</span></div>
         </div>
         <div class="faq__item">
           <button type="button" class="faq__q" aria-expanded="false" aria-controls="hfaq-a14"><span>Do you offer bulk or corporate pricing?</span><span class="faq__chev" data-icon="chev-r" data-size="18"></span></button>
@@ -146,8 +148,10 @@
   <div class="toast" id="toast" role="status" hidden></div>
 </div>
 
+<script src="js/catalog.js"></script>
 <script src="js/wu-data.js"></script>
 <script src="js/ds-icons.js"></script>
+<script src="js/shop.js"></script>
 <script src="js/common.js"></script>
 <script src="js/info.js"></script>
 </body>
