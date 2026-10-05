@@ -3,8 +3,8 @@
   "redirects": [
     {
       "source": "/",
-      "destination": "/HomeEditorial.dc.html",
-      "permanent": true
+      "destination": "/site/index.html",
+      "permanent": false
     }
   ]
 }
