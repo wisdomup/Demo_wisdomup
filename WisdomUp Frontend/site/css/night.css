@@ -1,0 +1,203 @@
+/* ==========================================================================
+   WisdomUp NIGHT theme — the new premium look, behind the sun/moon toggle in the nav (html[data-theme="night"]).
+   Day = the existing white site, untouched. Night follows the rules taken from higgsfield.ai (surveyed 2026-10-06):
+   · one dark stage (#0F1113), white type, ONE accent (brand red) used sparingly
+   · corners on one scale: 10px buttons · 12px media · 16px cards · 24px panels — no pills except the nav
+   · hairline borders (white at 7%) instead of shadows; nothing floats
+   · section headers: uppercase, left, white; "Shop all ↗" as a small red-tinted button
+   · product rails sit straight on the stage (no colour bands)
+   · a solid brand-red footer
+   Loaded after controls.css on every page; home page + shared chrome are complete, other pages get a safe dark base.
+   ========================================================================== */
+html[data-theme="night"] {
+  color-scheme: dark;
+  --n-bg: #0F1113; --n-bg2: #15181B; --n-card: #1A1D21; --n-raise: #1E2226; --n-raise2: #2A2F35;
+  --n-line: rgba(255,255,255,.07); --n-line2: rgba(255,255,255,.14);
+  --n-text: #F2F3F5; --n-text2: #C9CDD2; --n-muted: #9AA0A6; --n-dim: #6F757C;
+  --n-red: #D91E05; --n-red-hi: #F0300F; --n-red-text: #FF6A4A; --n-red-soft: rgba(217,30,5,.14); --n-red-line: rgba(217,30,5,.38);
+  /* design-system tokens re-pointed */
+  --page: var(--n-bg); --panel: var(--n-bg2); --card: var(--n-card); --chip: var(--n-raise); --field: var(--n-raise2); --line: var(--n-line);
+  --ink: var(--n-text); --ink-2: #E3E5E8; --ink-body: var(--n-text2); --ink-muted: var(--n-muted); --ink-meta: var(--n-dim); --ink-strike: var(--n-dim);
+  --muted: var(--n-muted); --muted-strong: #B6BBC1; --accent-price: #FFFFFF; --navy: var(--n-text); --navy-deep: var(--n-bg2); --navy-link: #A9AFB6; --utility: var(--n-muted);
+  --aqua-band: var(--n-raise); --form-label: var(--n-text2); --form-line: var(--n-line2); --form-required: var(--n-red-text); --focus: #FFFFFF; --frame-selected: #fff;
+  --grad-cta: linear-gradient(90deg, #E8310F 0%, #C41A04 100%); --grad-cta-soft: linear-gradient(90deg, #2A2F35 0%, #1E2226 100%);
+  --grad-heading: linear-gradient(90deg, #fff 0%, #fff 100%); --grad-gold: linear-gradient(90deg, #fff 0%, #E9E9EC 100%); --grad-ribbon: linear-gradient(180deg, #E8310F, #C41A04);
+  --ctl-ink: var(--n-text); --chip-bg: var(--n-raise); --chip-bg-hover: var(--n-raise2); --chip-line: var(--n-line); --chip-line-hover: var(--n-line2);
+  --shadow-soft: none; --shadow-nav: none; --shadow-float: none; --shadow-product: none;
+}
+html[data-theme="night"] body, html[data-theme="night"] .page { background: var(--n-bg); color: var(--n-text); }
+html[data-theme="night"] ::selection { background: rgba(217,30,5,.35); }
+html[data-theme="night"] a { color: var(--n-red-text); }
+html[data-theme="night"] a:hover { color: #fff; }
+html[data-theme="night"] :is(h1, h2, h3, h4) { color: var(--n-text); }
+/* Flat white headings instead of gradient text */
+html[data-theme="night"] :is(.sec-title, .grad-h, .faq__h, .trust__title, .search__label b, .viewall span, .promo__kicker span, .ccard__tag span, .hero__name, .mic__code, .series__off, .pdp2__off, .utility .gold, .grad-text) { background: none; color: var(--n-text); }
+
+/* ---------- Buttons: 10px corners, red = buy, white = secondary, dark + hairline = tertiary ---------- */
+html[data-theme="night"] :is(.btn-pill, .btn-buy, .btn-cart, .btn-navy, .btn-outline, .shop-rail__all, .loop__cta, .pp__cta, .seo__toggle, .wpc__cta, .cartd__go, .fdrawer__apply, .ck__place, .bulk__alt, .mnav__foot a, .mnav__promo-cta) { border-radius: 10px; }
+html[data-theme="night"] :is(.btn-buy, .cartd__go, .ck__place, .fdrawer__apply, .wpc__cta:not(:disabled), a.wpc__cta:not([aria-disabled="true"])) { background: var(--n-red); color: #fff; box-shadow: none; }
+html[data-theme="night"] :is(.btn-buy, .cartd__go, .wpc__cta):not(:disabled):hover { background: var(--n-red-hi); color: #fff; box-shadow: none; filter: none; }
+html[data-theme="night"] :is(.btn-pill, .btn-navy, .pp__cta, .loop__cta) { background: var(--n-text); color: #111; }
+html[data-theme="night"] :is(.btn-pill, .btn-navy, .pp__cta, .loop__cta):hover { background: #fff; color: #111; filter: none; }
+html[data-theme="night"] :is(.btn-outline, .btn-cart, .seo__toggle, .mnav__foot a) { background: var(--n-raise); color: var(--n-text); border-color: var(--n-line2); box-shadow: inset 0 0 0 1px var(--n-line2); }
+html[data-theme="night"] :is(.btn-outline, .btn-cart, .seo__toggle, .mnav__foot a):hover { background: var(--n-raise2); color: #fff; border-color: var(--n-line2); }
+html[data-theme="night"] :is(.btn-cart:disabled, .btn-buy:disabled, .wpc__cta:disabled, a.wpc__cta[aria-disabled="true"]) { background: var(--n-raise2); color: var(--n-muted); }
+/* Chips */
+html[data-theme="night"] :is(.chip, .quick .chip, .series .chip, .pdtabs .chip, .bk-chips .chip, .policy__links a, .search__pages a, .opt-chip, .fbtn, .mnav__chip, .cities span) { border-radius: 10px; background: var(--n-raise); color: var(--n-text); border-color: var(--n-line2); box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] :is(.chip, .policy__links a, .search__pages a, .opt-chip, .fbtn, .mnav__chip):hover { background: var(--n-raise2); color: #fff; box-shadow: inset 0 0 0 1px var(--n-line2); }
+html[data-theme="night"] :is(.series .chip[aria-pressed="true"], .bk-chips .chip[aria-pressed="true"], .opt-chip[aria-checked="true"], .fbtn--dd.is-set, .pdtabs .chip[aria-current="true"], .policy__links a[aria-current="true"]) { background: var(--n-text); color: #111; box-shadow: none; border-color: transparent; }
+html[data-theme="night"] .quick .chip { color: var(--n-text); }
+html[data-theme="night"] .quick__art { background: var(--n-raise2); }
+/* Round icon tools keep their circles but go dark + hairline */
+html[data-theme="night"] :is(.loop__btn, .feat__btn, .shop-rail__step, .hero__arrow, .pdp2__chev, .wpc__wish, .pdp2__wish, .mnav__x, .cartd__x, .fdrawer__x, .search__close, .newsletter button) { background: var(--n-raise); color: var(--n-text); border-color: var(--n-line2); box-shadow: inset 0 0 0 1px var(--n-line2); }
+html[data-theme="night"] :is(.loop__btn, .feat__btn, .shop-rail__step, .wpc__wish, .pdp2__wish):hover { background: var(--n-raise2); color: #fff; }
+html[data-theme="night"] .loop__btn--play { border-color: var(--n-line2); background: var(--n-raise); color: var(--n-text); }
+html[data-theme="night"] :is(.wpc__wish[aria-pressed="true"], .pdp2__wish[aria-pressed="true"]) { color: var(--n-red-text); border-color: var(--n-red-line); }
+html[data-theme="night"] .totop { background: var(--n-text); color: #111; box-shadow: none; }
+html[data-theme="night"] .totop:hover { background: #fff; }
+html[data-theme="night"] .toast { background: var(--n-text); color: #111; }
+html[data-theme="night"] :is(.btn-pill, .btn-buy, .chip, .fbtn, .opt-chip, .faq__q, .seo__toggle, .mnav :focus-visible, .wpc__wish, .totop, .field input, .field textarea):focus-visible { outline-color: #fff; }
+
+/* ---------- Nav: flat dark glass + brighter hairline (the edge light stays) ---------- */
+html[data-theme="night"] .site-nav, html[data-theme="night"] .site-nav.on-dark, html[data-theme="night"] .mfloat .mbar__cap { background-color: rgba(26, 29, 33, .78); background-image: none; box-shadow: none; }
+html[data-theme="night"] .site-nav::before, html[data-theme="night"] .mfloat .mbar__cap::before { border-color: var(--n-line2); }
+html[data-theme="night"] .site-nav .navbtn--all { background: rgba(255,255,255,.06); border-color: var(--n-line2); }
+html[data-theme="night"] .wu-util .utility a { color: var(--n-muted); }
+html[data-theme="night"] .wu-util .utility a:hover, html[data-theme="night"] .wu-util .utility a[aria-current="page"] { color: #fff; }
+
+/* ---------- Product card: dark card, hairline, 16px / 12px corners, red CTA ---------- */
+html[data-theme="night"] .wpc__card { background: var(--n-card); border-radius: 16px; box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] .wpc:hover .wpc__card { box-shadow: inset 0 0 0 1px var(--n-line2); }
+html[data-theme="night"] .wpc__media { border-radius: 12px; }
+html[data-theme="night"] .wpc__title { color: var(--n-text); }
+html[data-theme="night"] .wpc__price { color: #fff; }
+html[data-theme="night"] :is(.wpc__kind, .wpc__rating, .wpc__rating small, .wpc__opts) { color: var(--n-muted); }
+html[data-theme="night"] .wpc__eta { color: #7ED6A0; }
+html[data-theme="night"] .wpc__badge { background: var(--n-red-soft); color: var(--n-red-text); box-shadow: inset 0 0 0 1px var(--n-red-line); border-radius: 8px; }
+html[data-theme="night"] .wpc__wish { background: rgba(26, 29, 33, .85); }
+
+/* ---------- Rails: straight on the stage; uniform header ---------- */
+html[data-theme="night"] :is(.shop-rail, .mgrid-band) { background: transparent; }
+html[data-theme="night"] .shop-rail__title { color: var(--n-text); }
+html[data-theme="night"] .shop-rail__all { background: var(--n-red-soft); color: var(--n-red-text); box-shadow: inset 0 0 0 1px var(--n-red-line); border-radius: 10px; }
+html[data-theme="night"] .shop-rail__all:hover { background: rgba(217,30,5,.26); color: #fff; }
+html[data-theme="night"] .shop-rail__all::after { content: " ↗"; }
+
+/* ---------- Home: hero, carousels, panels ---------- */
+html[data-theme="night"] .hero { border-radius: 24px; box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] .hero__sub { color: var(--n-muted); }
+html[data-theme="night"] .loop__slide { border-radius: 24px; background: linear-gradient(120deg, #1E2226, #0F1113) !important; box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] .feat__slide { border-radius: 24px; box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] .promo { background: var(--n-card) !important; border-radius: 24px; box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] .duo__card { border-radius: 24px; background: var(--n-bg2) !important; box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] .duo__card--live { background: radial-gradient(70% 90% at 100% 100%, rgba(217,30,5,.35) 0%, rgba(217,30,5,0) 60%), var(--n-bg2) !important; }
+html[data-theme="night"] .series { background: var(--n-bg2); border-radius: 24px; box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] :is(.series__code, .series__title, .series__now) { color: #fff; }
+html[data-theme="night"] :is(.series__meta, .series__was) { color: var(--n-muted); }
+html[data-theme="night"] .pp__card { background: var(--n-bg2); border-radius: 24px; box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] .pp__h { color: #fff; }
+html[data-theme="night"] :is(.pp__sub, .pp__note) { color: var(--n-muted); }
+html[data-theme="night"] .bulk__h { color: #fff; }
+html[data-theme="night"] :is(.bulk__p, .bulk__pt) { color: var(--n-text2); }
+html[data-theme="night"] .bulk__pt i { background: var(--n-red); }
+html[data-theme="night"] .bulk__alt { color: var(--n-red-text); }
+html[data-theme="night"] .eyebrow { color: var(--n-red-text); }
+html[data-theme="night"] .eyebrow--warm { color: var(--n-muted); }
+html[data-theme="night"] .h-light b { color: #fff; }
+html[data-theme="night"] .trust__item { color: var(--n-muted) !important; }
+html[data-theme="night"] .trust { background: var(--n-bg2); border-radius: 16px; box-shadow: inset 0 0 0 1px var(--n-line); }
+/* FAQ + SEO blocks */
+html[data-theme="night"] :is(.faq__list, .seo__card, .panel-list) { background: var(--n-bg2); border-color: var(--n-line); border-radius: 24px; box-shadow: none; }
+html[data-theme="night"] .faq__item { border-color: var(--n-line); }
+html[data-theme="night"] :is(.faq__q, .manual__q b) { color: var(--n-text); }
+html[data-theme="night"] :is(.faq__a, .faq__intro, .faq__p, .faq__contact, .faq__chev, .manual__q small) { color: var(--n-muted); }
+html[data-theme="night"] .faq__contact a { color: var(--n-text); }
+html[data-theme="night"] .seo { color: var(--n-muted); }
+html[data-theme="night"] :is(.seo h2, .seo h3) { color: var(--n-text); }
+html[data-theme="night"] .seo a { color: var(--n-red-text); }
+html[data-theme="night"] .seo li::marker { color: var(--n-red); }
+/* Footer: solid brand red */
+html[data-theme="night"] .footer-wrap .footer { background: var(--n-red); border-radius: 24px; color: #fff; }
+html[data-theme="night"] .footer-wrap .footer a { color: rgba(255,255,255,.84); }
+html[data-theme="night"] .footer-wrap .footer a:hover, html[data-theme="night"] .footer-wrap .footer a[aria-current="page"] { color: #fff; }
+html[data-theme="night"] .footer-wrap .footer h4, html[data-theme="night"] .footer-wrap .ft__q, html[data-theme="night"] .ft__chev { color: #fff; }
+html[data-theme="night"] .footer-wrap .newsletter { border-color: rgba(255,255,255,.7); }
+html[data-theme="night"] .footer-wrap .newsletter input { color: #fff; }
+html[data-theme="night"] .footer-wrap .newsletter button { background: #fff; color: var(--n-red); box-shadow: none; }
+html[data-theme="night"] .footer-wrap .subfooter { color: var(--n-muted); }
+
+/* ---------- Shared chrome: menu, cart, search ---------- */
+html[data-theme="night"] :is(.mnav, .cartd, .fdrawer, .search, .msort__list) { background: var(--n-bg2); color: var(--n-text); box-shadow: inset 0 0 0 1px var(--n-line2); }
+html[data-theme="night"] :is(.mnav-scrim, .cartd-scrim, .fscrim, .scrim) { background: rgba(0,0,0,.6); }
+html[data-theme="night"] :is(.mnav__acc-h, .mnav__group a, .mnav__prod b, .mnav__tile-t, .mnav__label, .mnav__acc-t, .mnav__all, .cartd__head h2, .cline__t, .cartd__row, .cartd__row b, .cartd__gift, .cartd__ship b, .cline__p, .cartd__empty, .search__field input, .ccard__title, .ccard__price, .fdrawer__head h2, .facc__h, .facc__chev, .fopt, .fdrawer__clear, .msort__cur, .msort__btn svg, .msort__opt, .mtitle, .mcrumbs, .mcrumbs b, .mdesc__more, .mcount__n b) { color: var(--n-text) !important; }
+html[data-theme="night"] :is(.mnav__prod small, .mnav__eyebrow, .cline__rm, .cartd__ship p, .cartd__note, .cartd__empty p, .ccard__meta, .ccard__was, .facc__v, .fopt small, .mcrumbs a, .mdesc, .mcount, .mcount__n, .msort__btn, .search__label) { color: var(--n-muted) !important; }
+html[data-theme="night"] .mnav__ic { background: var(--n-raise2); color: #fff; }
+html[data-theme="night"] .mnav__tile--all .mnav__thumb { background: var(--n-raise2); }
+html[data-theme="night"] .mnav__n { background: var(--n-red); }
+html[data-theme="night"] .mnav__group a[aria-current="page"]::after { background: var(--n-red); }
+html[data-theme="night"] .ccard { background: var(--n-card); box-shadow: inset 0 0 0 1px var(--n-line); border-radius: 16px; }
+html[data-theme="night"] .cartd__ship i { background: linear-gradient(90deg, var(--n-red) var(--pct), var(--n-raise2) var(--pct)); }
+html[data-theme="night"] .cartd__gift input, html[data-theme="night"] input[type="checkbox"], html[data-theme="night"] input[type="radio"] { accent-color: var(--n-red); }
+html[data-theme="night"] :is(.qty, .cline__img, .ckline__img) { background: var(--n-raise); color: var(--n-text); border-color: var(--n-line2); }
+html[data-theme="night"] .qty button { color: var(--n-text); background: transparent; }
+html[data-theme="night"] .msort__opt:hover, html[data-theme="night"] .msort__opt.is-active { background: var(--n-raise2); }
+html[data-theme="night"] .mview__b { color: var(--n-muted); }
+html[data-theme="night"] .mview__b[aria-pressed="true"] { background: var(--n-raise2); color: #fff; }
+
+/* ---------- All Products: capsule + filter panel ---------- */
+html[data-theme="night"] .mbar__cap { background: rgba(30, 34, 38, .85); box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] :is(.mbar, .mfloat) .fbtn { color: var(--n-text); background: transparent; box-shadow: none; }
+html[data-theme="night"] :is(.mbar, .mfloat) .fbtn--dd.is-set { background: var(--n-text); color: #111; }
+html[data-theme="night"] :is(.mbar, .mfloat) .fbtn__n { background: var(--n-text); color: #111; }
+html[data-theme="night"] .fopt i { border-color: var(--n-line2); background: var(--n-raise); }
+html[data-theme="night"] .fopt input[type="radio"]:checked + i { border-color: var(--n-red); box-shadow: inset 0 0 0 5px var(--n-red); }
+html[data-theme="night"] .fopt input[type="checkbox"]:checked + i { border-color: var(--n-red); background-color: var(--n-red); }
+html[data-theme="night"] .fopt input:checked ~ span { color: #fff; }
+html[data-theme="night"] .fdrawer__apply:disabled { background: var(--n-raise2); color: var(--n-muted); }
+html[data-theme="night"] :is(.seo-lite h2, .seo-lite__h) { color: var(--n-text); }
+html[data-theme="night"] .seo-lite p { color: var(--n-muted); }
+html[data-theme="night"] .pbanner { box-shadow: inset 0 0 0 1px var(--n-line); border-radius: 24px; }
+
+/* ---------- Product page + other pages: a safe dark base (refined later) ---------- */
+html[data-theme="night"] :is(.pdp2__title, .pdp2__now, .pdp2__label, .pdp2__kicker b, .pd-stat__v, .highlights, .spec-table, .rv__avg b, .rv__item header b, .ck__h, .ck__sec h2, .ck__sumhead h2, .ck__total, .ord__hero h1, .ord__card h2, .ihero h1, .tile b, .post__body h3, .article__head h1, .prose h2, .prose h3, .prose strong, .contact-card b, .track__head b, .timeline b, .iform__h, .stat b, .quote-band p, .cta-band h2) { color: var(--n-text); }
+html[data-theme="night"] :is(.pdp2__was, .pdp2__stock, .pdp2__rate, .pdp2__kicker, .pdp2__label span, .pdp2__label small, .pays, .assure span, .prose, .ihero__lede, .tile p, .post__body p, .meta-line, .kv > *, .toc a, .contact-card small, .timeline span, .ck__terms, .ck__fine, .field small, .ckopt__t small, .ckline__t small, .ord__hero p, .ord__card p, .ord__steps li, .rv__item p, .rv__item footer, .rv__note, .cta-band p, .manual__a ol) { color: var(--n-text2); }
+html[data-theme="night"] :is(.ihero, .tile, .post, .ck__sec, .ck__sumcard, .ckopt, .ord__card, .ord__hero, .rv__sum, .rv__item, .contact-card, .callout, .kv > *, .toc, .cta-band, .stat, .adm__order, .pd-stat, .offer, .gift, .reviews-box, .spec-table, .highlights, .pdp2__stage, .bulk-steps, .bk-intro, .perk, .iform, .hsearch, .field input, .field textarea, .rv__sort select, .adm__cols select) { background: var(--n-bg2); border-color: var(--n-line); color: var(--n-text); box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] :is(.field input, .field textarea, .hsearch input) { color: var(--n-text); }
+html[data-theme="night"] :is(.ckopt:has(input:checked), .ckopt input:checked + .ckopt__dot) { border-color: #fff; box-shadow: inset 0 0 0 1px #fff; background: var(--n-raise); }
+html[data-theme="night"] .ckopt input:checked + .ckopt__dot { box-shadow: inset 0 0 0 5px #fff; }
+html[data-theme="night"] :is(.ck__sec h2 span, .ckline__img b, .fbtn__n, .ord__steps li::before) { background: var(--n-text); color: #111; }
+html[data-theme="night"] :is(.tile__ic, .perk__ic, .wish-empty__ic) { background: var(--n-raise2); color: #fff; }
+html[data-theme="night"] .link-arrow, html[data-theme="night"] .tile__go { color: var(--n-red-text); }
+html[data-theme="night"] :is(.prose a, .faq__p a, .faq__a a, .assure a, .offer a, .ck__terms a) { color: var(--n-red-text); }
+html[data-theme="night"] .pdp2__kicker a { background: var(--n-raise); color: var(--n-text); }
+html[data-theme="night"] .highlights i { background: var(--n-red); }
+html[data-theme="night"] .pdtabs__in { background: rgba(30, 34, 38, .85); box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] .pdtabs .chip { color: var(--n-text); background: transparent; box-shadow: none; }
+html[data-theme="night"] .pdtabs .chip[aria-current="true"] { background: var(--n-text); color: #111; }
+html[data-theme="night"] .buybar { background: rgba(26, 29, 33, .86); box-shadow: inset 0 0 0 1px var(--n-line2); }
+html[data-theme="night"] :is(.buybar__t, .buybar__p b) { color: var(--n-text); }
+html[data-theme="night"] .buybar__t small { color: var(--n-muted); }
+
+/* ---------- Leftovers found by the contrast scan (2026-10-06) ---------- */
+html[data-theme="night"] .h-light { color: var(--n-text); }
+html[data-theme="night"] .promo__kicker { background: var(--n-raise2); }
+html[data-theme="night"] :is(.pp__note, .pp__note b) { color: var(--n-muted); }
+html[data-theme="night"] .seo__faq dt { color: var(--n-text); }
+html[data-theme="night"] .seo__faq dd { color: var(--n-muted); }
+html[data-theme="night"] :is(.crumbs, .crumbs a, .crumbs__btn) { color: var(--n-muted); }
+html[data-theme="night"] .crumbs [aria-current] { color: var(--n-text); }
+html[data-theme="night"] :is(.crumbs a:hover, .crumbs__btn:hover) { color: #fff; }
+html[data-theme="night"] .pdp2__desc { color: var(--n-text2); }
+html[data-theme="night"] .pdp2__stock b { color: #7ED6A0; }
+html[data-theme="night"] .assure { background: var(--n-line); }
+html[data-theme="night"] :is(.assure > div, .assure > a) { background: var(--n-bg2); }
+html[data-theme="night"] .assure b { color: var(--n-text); }
+html[data-theme="night"] .pd-stat--light { background: var(--n-bg2) !important; color: var(--n-text) !important; border-color: var(--n-line); }
+html[data-theme="night"] .reviews-box h3 { color: var(--n-text); }
+html[data-theme="night"] .thumb { background: var(--n-raise); }
+html[data-theme="night"] .thumb[aria-current="true"] { border-color: #fff; background: var(--n-raise2); }
+html[data-theme="night"] :is(.offer, .offer__body, .offer p, .offer span, .offer b, .gift, .gift b, .gift span, .gift p) { color: var(--n-text2); }
+html[data-theme="night"] :is(.offer b, .gift b, .offer__head) { color: var(--n-text); }
+html[data-theme="night"] .gift { background: var(--n-bg2); box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] .offer__head { background: var(--n-raise); color: var(--n-text); }
+html[data-theme="night"] .offer { border-color: var(--n-line); }

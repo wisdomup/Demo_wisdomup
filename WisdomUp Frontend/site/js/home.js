@@ -58,9 +58,10 @@
 
   /* ---------- Editorial loop carousels (infinite, 3× slide copies) ---------- */
   const LN = LOOP.length;
-  const loops = ['car1', 'car2'].map(k => {
+  // Three copies of the carousel down the page; each starts on a different slide so they never show the same product at once
+  const loops = [['car1', 0], ['car2', 2], ['car3', 4]].map(([k, start]) => {
     const root = $(k);
-    const st = { i: LN, play: true };
+    const st = { i: LN + start % LN, play: true };
     root.innerHTML = `
       <div class="loop__track">
         ${[0, 1, 2].flatMap(c => LOOP.map(s => `
@@ -119,6 +120,48 @@
   let lastW = vw();
   window.addEventListener('resize', () => { if (vw() !== lastW) { lastW = vw(); loops.forEach(l => l.paint(false)); } });
 
+  /* ---------- Feature carousel: big photo cards, one centred with the neighbours peeking; prev/next + swipe, no autoplay.
+     Every line below is a catalogue fact (specs in catalog.js). ---------- */
+  // Optional 4th item = a video file (mp4/webm, under site/video/) — it fills the card, plays muted on loop, and the
+  // product photo is the poster. Example: ['ts-11anc', 'Active noise cancelling', '…', 'video/ts-11anc.mp4']
+  const FEATS = [
+    ['ts-11anc', 'Active noise cancelling', 'TS-11ANC earbuds: ANC and Bluetooth 6.0 in a pocket-sized case.'],
+    ['os-6', 'Open-ear comfort', 'OS-6 open-ear earbuds — hear traffic and people around you while you listen.'],
+    ['cdb-18', 'Magnetic wireless charging', 'CDB-18: a 10,000mAh power bank with 15W magnetic wireless charging.'],
+    ['ocd-28', '20W fast charging', 'OCD-28: a 20W USB-C + USB-A wall charger with the cable included.'],
+    ['yx-28', 'Party-sized sound', 'YX-28: a 150W party speaker with RGB lights.'],
+    ['mkf-02', 'Creator-ready audio', 'MKF-02 clip-on wireless mic: 2.4GHz link, under 20ms latency.'],
+  ].filter(f => P(f[0]));
+  const feat = $('feat'), ftrack = $('feat-track');
+  if (feat && FEATS.length) {
+    const FN = FEATS.length, fst = { i: FN };
+    ftrack.innerHTML = [0, 1, 2].flatMap(c => FEATS.map(([id, t, sub, video]) => { const p = P(id); return `
+      <a class="feat__slide${video ? ' feat__slide--video' : ''}" href="${url.product(id)}" style="background: ${WU.photoBg(p)};"${c !== 1 ? ' tabindex="-1" aria-hidden="true"' : ''}>
+        ${video
+          ? `<video class="feat__video" src="${video}" poster="${p.src}" muted loop playsinline preload="metadata" aria-hidden="true"></video>`
+          : `<span class="feat__ph"><img src="${p.src}" alt="" loading="lazy"></span>`}
+        <span class="feat__copy"><span class="feat__t">${esc(t)}</span><span class="feat__s">${esc(sub)}</span></span>
+      </a>`; })).join('');
+    // Videos play only while on screen (and never for people who ask for reduced motion — they see the poster)
+    if (!reduced() && 'IntersectionObserver' in window) {
+      const io = new IntersectionObserver(es => es.forEach(e => { const v = e.target; if (e.isIntersecting) v.play().catch(() => {}); else v.pause(); }), { threshold: .2 });
+      ftrack.querySelectorAll('.feat__video').forEach(v => io.observe(v));
+    }
+    const fpaint = anim => {
+      const W = getComputedStyle(feat).getPropertyValue('--feat-w').trim(), G = getComputedStyle(feat).getPropertyValue('--feat-g').trim();
+      ftrack.style.transition = anim ? SLIDE_T : 'none';
+      ftrack.style.transform = `translateX(calc(50% - (${W}) / 2 - ${fst.i} * ((${W}) + ${G})))`;
+    };
+    const fgo = d => { fst.i += d; fpaint(true); };
+    ftrack.addEventListener('transitionend', e => { if (e.target === ftrack && (fst.i < FN || fst.i >= 2 * FN)) { fst.i = ((fst.i % FN) + FN) % FN + FN; fpaint(false); } });
+    feat.addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b) fgo(+b.dataset.go); });
+    let fsx = null;
+    feat.addEventListener('touchstart', e => { fsx = e.touches[0].clientX; }, { passive: true });
+    feat.addEventListener('touchend', e => { if (fsx == null) return; const dx = e.changedTouches[0].clientX - fsx; if (Math.abs(dx) > 40) fgo(dx < 0 ? 1 : -1); fsx = null; });
+    window.addEventListener('resize', () => fpaint(false));
+    fpaint(false);
+  }
+
   /* ---------- Shop rails ---------- */
   // New for 2026: one per product type first (variety), then the rest
   const fresh = D.products.filter(p => p.tabs.includes('new'));
@@ -128,6 +171,14 @@
   const best = D.products.filter(p => p.tabs.includes('best'));
   const essentials = ['ocd-28', 'sjx-49', 'cdb-17', 'cc-14', 'cj-47', 'ej-ly7', 'tde-18', 'sjx-15'].map(P).filter(Boolean);
   mountRail($('rail-best'), { title: 'Best Sellers & Essentials', items: best.concat(essentials.filter(p => !best.includes(p))), allHref: url.filter('best') });
+  // Budget rails: one product per type first so the row shows the range (not 16 handsfree), then the rest, cheapest first
+  const byPrice = (a, b) => a.price - b.price;
+  const variety = list => { const first = list.filter((p, i) => list.findIndex(x => x.type === p.type) === i); return first.concat(list.filter(p => !first.includes(p))); };
+  const under1 = variety(D.products.filter(p => p.price < 1000).sort(byPrice));
+  mountRail($('rail-u1'), { title: 'Under Rs.1,000', items: under1.slice(0, 16), allHref: url.products + '?price=u1' });
+  // Under Rs.2,000 leads with the Rs.1,000–1,999 band so it doesn't repeat the rail above
+  const band = variety(D.products.filter(p => p.price >= 1000 && p.price < 2000).sort(byPrice));
+  mountRail($('rail-u2'), { title: 'Under Rs.2,000', items: band.concat(under1.filter(p => !band.includes(p))).slice(0, 16), allHref: url.products + '?price=u2' });
 
   /* ---------- Creator mics + Live countdown ---------- */
   document.querySelector('.duo__art').innerHTML = photo(P('mkf-01'), 'duo__ph', true, WIDE);

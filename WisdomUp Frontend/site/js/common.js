@@ -284,6 +284,19 @@
   let navMode = '', navHidden = false, lastY = window.scrollY, activeCat = null;
   // A nav icon is "on" for its own type, or for any type inside the department it stands for
   const navOn = t => !!activeCat && (t === activeCat || (DEPTS.find(d => d.id === t) || { types: [] }).types.includes(activeCat));
+  // Day / night theme (the new look lives in css/night.css). Remembered on this device; applied before paint by a head script.
+  const SUN = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg>';
+  const MOON = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M20.5 14.4A8.5 8.5 0 0 1 9.6 3.5a8.5 8.5 0 1 0 10.9 10.9z"/></svg>';
+  const isNight = () => document.documentElement.getAttribute('data-theme') === 'night';
+  const paintThemeBtns = () => document.querySelectorAll('[data-act="theme"]').forEach(b => { b.innerHTML = isNight() ? SUN : MOON; b.setAttribute('aria-label', isNight() ? 'Switch to day mode' : 'Switch to night mode'); b.title = b.getAttribute('aria-label'); });
+  function toggleTheme() {
+    const night = !isNight();
+    if (night) document.documentElement.setAttribute('data-theme', 'night'); else document.documentElement.removeAttribute('data-theme');
+    try { localStorage.setItem('wu-theme', night ? 'night' : 'day'); } catch (e) { /* private mode: the choice just isn't remembered */ }
+    paintThemeBtns();
+    window.dispatchEvent(new CustomEvent('wu-theme', { detail: { night } }));
+  }
+  const themeBtn = cls => `<button type="button" class="${cls}" data-act="theme" aria-label="Switch to night mode">${MOON}</button>`;
   const logoImgs = h => `<span class="site-nav__logo" style="height: ${h}px;"><img src="img/wu-logo.png" alt="WisdomUp"><img src="img/wu-logo-white.png" alt="" aria-hidden="true"></span>`;
   const DARK = '.hero, .pbanner, .loop__slide, .duo__card, .promo, .footer, .pd-stat--dark, .bulk-steps';
   function renderNav(force) {
@@ -306,6 +319,7 @@
         </nav>
         <div class="site-nav__tools">
           <a class="navbtn navbtn--all" href="${url.products}" style="padding: 0 16px 0 11px; margin-right: 6px;">${navSvg(P_GRID, '', 2.2, 22)}<span>Shop All</span></a>
+          ${themeBtn('navbtn navbtn--util')}
           <button type="button" class="navbtn navbtn--util" data-act="search" aria-label="Search">${navSvg('', P_SEARCH, 2.2, 22)}</button>
           <button type="button" class="navbtn navbtn--util" data-act="account" aria-label="Account">${navSvg(P_USER, '', 2.2, 22)}</button>
           <a class="navbtn navbtn--util" href="${url.wishlist}" aria-label="Wishlist" style="position: relative;"${here() === url.wishlist ? ' aria-current="true"' : ''}>${navSvg('', P_HEART, 2.2, 22)}<b class="site-nav__badge site-nav__wbadge" hidden></b></a>
@@ -317,6 +331,7 @@
           <button type="button" class="site-nav__icon" data-act="menu" aria-label="Menu" aria-haspopup="dialog" aria-controls="mnav" aria-expanded="false" style="justify-self: start;"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M4 6.5h16M4 12h16M4 17.5h16"></path></svg></button>
           <a href="${url.home}" aria-label="WisdomUp home" style="display: flex; align-items: center; justify-content: center;">${logoImgs(26)}</a>
           <div style="justify-self: end; display: flex; align-items: center; gap: 2px;">
+            ${themeBtn('site-nav__icon')}
             <button type="button" class="site-nav__icon" data-act="search" aria-label="Search"><svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="${P_SEARCH}"></path></svg></button>
             <a class="site-nav__icon" href="${url.wishlist}" aria-label="Wishlist" style="position: relative;"><svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true" fill="none" stroke="#fff" stroke-width="2.1" stroke-linejoin="round"><path d="${P_HEART}"></path></svg><b class="site-nav__badge site-nav__wbadge" hidden></b></a>
             <button type="button" class="site-nav__icon" data-act="bag" aria-label="Cart"><svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${P_BAG}${P_HANDLE}"></path></svg><b class="site-nav__badge" hidden></b></button>
@@ -325,6 +340,7 @@
     }
     paintBadge();
     paintWish();
+    paintThemeBtns();
     mountNavEdge();
   }
   // Edge light: one rainbow arc glides clockwise round a pill's 1px edge (the nav, and the stuck filter capsule). Speed, length and colours are copied from
@@ -912,6 +928,7 @@
     if (nav) nav.addEventListener('click', e => {
       const a = e.target.closest('[data-act]');
       if (!a) return;
+      if (a.dataset.act === 'theme') toggleTheme();
       if (a.dataset.act === 'search') search.open();
       if (a.dataset.act === 'menu') menu.open(a);
       if (a.dataset.act === 'bag') cartUI.open(a);
@@ -1125,6 +1142,7 @@
     productCard, colorsOf, photoBg, photoFit, ratingOf, reviewsOf, seedOf, mountRail, mountHero, mountAccordion, DEPTS, typeLabel,
     initChrome, placeNav, setActiveCat, navOffset, scrollToEl,
     openSearch: () => search && search.open(),
+    toggleTheme, isNight,
     seo, abs, clip, ldCrumbs, ldFaq, px, pxItem, YEAR, SITE,
   };
 })();

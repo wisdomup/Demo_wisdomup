@@ -35,7 +35,10 @@
  ]}
 ]}
 </script>
-<link rel="icon" href="img/wu-logo.png">
+<script>try{if(localStorage.getItem("wu-theme")==="night")document.documentElement.setAttribute("data-theme","night")}catch(e){}</script>
+<link rel="icon" href="favicon.ico" sizes="32x32">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 <link rel="stylesheet" href="css/ds/tokens/fonts.css">
 <link rel="stylesheet" href="css/ds/tokens/colors.css">
 <link rel="stylesheet" href="css/ds/tokens/typography.css">
@@ -47,6 +50,8 @@
 <link rel="stylesheet" href="css/pages.css">
 <link rel="stylesheet" href="css/info.css">
 <link rel="stylesheet" href="css/controls.css">
+<link rel="stylesheet" href="css/night.css">
+<link rel="stylesheet" href="css/night-home.css">
 <link rel="stylesheet" href="css/motion.css">
 </head>
 <body>
@@ -56,6 +61,8 @@
   <header class="nav site-nav" id="site-nav"></header>
   <h1 class="visually-hidden">WisdomUp Pakistan — wireless earbuds, power banks, chargers, handsfree, speakers and mobile accessories</h1>
 
+  <!-- DAY home page (hidden while the night theme is on; night renders its own layout into #night-home) -->
+  <div id="day-home">
   <div class="hero-stack">
     <nav class="quick" aria-label="Quick filters"><div class="wu-chip-track" id="quick-chips"></div></nav>
     <div class="hero-anchor" data-nav-anchor>
@@ -104,6 +111,12 @@
 
   <section class="loop loop--second" id="car2" aria-label="Featured more" aria-roledescription="carousel"></section>
 
+  <div class="rail-wrap"><section class="shop-rail" id="rail-u1" data-title="Under Rs.1,000"></section></div>
+
+  <section class="loop loop--third" id="car3" aria-label="Featured picks" aria-roledescription="carousel"></section>
+
+  <div class="rail-wrap"><section class="shop-rail" id="rail-u2" data-title="Under Rs.2,000"></section></div>
+
   <section class="series" id="series" aria-label="TS True Wireless series">
     <div class="series__col">
       <div class="series__chips" id="series-chips"></div>
@@ -120,6 +133,16 @@
       <div class="series__btns" id="series-btns"></div>
     </div>
     <div class="series__art" id="series-art"></div>
+  </section>
+
+  <!-- Feature carousel: one big photo card centred with its neighbours peeking, prev/next below (Zenni-style) -->
+  <section class="feat" id="feat" aria-roledescription="carousel" aria-label="Built around your day">
+    <h2 class="sec-title feat__h">Built around your day</h2>
+    <div class="feat__track" id="feat-track"></div>
+    <div class="feat__ctrls">
+      <button type="button" class="feat__btn" data-go="-1" aria-label="Previous"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 2.5 4 6l3.5 3.5"/></svg></button>
+      <button type="button" class="feat__btn" data-go="1" aria-label="Next"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg></button>
+    </div>
   </section>
 
   <section class="bulk">
@@ -225,6 +248,9 @@
     <button type="button" class="seo__toggle" id="seo-toggle" aria-expanded="false" aria-controls="seo-more"><span class="seo__toggle-t">Read more</span><svg width="16" height="16" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="2.5,4.5 6,8 9.5,4.5"></polyline></svg></button>
   </section>
 
+  </div>
+  <div id="night-home" hidden></div>
+
   <div class="footer-wrap" id="footer"></div>
 
   <div class="toast" id="toast" role="status" hidden></div>
@@ -236,5 +262,6 @@
 <script src="js/shop.js"></script>
 <script src="js/common.js"></script>
 <script src="js/home.js"></script>
+<script src="js/night-home.js"></script>
 </body>
 </html>

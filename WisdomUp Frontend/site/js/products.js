@@ -10,6 +10,8 @@
   };
   const PRICES = {
     u1: { label: 'Under Rs.1,000', test: p => p.price < 1000 },
+    u2: { label: 'Under Rs.2,000', test: p => p.price < 2000 },
+    u5: { label: 'Under Rs.5,000', test: p => p.price < 5000 },
     m3: { label: 'Rs.1,000 – 2,999', test: p => p.price >= 1000 && p.price < 3000 },
     m10: { label: 'Rs.3,000 – 9,999', test: p => p.price >= 3000 && p.price < 10000 },
     p10: { label: 'Rs.10,000 & above', test: p => p.price >= 10000 },

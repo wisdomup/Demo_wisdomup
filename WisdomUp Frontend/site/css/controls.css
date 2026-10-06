@@ -145,11 +145,11 @@ button.link-arrow { height: var(--ctl); padding: 0; border: 0; background: none;
 .cline__rm { height: var(--ctl); }                            /* cart row: stepper and Remove share 40px */
 /* Phones: no left/right arrows anywhere — carousels and the product gallery are swiped instead */
 @media (max-width: 639px) {
-  .hero__arrow, .shop-rail__step, .loop__btn[data-go], .pdp2__chev { display: none !important; }
+  .hero__arrow, .shop-rail__step, .pdp2__chev { display: none !important; }
 }
 /* Touch screens (phones AND tablets): no left/right arrows — rails scroll and carousels/gallery swipe with a finger */
 @media (hover: none) and (pointer: coarse) {
-  .hero__arrow, .shop-rail__step, .loop__btn[data-go], .pdp2__chev { display: none !important; }
+  .hero__arrow, .shop-rail__step, .pdp2__chev { display: none !important; }
   .shop-rail__all { margin-right: 0; }
 }
 

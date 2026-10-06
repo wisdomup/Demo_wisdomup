@@ -1,0 +1,178 @@
+/* ==========================================================================
+   NIGHT HOME — the home page's own layout in night mode (#night-home, rendered by js/night-home.js).
+   Separate rules from the day page. Patterns and numbers taken from higgsfield.ai (surveyed 2026-10-06):
+   · stage #0F1113, panels pure #000 with a 1px white-6% hairline, cards #1C1E20 — no shadows
+   · 16px page gutter, 8px gaps inside grids, 16px between big blocks, 64px between sections
+   · corners: 8px chips · 12px tiles · 16px cards · 24px panels; buttons 10–12px (no pills)
+   · section header: uppercase 27px 700 −4% tracking, 14px grey line under it, small red-tinted "View all ↗" right
+   · hero = three media tiles with a title line under each; promo card + feature tiles; dense edge-to-edge grids;
+     black showpiece panels with a glow; a segmented control; a fanned tile strip; a chip cloud; red footer
+   ========================================================================== */
+.nh { --g: 16px; --gap: 8px; --r-tile: 12px; --r-card: 16px; --r-panel: 24px;
+  --panel: #000; --card: #1C1E20; --card-hi: #24272A; --line: rgba(255,255,255,.06); --line2: rgba(255,255,255,.12);
+  --text: #fff; --text2: #C9CDD2; --muted: #898A8B; --red: #D91E05; --red-hi: #F0300F; --red-t: #FF6A4A; --red-10: rgba(217,30,5,.12); --red-24: rgba(217,30,5,.26);
+  --ease: cubic-bezier(.2,.7,.2,1);
+  box-sizing: border-box; max-width: 1632px; margin: 0 auto; padding: 0 var(--g) 64px; color: var(--text); font-family: var(--font); }
+.nh *, .nh *::before, .nh *::after { box-sizing: border-box; }
+.nh > section { margin-top: 64px; }
+.nh > .nh-top { margin-top: 8px; }
+.nh > .nh-stripwrap { margin-top: var(--g); }
+.nh a { color: inherit; text-decoration: none; }
+.nh img { display: block; }
+.nh :focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+/* ---------- Section header ---------- */
+.nh-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+.nh-h { margin: 0; font: 700 clamp(22px, 2.1vw, 27px)/1.15 var(--font); letter-spacing: -.04em; text-transform: uppercase; color: var(--text); }
+.nh-sub { margin: 6px 0 0; font: 400 14px/1.45 var(--font); color: var(--muted); max-width: 70ch; }
+.nh-head--center { flex-direction: column; align-items: center; text-align: center; }
+
+/* ---------- Buttons ---------- */
+.nh-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 40px; padding: 0 14px; border: 0; border-radius: 10px; background: var(--red-10); color: var(--red-t); font: 600 14px/1 var(--font); white-space: nowrap; cursor: pointer; transition: background-color 160ms var(--ease), color 160ms var(--ease); }
+.nh-btn:hover { background: var(--red-24); color: #fff; }
+.nh-btn--primary { height: 48px; padding: 0 22px; border-radius: 12px; background: var(--red); color: #fff; font-size: 16px; }
+.nh-btn--primary:hover { background: var(--red-hi); color: #fff; }
+.nh-btn--ghost { background: rgba(255,255,255,.06); color: #fff; box-shadow: inset 0 0 0 1px var(--line2); }
+.nh-btn--ghost:hover { background: rgba(255,255,255,.12); color: #fff; }
+.nh-btn--lg { height: 48px; padding: 0 22px; border-radius: 12px; font-size: 16px; }
+.nh-tag { display: inline-flex; align-items: center; height: 24px; padding: 0 9px; border-radius: 6px; background: var(--red-24); color: #fff; font: 700 11px/1 var(--font); letter-spacing: .06em; text-transform: uppercase; }
+.nh-tag--grey { background: rgba(255,255,255,.1); }
+
+/* ---------- Hero: three media tiles with a line under each ---------- */
+.nh-trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--g); }
+.nh-trio__item { display: block; }
+.nh-trio__media { position: relative; aspect-ratio: 16 / 10; border-radius: var(--r-tile); overflow: hidden; box-shadow: inset 0 0 0 1px var(--line); }
+.nh-trio__media img { width: 100%; height: 100%; transition: transform 700ms var(--ease); }
+.nh-trio__item:hover .nh-trio__media img { transform: scale(1.04); }
+.nh-trio__media .nh-tag { position: absolute; top: 12px; left: 12px; }
+.nh-trio__t { margin: 12px 0 0; font: 500 16px/1.3 var(--font); }
+.nh-trio__s { margin: 4px 0 0; font: 400 14px/1.4 var(--font); color: var(--muted); }
+@media (max-width: 767px) {
+  .nh-trio { display: flex; gap: 10px; margin: 0 calc(-1 * var(--g)); padding: 0 var(--g); overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--g); scrollbar-width: none; }
+  .nh-trio::-webkit-scrollbar { display: none; }
+  .nh-trio__item { flex: 0 0 82vw; scroll-snap-align: start; }
+}
+
+/* ---------- Promise strip ---------- */
+.nh-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gap); }
+.nh-strip a { display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 10px 14px; border-radius: var(--r-tile); background: var(--card); box-shadow: inset 0 0 0 1px var(--line); font: 500 13px/1.3 var(--font); color: var(--text); transition: background-color 160ms var(--ease); }
+.nh-strip a:hover { background: var(--card-hi); }
+.nh-strip svg { width: 22px; height: 22px; flex: none; color: var(--red-t); }
+@media (max-width: 767px) { .nh-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* ---------- Promo card + department tiles ---------- */
+.nh-promo { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: var(--g); }
+.nh-live { position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; gap: 12px; min-height: 320px; padding: 28px; border-radius: var(--r-panel); background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); }
+.nh-live::before { content: ""; position: absolute; left: -10%; right: -10%; bottom: -45%; height: 90%; background: radial-gradient(50% 55% at 50% 100%, rgba(217,30,5,.6) 0%, rgba(217,30,5,0) 70%); pointer-events: none; }
+.nh-live > * { position: relative; }
+.nh-live__tag { position: absolute; top: 20px; left: 20px; }
+.nh-live__h { margin: 0; font: 800 clamp(30px, 3.2vw, 44px)/1 var(--font); letter-spacing: -.04em; text-transform: uppercase; }
+.nh-live__p { margin: 0; max-width: 38ch; font: 400 15px/1.5 var(--font); color: var(--text2); }
+.nh-live__row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.nh-live__when { font: 600 13px/1 var(--font); color: var(--muted); }
+.nh-feats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: var(--gap); }
+.nh-feat { display: flex; flex-direction: column; gap: 10px; min-height: 150px; padding: 14px; border-radius: var(--r-tile); background: var(--card); box-shadow: inset 0 0 0 1px var(--line); transition: background-color 160ms var(--ease); }
+.nh-feat:hover { background: var(--card-hi); }
+.nh-feat__ic { width: 36px; height: 36px; border-radius: 8px; overflow: hidden; background: #2A2F35; }
+.nh-feat__ic img { width: 100%; height: 100%; }
+.nh-feat__t { font: 600 15px/1.2 var(--font); }
+.nh-feat__s { margin-top: auto; font: 400 13px/1.4 var(--font); color: var(--muted); }
+@media (max-width: 1023px) { .nh-promo { grid-template-columns: 1fr; } .nh-live { min-height: 260px; } }
+@media (max-width: 639px) { .nh-feats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .nh-feat { min-height: 128px; } }
+
+/* ---------- Dense product grid ---------- */
+.nh-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(188px, 1fr)); gap: var(--gap); }
+.nh-tile { position: relative; border-radius: var(--r-tile); overflow: hidden; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); transition: box-shadow 160ms var(--ease); }
+.nh-tile:hover { box-shadow: inset 0 0 0 1px var(--line2); }
+.nh-tile__img { display: block; position: relative; aspect-ratio: 4 / 5; overflow: hidden; }
+.nh-tile__img img { width: 100%; height: 100%; transition: transform 700ms var(--ease); }
+.nh-tile:hover .nh-tile__img img { transform: scale(1.05); }
+.nh-tile__tag { position: absolute; top: 8px; left: 8px; }
+.nh-tile__wish, .nh-tile__add { position: absolute; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 50%; display: grid; place-items: center; cursor: pointer; transition: background-color 160ms var(--ease), opacity 160ms var(--ease), transform 160ms var(--ease); }
+.nh-tile__wish { top: 8px; right: 8px; background: rgba(15,17,19,.72); color: #fff; }
+.nh-tile__wish svg { width: 17px; height: 17px; }
+.nh-tile__wish[aria-pressed="true"] { color: var(--red-t); }
+.nh-tile__add { right: 8px; top: calc(80% + 8px); transform: translateY(-100%); background: var(--red); color: #fff; }
+.nh-tile__add svg { width: 16px; height: 16px; }
+.nh-tile__add:hover { background: var(--red-hi); }
+.nh-tile__add:active { transform: translateY(-100%) scale(.96); }
+@media (hover: hover) { .nh-tile__add { opacity: 0; } .nh-tile:hover .nh-tile__add, .nh-tile__add:focus-visible { opacity: 1; } }
+.nh-tile__cap { display: flex; flex-direction: column; gap: 3px; padding: 10px 12px 12px; }
+.nh-tile__p { font: 700 15px/1 var(--font); color: var(--text); }
+.nh-tile__n { font: 400 13px/1.35 var(--font); color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.nh-tile--out .nh-tile__img img { opacity: .55; }
+.nh-more { display: flex; justify-content: center; margin-top: 16px; }
+@media (max-width: 639px) { .nh-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .nh-tile__cap { padding: 8px 10px 10px; } }
+
+/* ---------- Showpiece panel (black, hairline, big headline, product media, thumbnail row) ---------- */
+.nh-show { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 24px; align-items: center; padding: clamp(20px, 3vw, 40px); border-radius: var(--r-panel); background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); }
+.nh-show__copy { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
+.nh-show__h { margin: 0; font: 800 clamp(40px, 5.4vw, 76px)/.95 var(--font); letter-spacing: -.04em; text-transform: uppercase; }
+.nh-show__t { margin: 0; font: 500 16px/1.4 var(--font); color: var(--text2); }
+.nh-show__meta { margin: 0; font: 400 14px/1.5 var(--font); color: var(--muted); }
+.nh-show__price { margin: 4px 0 0; font: 700 28px/1 var(--font); }
+.nh-show__btns { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+.nh-show__media { position: relative; aspect-ratio: 4 / 3; border-radius: var(--r-card); overflow: hidden; box-shadow: inset 0 0 0 1px var(--line); }
+.nh-show__media img { width: 100%; height: 100%; }
+.nh-show__thumbs { grid-column: 1 / -1; display: flex; gap: 8px; margin-top: 4px; overflow-x: auto; scrollbar-width: none; }
+.nh-show__thumbs::-webkit-scrollbar { display: none; }
+.nh-show__thumb { flex: none; width: 96px; padding: 0; border: 0; border-radius: 10px; overflow: hidden; background: var(--card); color: #fff; box-shadow: inset 0 0 0 1px var(--line); cursor: pointer; font: 600 11px/1 var(--font); transition: box-shadow 160ms var(--ease); }
+.nh-show__thumb img { width: 100%; aspect-ratio: 1; object-fit: cover; }
+.nh-show__thumb span { display: block; padding: 7px 4px; text-align: center; }
+.nh-show__thumb[aria-pressed="true"] { box-shadow: inset 0 0 0 2px #fff; }
+@media (max-width: 1023px) { .nh-show { grid-template-columns: 1fr; } .nh-show__media { order: -1; } }
+
+/* ---------- Glow panel (centred headline, red glow, floating mini cards) ---------- */
+.nh-glow { position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; gap: 14px; padding: clamp(44px, 7vw, 96px) 24px; border-radius: var(--r-panel); background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); text-align: center; }
+.nh-glow::before { content: ""; position: absolute; left: 50%; bottom: -35%; width: 76%; height: 80%; transform: translateX(-50%); background: radial-gradient(50% 50% at 50% 50%, rgba(217,30,5,.7) 0%, rgba(217,30,5,0) 70%); filter: blur(24px); pointer-events: none; }
+.nh-glow > * { position: relative; }
+.nh-glow__h { margin: 0; font: 800 clamp(30px, 4.2vw, 58px)/1 var(--font); letter-spacing: -.04em; text-transform: uppercase; }
+.nh-glow__p { margin: 0; max-width: 46ch; font: 400 15px/1.5 var(--font); color: var(--text2); }
+.nh-glow__card { position: absolute; z-index: 1; display: flex; align-items: center; gap: 10px; width: 196px; padding: 8px; border-radius: 12px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line2); font: 600 12px/1.3 var(--font); text-align: left; }
+.nh-glow__card img { width: 48px; height: 48px; border-radius: 8px; object-fit: cover; flex: none; }
+.nh-glow__card small { display: block; font: 500 11px/1.3 var(--font); color: var(--muted); }
+.nh-glow__card--a { left: 6%; top: 16%; transform: rotate(-4deg); }
+.nh-glow__card--b { right: 6%; bottom: 16%; transform: rotate(4deg); }
+@media (max-width: 1023px) { .nh-glow__card { display: none; } }
+
+/* ---------- Segmented control ---------- */
+.nh-seg { display: inline-flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); }
+.nh-seg button { height: 32px; padding: 0 14px; border: 0; border-radius: 8px; background: transparent; color: var(--muted); font: 600 14px/1 var(--font); cursor: pointer; transition: background-color 160ms var(--ease), color 160ms var(--ease); }
+.nh-seg button:hover { color: #fff; }
+.nh-seg button[aria-pressed="true"] { background: #fff; color: #111; }
+
+/* ---------- Fanned tile strip panel ---------- */
+.nh-fan { position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 44px 24px 36px; border-radius: var(--r-panel); background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); text-align: center; }
+.nh-fan::before { content: ""; position: absolute; left: 50%; top: 40%; width: 60%; height: 70%; transform: translateX(-50%); background: radial-gradient(50% 50% at 50% 50%, rgba(217,30,5,.35) 0%, rgba(217,30,5,0) 70%); filter: blur(30px); pointer-events: none; }
+.nh-fan > * { position: relative; }
+.nh-fan__h { margin: 0; font: 800 clamp(28px, 3.6vw, 48px)/1 var(--font); letter-spacing: -.04em; text-transform: uppercase; }
+.nh-fan__p { margin: 0; max-width: 48ch; font: 400 15px/1.5 var(--font); color: var(--text2); }
+.nh-fan__row { display: flex; justify-content: center; align-items: center; gap: 12px; width: 100%; margin: 8px 0 4px; perspective: 1000px; }
+.nh-fan__tile { flex: none; width: clamp(88px, 11vw, 150px); aspect-ratio: 4 / 5; border-radius: 12px; overflow: hidden; box-shadow: inset 0 0 0 1px var(--line); }
+.nh-fan__tile img { width: 100%; height: 100%; }
+.nh-fan__tile:nth-child(1) { transform: rotateY(30deg) scale(.84); opacity: .55; }
+.nh-fan__tile:nth-child(2) { transform: rotateY(20deg) scale(.9); opacity: .75; }
+.nh-fan__tile:nth-child(3) { transform: rotateY(9deg) scale(.96); }
+.nh-fan__tile:nth-child(4) { transform: scale(1.1); box-shadow: inset 0 0 0 1px var(--line2), 0 0 0 6px rgba(217,30,5,.18); }
+.nh-fan__tile:nth-child(5) { transform: rotateY(-9deg) scale(.96); }
+.nh-fan__tile:nth-child(6) { transform: rotateY(-20deg) scale(.9); opacity: .75; }
+.nh-fan__tile:nth-child(7) { transform: rotateY(-30deg) scale(.84); opacity: .55; }
+@media (max-width: 767px) { .nh-fan__tile:nth-child(1), .nh-fan__tile:nth-child(7) { display: none; } .nh-fan__tile { width: 20vw; } }
+
+/* ---------- Chip cloud ---------- */
+.nh-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.nh-chip { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 8px; background: var(--card); color: #DADDE1; font: 500 13px/1 var(--font); box-shadow: inset 0 0 0 1px var(--line); transition: background-color 160ms var(--ease), color 160ms var(--ease); }
+.nh-chip--dept { color: #fff; font-weight: 600; }
+.nh-chip:hover { background: var(--card-hi); color: #fff; }
+
+/* ---------- FAQ ---------- */
+.nh-faq { display: flex; flex-direction: column; align-items: center; }
+.nh-faq .faq__list { width: min(100%, 880px); }
+
+/* ---------- Link colours: night.css paints every <a> red; inside the night home links inherit, buttons set their own ---------- */
+html[data-theme="night"] .nh a, html[data-theme="night"] .nh a:hover { color: inherit; }
+html[data-theme="night"] .nh .nh-btn { color: var(--red-t); }
+html[data-theme="night"] .nh .nh-btn:hover { color: #fff; }
+html[data-theme="night"] .nh :is(.nh-btn--primary, .nh-btn--ghost, .nh-btn--primary:hover, .nh-btn--ghost:hover, .nh-strip a, .nh-feat, .nh-live, .nh-trio__item, .nh-tile__cap, .nh-glow__card, .nh-fan__tile) { color: var(--text); }
+html[data-theme="night"] .nh .nh-chip { color: #DADDE1; }
+html[data-theme="night"] .nh .nh-chip--dept, html[data-theme="night"] .nh .nh-chip:hover { color: #fff; }
