@@ -39,10 +39,13 @@
 @media (max-width: 639px) { .wu-motion [data-rv="grid"] { --rv-t: 300ms; transform: translate3d(0, 30px, 0); } }
 
 /* ---------- Buttons: liquid fill (a circle rises from below on enter, leaves upward), text colour swaps 100ms behind ---------- */
-.wu-fill { position: relative; overflow: hidden; isolation: isolate; transition: color var(--m-primary) 100ms, box-shadow var(--m-primary), border-color var(--m-primary), opacity var(--m-fast); }
+.wu-fill { position: relative; overflow: hidden; isolation: isolate; }
+.wu-fill:not([data-fill-auto]) { transition: color var(--m-primary) 100ms, box-shadow var(--m-primary), border-color var(--m-primary), opacity var(--m-fast); } /* auto-marked buttons keep their own transitions (JS appends the colour one) */
 .wu-fill::before { content: ""; position: absolute; z-index: -1; left: -25%; top: -50%; width: 150%; height: 200%; border-radius: 50%; background: var(--fill, #fff); transform: translate3d(0, var(--fill-y, -76%), 0); transition: transform 600ms var(--e-hover); pointer-events: none; }
 .wu-fill.wu-fill--snap::before { transition: none; }
 .wu-fill:disabled::before, .wu-fill[aria-disabled="true"]::before { display: none; }
+/* a chosen chip/tab/segment is already "filled": no liquid on it */
+.wu-fill:is([aria-pressed="true"], [aria-selected="true"], [aria-current="true"], [aria-checked="true"], .is-set)::before { display: none; }
 /* day: every button inverts into its own text colour */
 .btn-pill, .btn-buy, .ck__place, .cartd__go { --fill: #fff; --fill-text: #2350C8; }
 .btn-navy, .shop-rail__all { --fill: #fff; --fill-text: #172248; }
@@ -54,7 +57,10 @@ html[data-theme="night"] :is(.btn-buy, .ck__place, .cartd__go, .fdrawer__apply, 
 html[data-theme="night"] :is(.btn-pill, .btn-navy, .pp__cta, .loop__cta, .shop-rail__all) { --fill: #111; --fill-text: #fff; }
 html[data-theme="night"] :is(.btn-outline, .btn-cart, .seo__toggle, .mnav__foot a, .nh-btn:not(.nh-btn--primary), .nh-btn--ghost) { --fill: #fff; --fill-text: #111; }
 @media (hover: hover) and (pointer: fine) {
-  .wu-fill:not(:disabled):not([aria-disabled="true"]):hover { color: var(--fill-text) !important; filter: none; transform: none; box-shadow: none; }
+  .wu-fill:not([data-fill-auto]):not(:disabled):not([aria-disabled="true"]):not([aria-pressed="true"]):not([aria-selected="true"]):not([aria-current="true"]):not([aria-checked="true"]):not(.is-set):hover { color: var(--fill-text) !important; filter: none; transform: none; box-shadow: none; }
+  /* auto-marked buttons: only the colours change (their own transform/position stay — e.g. centred gallery arrows) */
+  [data-fill-auto].wu-fill:not(:disabled):not([aria-disabled="true"]):not([aria-pressed="true"]):not([aria-selected="true"]):not([aria-current="true"]):not([aria-checked="true"]):not(.is-set):hover { color: var(--fill-text) !important; box-shadow: 0 0 0 1px var(--fill-ring, transparent); }
+  [data-fill-auto].wu-fill:not(:disabled):not([aria-disabled="true"]):not([aria-pressed="true"]):not([aria-selected="true"]):not([aria-current="true"]):not([aria-checked="true"]):not(.is-set):hover *:not([class*="badge"]) { color: inherit !important; }
   /* the old hover backgrounds/filters go: the fill is the hover */
   .btn-buy:hover, .btn-pill:hover, .btn-navy:hover, .shop-rail__all:hover { filter: none; }
   .btn-outline:hover, .seo__toggle:hover { background: transparent; }
@@ -84,8 +90,8 @@ html[data-theme="night"] .quick .chip { --fill: #fff; --fill-text: #0B0B0B; }
 .wpc__cta { --fill: #fff; --fill-text: #0B0B0B; }
 html[data-theme="night"] .wpc__cta { --fill: #fff; --fill-text: #D91E05; }
 @media (hover: hover) and (pointer: fine) {
-  .wpc__cta.wu-fill:not(:disabled):not([aria-disabled="true"]):hover { background: #000; box-shadow: 0 0 0 1px #0B0B0B; }
-  html[data-theme="night"] .wpc__cta.wu-fill:not(:disabled):not([aria-disabled="true"]):hover { background: var(--n-red); box-shadow: none; }
+  /* the ring stays (never repaint the background on hover); the glow turns blue as the ring sweeps */
+  .wpc .wpc__cta.wu-fill:not(:disabled):not([aria-disabled="true"]):hover { box-shadow: 0 2.326cqw 6.977cqw rgba(0, 145, 255, .22) !important; }
   .wpc__cta.wu-fill .wpc__cta-ic, .wpc__cta.wu-fill .wpc__cta-t { position: relative; }
 }
 /* Cookie choices (2026-10-06): modal 600ms drawer curve + 800ms scrim; phones rise as a sheet; buttons get the liquid fill
@@ -162,7 +168,7 @@ html[data-theme="night"] .ckc__btn--line { --fill: #fff; --fill-text: #111; }
 @media (hover: hover) and (pointer: fine) {
   .wpc__media:hover .wpc__photo { transform: scale(1.05); }
   .wpc__cta:not(:disabled):hover { transform: none; }
-  .wpc__cta { transition: background-color var(--m-primary), color var(--m-primary), box-shadow var(--m-primary); }
+  .wpc__cta { transition: --ring-a 900ms var(--e-hover), color var(--m-primary) 100ms, box-shadow var(--m-primary); }
   .nh-tile__img img, .nh-trio__media img { transition: transform var(--m-primary); }
   .nh-tile:hover .nh-tile__img img { transform: scale(1.05); }
   .tile, .post, .duo__card, .nh-feat, .nh-strip a { transition: background-color var(--m-primary), color var(--m-primary), box-shadow var(--m-primary); }
@@ -183,16 +189,37 @@ html[data-theme="night"] .ckc__btn--line { --fill: #fff; --fill-text: #111; }
 .scrim.is-anim.is-open { opacity: 1; }
 .scrim.is-anim.is-open .search { opacity: 1; transform: none; }
 /* sort menu: drops in, options glide from the right one after another */
-.msort__list.is-anim { opacity: 0; transform: translate3d(0, -8px, 0) scale(.98); transform-origin: 100% 0; transition: opacity var(--m-drawer), transform var(--m-drawer); }
-.msort__list.is-anim .msort__opt { opacity: 0; transform: translate3d(20%, 0, 0); transition: transform 1000ms var(--e-glide), opacity 1000ms var(--e-glide-fade); }
-.msort__list.is-anim.is-open { opacity: 1; transform: none; }
-.msort__list.is-anim.is-open .msort__opt { opacity: 1; transform: none; }
-.msort__list.is-anim.is-open .msort__opt:nth-child(1) { transition-delay: 150ms; }
-.msort__list.is-anim.is-open .msort__opt:nth-child(2) { transition-delay: 220ms; }
-.msort__list.is-anim.is-open .msort__opt:nth-child(3) { transition-delay: 290ms; }
-.msort__list.is-anim.is-open .msort__opt:nth-child(4) { transition-delay: 360ms; }
-.msort__list.is-anim.is-open .msort__opt:nth-child(5) { transition-delay: 430ms; }
-.msort__list.is-anim.is-open .msort__opt:nth-child(n+6) { transition-delay: 500ms; }
+/* Sort morph (bugatti.store measurements): the panel's clip-path grows from the button's rectangle (top-right anchored)
+   to the full panel in 500ms on the hover curve and shrinks back on close; the button's label fades out (200ms) while
+   "SORT BY" fades in; the dot becomes a round × (scale 0 → 1 with a quarter turn, 500ms); options fade in over 700ms,
+   60ms + 50ms apart. Closing: options/title fade in 200ms, then the shape folds back into the button. */
+/* ONE radius all the way (bugatti.store keeps 32px on its 56px button): the button's half-height — so the pill's ends and
+   the open panel's corners are the same curve; the fill layer is clipped 0.5px inside the edge layer, so the hairline is
+   even on the straights AND the curves at every frame of the morph */
+.msort__sheet { --rad: calc(var(--sb-h, 40px) / 2); --e: 1.5px; /* the same stroke as the closed capsule */ clip-path: inset(0 var(--sb-r, 0px) calc(100% - var(--sb-h, 40px)) var(--sb-l, calc(100% - var(--sb-w, 120px))) round var(--rad)); transition: clip-path var(--m-primary); }
+.msort__sheet::before { clip-path: inset(var(--e) calc(var(--sb-r, 0px) + var(--e)) calc(100% - var(--sb-h, 40px) + var(--e)) calc(var(--sb-l, calc(100% - var(--sb-w, 120px))) + var(--e)) round calc(var(--rad) - var(--e))); transition: clip-path var(--m-primary); }
+.msort__panel.is-open .msort__sheet { clip-path: inset(0 round var(--rad)); }
+.msort__panel.is-open .msort__sheet::before { clip-path: inset(var(--e) round calc(var(--rad) - var(--e))); }
+.msort__panel.is-setup .msort__sheet, .msort__panel.is-setup .msort__sheet::before { transition: none !important; } /* :is() can't hold a pseudo-element */
+.msort__now { opacity: 1; transition: opacity 200ms var(--e-hover); }
+.msort__panel.is-open .msort__now { opacity: 0; }
+.msort__title { opacity: 0; transition: opacity 300ms var(--e-hover); }
+.msort__panel.is-open .msort__title { opacity: 1; transition: opacity 500ms var(--e-hover) 120ms; }
+.msort__x { transform: scale(0) rotate(-90deg); transition: transform var(--m-primary); }
+.msort__panel.is-open .msort__x { transform: none; }
+.msort__opt { opacity: 0; transition: opacity 200ms ease-out; }
+.msort__panel.is-open .msort__opt { opacity: 1; transition: opacity 700ms ease-out calc(60ms + var(--i, 0) * 50ms); }
+.msort__opt > span { transition: background-size var(--m-primary); }
+.msort__opt.is-active > span { background-size: 100% 1px; }
+@media (hover: hover) and (pointer: fine) { .msort__opt:hover > span { background-size: 100% 1px; } }
+/* the closed capsule gets the liquid fill like every button (ink in day, white in night) */
+.msort__btn { --fill: #0B0B0B; --fill-text: #fff; }
+html[data-theme="night"] .msort__btn { --fill: #fff; --fill-text: #0B0B0B; }
+@media (hover: hover) and (pointer: fine) {
+  .msort__btn.wu-fill:hover :is(.msort__cur, .msort__dot) { color: inherit; }
+  /* night: the button turns white with ink text (the night label colours are !important, so this must be too) */
+  html[data-theme="night"] .msort__btn.wu-fill:hover, html[data-theme="night"] .msort__btn.wu-fill:hover :is(.msort__cur, .msort__dot) { color: #0B0B0B !important; }
+}
 
 /* ---------- Panels: ONE system for every slide-in (2026-10-06, bugatti.store) — menu, filters, cart, search, both themes ----------
    · ≥640px: menu + filters slide from the left, cart from the right, search drops from the top — 600ms (.7,0,.2,1)

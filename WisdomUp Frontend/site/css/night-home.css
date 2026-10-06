@@ -85,6 +85,7 @@
 @media (hover: hover) { .nh-tile__add { opacity: 0; } .nh-tile:hover .nh-tile__add, .nh-tile__add:focus-visible { opacity: 1; } }
 .nh-tile__cap { display: flex; flex-direction: column; gap: 3px; padding: 10px 12px 12px; }
 .nh-tile__p { font: 700 15px/1 var(--font); color: var(--text); }
+.nh-tile__was { margin-left: 4px; font: 500 12px/1 var(--font); color: var(--muted); text-decoration: line-through; }
 .nh-tile__n { font: 400 13px/1.35 var(--font); color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .nh-tile--out .nh-tile__img img { opacity: .55; }
 .nh-more { display: flex; justify-content: center; margin-top: 16px; }

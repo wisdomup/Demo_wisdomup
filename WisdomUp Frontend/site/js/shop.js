@@ -11,6 +11,16 @@ window.WU_SHOP = {
     "standard": { "label": "Standard delivery", "eta": "3–5 working days", "fee": 250, "freeOver": true },
     "express": { "label": "Express delivery", "eta": "1–2 working days", "fee": 450, "freeOver": false }
   },
+  "sale": {
+    "on": true,
+    "demo": true,
+    "note": "DEMO sale (2026-10-06): the struck price is the regular catalogue price; the sale price is what the cart, checkout and order server charge. Rules: first match wins (types = product type ids, ids = product ids, tab = new/best). Sale prices round UP to Rs.10 under Rs.1,000 and Rs.50 above. Set on to false to end the sale.",
+    "rules": [
+      { "types": ["headphones"], "pct": 20 },
+      { "types": ["earbuds", "neckbands", "power-banks"], "pct": 15 },
+      { "types": ["speakers", "charging-cables", "wall-chargers"], "pct": 10 }
+    ]
+  },
   "giftWrap": 490,
   "maxQty": 10,
   "payments": {

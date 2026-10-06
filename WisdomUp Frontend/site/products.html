@@ -88,8 +88,18 @@
   <div class="mcount">
     <span class="mcount__n" id="mbar-info" aria-live="polite"></span>
     <div class="msort" id="msort">
-      <button type="button" class="msort__btn" id="msort-btn" aria-haspopup="listbox" aria-expanded="false" aria-controls="msort-list">Sort <span class="msort__cur" id="msort-label"></span><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 9.5l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      <ul class="msort__list" id="msort-list" role="listbox" aria-label="Sort products" tabindex="-1" hidden></ul>
+      <button type="button" class="msort__btn" id="msort-btn" aria-haspopup="listbox" aria-expanded="false" aria-controls="msort-list" aria-label="Sort by"><span class="msort__cur" id="msort-label"></span><span class="msort__dot" aria-hidden="true"></span></button>
+      <!-- Bugatti-style morph (2026-10-06): the panel starts exactly on the button and grows open from its top-right corner -->
+      <div class="msort__panel" id="msort-panel" hidden>
+        <div class="msort__sheet">
+        <div class="msort__head">
+          <span class="msort__now" aria-hidden="true"><b id="msort-now"></b></span>
+          <span class="msort__title" aria-hidden="true">Sort by</span>
+          <button type="button" class="msort__x" id="msort-x" aria-label="Close sort menu" data-no-fill><svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+        </div>
+        <ul class="msort__list" id="msort-list" role="listbox" aria-label="Sort products" tabindex="-1"></ul>
+        </div>
+      </div>
     </div>
     <div class="mview" role="group" aria-label="Products per row">
       <button type="button" class="mview__b" data-cols="1" aria-pressed="false" aria-label="1 product per row"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="6" y="3.5" width="12" height="17" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
@@ -160,9 +170,9 @@
 </div>
 
 <script src="js/catalog.js"></script>
+<script src="js/shop.js"></script>
 <script src="js/wu-data.js"></script>
 <script src="js/ds-icons.js"></script>
-<script src="js/shop.js"></script>
 <script src="js/seo-content.js"></script>
 <script src="js/common.js"></script>
 <script src="js/products.js"></script>

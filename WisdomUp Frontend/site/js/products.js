@@ -9,9 +9,9 @@
     best: { label: 'Best sellers', test: p => p.tabs.includes('best') },
   };
   const PRICES = {
-    u1: { label: 'Under Rs.1,000', test: p => p.price < 1000 },
-    u2: { label: 'Under Rs.2,000', test: p => p.price < 2000 },
-    u5: { label: 'Under Rs.5,000', test: p => p.price < 5000 },
+    u1: { label: 'Under Rs.1,000', test: WU.budget.u1 }, // Rs.1–1,000 (bands in common.js)
+    u2: { label: 'Under Rs.2,000', test: WU.budget.u2 }, // Rs.1,001–2,000
+    u5: { label: 'Under Rs.5,000', test: WU.budget.u5 }, // Rs.2,001–5,000
     m3: { label: 'Rs.1,000 – 2,999', test: p => p.price >= 1000 && p.price < 3000 },
     m10: { label: 'Rs.3,000 – 9,999', test: p => p.price >= 3000 && p.price < 10000 },
     p10: { label: 'Rs.10,000 & above', test: p => p.price >= 10000 },
@@ -179,6 +179,7 @@
     pill('pill-show', state.filter ? FILTERS[state.filter].label : 'Show', !!state.filter);
     pill('pill-sort', state.price ? PRICES[state.price].label : 'Price', !!state.price);
     $('msort-label').textContent = SORTS[state.sort];
+    $('msort-btn').setAttribute('aria-label', 'Sort by: ' + SORTS[state.sort]); // the word "Sort" is not shown (compact), but it is still announced
     syncFloat();
     markPillScroll();
     paintSortList();
@@ -222,17 +223,51 @@
   /* ---------- Sort dropdown (popover with ✓ on the active option) ---------- */
   const sortBtn = $('msort-btn'), sortList = $('msort-list');
   function paintSortList() {
-    sortList.innerHTML = Object.entries(SORTS).map(([k, l]) => `<li class="msort__opt" role="option" id="so-${k}" data-sort="${k}" aria-selected="${k === state.sort}">${esc(l)}</li>`).join('');
+    sortList.innerHTML = Object.entries(SORTS).map(([k, l], i) => `<li class="msort__opt" role="option" id="so-${k}" data-sort="${k}" aria-selected="${k === state.sort}" style="--i: ${i};"><span>${esc(l)}</span></li>`).join('');
   }
   let sortActive = 0;
   const sortOpts = () => [...sortList.querySelectorAll('.msort__opt')];
-  const markActive = i => { const o = sortOpts(); sortActive = (i + o.length) % o.length; o.forEach((x, k) => x.classList.toggle('is-active', k === sortActive)); sortList.setAttribute('aria-activedescendant', o[sortActive].id); o[sortActive].scrollIntoView({ block: 'nearest' }); };
+  const markActive = i => { const o = sortOpts(); sortActive = (i + o.length) % o.length; o.forEach((x, k) => x.classList.toggle('is-active', k === sortActive)); sortList.setAttribute('aria-activedescendant', o[sortActive].id); o[sortActive].scrollIntoView({ block: 'nearest', inline: 'nearest' }); };
+  // Bugatti-style morph (2026-10-06, measured on bugatti.store/collections/tech, rebuilt in our code): the panel opens
+  // exactly over the button (--sb-w / --sb-h) and its clip-path grows to the full panel in 500ms on the hover curve;
+  // "Sort Featured" fades out, "SORT BY" fades in, the dot becomes a round ×, the options fade in 50ms apart.
+  const sortPanel = $('msort-panel');
+  const sortOpen = () => !sortPanel.hidden && sortPanel.classList.contains('is-open');
   let sortClosing = 0;
-  sortList.classList.add('is-anim');
-  function openSort() { clearTimeout(sortClosing); sortList.hidden = false; requestAnimationFrame(() => sortList.classList.add('is-open')); sortBtn.setAttribute('aria-expanded', 'true'); sortList.focus(); markActive(Object.keys(SORTS).indexOf(state.sort)); }
-  function closeSort(focusBtn) { sortList.classList.remove('is-open'); sortBtn.setAttribute('aria-expanded', 'false'); const done = () => { sortList.hidden = true; }; if (WU.reduced()) done(); else sortClosing = setTimeout(done, 450); if (focusBtn) sortBtn.focus(); }
+  function openSort() {
+    clearTimeout(sortClosing);
+    const r = sortBtn.getBoundingClientRect();
+    $('msort-now').textContent = SORTS[state.sort];
+    sortPanel.classList.add('is-setup'); // no transitions while it is measured and placed, so the morph starts exactly on the button
+    sortPanel.style.right = '0px';
+    sortPanel.hidden = false;
+    // anchored to the button's top-right like bugatti.store; where that would leave the screen (phones: the 1/2 toggle sits
+    // to the right) the panel slides right just enough to keep a 12px margin, and the morph starts from the button's spot
+    const vwid = document.documentElement.clientWidth, pw = sortPanel.offsetWidth, g = 12;
+    const shift = Math.max(0, Math.min(g - (r.right - pw), vwid - g - r.right));
+    sortPanel.style.right = (-shift) + 'px';
+    sortPanel.style.setProperty('--sb-w', r.width + 'px');
+    sortPanel.style.setProperty('--sb-h', r.height + 'px');
+    sortPanel.style.setProperty('--sb-r', shift + 'px');
+    sortPanel.style.setProperty('--sb-l', Math.max(0, pw - shift - r.width) + 'px');
+    void sortPanel.querySelector('.msort__sheet').offsetWidth; // commit the closed shape before transitions come back
+    sortPanel.classList.remove('is-setup');
+    requestAnimationFrame(() => requestAnimationFrame(() => sortPanel.classList.add('is-open')));
+    sortBtn.setAttribute('aria-expanded', 'true');
+    sortList.focus({ preventScroll: true });
+    markActive(Object.keys(SORTS).indexOf(state.sort));
+  }
+  function closeSort(focusBtn) {
+    if (sortPanel.hidden) return;
+    sortPanel.classList.remove('is-open');
+    sortBtn.setAttribute('aria-expanded', 'false');
+    const done = () => { sortPanel.hidden = true; };
+    if (WU.reduced()) done(); else sortClosing = setTimeout(done, 560);
+    if (focusBtn) sortBtn.focus({ preventScroll: true });
+  }
   function pickSort(k) { state.sort = k; syncUrl(); render(); closeSort(true); }
-  sortBtn.addEventListener('click', () => (sortList.hidden ? openSort() : closeSort()));
+  sortBtn.addEventListener('click', () => (sortOpen() ? closeSort() : openSort()));
+  $('msort-x').addEventListener('click', () => closeSort(true));
   sortList.addEventListener('click', e => { const o = e.target.closest('[data-sort]'); if (o) pickSort(o.dataset.sort); });
   sortList.addEventListener('keydown', e => {
     if (e.key === 'ArrowDown') { e.preventDefault(); markActive(sortActive + 1); }
@@ -240,7 +275,8 @@
     else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pickSort(sortOpts()[sortActive].dataset.sort); }
     else if (e.key === 'Escape' || e.key === 'Tab') closeSort(e.key === 'Escape');
   });
-  document.addEventListener('click', e => { if (!sortList.hidden && !e.target.closest('#msort')) closeSort(); });
+  sortPanel.addEventListener('keydown', e => { if (e.key === 'Escape') closeSort(true); });
+  document.addEventListener('click', e => { if (!sortPanel.hidden && !e.target.closest('#msort')) closeSort(); });
 
   /* ---------- Products per row (1 or 2), remembered ---------- */
   const setCols = n => {

@@ -347,20 +347,45 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
 .mcount__n { margin-right: auto; font: 500 14px/1 var(--font); color: var(--muted); white-space: nowrap; }
 .mcount__n b { font-weight: 700; color: #111; }
 /* Sort dropdown (popover under the button, ✓ on the active option) */
+/* Sort — Bugatti-style morphing capsule (2026-10-06, measured on bugatti.store/collections/tech; rebuilt in our own code).
+   Closed: an outlined 40px capsule "Sort Featured •". Open: .msort__panel sits exactly on the button (--sb-w × --sb-h) and
+   its clip-path grows from the button's shape to the whole panel (motion.css); outline + shadow are drop-shadows so they
+   follow the growing shape. Header: "Sort by" + a round × where the dot was; options are large text links, the chosen one
+   underlined. Colours: night.css. */
 .msort { position: relative; }
-.msort__btn { display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 2px; border: 0; background: none; font: 500 15px/1 var(--font); color: var(--muted); cursor: pointer; }
-.msort__cur { font-weight: 700; color: #111; max-width: 46vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.msort__btn svg { color: #111; transition: transform 240ms cubic-bezier(.2,.7,.2,1); }
-.msort__btn[aria-expanded="true"] svg { transform: rotate(180deg); }
-.msort__list { position: absolute; right: 0; top: calc(100% + 6px); z-index: 20; min-width: 248px; margin: 0; padding: 8px; list-style: none; border-radius: 22px; background: #F2F2F2; box-shadow: 0 18px 40px rgba(0,0,0,.16); transform-origin: top right; animation: msort-in 200ms cubic-bezier(.2,.7,.2,1); }
-.msort__list[hidden] { display: none; }
-.msort__list:focus { outline: none; } /* keyboard position is shown by the highlighted option */
-@keyframes msort-in { from { opacity: 0; transform: scale(.96) translateY(-4px); } }
-.msort__opt { display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 0 14px 0 12px; border-radius: 14px; font: 400 17px/1.2 var(--font); color: #464646; cursor: pointer; }
-.msort__opt::before { content: ""; flex: none; width: 20px; height: 20px; }
-.msort__opt[aria-selected="true"]::before { background: no-repeat center/18px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4.5 12.5l5 5 10-11' fill='none' stroke='%23464646' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
-.msort__opt[aria-selected="true"] { color: #111; font-weight: 600; }
-.msort__opt:hover, .msort__opt.is-active { background: rgba(23,34,72,.07); }
+.msort__btn { position: relative; display: inline-flex; align-items: center; gap: 6px; height: var(--ctl, 40px); padding: 0 14px 0 16px; border: 0; border-radius: 999px; background: transparent; box-shadow: inset 0 0 0 1.5px #0B0B0B; font: 500 14px/1 var(--font); letter-spacing: var(--ctl-track, .01em); color: #3D4656; cursor: pointer; } /* hairline edge, like the nav's 0.5px */
+.msort__cur { font-weight: 700; color: #0B0B0B; max-width: 46vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.msort__dot { flex: none; width: 5px; height: 5px; margin-left: 8px; border-radius: 999px; background: currentColor; color: #0B0B0B; }
+.msort__panel { --ms-edge: #0B0B0B; --ms-fill: #fff; position: absolute; top: 0; right: 0; z-index: 30; width: max(300px, var(--sb-w, 0px)); max-width: calc(100vw - 2 * var(--gutter, 12px)); filter: drop-shadow(0 18px 36px rgba(0,0,0,.12)); }
+.msort__panel[hidden] { display: none; }
+.msort__sheet { position: relative; background: var(--ms-edge); } /* the edge colour shows only as the 0.5px ring between the two clips (motion.css) */
+.msort__sheet::before { content: ""; position: absolute; inset: 0; background: var(--ms-fill); pointer-events: none; }
+.msort__sheet > * { position: relative; z-index: 1; }
+.msort__head { position: relative; display: flex; align-items: center; justify-content: flex-end; height: var(--sb-h, 40px); padding: 0 calc(3px + var(--sb-r, 0px)) 0 16px; } /* the × lands where the dot was */
+.msort__title { position: absolute; left: 22px; top: 50%; translate: 0 -50%; white-space: nowrap; pointer-events: none; }
+.msort__now { position: absolute; left: calc(16px + var(--sb-l, 0px)); top: 50%; translate: 0 -50%; white-space: nowrap; pointer-events: none; }
+.msort__now { right: calc(48px + var(--sb-r, 0px)); overflow: hidden; text-overflow: ellipsis; font: 500 14px/1 var(--font); color: #3D4656; }
+.msort__now b { font-weight: 700; color: #0B0B0B; }
+.msort__title { font: 600 11px/1 var(--font); letter-spacing: .16em; text-transform: uppercase; color: #6B7280; }
+.msort__x { flex: none; display: grid; place-items: center; width: var(--ctl-s, 34px); height: var(--ctl-s, 34px); padding: 0; border: 0; border-radius: 999px; background: #0B0B0B; color: #fff; cursor: pointer; }
+.msort__list { margin: 0; padding: 10px 22px 18px; list-style: none; display: grid; gap: 2px; }
+.msort__list:focus { outline: none; } /* keyboard position is shown by the underlined option */
+.msort__opt { display: flex; align-items: center; min-height: 40px; font: 400 18px/1.3 var(--font); letter-spacing: -.005em; color: #0B0B0B; cursor: pointer; }
+.msort__opt > span { background-image: linear-gradient(currentColor, currentColor); background-repeat: no-repeat; background-position: 0 100%; background-size: 0 1px; padding-bottom: 2px; }
+.msort__opt[aria-selected="true"] > span { background-size: 100% 1px; font-weight: 600; }
+/* phones: a compact capsule (34px) and a narrower, tighter panel — the morph reads the button's size, so it follows */
+@media (max-width: 639px) {
+  .msort .msort__btn { height: var(--ctl-s, 34px); padding: 0 11px 0 13px; gap: 5px; font-size: 13px; } /* .msort raises it over controls.css (linked last) */
+  .msort__dot { width: 4px; height: 4px; margin-left: 6px; }
+  .msort__panel { width: max(236px, var(--sb-w, 0px)); }
+  .msort__head { padding-left: 13px; padding-right: calc(3px + var(--sb-r, 0px)); }
+  .msort__now { left: calc(13px + var(--sb-l, 0px)); font-size: 13px; }
+  .msort__title { left: 16px; font-size: 10px; letter-spacing: .14em; }
+  .msort__x { width: 28px; height: 28px; }
+  .msort__x svg { width: 12px; height: 12px; }
+  .msort__list { padding: 4px 16px 12px; gap: 0; }
+  .msort__opt { min-height: 34px; font-size: 15px; }
+}
 /* Products-per-row toggle */
 .mview { gap: 6px; }
 .mview__b { width: 40px; height: 40px; border: 0; border-radius: 999px; background: none; color: #8B8B8B; display: grid; place-items: center; cursor: pointer; transition: background-color 180ms ease, color 180ms ease; }
@@ -450,6 +475,7 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
   .mgrid--2 .wpc__foot .wpc__cta svg { width: 14px; height: 14px; }
   .mgrid--2 .wpc__foot .wpc__cta::after { inset: -7px; } /* keeps a ~44px tap area */
   .mgrid--2 .wpc__eta { display: none; }
+  .mgrid--2 .wpc__specs { display: none; } /* ~170px cards: price + CTA only */
 }
 @media (prefers-reduced-motion: reduce) { .fdrawer, .fscrim { transition: none; } }
 
@@ -606,6 +632,8 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
 .pdp2__rate { display: inline-flex; align-items: center; gap: 6px; padding: 0 !important; background: none !important; font: 600 13px/1 var(--font); color: #3D4656 !important; text-decoration: none; }
 .pdp2__rate b { color: #0B0B0B; }
 .pdp2__rate svg { display: block; }
+.pdp2__rate--none, .pdp2__rate--none b { color: #8A8F98 !important; font-weight: 600; } /* no reviews yet: outline star + 0.0 */
+.pdp2__was:empty, .pdp2__off:empty { display: none; }
 .rv { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
 .rv__sum { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 20px 28px; padding: clamp(18px, 2.4vw, 24px); border-radius: 20px; background: #fff; border: 1px solid var(--line, #E4E4E4); }
 .rv__avg { display: flex; flex-direction: column; gap: 6px; }

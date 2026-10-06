@@ -33,15 +33,35 @@ def _read_js_json(rel):
 _CACHE = {}
 
 
+# Sale (shop.js "sale") — the SAME rules and rounding as site/js/wu-data.js, so the browser and the server agree on every price.
+def sale_pct(p, shop):
+    sale = shop.get('sale') or {}
+    if not sale.get('on'):
+        return 0
+    for r in sale.get('rules') or []:
+        if (p.get('type') in (r.get('types') or [])) or (p.get('id') in (r.get('ids') or [])) or (r.get('tab') and r.get('tab') in (p.get('tabs') or [])):
+            return int(r.get('pct') or 0)
+    return 0
+
+
+def sale_price(price, pct):
+    if not pct or not price:
+        return price
+    step = 10 if price < 1000 else 50
+    s = -(-(price * (100 - pct)) // (100 * step)) * step  # ceil to the step, integer maths
+    return s if s < price else price
+
+
 def catalog():
     if 'skus' not in _CACHE:
         cat = _read_js_json('site/js/catalog.js')
+        shop = _read_js_json('site/js/shop.js')
         skus = {}
         for p in cat['products']:
+            pct = sale_pct(p, shop)
             variants = p['variants'] or [{'sku': p['code'], 'attrs': {}, 'price': p['price']}]
             for v in variants:
-                skus[v['sku']] = {'id': p['id'], 'title': p['title'], 'attrs': v['attrs'], 'price': v['price'], 'soldOut': bool(p.get('soldOut'))}
-        shop = _read_js_json('site/js/shop.js')
+                skus[v['sku']] = {'id': p['id'], 'title': p['title'], 'attrs': v['attrs'], 'price': sale_price(v['price'], pct), 'soldOut': bool(p.get('soldOut'))}
         _CACHE.update(skus=skus, shop=shop)
     return _CACHE['skus'], _CACHE['shop']
 

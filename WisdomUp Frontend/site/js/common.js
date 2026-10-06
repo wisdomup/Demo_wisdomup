@@ -79,6 +79,8 @@
   const P_HANDLE = 'M8.8 8V6.5a3.2 3.2 0 0 1 6.4 0V8';
   const P_HEART = 'M12 20.2l-1.3-1.2C6.1 14.9 3.2 12.3 3.2 9a4.6 4.6 0 0 1 4.7-4.7c1.6 0 3.1.7 4.1 1.9a5.4 5.4 0 0 1 4.1-1.9A4.6 4.6 0 0 1 20.8 9c0 3.3-2.9 5.9-7.5 10z';
   const STAR_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z" fill="#E2A92C"></path></svg>';
+  // no reviews yet: an outline star and 0.0 (decided 2026-10-06) — honest, never a made-up score
+  const STAR_OUTLINE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z" fill="none" stroke="#E2A92C" stroke-width="1.8" stroke-linejoin="round"></path></svg>';
   const btnBuy = (label, href) => href
     ? `<a class="btn-buy" href="${href}">${icon('cart', 30)}${esc(label)}</a>`
     : `<button type="button" class="btn-buy">${icon('cart', 30)}${esc(label)}</button>`;
@@ -99,6 +101,9 @@
   }
   /* ---------- Cart: line items (sku + qty) kept on this device. Prices always come from the catalogue,
      and the order server recomputes them again, so a stale or edited cart can never change what is charged. ---------- */
+  // Shop-by-budget bands (changed 2026-10-06): NON-overlapping — u1 = Rs.1–1,000, u2 = Rs.1,001–2,000, u5 = Rs.2,001–5,000.
+  // The site keeps the "Under Rs.…" labels; the listing (?price=u1/u2/u5), the day rail tabs and the night segment all read these.
+  const BUDGET = { u1: p => p.price >= 1 && p.price <= 1000, u2: p => p.price > 1000 && p.price <= 2000, u5: p => p.price > 2000 && p.price <= 5000 };
   const SHOP = window.WU_SHOP || { freeDeliveryFrom: 20000, maxQty: 10, giftWrap: 490, delivery: { standard: { fee: 250, freeOver: true } } };
   // Copy that quotes the free-delivery threshold ({FREE_FROM} in wu-data.js) always follows shop.js
   const FREE_FROM = D.rs(SHOP.freeDeliveryFrom);
@@ -629,6 +634,23 @@
     const d = new Date(); d.setDate(d.getDate() + 2 + (seed % 2));
     return 'Get it as early as ' + d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
+  // Card spec trio (2026-10-06, inspired by login.com.pk's cards): up to three SHORT real specs from catalog.js, most useful first
+  const SPEC_ORDER = ['Max output', 'Output power', 'Fast charging', 'Capacity', 'Playtime', 'Battery', 'Runtime', 'Bluetooth', 'Driver', 'Range', 'Cable length', 'Length', 'Water resistance', 'Case battery', 'Earbud battery', 'Ports', 'Wireless output', 'Output', 'DPI', 'Resolution', 'Latency', 'Motor speed', 'Standby', 'Charging time'];
+  const SPEC_LABEL = { 'Output power': 'Output', 'Fast charging': 'Fast charge', 'Cable length': 'Length', 'Water resistance': 'Water', 'Case battery': 'Case', 'Earbud battery': 'Earbud', 'Wireless output': 'Wireless', 'Charging time': 'Charge time', 'Motor speed': 'Motor' };
+  const specTrio = p => {
+    const out = [];
+    for (const k of SPEC_ORDER) {
+      const hit = (p.specs || []).find(([kk]) => kk === k);
+      if (!hit) continue;
+      const v = String(hit[1]).trim();
+      if (v.length > 11) continue; // long values don't fit a trio cell — the full spec list is on the product page
+      out.push([v, SPEC_LABEL[k] || k]);
+      if (out.length === 3) break;
+    }
+    return out;
+  };
+  // "SJX-49 Fast Charging Cable" → name "Fast Charging Cable" + model "SJX-49" (every catalogue title starts with its code)
+  const cardName = p => (p.title.toUpperCase().startsWith(p.code.toUpperCase()) ? p.title.slice(p.code.length).replace(/^[\s\-–—|:·]+/, '') : '') || p.title;
   function productCard(p, opts = {}) {
     const seed = seedOf(p), off = !!p.soldOut, href = url.product(p.id);
     const badge = opts.badge !== undefined ? opts.badge : p.ribbon;
@@ -645,16 +667,22 @@
           </a>
           ${wishBtn(p, 'wpc__wish')}
           <div class="wpc__body">
-            <div class="wpc__row">
-              <span class="wpc__price">${esc(p.priceText)}</span>
-              ${(() => { const rv = reviews.summary(p.id); return rv.count ? `<span class="wpc__rating" aria-label="Rated ${rv.avg.toFixed(1)} out of 5 from ${rv.count} review${rv.count > 1 ? 's' : ''}">${STAR_SVG}<span>${rv.avg.toFixed(1)}</span><small>(${rv.count})</small></span>` : `<span class="wpc__kind">${esc(p.cat)}</span>`; })()}
+            <div class="wpc__head">
+              <h3 class="wpc__title"><a href="${href}" aria-label="${esc(p.title)}">${esc(cardName(p))}</a></h3>
+              <div class="wpc__model"><span>${esc(p.code)}</span><i aria-hidden="true"></i><span>${esc(p.cat)}</span></div>
+              ${(() => { const rv = reviews.summary(p.id); return rv.count ? `<span class="wpc__rating" aria-label="Rated ${rv.avg.toFixed(1)} out of 5 from ${rv.count} review${rv.count > 1 ? 's' : ''}">${STAR_SVG}<span>${rv.avg.toFixed(1)}</span><small>(${rv.count})</small></span>` : `<span class="wpc__rating wpc__rating--none" aria-label="No reviews yet">${STAR_OUTLINE}<span>0.0</span></span>`; })()}
             </div>
-            <h3 class="wpc__title"><a href="${href}">${esc(p.title)}</a></h3>
-            <div class="wpc__eta">${etaFor(seed, off)}</div>
-            <div class="wpc__row wpc__foot">
+            <div class="wpc__rule" aria-hidden="true"></div>
+            <div class="wpc__deal">${p.off ? `${p.off}% off` : ''}</div>
+            <div class="wpc__row wpc__pricerow">
+              <span class="wpc__prices"><span class="wpc__price">${/^From\s/.test(p.priceText) ? `<small>From</small>${esc(p.priceText.replace(/^From\s+/, ''))}` : esc(p.priceText)}</span>${p.wasText ? `<s class="wpc__was" aria-label="Regular price ${esc(p.wasText)}">${esc(p.wasText)}</s>` : ''}</span>
               ${colours.length > 1 ? `<div class="wpc__swatches" role="radiogroup" aria-label="Colour">
                 ${colours.map((c, i) => `<button type="button" class="wpc__swatch" role="radio" aria-label="${esc(c.name)}" aria-checked="${i === 0}" style="background: ${c.hex}; --sw: ${c.hex};"></button>`).join('')}
-              </div>` : opts_n ? `<span class="wpc__opts">${opts_n} options</span>` : '<span></span>'}
+              </div>` : opts_n ? `<span class="wpc__opts">${opts_n} options</span>` : ''}
+            </div>
+            <div class="wpc__eta">${etaFor(seed, off)}</div>
+            <div class="wpc__row wpc__foot">
+              <dl class="wpc__specs">${specTrio(p).map(([v, k]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>
               ${opts_n
                 ? `<a class="wpc__cta" href="${href}"${off ? ' aria-disabled="true"' : ''}><span class="wpc__cta-t">${off ? 'Sold out' : 'Choose'}</span><span class="wpc__cta-ic">${icon('chev-r', 16)}</span></a>`
                 : `<button type="button" class="wpc__cta"${off ? ' disabled aria-disabled="true"' : ''}><span class="wpc__cta-ic">${icon('cart', 16)}</span><span class="wpc__cta-t">${off ? 'Sold out' : 'Add to cart'}</span></button>`}
@@ -995,8 +1023,18 @@
     });
     groupEls.forEach(g => g.querySelector('.ft__q').addEventListener('click', () => {
       if (!FT_ACC.matches) return;
-      setGroup(g.querySelector('.ft__q').getAttribute('aria-expanded') === 'true' ? null : g);
+      const opening = g.querySelector('.ft__q').getAttribute('aria-expanded') !== 'true';
+      setGroup(opening ? g : null);
+      if (opening) setTimeout(() => showGroup(g), 280); // once the 250ms fold-out has its height
     }));
+    // An opened group grows DOWNWARD (the footer is in the flow): if its links end below the screen, glide just far
+    // enough to show them — never so far that the group's own header leaves the top.
+    const showGroup = g => {
+      const r = g.getBoundingClientRect(), vh = innerHeight, room = 16;
+      const need = r.bottom + room - vh;
+      if (need <= 0) return;
+      window.scrollBy({ top: Math.min(need, Math.max(0, r.top - 96)), behavior: reduced() ? 'auto' : 'smooth' });
+    };
     const current = groupEls.find(g => g.querySelector('[aria-current="page"]')) || null; // open the group for this page
     FT_ACC.addEventListener('change', () => setGroup(current));
     setGroup(current);
@@ -1004,30 +1042,43 @@
       e.preventDefault();
       if (e.currentTarget.querySelector('input').value) el.querySelector('.footer__nl-msg').textContent = 'Thanks — you’re on the list.';
     });
-    // The reveal: the wrap keeps the footer's height in the flow, the footer itself is fixed to the viewport bottom and
-    // clipped to the wrap, so the page slides up and uncovers it. Falls back to a normal footer when it would be taller
-    // than the screen, for reduced motion, or without clip-path.
+    // The reveal (reworked 2026-10-06 — the old version pinned the footer to the screen bottom, so an opened accordion
+    // group grew UPWARD and pushed the logo/newsletter/headers under the page): the footer stays IN the flow and is only
+    // TRANSLATED while the wrap enters the screen, as if pinned to the bottom — y = (vh − R) − wrapTop, R = min(footer
+    // height, vh) — and sits at y = 0 once revealed, so it grows downward like any accordion. Works at any height (a
+    // footer taller than the screen reveals its top R px first). Clipped by the wrap; off for reduced motion.
     const fixed = el.querySelector('.footer-fixed');
-    let fitting = false;
-    const fit = () => {
-      if (fitting) return;
-      fitting = true;
-      const h = fixed.offsetHeight;
-      const ok = !reduced() && window.CSS && CSS.supports('clip-path', 'inset(0)') && h < innerHeight - 24;
-      el.classList.toggle('is-fixed', ok);
-      if (ok) {
-        el.style.height = h + 'px'; el.style.marginBottom = '';
-        // anything below the wrap (the page's bottom padding) would clip the footer's last pixels: pull the page end up to the wrap
-        const gap = Math.max(0, document.documentElement.scrollHeight - (el.offsetTop + el.offsetHeight));
-        if (gap) el.style.marginBottom = (-gap) + 'px';
-      } else { el.style.height = ''; el.style.marginBottom = ''; }
-      fitting = false;
+    const canReveal = () => !reduced() && window.CSS && CSS.supports('clip-path', 'inset(0)');
+    // Where the browser can run scroll-driven CSS animations (Chrome/Android 115+, Safari 26+) the same y is drawn by the
+    // compositor (view timeline on the wrap, range "entry 0 → entry R", R in --ft-r) — no scroll script, no lag. Else JS.
+    const sda = !!(window.CSS && CSS.supports('animation-timeline: view()') && CSS.supports('animation-range: entry 0px entry 10px'));
+    el.classList.toggle('is-sda', sda);
+    let raf = 0, lastY = null, lastR = null;
+    // the page's bottom padding would leave a strip under the subfooter: pull the page end up to the wrap (sizes only)
+    const fitGap = () => {
+      el.style.marginBottom = '';
+      const gap = Math.max(0, document.documentElement.scrollHeight - (el.offsetTop + el.offsetHeight));
+      if (gap && gap < 120) el.style.marginBottom = (-gap) + 'px';
     };
-    if ('ResizeObserver' in window) new ResizeObserver(() => fit()).observe(fixed);
-    window.addEventListener('resize', fit);
-    window.addEventListener('load', fit);
-    fit();
-    setTimeout(fit, 800);
+    const place = () => {
+      raf = 0;
+      const on = canReveal();
+      el.classList.toggle('is-reveal', on);
+      if (!on) { if (lastY !== null) { fixed.style.transform = ''; lastY = null; } return; }
+      // R = the CLOSED footer's height: an opened group must not change the reveal, or its growth would push the footer up
+      const open = FT_ACC.matches ? groupEls.reduce((n, g) => { const l = g.querySelector('.ft__links'); return n + (l.hidden ? 0 : l.offsetHeight); }, 0) : 0;
+      const vh = innerHeight, top = el.getBoundingClientRect().top, R = Math.round(Math.min(fixed.offsetHeight - open, vh));
+      if (sda) { if (R !== lastR) { el.style.setProperty('--ft-r', R + 'px'); lastR = R; } return; }
+      const y = Math.round(Math.max(-R, Math.min(0, (vh - R) - top)));
+      if (y !== lastY) { fixed.style.transform = y ? `translate3d(0, ${y}px, 0)` : ''; lastY = y; }
+    };
+    const req = () => { if (!raf) raf = requestAnimationFrame(place); };
+    const resized = () => { fitGap(); req(); };
+    if (!sda) addEventListener('scroll', req, { passive: true });
+    addEventListener('resize', resized);
+    addEventListener('load', resized);
+    if ('ResizeObserver' in window) new ResizeObserver(resized).observe(fixed);
+    fitGap(); place();
   }
 
   /* ---------- Smooth in-page scrolling that clears the fixed nav + any sticky bar ---------- */
@@ -1086,7 +1137,7 @@
   const RV_SKIP = '#site-nav, .mnav, .cartd, .fdrawer, .search, .ckc, .hero, .buybar, .toast, .wu-util, .quick, .visually-hidden, .seo__more';
   let revealer = null;
   // ---------- Motion engine (MOTION-REPORT.md, approved 2026-10-06): reveals, grid staggers, scroll-driven curtain/clip, liquid fills, magnets ----------
-  const FILL_SEL = '.btn-pill, .btn-buy, .btn-navy, .btn-outline, .btn-cart, .shop-rail__all, .loop__cta, .pp__cta, .seo__toggle, .fdrawer__apply, .ck__place, .cartd__go, .mnav__foot a, .nh-btn, .totop, .quick .chip, .wpc__cta, .ckc__btn';
+  const FILL_SEL = '.btn-pill, .btn-buy, .btn-navy, .btn-outline, .btn-cart, .shop-rail__all, .loop__cta, .pp__cta, .seo__toggle, .fdrawer__apply, .ck__place, .cartd__go, .mnav__foot a, .nh-btn, .totop, .quick .chip, .wpc__cta, .ckc__btn, .msort__btn';
   const MAG_SEL = '.loop__btn, .feat__btn, .shop-rail__step, .hero__arrow, .pdp2__chev, .wpc__wish, .pdp2__wish, .totop, .mnav__x, .cartd__x, .fdrawer__x, .mnav__theme, .nh-tile__add, .mnav__back';
   const X_SEL = '.mnav__x, .cartd__x, .fdrawer__x';
   const SD_CLIP = '.promo, .bulk, .duo__card, .cta-band, .quote-band, .pp__card, .nh-show, .nh-glow, .nh-live, .feat__slide';
@@ -1241,7 +1292,7 @@
       // liquid fills and magnets (pointer devices only)
       if (isFine) {
         const q = sel => [...(root.matches && root.matches(sel) ? [root] : []), ...root.querySelectorAll(sel)];
-        q(FILL_SEL).forEach(b => { if (!b.closest('#site-nav') && b.querySelector('svg, img') === null || b.matches('.btn-buy, .btn-cart, .btn-pill, .btn-navy, .btn-outline, .shop-rail__all, .seo__toggle, .pp__cta, .mnav__foot a, .nh-btn, .loop__cta, .fdrawer__apply, .ck__place, .cartd__go, .totop, .quick .chip, .wpc__cta, .ckc__btn')) b.classList.add('wu-fill'); });
+        q(FILL_SEL).forEach(b => { if (!b.closest('#site-nav') && b.querySelector('svg, img') === null || b.matches('.btn-buy, .btn-cart, .btn-pill, .btn-navy, .btn-outline, .shop-rail__all, .seo__toggle, .pp__cta, .mnav__foot a, .nh-btn, .loop__cta, .fdrawer__apply, .ck__place, .cartd__go, .totop, .quick .chip, .wpc__cta, .ckc__btn, .msort__btn')) b.classList.add('wu-fill'); });
         q(MAG_SEL).forEach(b => { b.classList.add('wu-mag'); if (b.matches(X_SEL)) b.classList.add('is-x'); });
       }
       collect(root);
@@ -1301,10 +1352,55 @@
       if (queued.length) requestAnimationFrame(() => { const q = queued; queued = []; q.forEach(n => n.isConnected && mark(n)); setTimeout(sweep, 700); });
     }).observe(document.body, { childList: true, subtree: true });
     if (!isFine) return;
+    // EVERY button gets the liquid fill (2026-10-06, both themes, every page): besides the named classes above, any button or
+    // link is checked the first time the pointer enters it — a capsule/circle with its own fill or edge, or a small button
+    // sitting inside such a capsule (chips in the filter capsule, product tabs, qty − / +, the newsletter arrow, segments).
+    // Lazy, so drawers, menus and popups that were hidden at load are covered. Never: the nav (its tools have no hover by
+    // rule), switches, slider dots, swatches, thumbnails. Colours are worked out on every enter from what the button sits on.
+    const AUTO_SEL = 'button, a, [role="button"], [role="tab"], summary';
+    const AUTO_SKIP = '#site-nav, .site-nav, .mfloat, [role="switch"], .dot, .dots, .wpc__swatch, .thumb, .nh-show__thumb, .hero__bar, [data-no-fill]';
+    const rgbOf = s => (String(s).match(/[\d.]+/g) || []).map(Number);
+    const lumOf = ([r, g, b]) => { const f = v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }; return .2126 * f(r) + .7152 * f(g) + .0722 * f(b); };
+    const solid = s => { const v = rgbOf(s); return v.length >= 3 && (v.length < 4 || v[3] > .5) ? v.slice(0, 3) : null; };
+    const surfaced = cs => { const bg = rgbOf(cs.backgroundColor), bd = rgbOf(cs.borderTopColor);
+      return (bg.length >= 3 && (bg.length < 4 || bg[3] > .04)) || /gradient/.test(cs.backgroundImage) || (parseFloat(cs.borderTopWidth) > 0 && (bd.length < 4 || bd[3] > .04)) || /inset/.test(cs.boxShadow); };
+    const backdrop = el => { for (let e = el; e && e !== document.documentElement; e = e.parentElement) { const c = getComputedStyle(e); const v = solid(c.backgroundColor); if (v) return v; const g = /gradient/.test(c.backgroundImage) && c.backgroundImage.match(/rgba?\([^)]+\)/); if (g && solid(g[0])) return solid(g[0]); } return isNight() ? [15, 17, 19] : [255, 255, 255]; };
+    const fillChecked = new WeakSet();
+    const autoMark = b => {
+      if (!b.matches(AUTO_SEL) || b.closest(AUTO_SKIP) || b.disabled) return;
+      const r = b.getBoundingClientRect();
+      if (r.height < 20 || r.height > 72 || r.width < 20) return;
+      const cs = getComputedStyle(b);
+      const round = parseFloat(cs.borderTopLeftRadius) >= r.height / 2 - 1, own = surfaced(cs);
+      let inCapsule = false;
+      if (!(round && own)) for (let p = b.parentElement, i = 0; p && i < 3; p = p.parentElement, i++) {
+        const pr = p.getBoundingClientRect(), pc = getComputedStyle(p);
+        if (pr.height >= r.height && pr.height <= 90 && parseFloat(pc.borderTopLeftRadius) >= pr.height / 2 - 1 && surfaced(pc)) { inCapsule = true; break; }
+      }
+      if (!(round && own) && !inCapsule) return;
+      for (const k of b.children) { const kr = k.getBoundingClientRect(); if (kr.width && (kr.left < r.left - 1 || kr.right > r.right + 1 || kr.top < r.top - 1 || kr.bottom > r.bottom + 1)) return; } // never clip a badge
+      if (cs.position !== 'static') b.style.position = cs.position; // keep absolute/fixed buttons where they are
+      if (!round) b.style.borderRadius = '999px';                   // an inner square button fills as a circle
+      const hasOwn = cs.transitionDuration.split(',').some(d => parseFloat(d) > 0); // keep the button's own transitions, add the colour swap
+      b.style.transition = (hasOwn ? cs.transition + ', ' : '') + 'color 500ms cubic-bezier(.3,1,.3,1) 100ms';
+      b.dataset.fillAuto = '';
+      b.classList.add('wu-fill');
+    };
+    const autoColours = b => {
+      const cs = getComputedStyle(b), own = solid(cs.backgroundColor), under = backdrop(b.parentElement), bg = own || under;
+      const chroma = Math.max(...bg) - Math.min(...bg);
+      if (lumOf(bg) < .45) { // dark or coloured: white rises, text keeps the button's colour (or ink); a ring keeps its edge on a light page
+        b.style.setProperty('--fill', '#fff');
+        b.style.setProperty('--fill-text', own && chroma > 60 ? `rgb(${bg.join(',')})` : '#0B0B0B');
+        b.style.setProperty('--fill-ring', own && lumOf(under) > .6 ? `rgb(${bg.join(',')})` : 'transparent');
+      } else { b.style.setProperty('--fill', '#0B0B0B'); b.style.setProperty('--fill-text', '#fff'); b.style.setProperty('--fill-ring', 'transparent'); }
+    };
     // Liquid fill: on enter the circle starts below (+76%) and rises to 0; on leave it carries on upward (−76%)
     document.addEventListener('pointerenter', e => {
       const b = e.target;
       if (!(b instanceof Element) || e.pointerType === 'touch') return;
+      if (!b.classList.contains('wu-fill') && !fillChecked.has(b)) { fillChecked.add(b); autoMark(b); }
+      if (b.classList.contains('wu-fill') && b.hasAttribute('data-fill-auto')) autoColours(b);
       if (b.classList.contains('wu-fill')) {
         b.classList.add('wu-fill--snap'); b.style.setProperty('--fill-y', '76%');
         void b.offsetWidth;
@@ -1483,6 +1579,8 @@
       $('qadd-media').style.background = photoBg(v.bg ? v : p);
       $('qadd-sku').textContent = v.sku;
       $('qadd-price').textContent = v.priceText || D.rs(v.price);
+      $('qadd-was').textContent = v.wasText || '';
+      $('qadd-off').textContent = v.off ? v.off + '% off' : '';
       body.querySelectorAll('.qadd__opt').forEach(box => {
         const a = box.dataset.axis;
         box.querySelector('[data-cur]').textContent = v.attrs[a];
@@ -1494,14 +1592,14 @@
       $('qadd-go').textContent = `Add to cart · ${D.rs(v.price * qty)}`;
     };
     function open(prod, btn) {
-      p = prod; V = p.variants && p.variants.length ? p.variants : [{ sku: p.code, attrs: {}, price: p.price, img: p.src, thumb: p.thumb, bg: p.bg }];
+      p = prod; V = p.variants && p.variants.length ? p.variants : [{ sku: p.code, attrs: {}, price: p.price, was: p.was, wasText: p.wasText, off: p.off, img: p.src, thumb: p.thumb, bg: p.bg }];
       cur = 0; qty = 1; opener = btn || document.activeElement;
       body.innerHTML = `
         <div class="qadd__media" id="qadd-media"><img id="qadd-img" src="" alt="${esc(p.title)}"></div>
         <div class="qadd__info">
           <div class="qadd__kicker">${esc(typeLabel(p.type))} · Model <b id="qadd-sku"></b></div>
           <h3 class="qadd__title"><a href="${url.product(p.id)}">${esc(p.title)}</a></h3>
-          <div class="qadd__price" id="qadd-price"></div>
+          <div class="qadd__prices"><span class="qadd__price" id="qadd-price"></span><s class="qadd__was" id="qadd-was"></s><span class="qadd__off" id="qadd-off"></span></div>
         </div>
         ${(p.axes || []).map(a => `<div class="qadd__opt" data-axis="${esc(a)}">
           <div class="qadd__label">${esc(a)}: <span data-cur></span>${AXIS_HINT[a] ? `<small>${esc(AXIS_HINT[a])}</small>` : ''}</div>
@@ -1873,7 +1971,7 @@
     productCard, colorsOf, photoBg, photoFit, ratingOf, reviewsOf, seedOf, mountRail, mountHero, mountAccordion, DEPTS, typeLabel,
     initChrome, placeNav, setActiveCat, navOffset, scrollToEl,
     openSearch: () => search && search.open(),
-    toggleTheme, isNight, slide, staggerCards, revealWords, sheetDrag, quickAdd,
+    toggleTheme, isNight, slide, staggerCards, revealWords, sheetDrag, quickAdd, budget: BUDGET, STAR_OUTLINE,
     consent: { open: n => consentUI && consentUI.open(n), get: consentGet },
     seo, abs, clip, ldCrumbs, ldFaq, px, pxItem, YEAR, SITE,
   };

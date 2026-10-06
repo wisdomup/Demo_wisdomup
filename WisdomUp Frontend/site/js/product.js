@@ -60,7 +60,7 @@
   ]);
 
   /* ---------- Variants ---------- */
-  const V = p.variants.length ? p.variants : [{ sku: p.code, attrs: {}, price: p.price, priceText: WU.D.rs(p.price), img: p.src, thumb: p.thumb, bg: p.bg, ar: p.ar }];
+  const V = p.variants.length ? p.variants : [{ sku: p.code, attrs: {}, price: p.price, priceText: WU.D.rs(p.price), was: p.was, wasText: p.wasText, off: p.off, img: p.src, thumb: p.thumb, bg: p.bg, ar: p.ar }];
   let cur = Math.max(0, V.findIndex(v => v.sku === q.get('sku')));
   const AXIS_HINT = { Plug: 'EU 2-pin fits most sockets in Pakistan', Cable: 'Cable included in the box' };
   const values = a => V.map(v => v.attrs[a]).filter((x, i, arr) => x && arr.indexOf(x) === i);
@@ -117,7 +117,7 @@
           <p class="pdp2__desc">${esc(DESC)}</p>
         </div>
         <div style="display: flex; flex-direction: column; gap: 8px;">
-          <div class="pdp2__price"><span class="pdp2__now" id="pd-price">${esc(V[cur].priceText)}</span></div>
+          <div class="pdp2__price"><span class="pdp2__now" id="pd-price">${esc(V[cur].priceText)}</span><s class="pdp2__was" id="pd-was">${esc(V[cur].wasText || '')}</s><span class="pdp2__off" id="pd-off">${V[cur].off ? V[cur].off + '% off' : ''}</span></div>
           <span class="pdp2__stock">Inclusive of all taxes · ${p.soldOut ? '<b style="color: #B42318;">Sold out</b> — back soon' : '<b>In stock</b>, ships in 24 hours'}</span>
         </div>
         ${p.axes.length || colours.length > 1 ? '<div class="pdp2__rule"></div>' : ''}
@@ -210,6 +210,8 @@
     const v = V[cur];
     $('pd-sku').textContent = v.sku;
     $('pd-price').textContent = v.priceText;
+    $('pd-was').textContent = v.wasText || '';
+    $('pd-off').textContent = v.off ? v.off + '% off' : '';
     $('bb-price').textContent = v.priceText;
     if (v.thumb) $('bb-img').src = v.thumb;
     document.querySelectorAll('.pdp2__opt[data-axis]').forEach(box => {
@@ -276,7 +278,7 @@
   const contact = WU.store.get('wu-ck-contact', {}) || {};
   function paintReviews() {
     const sum = R.summary(p.id), list = R.list(p.id).filter(r => !rvStar || r.rating === rvStar).sort(SORTERS[rvSort]);
-    $('pd-rate').innerHTML = sum.count ? `<a class="pdp2__rate" href="#pd-reviews" data-jump>${stars(sum.avg, 15)}<b>${sum.avg.toFixed(1)}</b> · ${sum.count} review${sum.count > 1 ? 's' : ''}</a>` : '';
+    $('pd-rate').innerHTML = sum.count ? `<a class="pdp2__rate" href="#pd-reviews" data-jump>${stars(sum.avg, 15)}<b>${sum.avg.toFixed(1)}</b> · ${sum.count} review${sum.count > 1 ? 's' : ''}</a>` : `<a class="pdp2__rate pdp2__rate--none" href="#pd-reviews" data-jump>${WU.STAR_OUTLINE}<b>0.0</b> · No reviews yet</a>`;
     $('rv').innerHTML = `
       <div class="rv__sum">
         ${sum.count ? `<div class="rv__avg"><b>${sum.avg.toFixed(1)}</b><span class="rv__stars">${stars(sum.avg, 20)}</span><small>Based on ${sum.count} review${sum.count > 1 ? 's' : ''}</small></div>

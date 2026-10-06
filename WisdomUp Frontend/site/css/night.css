@@ -132,10 +132,10 @@ html[data-theme="night"] .footer-wrap .newsletter button { background: #fff; col
 html[data-theme="night"] .footer-wrap .subfooter { color: var(--n-muted); }
 
 /* ---------- Shared chrome: menu, cart, search ---------- */
-html[data-theme="night"] :is(.mnav, .cartd, .fdrawer, .search, .msort__list) { background: var(--n-bg2); color: var(--n-text); box-shadow: inset 0 0 0 1px var(--n-line2); }
+html[data-theme="night"] :is(.mnav, .cartd, .fdrawer, .search) { background: var(--n-bg2); color: var(--n-text); box-shadow: inset 0 0 0 1px var(--n-line2); }
 html[data-theme="night"] :is(.mnav-scrim, .cartd-scrim, .fscrim, .scrim) { background: rgba(0,0,0,.6); }
-html[data-theme="night"] :is(.mnav__acc-h, .mnav__group a, .mnav__prod b, .mnav__tile-t, .mnav__label, .mnav__acc-t, .mnav__all, .cartd__head h2, .cline__t, .cartd__row, .cartd__row b, .cartd__gift, .cartd__ship b, .cline__p, .cartd__empty, .search__field input, .ccard__title, .ccard__price, .fdrawer__head h2, .facc__h, .facc__chev, .fopt, .fdrawer__clear, .msort__cur, .msort__btn svg, .msort__opt, .mtitle, .mcrumbs, .mcrumbs b, .mdesc__more, .mcount__n b) { color: var(--n-text) !important; }
-html[data-theme="night"] :is(.mnav__prod small, .mnav__eyebrow, .cline__rm, .cartd__ship p, .cartd__note, .cartd__empty p, .ccard__meta, .ccard__was, .facc__v, .fopt small, .mcrumbs a, .mdesc, .mcount, .mcount__n, .msort__btn, .search__label) { color: var(--n-muted) !important; }
+html[data-theme="night"] :is(.mnav__acc-h, .mnav__group a, .mnav__prod b, .mnav__tile-t, .mnav__label, .mnav__acc-t, .mnav__all, .cartd__head h2, .cline__t, .cartd__row, .cartd__row b, .cartd__gift, .cartd__ship b, .cline__p, .cartd__empty, .search__field input, .ccard__title, .ccard__price, .fdrawer__head h2, .facc__h, .facc__chev, .fopt, .fdrawer__clear, .msort__cur, .mtitle, .mcrumbs, .mcrumbs b, .mdesc__more, .mcount__n b) { color: var(--n-text) !important; }
+html[data-theme="night"] :is(.mnav__prod small, .mnav__eyebrow, .cline__rm, .cartd__ship p, .cartd__note, .cartd__empty p, .ccard__meta, .ccard__was, .facc__v, .fopt small, .mcrumbs a, .mdesc, .mcount, .mcount__n, .search__label) { color: var(--n-muted) !important; }
 html[data-theme="night"] .mnav__ic { background: var(--n-raise2); color: #fff; }
 html[data-theme="night"] .mnav__tile--all .mnav__thumb { background: var(--n-raise2); }
 html[data-theme="night"] .mnav__n { background: var(--n-red); }
@@ -146,7 +146,7 @@ html[data-theme="night"] .cartd__gift input, html[data-theme="night"] input[type
 html[data-theme="night"] :is(.qty, .cline__img, .ckline__img) { background: var(--n-raise); color: var(--n-text); border-color: var(--n-line2); }
 html[data-theme="night"] .qty button { color: var(--n-text); background: transparent; }
 html[data-theme="night"] .qty output { color: var(--n-text); } /* pages.css gives the number a day grey */
-html[data-theme="night"] .msort__opt:hover, html[data-theme="night"] .msort__opt.is-active { background: var(--n-raise2); }
+
 html[data-theme="night"] .mview__b { color: var(--n-muted); }
 html[data-theme="night"] .mview__b[aria-pressed="true"] { background: var(--n-raise2); color: #fff; }
 
@@ -445,3 +445,27 @@ html[data-theme="night"] .wpc__title a { color: inherit; }
 html[data-theme="night"] .wpc__title { color: var(--n-text); }
 html[data-theme="night"] .pdp2__stage { box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 30px 60px rgba(0,0,0,.35); }
 
+/* Sort morph (2026-10-06) — night skin: white outline capsule, dark panel with a white edge, white options */
+html[data-theme="night"] .msort__btn { box-shadow: inset 0 0 0 1.5px #fff; color: var(--n-text2); }
+html[data-theme="night"] :is(.msort__cur, .msort__dot) { color: #fff !important; }
+/* the open panel is WHITE in night (bugatti.store: the hover fill turns the button white and the panel grows out of it white);
+   its type, title and × keep the day colours; no edge needed on dark, just a deeper lift */
+html[data-theme="night"] .msort__panel { --ms-edge: #fff; --ms-fill: #fff; filter: drop-shadow(0 18px 40px rgba(0,0,0,.55)); }
+
+/* Product card premium pass (2026-10-06) — night: the CTA stays the night RED pill, wrapped in the same edge-light ring */
+html[data-theme="night"] .wpc .wpc__cta:not(:disabled):not([aria-disabled="true"]) { --pill: var(--n-red); background: linear-gradient(var(--pill), var(--pill)) padding-box, var(--ring) border-box; box-shadow: 0 1.86cqw 5.116cqw rgba(217, 30, 5, .3); }
+html[data-theme="night"] .wpc .wpc__cta:not(:disabled):not([aria-disabled="true"]):hover { background: linear-gradient(var(--pill), var(--pill)) padding-box, var(--ring) border-box; }
+html[data-theme="night"] .wpc__model { color: var(--n-muted); }
+html[data-theme="night"] .wpc__model span:first-child { color: var(--n-text2); }
+html[data-theme="night"] .wpc__rule { background: rgba(255,255,255,.08); }
+html[data-theme="night"] .wpc__price small { color: var(--n-muted); }
+html[data-theme="night"] .wpc__specs > div { border-left-color: rgba(255,255,255,.1); }
+html[data-theme="night"] .wpc__specs dd { color: var(--n-text2); }
+html[data-theme="night"] .wpc__specs dt { color: var(--n-muted); }
+html[data-theme="night"] .wpc__swatch { box-shadow: inset 0 0 0 1px rgba(255,255,255,.2), inset 0 1px 2px rgba(0,0,0,.3); }
+html[data-theme="night"] .wpc__swatch[aria-checked="true"] { box-shadow: inset 0 0 0 1px rgba(255,255,255,.2), 0 0 0 2px var(--n-card), 0 0 0 3.5px var(--sw); }
+
+/* Sale + ratings (2026-10-06) — night colours */
+html[data-theme="night"] :is(.wpc__deal, .qadd__off) { color: var(--n-red-text); }
+html[data-theme="night"] :is(.wpc__was, .qadd__was, .pdp2__was, .nh-tile__was) { color: #8A9097 !important; }
+html[data-theme="night"] .wpc__rating--none, html[data-theme="night"] .pdp2__rate--none, html[data-theme="night"] .pdp2__rate--none b { color: var(--n-muted) !important; }

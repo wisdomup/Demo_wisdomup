@@ -28,7 +28,7 @@
       </a>
       ${wishBtn(p, 'nh-tile__wish')}
       ${p.soldOut ? '' : `<button type="button" class="nh-tile__add" data-nh-add="${p.id}" aria-label="Add ${esc(p.title)} to cart">${icon('cart', 16)}</button>`}
-      <a class="nh-tile__cap" href="${url.product(p.id)}"><b class="nh-tile__p">${esc(p.priceText)}</b><span class="nh-tile__n">${esc(p.title)}</span></a>
+      <a class="nh-tile__cap" href="${url.product(p.id)}"><b class="nh-tile__p">${esc(p.priceText)}${p.wasText ? ` <s class="nh-tile__was">${esc(p.wasText)}</s>` : ''}</b><span class="nh-tile__n">${esc(p.title)}</span></a>
     </article>`;
   const grid = (items, id) => `<div class="nh-grid"${id ? ` id="${id}"` : ''}>${items.map(tile).join('')}</div>`;
 
@@ -40,7 +40,7 @@
   const SERIES = ['ts-11anc', 'ts-12', 'ts-13', 'ts-11', 'ts-10'].map(P).filter(Boolean);
   const MICS = ['mkf-02', 'mkf-01'].map(P).filter(Boolean);
   const FAN = ['cj-47', 'sjx-49', 'ts-4', 'ocd-28', 'cdb-17', 'cc-14', 'ej-ly7'].map(P).filter(Boolean);
-  const BANDS = [['u1', 'Under Rs.1,000', p => p.price < 1000], ['u2', 'Under Rs.2,000', p => p.price < 2000], ['u5', 'Under Rs.5,000', p => p.price < 5000]];
+  const BANDS = [['u1', 'Under Rs.1,000', WU.budget.u1], ['u2', 'Under Rs.2,000', WU.budget.u2], ['u5', 'Under Rs.5,000', WU.budget.u5]]; // non-overlapping bands from common.js
   const deptInfo = d => {
     const ps = D.products.filter(p => d.types.includes(p.type));
     const rep = ['audio:ts-11anc', 'charging:cdb-18', 'cables:sjx-59', 'car:cj-47', 'stands:cj-06', 'computer:jp-03', 'storage:usb-01', 'care:txd-01'].map(s => s.split(':')).find(([k]) => k === d.id);

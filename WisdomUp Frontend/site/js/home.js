@@ -174,12 +174,10 @@
   // Budget rails: one product per type first so the row shows the range (not 16 handsfree), then the rest, cheapest first
   const byPrice = (a, b) => a.price - b.price;
   const variety = list => { const first = list.filter((p, i) => list.findIndex(x => x.type === p.type) === i); return first.concat(list.filter(p => !first.includes(p))); };
-  const under1 = variety(D.products.filter(p => p.price < 1000).sort(byPrice));
-  // Each wider band leads with its own price range so the tabs don't repeat each other, then fills with the cheaper picks
-  const band2 = variety(D.products.filter(p => p.price >= 1000 && p.price < 2000).sort(byPrice));
-  const band5 = variety(D.products.filter(p => p.price >= 2000 && p.price < 5000).sort(byPrice));
-  const under2 = band2.concat(under1.filter(p => !band2.includes(p)));
-  const under5 = band5.concat(under2.filter(p => !band5.includes(p)));
+  // Each tab shows ONLY its own band (2026-10-06): Rs.1–1,000 / Rs.1,001–2,000 / Rs.2,001–5,000 — see WU.budget in common.js
+  const under1 = variety(D.products.filter(WU.budget.u1).sort(byPrice));
+  const under2 = variety(D.products.filter(WU.budget.u2).sort(byPrice));
+  const under5 = variety(D.products.filter(WU.budget.u5).sort(byPrice));
   // Shop by Budget: ONE rail with tabs (requested 2026-10-06; replaced the separate Under Rs.1,000 / Under Rs.2,000 rails)
   mountRail($('rail-budget'), { title: 'Shop by Budget', tabsLabel: 'Budget', tabs: [
     { label: 'Under Rs.1,000', items: under1.slice(0, 16), allHref: url.products + '?price=u1' },

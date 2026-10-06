@@ -4,10 +4,18 @@ window.WU_STORE = (function () {
   const C = window.WU_CATALOG;
   const rs = n => n == null ? null : 'Rs.' + n.toLocaleString('en-PK');
   const products = C.products;
+  // Sale (shop.js "sale", 2026-10-06): the regular catalogue price becomes `was` and the sale price becomes `price` — the
+  // number every page, filter, cart and the order server (api/orders.py, same rules + rounding) use. Off = no change.
+  const SALE = (window.WU_SHOP && window.WU_SHOP.sale) || {};
+  const salePct = p => { if (!SALE.on) return 0; for (const r of SALE.rules || []) if ((r.types && r.types.includes(p.type)) || (r.ids && r.ids.includes(p.id)) || (r.tab && p.tabs.includes(r.tab))) return r.pct || 0; return 0; };
+  const salePrice = (price, pct) => { if (!pct || !price) return price; const step = price < 1000 ? 10 : 50; const s = Math.ceil(price * (100 - pct) / (100 * step)) * step; return s < price ? s : price; };
+  const deal = (o, pct) => { const was = o.price; o.price = salePrice(was, pct); o.was = o.price < was ? was : null; o.wasText = o.was ? rs(o.was) : null; o.off = o.was ? Math.round((o.was - o.price) / o.was * 100) : null; };
   products.forEach(p => {
+    const pct = salePct(p);
+    p.variants.forEach(v => { deal(v, pct); v.priceText = rs(v.price); });
+    deal(p, pct);
     p.priceText = (p.from ? 'From ' : '') + rs(p.price);
-    p.wasText = null; p.off = null; p.rating = null;
-    p.variants.forEach(v => { v.priceText = rs(v.price); });
+    p.rating = null;
   });
   const byId = id => products.find(p => p.id === id);
   // Hero slides: flagship products with studio photos (copy pulls live price/specs from the catalogue)

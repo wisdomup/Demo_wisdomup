@@ -252,30 +252,62 @@ a.feat__slide:hover { color: #111; }
 .wpc__media:hover .wpc__art--main { opacity: 0; }
 .wpc__media:hover .wpc__art--alt { opacity: 1; transform: scaleX(-1) rotate(-6deg) scale(1.04); }
 .wpc__badge { position: absolute; top: 3.488cqw; left: 2.791cqw; display: inline-flex; align-items: center; height: max(20px, 6.047cqw); padding: 0 max(8px, 2.326cqw); border-radius: 999px; background: #CEECF2; font: 700 max(11px, 3.488cqw)/1 var(--font); color: #2B3A40; white-space: nowrap; pointer-events: none; }
-.wpc__body { display: flex; flex-direction: column; padding: 5.814cqw 0.465cqw 0; }
+/* ---------- Card body — premium pass (2026-10-06, inspired by login.com.pk's cards; facts only: no invented
+   ratings, discounts or "was" prices). Bold uppercase name → model · type → (real stars only) → hairline → heavy price +
+   real colour dots → delivery line → spec trio (real specs) + the ring CTA. Sizes stay in cqw (the 430px design). ---------- */
+/* equal-height cards in a rail/grid row: the name block sits at the top, the price block is pushed to the bottom, so prices and
+   CTAs line up across cards without reserving empty title lines */
+.wpc { display: flex; flex-direction: column; }
+.wpc__card { flex: 1 1 auto; }
+.wpc__body { flex: 1 1 auto; display: flex; flex-direction: column; padding: 5.116cqw 1.163cqw 0; }
+.wpc__head { padding-bottom: 4.186cqw; }
 .wpc__row { display: flex; align-items: center; justify-content: space-between; gap: 2.791cqw; }
-.wpc__price { font: 800 max(16px, 6.512cqw)/1 var(--font); color: #111; }
-.wpc__rating { display: flex; align-items: center; gap: 1.395cqw; font: 600 max(12px, 4.419cqw)/1 var(--font); color: #2B2B2B; white-space: nowrap; }
-.wpc__rating svg { display: block; width: 5.581cqw; height: 5.581cqw; margin: -0.465cqw 0; }
+.wpc__title { cursor: pointer; margin: 0; font: 700 max(13px, 4.186cqw)/1.2 var(--font); letter-spacing: .02em; text-transform: uppercase; color: #0B0B0B; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+.wpc__model { display: flex; align-items: center; gap: 1.86cqw; min-width: 0; margin-top: 1.628cqw; font: 600 max(10px, 2.791cqw)/1.2 var(--font); letter-spacing: .08em; text-transform: uppercase; color: #8A8F98; white-space: nowrap; }
+.wpc__model span:first-child { flex: none; color: #5A6170; }
+.wpc__model span:last-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.wpc__model i { flex: none; width: 3px; height: 3px; border-radius: 999px; background: currentColor; opacity: .7; }
+.wpc__rating { display: flex; align-items: center; gap: 1.395cqw; margin-top: 2.326cqw; font: 600 max(12px, 3.721cqw)/1 var(--font); color: #2B2B2B; white-space: nowrap; }
+.wpc__rating svg { display: block; width: 4.651cqw; height: 4.651cqw; margin: -0.465cqw 0; }
 .wpc__rating small { font-size: inherit; font-weight: 400; color: #5A5A5A; }
-.wpc__title { cursor: pointer; margin: 5.814cqw 0 0; min-height: 2.4em; font: 400 max(13px, 4.651cqw)/1.2 var(--font); color: #1A1A1A; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+.wpc__rule { flex: none; height: 1px; margin: auto 0 3.721cqw; background: #ECEDEF; } /* margin-top: auto pushes the price block down */
+.wpc__price { display: inline-flex; align-items: baseline; gap: 1.395cqw; font: 800 max(18px, 6.977cqw)/1 var(--font); letter-spacing: -.02em; color: #0B0B0B; white-space: nowrap; }
+.wpc__price small { font: 700 max(9px, 2.558cqw)/1 var(--font); letter-spacing: .08em; text-transform: uppercase; color: #8A8F98; }
+/* sale (shop.js "sale"): a red "% off" line (its height is kept on every card so prices line up), the sale price, the regular price struck */
+.wpc__deal { min-height: max(13px, 3.488cqw); margin-bottom: 1.395cqw; font: 800 max(11px, 3.256cqw)/1 var(--font); letter-spacing: .01em; color: #E1251B; }
+.wpc__prices { display: inline-flex; align-items: baseline; gap: 2.326cqw; min-width: 0; }
+.wpc__was { font: 500 max(11px, 3.256cqw)/1 var(--font); color: #9AA0A6; text-decoration: line-through; text-decoration-thickness: 1.5px; white-space: nowrap; }
+.wpc__rating--none { color: #9AA0A6; }
 .wpc__kind { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: right; font: 600 max(11px, 3.721cqw)/1.2 var(--font); color: #5A5A5A; }
-.wpc__opts { font: 600 max(12px, 4.186cqw)/1 var(--font); color: #273F85; white-space: nowrap; }
+.wpc__opts { font: 600 max(10px, 2.791cqw)/1 var(--font); letter-spacing: .06em; text-transform: uppercase; color: #5A6170; white-space: nowrap; }
 a.wpc__cta, a.wpc__cta:hover { color: #fff; text-decoration: none; }
 a.wpc__cta[aria-disabled="true"] { background: #E6E7EA; color: #5F6368; pointer-events: none; }
-.wpc__eta { margin-top: 6.977cqw; min-height: 4.419cqw; font: 500 max(12px, 4.419cqw)/1 var(--font); color: #1F5E3A; }
-.wpc__foot { margin-top: 5.814cqw; }
-.wpc__swatches { display: flex; align-items: center; gap: 5.116cqw; padding-left: 0.93cqw; }
-.wpc__swatch { position: relative; width: 7.907cqw; height: 7.907cqw; padding: 0; border-radius: 50%; border: 0; cursor: pointer; transition: box-shadow 160ms ease; }
-.wpc__swatch[aria-checked="true"] { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--sw); }
+.wpc__eta { margin-top: 2.326cqw; min-height: 3.721cqw; font: 500 max(11px, 3.256cqw)/1.15 var(--font); color: #1F7A4C; }
+.wpc__foot { margin-top: 4.651cqw; align-items: center; }
+/* spec trio: bold value over a tiny label, hairline separators (a <dl>: label is the <dt>, shown under the value) */
+.wpc__specs { display: flex; align-items: stretch; min-width: 0; min-height: max(28px, 8.372cqw); margin: 0; }
+.wpc__specs > div { display: flex; flex-direction: column-reverse; justify-content: center; gap: .698cqw; min-width: 0; padding: 0 2.558cqw; border-left: 1px solid #E6E7EA; }
+.wpc__specs > div:first-child { padding-left: 0; border-left: 0; }
+.wpc__specs dd { margin: 0; font: 700 max(11px, 3.256cqw)/1.1 var(--font); letter-spacing: -.005em; color: #2B2F36; white-space: nowrap; }
+.wpc__specs dt { font: 500 max(9px, 2.326cqw)/1.1 var(--font); color: #8A8F98; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* real colour dots: small, with a hairline edge and a soft inner shade; the chosen one gets a ring */
+.wpc__swatches { display: flex; align-items: center; gap: 2.326cqw; padding: 0; }
+.wpc__swatch { position: relative; width: max(16px, 4.651cqw); height: max(16px, 4.651cqw); padding: 0; border-radius: 50%; border: 0; cursor: pointer; box-shadow: inset 0 0 0 1px rgba(0,0,0,.16), inset 0 1px 2px rgba(0,0,0,.14); transition: box-shadow 160ms ease; }
+.wpc__swatch[aria-checked="true"] { box-shadow: inset 0 0 0 1px rgba(0,0,0,.16), 0 0 0 2px #fff, 0 0 0 3.5px var(--sw); }
 .wpc__swatch::after, .wpc__cta::after, .loop__cta::after, .dot::after { content: ""; position: absolute; inset: -8px; }
-.wpc__cta { position: relative; height: max(32px, 9.767cqw); min-width: 32.558cqw; padding: 0 5.116cqw; border: 0; border-radius: 999px; background: #000; color: #fff; display: flex; align-items: center; justify-content: center; gap: 1.86cqw; font: 700 max(12px, 3.721cqw)/1 var(--font); white-space: nowrap; cursor: pointer; box-shadow: 0 0 0 0 #fff, 0 0 0 0 #E1251B; transition: transform 220ms cubic-bezier(.2,.7,.2,1), box-shadow 220ms cubic-bezier(.2,.7,.2,1), background-color 220ms ease; }
+/* the ring CTA: an ink pill inside a 2px gradient ring in the nav edge-light colours (orange → magenta → blue); on hover the
+   ring's colours sweep round (registered --ring-a) while the liquid fill rises inside it */
+@property --ring-a { syntax: "<angle>"; inherits: false; initial-value: 115deg; }
+.wpc__cta { --ring: linear-gradient(var(--ring-a), #ED5F00 0%, #FF02F0 50%, #0091FF 100%); --pill: #0B0B0B; position: relative; flex: none; height: max(32px, 9.767cqw); min-width: 32.558cqw; padding: 0 4.651cqw; border: max(1.5px, .465cqw) solid transparent; border-radius: 999px; background: linear-gradient(var(--pill), var(--pill)) padding-box, var(--ring) border-box; color: #fff; display: flex; align-items: center; justify-content: center; gap: 1.86cqw; font: 700 max(12px, 3.721cqw)/1 var(--font); letter-spacing: .01em; white-space: nowrap; cursor: pointer; box-shadow: 0 1.86cqw 5.116cqw rgba(255, 2, 240, .16); transition: --ring-a 900ms cubic-bezier(.3,1,.3,1), box-shadow 500ms cubic-bezier(.3,1,.3,1), color 500ms cubic-bezier(.3,1,.3,1) 100ms; }
 .wpc__cta-ic { display: flex; transition: transform 260ms cubic-bezier(.3,1.4,.5,1); }
-.wpc__cta:not(:disabled):hover { background: #1A1A1A; transform: translateY(-2px); box-shadow: 0 0 0 2px #fff, 0 0 0 4px #E1251B; }
+.wpc__cta:not(:disabled):not([aria-disabled="true"]):hover { --ring-a: 295deg; }
 .wpc__cta:not(:disabled):hover .wpc__cta-ic { transform: translateX(-2px) rotate(-12deg); }
-.wpc__cta:not(:disabled):active { transform: translateY(0) scale(.97); }
-.wpc__cta:disabled { background: #E6E7EA; color: #5F6368; cursor: not-allowed; }
+.wpc__cta:not(:disabled):active { transform: scale(.97); }
+.wpc__cta:disabled, a.wpc__cta[aria-disabled="true"] { background: #E6E7EA; border-color: #E6E7EA; color: #5F6368; box-shadow: none; cursor: not-allowed; }
 .wpc__cta:disabled .wpc__cta-ic { display: none; }
+/* narrow cards: the 3rd spec goes first, then the CTA drops under the specs */
+@container (max-width: 330px) { .wpc__specs > div:nth-child(3) { display: none; } }
+@container (max-width: 250px) { .wpc__foot { flex-direction: column; align-items: stretch; row-gap: 3.721cqw; } .wpc__cta { width: 100%; } }
 
 /* ---------- Creator tools + Live ---------- */
 .duo { margin: var(--sec) var(--gutter, 28px) 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr)); gap: 20px; }
@@ -444,8 +476,14 @@ html[data-theme="night"] :is(.on-light-dots, .on-light) .dot { color: #fff; }
 
 /* ---------- Footer (redesigned 2026-10-06): full-bleed, square, premium spacing; the page lifts off it (fixed + clip-path reveal) ---------- */
 .footer-wrap { position: relative; margin-top: var(--sec); }
-.footer-wrap.is-fixed { clip-path: inset(0); }
-.footer-wrap.is-fixed .footer-fixed { position: fixed; left: 0; right: 0; bottom: 0; }
+.footer-wrap.is-reveal { clip-path: inset(0); } /* the footer slides up from under the page; the wrap clips it (renderFooter) */
+.footer-wrap.is-reveal .footer-fixed { will-change: transform; }
+/* compositor-driven reveal: y = −R → 0 while the wrap's top travels from the screen bottom up by R (= closed footer height) */
+@keyframes wu-ft-reveal { from { transform: translate3d(0, calc(-1 * var(--ft-r, 0px)), 0); } to { transform: none; } }
+@supports (animation-timeline: view()) {
+  .footer-wrap.is-reveal.is-sda { view-timeline: --wu-ft block; }
+  .footer-wrap.is-reveal.is-sda .footer-fixed { animation: wu-ft-reveal linear both; animation-timeline: --wu-ft; animation-range: entry 0px entry var(--ft-r, 0px); }
+}
 .footer-fixed { background: #fff; }
 .footer-wrap .footer { display: block; margin: 0; padding: clamp(40px, 5vw, 64px) var(--gutter, 28px) clamp(32px, 4vw, 48px); border-radius: 0; background: var(--navy-deep, #172248); color: #fff; }
 .footer__top { display: flex; align-items: flex-end; justify-content: space-between; gap: 32px 48px; flex-wrap: wrap; padding-bottom: clamp(28px, 4vw, 44px); border-bottom: 1px solid rgba(255,255,255,.16); }
@@ -757,6 +795,10 @@ body:has(.buybar.is-on) .totop { bottom: calc(96px + env(safe-area-inset-bottom)
 .qadd__title { margin: 0; font: 800 20px/1.25 var(--font); letter-spacing: -.01em; }
 .qadd__title a { color: #0B0B0B; text-decoration: none; }
 .qadd__price { font: 800 22px/1 var(--font); color: #0B0B0B; }
+.qadd__prices { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.qadd__was { font: 500 15px/1 var(--font); color: #9AA0A6; text-decoration: line-through; text-decoration-thickness: 1.5px; }
+.qadd__was:empty, .qadd__off:empty { display: none; }
+.qadd__off { font: 800 13px/1 var(--font); color: #E1251B; }
 .qadd__opt { display: flex; flex-direction: column; gap: 10px; }
 .qadd__label { font: 600 14px/1.3 var(--font); color: #3D4656; }
 .qadd__label span { font-weight: 700; color: #0B0B0B; }
