@@ -12,11 +12,10 @@
   --panel: #000; --card: #1C1E20; --card-hi: #24272A; --line: rgba(255,255,255,.06); --line2: rgba(255,255,255,.12);
   --text: #fff; --text2: #C9CDD2; --muted: #898A8B; --red: #D91E05; --red-hi: #F0300F; --red-t: #FF6A4A; --red-10: rgba(217,30,5,.12); --red-24: rgba(217,30,5,.26);
   --ease: cubic-bezier(.2,.7,.2,1);
-  box-sizing: border-box; max-width: 1632px; margin: 0 auto; padding: 0 var(--g) 64px; color: var(--text); font-family: var(--font); }
+  box-sizing: border-box; margin: 0; padding: 0 var(--gutter, 28px) 64px; /* side edges line up with the shared hero banner at every width */ color: var(--text); font-family: var(--font); }
 .nh *, .nh *::before, .nh *::after { box-sizing: border-box; }
 .nh > section { margin-top: 64px; }
-.nh > .nh-top { margin-top: 8px; }
-.nh > .nh-stripwrap { margin-top: var(--g); }
+.nh > .nh-stripwrap { margin-top: 24px; } /* first block under the shared hero banner */
 .nh a { color: inherit; text-decoration: none; }
 .nh img { display: block; }
 .nh :focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
@@ -38,20 +37,7 @@
 .nh-tag { display: inline-flex; align-items: center; height: 24px; padding: 0 9px; border-radius: 6px; background: var(--red-24); color: #fff; font: 700 11px/1 var(--font); letter-spacing: .06em; text-transform: uppercase; }
 .nh-tag--grey { background: rgba(255,255,255,.1); }
 
-/* ---------- Hero: three media tiles with a line under each ---------- */
-.nh-trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--g); }
-.nh-trio__item { display: block; }
-.nh-trio__media { position: relative; aspect-ratio: 16 / 10; border-radius: var(--r-tile); overflow: hidden; box-shadow: inset 0 0 0 1px var(--line); }
-.nh-trio__media img { width: 100%; height: 100%; transition: transform 700ms var(--ease); }
-.nh-trio__item:hover .nh-trio__media img { transform: scale(1.04); }
-.nh-trio__media .nh-tag { position: absolute; top: 12px; left: 12px; }
-.nh-trio__t { margin: 12px 0 0; font: 500 16px/1.3 var(--font); }
-.nh-trio__s { margin: 4px 0 0; font: 400 14px/1.4 var(--font); color: var(--muted); }
-@media (max-width: 767px) {
-  .nh-trio { display: flex; gap: 10px; margin: 0 calc(-1 * var(--g)); padding: 0 var(--g); overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--g); scrollbar-width: none; }
-  .nh-trio::-webkit-scrollbar { display: none; }
-  .nh-trio__item { flex: 0 0 82vw; scroll-snap-align: start; }
-}
+/* (The night home opens with the SHARED hero banner from the day page — see index.html .hero-stack.) */
 
 /* ---------- Promise strip ---------- */
 .nh-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gap); }
@@ -136,10 +122,25 @@
 @media (max-width: 1023px) { .nh-glow__card { display: none; } }
 
 /* ---------- Segmented control ---------- */
-.nh-seg { display: inline-flex; gap: 4px; padding: 4px; border-radius: 999px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); }
-.nh-seg button { height: 32px; padding: 0 14px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font: 600 14px/1 var(--font); cursor: pointer; transition: background-color 160ms var(--ease), color 160ms var(--ease); }
+/* Shop by budget (reworked 2026-10-06): ONE header row — title + line on the left, the segmented control on the right,
+   bottom-aligned like every section's "View all"; it drops under the title when the row is too narrow. The control is a
+   56px bar (8px padding) of three equal 40px segments; a white thumb GLIDES to the chosen one (transform only, 500ms
+   hover curve) instead of the pill jumping. Phones: full width, "UNDER" as a small kicker over the amount. */
+.nh-head--budget { flex-wrap: wrap; row-gap: 16px; margin-bottom: 24px; }
+.nh-head--budget .nh-head__t { flex: 1 1 320px; min-width: 0; }
+.nh-seg { --n: 3; --pad: 8px; --sg: 4px; position: relative; isolation: isolate; flex: none; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: var(--sg); width: min(100%, 492px); height: var(--bar, 56px); padding: var(--pad); border-radius: 999px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line2); }
+.nh-seg__thumb { position: absolute; z-index: -1; top: var(--pad); left: var(--pad); width: calc((100% - 2 * var(--pad) - (var(--n) - 1) * var(--sg)) / var(--n)); height: calc(100% - 2 * var(--pad)); border-radius: 999px; background: #fff; box-shadow: 0 6px 20px rgba(0,0,0,.4); transform: translateX(calc(var(--i, 0) * (100% + var(--sg)))); transition: transform var(--m-primary, 500ms cubic-bezier(.3,1,.3,1)); pointer-events: none; }
+.nh-seg button { display: flex; align-items: center; justify-content: center; gap: .32em; min-width: 0; height: 100%; padding: 0 12px; border: 0; border-radius: 999px; background: transparent; color: var(--text2); font: 600 14px/1 var(--font); letter-spacing: .01em; white-space: nowrap; font-variant-numeric: tabular-nums; cursor: pointer; transition: color var(--m-primary, 500ms cubic-bezier(.3,1,.3,1)); }
 .nh-seg button:hover { color: #fff; }
-.nh-seg button[aria-pressed="true"] { background: #fff; color: #111; }
+.nh-seg button[aria-pressed="true"] { color: #111; }
+.nh-seg__k { font-weight: 500; opacity: .7; }
+.nh-seg__v { font-weight: 700; }
+@media (max-width: 639px) {
+  .nh-seg { width: 100%; }
+  .nh-seg button { flex-direction: column; gap: 3px; padding: 0 4px; }
+  .nh-seg__k { font: 600 10px/1 var(--font); letter-spacing: .08em; text-transform: uppercase; }
+  .nh-seg__v { font-size: 14px; line-height: 1; }
+}
 
 /* ---------- Fanned tile strip panel ---------- */
 .nh-fan { position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 44px 24px 36px; border-radius: var(--r-panel); background: var(--panel); box-shadow: inset 0 0 0 1px var(--line); text-align: center; }

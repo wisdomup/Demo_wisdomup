@@ -656,6 +656,12 @@
       </div>`;
   }
   document.addEventListener('click', e => {
+    const choose = e.target.closest('a.wpc__cta');
+    if (choose && !(e.metaKey || e.ctrlKey || e.shiftKey || e.button)) {
+      const pid = choose.closest('.wpc') && choose.closest('.wpc').dataset.pid, prod = D.byId(pid);
+      if (prod && !prod.soldOut && prod.variants && prod.variants.length > 1 && qaddUI) { e.preventDefault(); qaddUI.open(prod, choose); }
+      return;
+    }
     const sw = e.target.closest('.wpc__swatch');
     if (sw) { sw.parentElement.querySelectorAll('.wpc__swatch').forEach(x => x.setAttribute('aria-checked', x === sw)); return; }
     const cta = e.target.closest('button.wpc__cta');
@@ -729,56 +735,164 @@
   /* ---------- Lifestyle hero (crossfade) ---------- */
   const HERO_POS = { 'hero-os4': '50% 0%' };
   function mountHero(el, slides = D.lifestyle) {
+    // Hero slideshow — bugatti.store behaviour (measured 2026-10-06), our own code:
+    // · slides GLIDE sideways (1000ms expo-out), wrap around, follow a mouse/finger drag (release past 15% or a flick to change)
+    // · every incoming image zooms out 1.3 → 1 over 1300ms
+    // · the copy lives in its own layer: old words rise out (−90%, 1s), and 500ms + 30ms per word later the new words rise in
+    //   from below, 250ms + 30ms apart (the name and the button move as whole units)
+    // · autoplay every 6s, paused while hovered, restarted after any interaction; reduced motion = instant swaps
     if (!el) return;
     const n = slides.length;
-    let i = 0, hover = false;
+    const E = 'cubic-bezier(.16,1,.3,1)';
+    let i = 0, hover = false, busy = null, timer = 0, wordTimer = 0, drag = null, dragged = false;
+    const words = t => esc(t).split(/\s+/).filter(Boolean).map(w => `<span class="hw"><span class="hw__i">${w}</span></span>`).join(' ');
     el.innerHTML = slides.map((s, k) => `
-      <div class="hero__slide${s.pack ? ' hero__slide--pack' : ''}${k === 0 ? ' is-on' : ''}" aria-roledescription="slide" aria-label="${k + 1} of ${n}">
-        ${s.pack && s.src ? `<a class="hero__pack" href="${url.product(s.pid)}" tabindex="-1" aria-hidden="true" style="background: radial-gradient(110% 80% at 50% 45%, ${s.bg[0]}, ${s.bg[1]});"><img src="${s.src}" alt=""${k ? ' loading="lazy"' : ''}></a>`
-          : s.src ? `<img class="hero__img" src="${s.src}" alt="${esc(s.hint)}"${HERO_POS[s.slotId] ? ` style="object-position: ${HERO_POS[s.slotId]};"` : ''}${k ? ' loading="lazy"' : ''}>` : ''}
+      <div class="hero__slide${s.pack ? ' hero__slide--pack' : ''}${k === 0 ? ' is-on' : ''}" aria-roledescription="slide" aria-label="${k + 1} of ${n}"${k ? ' aria-hidden="true"' : ''}>
+        ${s.pack && s.src ? `<a class="hero__pack" href="${url.product(s.pid)}" tabindex="-1" aria-hidden="true" draggable="false" style="background: radial-gradient(110% 80% at 50% 45%, ${s.bg[0]}, ${s.bg[1]});"><img src="${s.src}" alt="" draggable="false"${k ? ' loading="lazy"' : ''}></a>`
+          : s.src ? `<img class="hero__img" src="${s.src}" alt="${esc(s.hint)}" draggable="false"${HERO_POS[s.slotId] ? ` style="object-position: ${HERO_POS[s.slotId]};"` : ''}${k ? ' loading="lazy"' : ''}>` : ''}
         <div class="hero__scrim"></div>
-        <div class="hero__copy">
-          <div class="eyebrow eyebrow--warm">${esc(s.kicker)}</div>
-          <div class="hero__name">${esc(s.name)}</div>
-          <div class="hero__line">${esc(s.line)}</div>
-          ${s.sub ? `<div class="hero__sub">${esc(s.sub)}</div>` : ''}
-          <div class="hero__cta">${btnBuy(s.ctaLabel, url.product(s.pid))}</div>
-        </div>
       </div>`).join('') + `
-      <button type="button" class="hero__arrow hero__arrow--prev" aria-label="Previous slide"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path stroke-width="1.6" d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
-      <button type="button" class="hero__arrow hero__arrow--next" aria-label="Next slide"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path stroke-width="1.6" d="M9.5 6l6 6-6 6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
-      <div class="hero__dots"><div class="dots" role="tablist" aria-label="Slides" style="position: static;">
-        ${slides.map((_, k) => `<button type="button" class="dot" role="tab" aria-label="Slide ${k + 1}" aria-selected="${k === 0}"></button>`).join('')}
-      </div></div>`;
-    const slideEls = el.querySelectorAll('.hero__slide'), dots = el.querySelectorAll('.dot');
-    const revealCopy = () => {
-      const copy = slideEls[i].querySelector('.hero__copy');
-      if (!copy || reduced() || !copy.animate) return;
-      [...copy.children].forEach((c, k) => c.animate([{ opacity: 0, transform: 'translateY(90%)' }, { opacity: 1, transform: 'none' }], { duration: 1000, delay: 120 + k * 80, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards' }));
+      <div class="hero__words">${slides.map((s, k) => `
+        <div class="hero__copy${s.pack ? ' hero__copy--pack' : ''}" aria-current="${k === 0}"${k ? ' aria-hidden="true"' : ''}>
+          <div class="eyebrow eyebrow--warm">${words(s.kicker)}</div>
+          <div class="hw hw--block"><div class="hero__name hw__i">${esc(s.name)}</div></div>
+          <div class="hero__line">${words(s.line)}</div>
+          ${s.sub ? `<div class="hero__sub">${words(s.sub)}</div>` : ''}
+          <div class="hero__cta hw__i hw__i--cta">${btnBuy(s.ctaLabel, url.product(s.pid))}</div>
+        </div>`).join('')}
+      </div>
+      <div class="hero__bar">
+        <button type="button" class="hero__arrow hero__arrow--prev" aria-label="Previous slide"><svg viewBox="0 0 37 24" aria-hidden="true"><path d="M10 5L3 12M3 12L10 19M3 12H33.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="hero__dots"><div class="dots" role="tablist" aria-label="Slides" style="position: static;">
+          ${slides.map((_, k) => `<button type="button" class="dot" role="tab" aria-label="Slide ${k + 1}" aria-selected="${k === 0}"></button>`).join('')}
+        </div></div>
+        <button type="button" class="hero__arrow hero__arrow--next" aria-label="Next slide"><svg viewBox="0 0 37 24" aria-hidden="true"><path d="M26.5 5L33.5 12M33.5 12L26.5 19M33.5 12H3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>`;
+    const slideEls = [...el.querySelectorAll('.hero__slide')], copies = [...el.querySelectorAll('.hero__copy')], dots = el.querySelectorAll('.dot');
+    const units = c => [...c.querySelectorAll('.hw__i')];
+    const setCur = (c, on) => {
+      c.setAttribute('aria-current', on);
+      if (on) c.removeAttribute('aria-hidden'); else c.setAttribute('aria-hidden', 'true');
+      c.querySelectorAll('a, button').forEach(x => { x.tabIndex = on ? 0 : -1; });
     };
-    const go = v => {
-      const next = (v + n) % n;
+    copies.forEach((c, k) => setCur(c, k === 0));
+    const stopAnims = c => c.querySelectorAll('.hw__i').forEach(x => x.getAnimations().forEach(a => a.cancel()));
+    const wordsIn = c => {
+      if (reduced() || !c.animate) return;
+      c.querySelectorAll('.hw').forEach(w => w.classList.remove('is-open'));
+      const u = units(c);
+      u.forEach((x, k) => {
+        const cta = x.classList.contains('hw__i--cta');
+        x.animate([{ opacity: 0, transform: cta ? 'translateY(2rem)' : 'translateY(90%)' }, { opacity: 1, transform: 'none' }],
+          { duration: cta ? 1500 : 1000, delay: 250 + k * 30, easing: E, fill: 'backwards' });
+      });
+      setTimeout(() => c.querySelectorAll('.hw').forEach(w => w.classList.add('is-open')), 1250 + u.length * 30);
+    };
+    const wordsOut = c => {
+      if (reduced() || !c.animate) return 0;
+      c.querySelectorAll('.hw').forEach(w => w.classList.remove('is-open'));
+      const u = units(c);
+      u.forEach((x, k) => {
+        const cta = x.classList.contains('hw__i--cta');
+        x.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: cta ? 'translateY(-2rem)' : 'translateY(-90%)' }],
+          { duration: 1000, delay: 250 + k * 30, easing: E, fill: 'forwards' });
+      });
+      return 500 + 30 * u.length;
+    };
+    const swapWords = (from, to) => {
+      clearTimeout(wordTimer);
+      copies.forEach(c => { if (c !== from) { stopAnims(c); setCur(c, false); } });
+      const done = () => { stopAnims(from); setCur(from, false); setCur(to, true); wordsIn(to); };
+      const wait = wordsOut(from);
+      if (wait) wordTimer = setTimeout(done, wait); else done();
+    };
+    const zoom = slide => {
+      const m = slide.querySelector('.hero__img, .hero__pack img');
+      if (m && !reduced() && m.animate) m.animate([{ transform: 'scale(1.3)' }, { transform: 'scale(1)' }], { duration: 1300, easing: E });
+    };
+    // from/to positions in % of the hero width (a drag hands over where the finger left them)
+    const glide = (from, to, dir, offset = 0) => {
+      to.classList.add('is-on'); from.classList.add('is-on', 'is-out');
+      const o = { duration: 1000, easing: E, fill: 'forwards' };
+      const a = to.animate([{ transform: `translateX(${dir * 100 + offset}%)` }, { transform: 'translateX(0)' }], o);
+      const b = from.animate([{ transform: `translateX(${offset}%)` }, { transform: `translateX(${-dir * 100}%)` }], o);
+      const end = () => { from.classList.remove('is-on', 'is-out'); a.cancel(); b.cancel(); busy = null; };
+      b.onfinish = end;
+      return { finish: () => { a.finish(); b.finish(); } };
+    };
+    const go = (v, { dir, offset = 0 } = {}) => {
+      const next = ((v % n) + n) % n;
       if (next === i) return;
+      if (busy) busy.finish();
+      dir = dir || (v > i ? 1 : -1);
+      const from = slideEls[i], to = slideEls[next];
+      swapWords(copies[i], copies[next]);
       i = next;
-      slideEls.forEach((s, k) => s.classList.toggle('is-on', k === i));
       dots.forEach((d, k) => d.setAttribute('aria-selected', k === i));
-      revealCopy();
+      slideEls.forEach((s, k) => { if (k === i) s.removeAttribute('aria-hidden'); else s.setAttribute('aria-hidden', 'true'); });
+      if (reduced() || !to.animate) { from.classList.remove('is-on'); to.classList.add('is-on'); }
+      else { busy = glide(from, to, dir, offset); zoom(to); }
+      play();
     };
-    setTimeout(revealCopy, 150);
+    // Autoplay: every 6s, paused while hovered or dragged, restarted after any interaction
+    const play = () => {
+      clearTimeout(timer);
+      if (reduced() || n < 2) return;
+      timer = setTimeout(() => { if (!hover && !drag && !document.hidden) go(i + 1, { dir: 1 }); else play(); }, 6000);
+    };
+    setTimeout(() => wordsIn(copies[0]), 150);
+    zoom(slideEls[0]);
+    play();
     el.addEventListener('click', e => {
+      if (dragged) { e.preventDefault(); e.stopPropagation(); return; }
       const t = e.target;
-      if (t.closest('.hero__arrow--prev')) go(i - 1);
-      else if (t.closest('.hero__arrow--next')) go(i + 1);
-      else if (t.closest('.dot')) go([...dots].indexOf(t.closest('.dot')));
+      if (t.closest('.hero__arrow--prev')) go(i - 1, { dir: -1 });
+      else if (t.closest('.hero__arrow--next')) go(i + 1, { dir: 1 });
+      else if (t.closest('.dot')) { const k = [...dots].indexOf(t.closest('.dot')); go(k, { dir: k > i ? 1 : -1 }); }
+    }, true);
+    // Drag (mouse and touch): the slide follows the pointer; past 15% of the width or a quick flick it changes, otherwise it springs back
+    el.addEventListener('pointerdown', e => {
+      if ((e.pointerType === 'mouse' && e.button !== 0) || e.target.closest('.hero__arrow, .dot, .hero__cta') || n < 2) return;
+      if (busy) busy.finish();
+      drag = { x: e.clientX, y: e.clientY, t: performance.now(), dx: 0, on: false, id: e.pointerId, w: el.clientWidth, nb: null };
+      dragged = false;
     });
-    // Touch: swipe left/right (touch screens have no arrow buttons)
-    let hx = null;
-    el.addEventListener('touchstart', e => { hx = e.touches[0].clientX; }, { passive: true });
-    el.addEventListener('touchend', e => { if (hx == null) return; const dx = e.changedTouches[0].clientX - hx; if (Math.abs(dx) > 40) go(i + (dx < 0 ? 1 : -1)); hx = null; });
+    window.addEventListener('pointermove', e => {
+      if (!drag || e.pointerId !== drag.id) return;
+      const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      if (!drag.on) {
+        if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+        if (Math.abs(dy) > Math.abs(dx)) { drag = null; return; } // a vertical swipe scrolls the page
+        drag.on = true; el.classList.add('is-dragging');
+      }
+      drag.dx = dx;
+      const dir = dx < 0 ? 1 : -1, nb = slideEls[(i + dir + n) % n];
+      if (drag.nb && drag.nb !== nb) { drag.nb.classList.remove('is-on'); drag.nb.style.transform = ''; }
+      drag.nb = nb; nb.classList.add('is-on');
+      slideEls[i].style.transform = `translateX(${dx}px)`;
+      nb.style.transform = `translateX(calc(${dir * 100}% + ${dx}px))`;
+    }, { passive: true });
+    const release = e => {
+      if (!drag || (e && e.pointerId !== drag.id)) return;
+      const d = drag; drag = null;
+      if (!d.on) return;
+      dragged = true; setTimeout(() => { dragged = false; }, 0);
+      el.classList.remove('is-dragging');
+      const pct = d.dx / d.w * 100, dir = d.dx < 0 ? 1 : -1;
+      const fast = Math.abs(d.dx) > 40 && performance.now() - d.t < 300;
+      slideEls[i].style.transform = ''; if (d.nb) d.nb.style.transform = '';
+      if (Math.abs(pct) > 15 || fast) { if (d.nb) d.nb.classList.remove('is-on'); go(i + dir, { dir, offset: pct }); return; }
+      const o = { duration: 600, easing: E };
+      slideEls[i].animate([{ transform: `translateX(${pct}%)` }, { transform: 'translateX(0)' }], o);
+      if (d.nb) { const nb = d.nb; const a = nb.animate([{ transform: `translateX(${dir * 100 + pct}%)` }, { transform: `translateX(${dir * 100}%)` }], o); a.onfinish = () => { if (nb !== slideEls[i]) nb.classList.remove('is-on'); }; }
+      play();
+    };
+    window.addEventListener('pointerup', release);
+    window.addEventListener('pointercancel', release);
     el.addEventListener('mouseenter', () => { hover = true; });
-    el.addEventListener('mouseleave', () => { hover = false; });
-    if (!reduced()) setInterval(() => { if (!hover) go(i + 1); }, 6000);
+    el.addEventListener('mouseleave', () => { hover = false; play(); });
   }
+
 
   /* ---------- Accordion (FAQ pattern: one open at a time) ---------- */
   const faqSeen = [];
@@ -961,7 +1075,7 @@
   const RV_SKIP = '#site-nav, .mnav, .cartd, .fdrawer, .search, .hero, .buybar, .toast, .wu-util, .quick, .visually-hidden, .seo__more';
   let revealer = null;
   // ---------- Motion engine (MOTION-REPORT.md, approved 2026-10-06): reveals, grid staggers, scroll-driven curtain/clip, liquid fills, magnets ----------
-  const FILL_SEL = '.btn-pill, .btn-buy, .btn-navy, .btn-outline, .btn-cart, .shop-rail__all, .loop__cta, .pp__cta, .seo__toggle, .fdrawer__apply, .ck__place, .cartd__go, .mnav__foot a, .nh-btn, .totop';
+  const FILL_SEL = '.btn-pill, .btn-buy, .btn-navy, .btn-outline, .btn-cart, .shop-rail__all, .loop__cta, .pp__cta, .seo__toggle, .fdrawer__apply, .ck__place, .cartd__go, .mnav__foot a, .nh-btn, .totop, .quick .chip, .wpc__cta';
   const MAG_SEL = '.loop__btn, .feat__btn, .shop-rail__step, .hero__arrow, .pdp2__chev, .wpc__wish, .pdp2__wish, .totop, .mnav__x, .cartd__x, .fdrawer__x, .mnav__theme, .nh-tile__add, .mnav__back';
   const X_SEL = '.mnav__x, .cartd__x, .fdrawer__x';
   const SD_CLIP = '.promo, .bulk, .duo__card, .cta-band, .quote-band, .pp__card, .nh-show, .nh-glow, .nh-live, .feat__slide';
@@ -1116,7 +1230,7 @@
       // liquid fills and magnets (pointer devices only)
       if (isFine) {
         const q = sel => [...(root.matches && root.matches(sel) ? [root] : []), ...root.querySelectorAll(sel)];
-        q(FILL_SEL).forEach(b => { if (!b.closest('#site-nav') && b.querySelector('svg, img') === null || b.matches('.btn-buy, .btn-cart, .btn-pill, .btn-navy, .btn-outline, .shop-rail__all, .seo__toggle, .pp__cta, .mnav__foot a, .nh-btn, .loop__cta, .fdrawer__apply, .ck__place, .cartd__go, .totop')) b.classList.add('wu-fill'); });
+        q(FILL_SEL).forEach(b => { if (!b.closest('#site-nav') && b.querySelector('svg, img') === null || b.matches('.btn-buy, .btn-cart, .btn-pill, .btn-navy, .btn-outline, .shop-rail__all, .seo__toggle, .pp__cta, .mnav__foot a, .nh-btn, .loop__cta, .fdrawer__apply, .ck__place, .cartd__go, .totop, .quick .chip, .wpc__cta')) b.classList.add('wu-fill'); });
         q(MAG_SEL).forEach(b => { b.classList.add('wu-mag'); if (b.matches(X_SEL)) b.classList.add('is-x'); });
       }
       collect(root);
@@ -1217,6 +1331,7 @@
     menu = mountMenu();
     paintThemeBtns(); // the menu panel's day/night button
     cartUI = mountCart();
+    qaddUI = mountQuickAdd();
     initMotion();
     mountToTop();
     runEdges();
@@ -1320,6 +1435,114 @@
 
   /* ---------- Menu drawer (burger, narrow nav): slides in from the left like the Filters panel.
      Built from the catalogue, so new categories and products appear without editing this. ---------- */
+  // ---------- Quick options panel (2026-10-06): "Choose" on a product card with options opens this instead of leaving the
+  // page. Same shell and motion as the cart/menu (right drawer ≥640px, bottom sheet + drag on phones, 600/800/500ms) and the
+  // menu's block glide; pick Plug / Cable / Connector / Capacity / Length, set a quantity, add to cart (the cart then opens).
+  function mountQuickAdd() {
+    const AXIS_HINT = { Plug: 'EU 2-pin fits most sockets in Pakistan', Cable: 'Cable included in the box' };
+    const el = document.createElement('div');
+    el.innerHTML = `
+      <div class="cartd-scrim qadd-scrim" hidden></div>
+      <aside class="cartd qadd" id="qadd" role="dialog" aria-modal="true" aria-labelledby="qadd-h" hidden>
+        <header class="cartd__head">
+          <h2 id="qadd-h">Choose options</h2>
+          <button type="button" class="cartd__x mnav__x qadd__x" aria-label="Close options"><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
+        </header>
+        <div class="cartd__body qadd__body" id="qadd-body"></div>
+        <footer class="cartd__foot qadd__foot">
+          <div class="qty qty--s" role="group" aria-label="Quantity"><button type="button" data-q="-1" aria-label="Fewer">−</button><output id="qadd-qty">1</output><button type="button" data-q="1" aria-label="More">+</button></div>
+          <button type="button" class="btn-buy qadd__go" id="qadd-go">Add to cart</button>
+        </footer>
+      </aside>`;
+    document.body.append(...el.children);
+    const panel = $('qadd'), scrim = panel.previousElementSibling, body = $('qadd-body');
+    let p = null, V = [], cur = 0, qty = 1, opener = null, hideT = 0, glides = [];
+    const values = a => V.map(v => v.attrs[a]).filter((x, i, arr) => x && arr.indexOf(x) === i);
+    const pick = (axis, val) => {
+      const want = { ...V[cur].attrs, [axis]: val };
+      const i = V.findIndex(v => Object.keys(want).every(k => v.attrs[k] === want[k]));
+      return i >= 0 ? i : V.findIndex(v => v.attrs[axis] === val);
+    };
+    const available = (axis, val) => V.some(v => v.attrs[axis] === val && p.axes.every(k => k === axis || v.attrs[k] === V[cur].attrs[k]));
+    const paint = () => {
+      const v = V[cur];
+      $('qadd-img').src = v.img || p.src;
+      $('qadd-img').style.objectFit = ((v.ar || p.ar || 1) >= 2.1) ? 'contain' : 'cover'; // as on the card: wide shots fit, the rest fill
+      $('qadd-media').style.background = photoBg(v.bg ? v : p);
+      $('qadd-sku').textContent = v.sku;
+      $('qadd-price').textContent = v.priceText || D.rs(v.price);
+      body.querySelectorAll('.qadd__opt').forEach(box => {
+        const a = box.dataset.axis;
+        box.querySelector('[data-cur]').textContent = v.attrs[a];
+        box.querySelectorAll('.opt-chip').forEach(c => { c.setAttribute('aria-checked', c.dataset.val === v.attrs[a]); c.classList.toggle('is-na', !available(a, c.dataset.val)); });
+      });
+      $('qadd-qty').textContent = qty;
+      panel.querySelector('[data-q="-1"]').disabled = qty <= 1;
+      panel.querySelector('[data-q="1"]').disabled = qty >= (SHOP.maxQty || 10);
+      $('qadd-go').textContent = `Add to cart · ${D.rs(v.price * qty)}`;
+    };
+    function open(prod, btn) {
+      p = prod; V = p.variants && p.variants.length ? p.variants : [{ sku: p.code, attrs: {}, price: p.price, img: p.src, thumb: p.thumb, bg: p.bg }];
+      cur = 0; qty = 1; opener = btn || document.activeElement;
+      body.innerHTML = `
+        <div class="qadd__media" id="qadd-media"><img id="qadd-img" src="" alt="${esc(p.title)}"></div>
+        <div class="qadd__info">
+          <div class="qadd__kicker">${esc(typeLabel(p.type))} · Model <b id="qadd-sku"></b></div>
+          <h3 class="qadd__title"><a href="${url.product(p.id)}">${esc(p.title)}</a></h3>
+          <div class="qadd__price" id="qadd-price"></div>
+        </div>
+        ${(p.axes || []).map(a => `<div class="qadd__opt" data-axis="${esc(a)}">
+          <div class="qadd__label">${esc(a)}: <span data-cur></span>${AXIS_HINT[a] ? `<small>${esc(AXIS_HINT[a])}</small>` : ''}</div>
+          <div class="opt-chips" role="radiogroup" aria-label="${esc(a)}">${values(a).map(val => `<button type="button" class="opt-chip" role="radio" data-val="${esc(val)}">${esc(val)}</button>`).join('')}</div>
+        </div>`).join('')}
+        <a class="qadd__more" href="${url.product(p.id)}">View full details ${icon('chev-r', 16)}</a>`;
+      paint();
+      clearTimeout(hideT);
+      panel.hidden = scrim.hidden = false;
+      document.documentElement.style.overflow = 'hidden';
+      requestAnimationFrame(() => { panel.classList.add('is-open'); scrim.classList.add('is-open'); glide(); });
+      setTimeout(() => panel.querySelector('.qadd__x').focus(), 60);
+    }
+    // the menu's block glide: each block slides in from −20px, 600ms, 100ms apart
+    const glide = () => {
+      glides.forEach(a => a.cancel()); glides = [];
+      if (reduced() || !body.animate) return;
+      [...body.children, panel.querySelector('.qadd__foot')].forEach((b, i) => glides.push(b.animate([{ transform: 'translateX(-20px)' }, { transform: 'translateX(0)' }],
+        { duration: 600, delay: Math.min(i * 100, 700), easing: 'cubic-bezier(.075,.82,.165,1)', fill: 'backwards' })));
+    };
+    function close(after) {
+      panel.classList.remove('is-open'); scrim.classList.remove('is-open');
+      document.documentElement.style.overflow = '';
+      const done = () => { panel.hidden = scrim.hidden = true; panel.style.transform = ''; if (typeof after === 'function') after(); else if (opener && opener.isConnected) opener.focus({ preventScroll: true }); };
+      if (reduced()) done(); else hideT = setTimeout(done, 850);
+    }
+    panel.addEventListener('click', e => {
+      if (e.target.closest('.qadd__x')) return close();
+      const c = e.target.closest('.opt-chip');
+      if (c) { const i = pick(c.closest('.qadd__opt').dataset.axis, c.dataset.val); if (i >= 0) { cur = i; paint(); } return; }
+      const q = e.target.closest('[data-q]');
+      if (q) { qty = Math.max(1, Math.min(SHOP.maxQty || 10, qty + +q.dataset.q)); paint(); return; }
+      if (e.target.closest('#qadd-go') && p) {
+        const id = p.id, n = qty, sku = V[cur].sku;
+        close(() => {});
+        setTimeout(() => add(id, n, sku, { open: true }), reduced() ? 0 : 300); // the options sheet leaves, then the cart arrives
+      }
+    });
+    scrim.addEventListener('click', () => close());
+    panel.addEventListener('keydown', e => {
+      if (e.key === 'Escape') return close();
+      if (e.key !== 'Tab') return;
+      const f = [...panel.querySelectorAll('a[href], button:not([disabled])')].filter(x => x.offsetParent !== null);
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+    sheetDrag(panel, () => close(), { scroller: () => body, head: '.cartd__head' });
+    return { open, close };
+  }
+  let qaddUI = null;
+  const quickAdd = (id, btn) => { const p = D.byId(id); if (!p || p.soldOut) return false; if (!(p.variants && p.variants.length > 1) || !qaddUI) { add(id); return true; } qaddUI.open(p, btn); return true; };
+
   function mountMenu() {
     const chev = '<svg class="mnav__chev" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M5.5 9l6.5 6.5L18.5 9" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     const arrow = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M9 5.5 15.5 12 9 18.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -1500,7 +1723,7 @@
     productCard, colorsOf, photoBg, photoFit, ratingOf, reviewsOf, seedOf, mountRail, mountHero, mountAccordion, DEPTS, typeLabel,
     initChrome, placeNav, setActiveCat, navOffset, scrollToEl,
     openSearch: () => search && search.open(),
-    toggleTheme, isNight, slide, staggerCards, revealWords, sheetDrag,
+    toggleTheme, isNight, slide, staggerCards, revealWords, sheetDrag, quickAdd,
     seo, abs, clip, ldCrumbs, ldFaq, px, pxItem, YEAR, SITE,
   };
 })();

@@ -1,6 +1,6 @@
 // WisdomUp — NIGHT home page. Its own layout, separate from the day page (which is wrapped in #day-home and hidden
 // while night is on). Built once, the first time night is switched on. Patterns from higgsfield.ai (2026-10-06):
-// hero tile trio → promise strip → promo card + department tiles → dense grid (New) → showpiece panel (TS series) →
+// (shared hero banner from the day page) → promise strip → promo card + department tiles → dense grid (New) → showpiece panel (TS series) →
 // dense grid (Best sellers) → glow panel (creator mics) → budget segmented control + grid → fanned bulk panel →
 // chip cloud → FAQ → (shared red footer). Every product fact comes from js/catalog.js.
 (function () {
@@ -16,9 +16,9 @@
   const img = (p, big) => `<img src="${big ? p.src : p.thumb}" alt="" loading="lazy" style="width: 100%; height: 100%; ${photoFit(p)}">`;
 
   /* ---------- pieces ---------- */
-  const head = (h, sub, href, label = 'View all', center = false) => `
+  const head = (h, sub, href, label = 'View all', center = false, id = '') => `
     <header class="nh-head${center ? ' nh-head--center' : ''}">
-      <div><h2 class="nh-h">${esc(h)}</h2>${sub ? `<p class="nh-sub">${esc(sub)}</p>` : ''}</div>
+      <div><h2 class="nh-h"${id ? ` id="${id}"` : ''}>${esc(h)}</h2>${sub ? `<p class="nh-sub">${esc(sub)}</p>` : ''}</div>
       ${href ? `<a class="nh-btn" href="${href}">${esc(label)} ↗</a>` : ''}
     </header>`;
   const tile = p => `
@@ -33,7 +33,6 @@
   const grid = (items, id) => `<div class="nh-grid"${id ? ` id="${id}"` : ''}>${items.map(tile).join('')}</div>`;
 
   /* ---------- data ---------- */
-  const TRIO = [['ts-11anc', 'New'], ['yx-28', ''], ['cdb-18', '']].map(([id, tag]) => [P(id), tag]).filter(x => x[0]);
   const fresh = variety(D.products.filter(p => p.tabs.includes('new')));
   const best = D.products.filter(p => p.tabs.includes('best'));
   const essentials = ['ocd-28', 'sjx-49', 'cdb-17', 'cc-14', 'cj-47', 'ej-ly7', 'tde-18', 'sjx-15', 'yx-28', 'mkf-02', 'cj-46', 'txd-01'].map(P).filter(Boolean);
@@ -68,10 +67,13 @@
   /* ---------- budget state ---------- */
   let band = 0;
   const bandItems = () => variety(D.products.filter(BANDS[band][2]).sort(byPrice)).slice(0, 12);
+  const bandAll = () => `View all ${D.products.filter(BANDS[band][2]).length} ${esc(BANDS[band][1].replace(/^Under/, 'under'))} ↗`;
   const paintBand = () => {
     $('nh-budget-grid').outerHTML = grid(bandItems(), 'nh-budget-grid');
     WU.staggerCards($('nh-budget-grid'));
     $('nh-budget-all').href = url.products + '?price=' + BANDS[band][0];
+    $('nh-budget-all').innerHTML = bandAll();
+    host.querySelector('.nh-seg').style.setProperty('--i', band);
     host.querySelectorAll('[data-nh-band]').forEach((b, i) => b.setAttribute('aria-pressed', i === band));
     paintWish();
   };
@@ -79,16 +81,7 @@
   /* ---------- build ---------- */
   function build() {
     host.innerHTML = `
-    <div class="nav-spacer"></div>
     <div class="nh">
-      <section class="nh-top" aria-label="Featured">
-        <div class="nh-trio">${TRIO.map(([p, tag]) => `
-          <a class="nh-trio__item" href="${url.product(p.id)}">
-            <div class="nh-trio__media" style="background: ${photoBg(p)};">${img(p, true)}${tag ? `<span class="nh-tag">${esc(tag)}</span>` : ''}</div>
-            <h3 class="nh-trio__t">${esc(p.title)}</h3><p class="nh-trio__s">${esc(p.meta)} · ${esc(p.priceText)}</p>
-          </a>`).join('')}
-        </div>
-      </section>
       <section class="nh-stripwrap" aria-label="Our promises">
         <div class="nh-strip">${[['truck', 'Delivery to every city in Pakistan', url.shipping], ['smile', '7-day money-back guarantee', url.returns], ['medal', 'WisdomUp brand warranty', url.warranty], ['shield', 'Cash on Delivery · JazzCash · EasyPaisa', url.help]].map(([ic, t, h]) => `<a href="${h}">${icon(ic, 22)}<span>${esc(t)}</span></a>`).join('')}</div>
       </section>
@@ -109,7 +102,7 @@
         </div>
       </section>
       <section aria-labelledby="nh-new-h">
-        ${head('New for 2026', `${fresh.length} new launches — the latest Bluetooth 6.0 earbuds, neckbands, party speakers and fast chargers.`, url.filter('new'))}
+        ${head('New for 2026', `${fresh.length} new launches — the latest Bluetooth 6.0 earbuds, neckbands, party speakers and fast chargers.`, url.filter('new'), 'View all', false, 'nh-new-h')}
         ${grid(fresh.slice(0, 12))}
         <div class="nh-more"><a class="nh-btn nh-btn--ghost" href="${url.filter('new')}">View all ${fresh.length} new products ↗</a></div>
       </section>
@@ -122,7 +115,7 @@
         </div>
       </section>` : ''}
       <section aria-labelledby="nh-best-h">
-        ${head('Best sellers & essentials', 'What customers buy most, plus the chargers, cables and power banks everyone needs.', url.filter('best'))}
+        ${head('Best sellers & essentials', 'What customers buy most, plus the chargers, cables and power banks everyone needs.', url.filter('best'), 'View all', false, 'nh-best-h')}
         ${grid(bestRow.slice(0, 12))}
       </section>
       ${MICS.length ? `
@@ -135,11 +128,13 @@
           ${MICS.map((p, i) => `<a class="nh-glow__card nh-glow__card--${i ? 'b' : 'a'}" href="${url.product(p.id)}"><img src="${p.thumb}" alt="" style="background: ${photoBg(p)};"><span>${esc(p.code)}<small>${esc(p.priceText)}</small></span></a>`).join('')}
         </div>
       </section>` : ''}
-      <section aria-labelledby="nh-budget-h">
-        ${head('Shop by budget', 'Real prices, every product with warranty and Cash on Delivery.', null)}
-        <div class="nh-seg" role="group" aria-label="Budget" style="margin: -8px 0 16px;">${BANDS.map(([k, label], i) => `<button type="button" data-nh-band="${i}" aria-pressed="${i === 0}">${esc(label)}</button>`).join('')}</div>
+      <section class="nh-budget" aria-labelledby="nh-budget-h">
+        <header class="nh-head nh-head--budget">
+          <div class="nh-head__t"><h2 class="nh-h" id="nh-budget-h">Shop by budget</h2><p class="nh-sub">Real prices, every product with warranty and Cash on Delivery.</p></div>
+          <div class="nh-seg" role="group" aria-label="Budget" style="--i: 0;"><span class="nh-seg__thumb" aria-hidden="true"></span>${BANDS.map(([k, label], i) => { const [w, ...v] = label.split(' '); return `<button type="button" data-nh-band="${i}" aria-pressed="${i === 0}" aria-label="${esc(label)}"><span class="nh-seg__k">${esc(w)}</span><span class="nh-seg__v">${esc(v.join(' '))}</span></button>`; }).join('')}</div>
+        </header>
         ${grid(bandItems(), 'nh-budget-grid')}
-        <div class="nh-more"><a class="nh-btn nh-btn--ghost" id="nh-budget-all" href="${url.products}?price=u1">View all ↗</a></div>
+        <div class="nh-more"><a class="nh-btn nh-btn--ghost" id="nh-budget-all" href="${url.products}?price=u1">${bandAll()}</a></div>
       </section>
       <section aria-label="Bulk orders">
         <div class="nh-fan">
@@ -151,11 +146,11 @@
         </div>
       </section>
       <section aria-labelledby="nh-explore-h">
-        ${head('Explore the range', 'Every department and product type.', null, '', true)}
+        ${head('Explore the range', 'Every department and product type.', null, '', true, 'nh-explore-h')}
         <div class="nh-chips">${DEPTS.map(d => `<a class="nh-chip nh-chip--dept" href="${url.dept(d.id)}">${esc(deptInfo(d).name)}</a>`).join('')}${CATS.map(t => `<a class="nh-chip" href="${url.cat(t)}">${esc((K.types && K.types[t] && K.types[t].name) || typeLabel(t))}</a>`).join('')}</div>
       </section>
       <section aria-labelledby="nh-faq-h" class="nh-faq">
-        ${head('Frequently asked', 'Orders, shipping and warranty.', url.help, 'Help Center', true)}
+        ${head('Frequently asked', 'Orders, shipping and warranty.', url.help, 'Help Center', true, 'nh-faq-h')}
         <div class="panel-list faq__list" id="nh-faq"></div>
       </section>
     </div>`;
@@ -163,11 +158,17 @@
     paintWish();
     host.addEventListener('click', e => {
       const addBtn = e.target.closest('[data-nh-add]');
-      if (addBtn) { e.preventDefault(); add(addBtn.dataset.nhAdd, 1, undefined, { open: addBtn.hasAttribute('data-open') }); return; }
+      if (addBtn) {
+        e.preventDefault();
+        const pr = P(addBtn.dataset.nhAdd);
+        if (pr && pr.variants && pr.variants.length > 1) WU.quickAdd(pr.id, addBtn); // options → the quick options panel
+        else add(addBtn.dataset.nhAdd, 1, undefined, { open: addBtn.hasAttribute('data-open') });
+        return;
+      }
       const pick = e.target.closest('[data-nh-pick]');
       if (pick) { showIdx = +pick.dataset.nhPick; paintShow(); return; }
       const b = e.target.closest('[data-nh-band]');
-      if (b) { band = +b.dataset.nhBand; paintBand(); }
+      if (b && +b.dataset.nhBand !== band) { band = +b.dataset.nhBand; paintBand(); }
     });
   }
 

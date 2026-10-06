@@ -7,11 +7,11 @@
   const photo = (p, cls = '', big = false, fit) => p ? `<span class="ph ${cls}" style="background: ${WU.photoBg(p)};"><img src="${big ? p.src : p.thumb}" alt="" loading="lazy" style="${fit || WU.photoFit(p)}"></span>` : '';
   const P = id => D.byId(id);
   // Quick chips → a department, a product type or a filter on the All Products page (photo = representative product)
-  const CHIPS = [
-    ['New for 2026', 'ts-12', url.filter('new')], ['Best Sellers', 'ts-4', url.filter('best')], ['Under Rs.1,000', 'sjx-57', url.products + '?price=u1'],
-    ['Earbuds', 'ts-11anc', url.cat('earbuds')], ['Chargers', 'ocd-28', url.cat('wall-chargers')], ['Cables', 'sjx-49', url.cat('charging-cables')],
-    ['Power Banks', 'cdb-18', url.cat('power-banks')], ['Speakers', 'yx-28', url.cat('speakers')], ['Car Holders', 'cj-47', url.cat('car-holders')],
-    ['Headphones', 'tde-18', url.cat('headphones')], ['Grooming', 'txd-01', url.dept('care')], ['Computer', 'jp-03', url.dept('computer')],
+  const CHIPS = [ // exactly 10, in this order and with these labels (user's list, 2026-10-06)
+    ['New Arrival', 'ts-12', url.filter('new')], ['Best Seller', 'ts-4', url.filter('best')], ['Under Rs.1,000', 'sjx-57', url.products + '?price=u1'],
+    ['Earbud', 'ts-11anc', url.cat('earbuds')], ['Headphone', 'tde-18', url.cat('headphones')], ['Speaker', 'yx-28', url.cat('speakers')],
+    ['Powerbank', 'cdb-18', url.cat('power-banks')], ['Charger', 'ocd-28', url.cat('wall-chargers')], ['Cable', 'sjx-49', url.cat('charging-cables')],
+    ['Shaver', 'txd-01', url.cat('shavers')],
   ];
   // Series spotlight: the TS true wireless family
   const SERIES = ['ts-11anc', 'ts-12', 'ts-13', 'ts-11', 'ts-10'].filter(P);
@@ -238,7 +238,7 @@
       track.style.transition = anim ? SLIDE_T : 'none';
       track.style.transform = `translateX(calc(${-idx} * (${W} + 20px)))`;
       const a = idx % n;
-      dots.forEach((d, i) => { d.setAttribute('aria-selected', i === a); d.style.background = i === a ? '' : 'var(--dot-idle-light)'; });
+      dots.forEach((d, i) => d.setAttribute('aria-selected', i === a));
     };
     track.addEventListener('transitionend', e => {
       if (e.target !== track) return;

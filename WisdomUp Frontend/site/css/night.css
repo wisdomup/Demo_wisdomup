@@ -83,7 +83,7 @@ html[data-theme="night"] .shop-rail__all:hover { background: rgba(217,30,5,.26);
 html[data-theme="night"] .shop-rail__all::after { content: " ↗"; }
 
 /* ---------- Home: hero, carousels, panels ---------- */
-html[data-theme="night"] .hero { border-radius: 24px; box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] .hero { box-shadow: inset 0 0 0 1px var(--n-line); } /* same geometry and position as day (shared banner, 2026-10-06) */
 html[data-theme="night"] .hero__sub { color: var(--n-muted); }
 html[data-theme="night"] .loop__slide { border-radius: 24px; background: linear-gradient(120deg, #1E2226, #0F1113) !important; box-shadow: inset 0 0 0 1px var(--n-line); }
 html[data-theme="night"] .feat__slide { border-radius: 24px; box-shadow: inset 0 0 0 1px var(--n-line); }
@@ -105,6 +105,8 @@ html[data-theme="night"] .eyebrow--warm { color: var(--n-muted); }
 html[data-theme="night"] .h-light b { color: #fff; }
 html[data-theme="night"] .trust__item { color: var(--n-muted) !important; }
 html[data-theme="night"] .trust { background: var(--n-bg2); border-radius: 16px; box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] .hero .hero__bar .hero__arrow { background: none; box-shadow: none; border: 0; color: #fff; }
+html[data-theme="night"] .hero__bar { border-top-color: rgba(255, 255, 255, .14); }
 /* FAQ + SEO blocks */
 html[data-theme="night"] :is(.faq__list, .seo__card, .panel-list) { background: var(--n-bg2); border-color: var(--n-line); border-radius: 24px; box-shadow: none; }
 html[data-theme="night"] .faq__item { border-color: var(--n-line); }
@@ -142,6 +144,7 @@ html[data-theme="night"] .cartd__ship i { background: linear-gradient(90deg, var
 html[data-theme="night"] .cartd__gift input, html[data-theme="night"] input[type="checkbox"], html[data-theme="night"] input[type="radio"] { accent-color: var(--n-red); }
 html[data-theme="night"] :is(.qty, .cline__img, .ckline__img) { background: var(--n-raise); color: var(--n-text); border-color: var(--n-line2); }
 html[data-theme="night"] .qty button { color: var(--n-text); background: transparent; }
+html[data-theme="night"] .qty output { color: var(--n-text); } /* pages.css gives the number a day grey */
 html[data-theme="night"] .msort__opt:hover, html[data-theme="night"] .msort__opt.is-active { background: var(--n-raise2); }
 html[data-theme="night"] .mview__b { color: var(--n-muted); }
 html[data-theme="night"] .mview__b[aria-pressed="true"] { background: var(--n-raise2); color: #fff; }
@@ -366,3 +369,9 @@ html[data-theme="night"] .adm__err { color: #FFB4A6 !important; }
 /* ---------- Panels in night (the motion and sheet geometry for every panel live in motion.css, same in both themes) ---------- */
 html[data-theme="night"] .mnav__sub { background: var(--n-bg); }
 html[data-theme="night"] .mnav__back { color: var(--n-text); border-bottom-color: var(--n-line); }
+
+/* Quick options panel (2026-10-06) — the cart drawer's night skin carries the shell; only its own type is recoloured here */
+html[data-theme="night"] :is(.qadd__title a, .qadd__price, .qadd__label span) { color: var(--n-text); }
+html[data-theme="night"] :is(.qadd__kicker, .qadd__label, .qadd__label small) { color: var(--n-muted); }
+html[data-theme="night"] .qadd__kicker b { color: var(--n-text2); }
+html[data-theme="night"] .qadd__more { color: var(--n-red-text); }

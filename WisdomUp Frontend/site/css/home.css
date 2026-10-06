@@ -96,41 +96,64 @@ button { font-family: inherit; }
 .hero-anchor { order: 1; }
 .hero { position: relative; height: max(457px, calc((100vh - 100px) * .86 - 72px + 18px)); min-height: 460px; margin: 0 var(--gutter, 28px); border-radius: clamp(24px, 6vw, 40px); overflow: hidden; background: #151312; }
 @media (max-width: 639px) { .hero { height: calc(100svh - 64px - 8px); } }
-@media (max-height: 540px) and (orientation: landscape) { .hero { height: calc(100svh - 24px); min-height: 320px; } .hero__copy { bottom: 40px; gap: 10px; } .hero__name { font-size: clamp(40px, 6vw, 64px); } }
-.hero__slide { position: absolute; inset: 0; opacity: 0; z-index: 0; pointer-events: none; transition: opacity 640ms cubic-bezier(.2,.7,.2,1); }
-.hero__slide.is-on { opacity: 1; z-index: 1; pointer-events: auto; }
+@media (max-height: 540px) and (orientation: landscape) { .hero { height: calc(100svh - 24px); min-height: 320px; } .hero__copy { bottom: calc(var(--hero-bar) + 12px); gap: 10px; } .hero { --hero-foot: 12px; } .hero__name { font-size: clamp(40px, 6vw, 64px); } }
+/* Slides glide (bugatti.store behaviour, 2026-10-06): only the current slide — and, during a glide or drag, its neighbour — is visible */
+.hero__slide { position: absolute; inset: 0; visibility: hidden; overflow: hidden; z-index: 0; pointer-events: none; }
+.hero__slide.is-on { visibility: visible; z-index: 1; pointer-events: auto; }
+.hero__slide.is-out { z-index: 0; pointer-events: none; }
+.hero { touch-action: pan-y; cursor: grab; -webkit-user-select: none; user-select: none; }
+.hero.is-dragging { cursor: grabbing; }
+.hero img { -webkit-user-drag: none; }
+.hero .hero__cta, .hero .hero__arrow, .hero .dot { cursor: pointer; }
+/* The copy is its own layer above the slides; one copy shows at a time and its words rise through masks */
+.hero__words { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.hero__copy[aria-current="false"] { visibility: hidden; }
+.hw { display: inline-flex; overflow: hidden; padding: .12em .05em; margin: -.12em -.05em; vertical-align: top; }
+.hw.is-open { overflow: visible; }
+.hw__i { display: inline-block; }
+.hw--block { display: block; padding: .12em 0; margin: -.12em 0; }
+.hw--block > .hw__i { display: block; }
 .hero__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
 .hero__scrim { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgba(13,12,11,.82) 0%, rgba(13,12,11,.45) 38%, rgba(13,12,11,0) 66%), linear-gradient(0deg, rgba(13,12,11,.55) 0%, rgba(13,12,11,0) 40%); }
-.hero__copy { position: absolute; left: clamp(22px, 5vw, 64px); right: clamp(22px, 5vw, 64px); bottom: clamp(56px, 9vh, 96px); max-width: 620px; display: flex; flex-direction: column; gap: 18px; pointer-events: none; }
+.hero__copy { position: absolute; left: var(--hero-x, clamp(22px, 5vw, 64px)); right: var(--hero-x, clamp(22px, 5vw, 64px)); bottom: calc(var(--hero-bar) + clamp(24px, 3.6vh, 40px)); max-width: 620px; display: flex; flex-direction: column; gap: 18px; pointer-events: none; }
 .hero__name { font: 400 clamp(48px, 7vw, 96px)/1 var(--font-display); background: var(--grad-gold); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .hero__line { font: 500 16px/1.5 var(--font); color: #fff; text-wrap: pretty; }
 .hero__cta { display: flex; align-self: flex-start; width: max-content; min-width: 220px; pointer-events: auto; margin-top: 6px; }
-.hero__arrow { position: absolute; top: 50%; z-index: 3; width: 50px; height: 50px; margin-top: -25px; padding: 0; border: 0; border-radius: 50%; background: rgba(225,220,216,.78); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); color: #4A4A4A; display: grid; place-items: center; cursor: pointer; transition: background-color 180ms ease, transform 220ms cubic-bezier(.2,.7,.2,1); }
-.hero__arrow:hover { background: rgba(240,237,234,.92); transform: scale(1.06); }
-.hero__arrow:active { transform: scale(.96); }
-.hero__arrow--prev { left: 20px; } .hero__arrow--next { right: 20px; }
-.hero__dots { position: absolute; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 3; height: 10px; width: 160px; }
+/* Banner foot — bugatti.store (2026-10-06): one bar on the copy's margins with a 1px hairline on top, a long thin arrow at each
+   end and the ring bullets centred between them; the copy and the product photo centre in the space above it */
+.hero { --hero-x: clamp(22px, 5vw, 64px); --hero-foot: clamp(22px, 3.4vh, 40px); --hero-bar: calc(var(--hero-foot) + clamp(16px, 1.8vw, 24px) + 40px); --hero-top: 78px; }
+.hero__bar { position: absolute; z-index: 3; left: var(--hero-x); right: var(--hero-x); bottom: var(--hero-foot); display: flex; align-items: center; padding-top: clamp(16px, 1.8vw, 24px); border-top: 1px solid rgba(255, 255, 255, .14); pointer-events: none; }
+.hero__bar > * { pointer-events: auto; }
+.hero .hero__bar .hero__arrow { position: static; flex: none; display: grid; width: 48px; height: 40px; margin: 0; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; color: #fff; opacity: .78; transition: opacity 500ms cubic-bezier(.3, 1, .3, 1); }
+.hero .hero__bar .hero__arrow--prev { place-items: center start; }
+.hero .hero__bar .hero__arrow--next { place-items: center end; }
+.hero .hero__bar .hero__arrow svg { width: clamp(32px, 2.105vw, 40px); height: auto; overflow: visible; }
+.hero .hero__bar .hero__arrow:hover, .hero .hero__bar .hero__arrow:focus-visible { opacity: 1; background: none; transform: none; }
+.hero .hero__bar .hero__arrow:active { transform: none; }
+.hero .hero__bar .hero__arrow:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.hero__bar .hero__dots { position: static; transform: none; width: auto; height: 24px; margin: 0 auto; }
 .hero__dots .dots { justify-content: center; }
 @media (max-width: 639px) { .hero__arrow, .hero__copy, .hero__scrim { display: none; } }
 /* Packshot slides: brand-dark stage, studio photo as a framed card on the right, copy on the left */
 .hero__slide--pack { background: radial-gradient(90% 120% at 80% 50%, #24262d 0%, #121214 60%, #0b0b0c 100%); }
 .hero__slide--pack .hero__scrim { display: none; }
-.hero__pack { position: absolute; right: clamp(80px, 7vw, 120px); top: 50%; width: min(49%, 820px); aspect-ratio: 3 / 2; transform: translateY(-50%); border-radius: clamp(20px, 2.4vw, 32px); overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,.45); }
-.hero__pack img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 900ms cubic-bezier(.2,.7,.2,1); }
-.hero__slide--pack.is-on .hero__pack img { transform: scale(1.03); }
-.hero__slide--pack .hero__copy { max-width: min(40%, 520px); bottom: auto; top: 50%; transform: translateY(-50%); }
+.hero__pack { position: absolute; right: var(--hero-x, clamp(80px, 7vw, 120px)); top: calc((100% + var(--hero-top) - var(--hero-bar)) / 2); width: auto; height: min(calc((100vw - 56px) * .49 / 1.5), 547px, calc(100% - var(--hero-top) - var(--hero-bar) - 36px)); aspect-ratio: 3 / 2; transform: translateY(-50%); border-radius: clamp(20px, 2.4vw, 32px); overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,.45); }
+.hero__pack img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hero__copy--pack { max-width: min(40%, 520px); bottom: auto; top: calc((100% + var(--hero-top) - var(--hero-bar)) / 2); transform: translateY(-50%); }
 .hero__sub { font: 600 13px/1.4 var(--font); letter-spacing: .02em; color: #C9C3BC; }
-.hero__slide--pack .hero__name { font-size: clamp(36px, 3.4vw, 64px); white-space: nowrap; }
+.hero__copy--pack .hero__name { font-size: clamp(36px, 3.4vw, 64px); white-space: nowrap; }
 @media (max-width: 1023px) {
-  .hero__pack { right: 50%; top: 9%; width: min(78%, 620px); transform: translateX(50%); }
-  .hero__slide--pack .hero__copy { max-width: none; top: auto; bottom: clamp(56px, 9vh, 96px); transform: none; }
+  /* tablets: the photo sits 14px under the nav and keeps its 3:2 shape, shrinking (not cropping) to leave room for the copy above the bar */
+  .hero__pack { right: 50%; top: calc(var(--hero-top) + 14px); width: auto; max-height: none; height: min(calc(min(78vw, 620px) / 1.5), calc(100% - var(--hero-top) - 14px - var(--hero-bar) - 290px)); transform: translateX(50%); }
+  .hero__copy--pack { max-width: none; top: auto; bottom: calc(var(--hero-bar) + clamp(20px, 3vh, 32px)); transform: none; }
 }
 @media (max-width: 639px) {
-  .hero__slide--pack .hero__copy { display: flex; left: 20px; right: 20px; bottom: 52px; gap: 10px; }
-  .hero__slide--pack .hero__name { font-size: clamp(30px, 10vw, 42px); }
-  .hero__slide--pack .hero__line { font-size: 15px; }
-  .hero__slide--pack .hero__cta { min-width: 0; }
-  .hero__pack { top: 64px; width: calc(100% - 32px); aspect-ratio: 1 / 1; max-height: calc(100% - 330px); border-radius: 18px; }
+  .hero__copy--pack { display: flex; left: 20px; right: 20px; bottom: 52px; gap: 10px; }
+  .hero__bar { left: 16px; right: 16px; bottom: 10px; padding-top: 0; border-top: 0; }
+  .hero__copy--pack .hero__name { font-size: clamp(30px, 10vw, 42px); }
+  .hero__copy--pack .hero__line { font-size: 15px; }
+  .hero__copy--pack .hero__cta { min-width: 0; }
+  .hero__pack { top: 64px; width: calc(100% - 32px); height: auto; aspect-ratio: 1 / 1; max-height: calc(100% - 330px); border-radius: 18px; }
   .hero__pack img { object-position: 8% 50%; }
 }
 
@@ -280,9 +303,17 @@ a.wpc__cta[aria-disabled="true"] { background: #E6E7EA; color: #5F6368; pointer-
 /* Accessible CTA fills: white text ≥4.5:1 across the whole gradient. */
 .btn-pill { cursor: pointer; height: 44px; background: linear-gradient(90deg, #4A6CE8 0%, #2350C8 100%); }
 .btn-buy { background: linear-gradient(90deg, #2F7FD0 0%, #2350C8 100%); font-weight: 600; }
-.on-light-dots .dot:not([aria-selected="true"]) { background: #8C857E !important; }
-.dot { position: relative; }
-@media (pointer: coarse) { .dots { gap: 14px; } }
+/* Pagination bullets — bugatti.store style (2026-10-06): a 24px round hit area holding a 5px dot; the current slide's bullet
+   turns into a hollow 2px ring. No gaps, 500ms (.3,1,.3,1). White on dark (hero), ink on light (promo band); same in both themes. */
+.dots { gap: 0; }
+.dot, .dot[aria-selected="true"], .on-light-dots .dot:not([aria-selected="true"]) { position: relative; display: grid; place-items: center; width: 24px; height: 24px; padding: 0; border: 0; border-radius: 50%; background: transparent !important; cursor: pointer; }
+.dot { color: #fff; }
+.dot::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: currentColor; box-shadow: 0 0 0 0 currentColor; transition: background-color 500ms cubic-bezier(.3, 1, .3, 1), box-shadow 500ms cubic-bezier(.3, 1, .3, 1); }
+.dot[aria-selected="true"]::before { background: transparent; box-shadow: 0 0 0 2px currentColor; }
+.dot::after { inset: -10px 0; } /* taller tap area, no overlap with the neighbours */
+.dot:focus-visible { outline: 2px solid currentColor; outline-offset: 0; }
+.on-light-dots .dot, .on-light .dot { color: #0B0B0B; }
+html[data-theme="night"] :is(.on-light-dots, .on-light) .dot { color: #fff; }
 
 /* ---------- Shop the range (promo carousel) ---------- */
 .range-head { margin: var(--sec) var(--gutter, 28px) 0; display: flex; flex-direction: column; gap: 20px; }
@@ -715,6 +746,24 @@ body:has(.buybar.is-on) .totop { bottom: calc(96px + env(safe-area-inset-bottom)
 .cartd__row { display: flex; justify-content: space-between; align-items: baseline; font: 600 15px/1 var(--font); color: #1F2633; }
 .cartd__row b { font: 800 18px/1 var(--font); color: #0B0B0B; }
 .cartd__note { margin: 0; font: 500 12px/1.4 var(--font); color: var(--muted, #8B8B8B); }
+/* Quick options panel (2026-10-06): the cart drawer's shell, opened by "Choose" on a product card with options */
+.qadd__body { display: flex; flex-direction: column; gap: 20px; padding: 16px 20px 24px; }
+.qadd__media { flex: none; display: flex; align-items: center; justify-content: center; aspect-ratio: 4 / 3; border-radius: 12px; overflow: hidden; }
+.qadd__media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.qadd__info { display: flex; flex-direction: column; gap: 8px; }
+.qadd__kicker { font: 600 12px/1.3 var(--font); letter-spacing: .02em; color: var(--muted, #8B8B8B); }
+.qadd__kicker b { font-weight: 700; color: #3D4656; }
+.qadd__title { margin: 0; font: 800 20px/1.25 var(--font); letter-spacing: -.01em; }
+.qadd__title a { color: #0B0B0B; text-decoration: none; }
+.qadd__price { font: 800 22px/1 var(--font); color: #0B0B0B; }
+.qadd__opt { display: flex; flex-direction: column; gap: 10px; }
+.qadd__label { font: 600 14px/1.3 var(--font); color: #3D4656; }
+.qadd__label span { font-weight: 700; color: #0B0B0B; }
+.qadd__label small { display: block; margin-top: 3px; font: 500 12px/1.4 var(--font); color: var(--muted, #8B8B8B); }
+.qadd__more { align-self: flex-start; display: inline-flex; align-items: center; gap: 4px; font: 600 14px/1.2 var(--font); color: #172248; text-decoration: none; }
+.qadd__more svg { flex: none; }
+.qadd__foot { flex-direction: row; align-items: center; gap: 11px; }
+.qadd__go { flex: 1; min-width: 0; }
 .cartd__go { width: 100%; text-decoration: none; }
 @media (prefers-reduced-motion: reduce) { .cartd, .cartd-scrim { transition: none; } }
 @media (min-width: 640px) { .cartd { width: 400px; } } /* same width as the Filters panel */
