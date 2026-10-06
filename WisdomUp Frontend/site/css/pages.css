@@ -106,7 +106,7 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
 .sw-tile { position: relative; border: 1px solid transparent; display: grid; place-items: center; }
 .sw-tile i { position: absolute; right: 6px; bottom: 6px; width: 14px; height: 14px; border-radius: 50%; box-shadow: 0 0 0 2px #fff; }
 .buybox { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
-.qty { display: flex; align-items: center; height: 52px; border-radius: 10px; background: #fff; border: 1px solid var(--line, #E4E4E4); overflow: hidden; }
+.qty { display: flex; align-items: center; height: 52px; border-radius: 999px; background: #fff; border: 1px solid var(--line, #E4E4E4); overflow: hidden; }
 .qty button { width: 48px; height: 52px; border: 0; background: none; font: 400 22px/1 var(--font); color: #464646; cursor: pointer; }
 .qty button:hover { background: #F5F5F6; }
 .qty output { min-width: 32px; text-align: center; font: 700 17px/1 var(--font); color: #464646; }
@@ -363,7 +363,7 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
 .msort__opt:hover, .msort__opt.is-active { background: rgba(23,34,72,.07); }
 /* Products-per-row toggle */
 .mview { gap: 6px; }
-.mview__b { width: 40px; height: 40px; border: 0; border-radius: 10px; background: none; color: #8B8B8B; display: grid; place-items: center; cursor: pointer; transition: background-color 180ms ease, color 180ms ease; }
+.mview__b { width: 40px; height: 40px; border: 0; border-radius: 999px; background: none; color: #8B8B8B; display: grid; place-items: center; cursor: pointer; transition: background-color 180ms ease, color 180ms ease; }
 .mview__b[aria-pressed="true"] { background: #EDEEF0; color: #111; }
 .mview__b:focus-visible { outline: 2px solid #2350C8; outline-offset: 2px; }
 .fbtn { flex: none; display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 18px 0 14px; border: 1.5px solid #111; border-radius: 999px; background: #fff; color: #111; font: 700 15px/1 var(--font); cursor: pointer; transition: none; }
@@ -459,7 +459,7 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
 .btn-buy:disabled svg { display: none; }
 
 /* Product page wishlist heart — square, matches the quantity box */
-.pdp2__wish { flex: none; width: 52px; height: 52px; padding: 0; border: 1px solid var(--line, #E4E4E4); border-radius: 10px; background: #fff; color: #1F2633; display: grid; place-items: center; cursor: pointer; transition: color 160ms ease, border-color 160ms ease, transform 200ms cubic-bezier(.3,1.4,.5,1); }
+.pdp2__wish { flex: none; width: 52px; height: 52px; padding: 0; border: 1px solid var(--line, #E4E4E4); border-radius: 999px; background: #fff; color: #1F2633; display: grid; place-items: center; cursor: pointer; transition: color 160ms ease, border-color 160ms ease, transform 200ms cubic-bezier(.3,1.4,.5,1); }
 .pdp2__wish svg { width: 24px; height: 24px; }
 .pdp2__wish:hover { border-color: #1F2633; }
 .pdp2__wish:active { transform: scale(.94); }
@@ -498,7 +498,7 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
 .pdp2__opt { display: flex; flex-direction: column; gap: 10px; }
 .pdp2__label small { display: block; margin-top: 4px; font: 500 12px/1.3 var(--font); color: var(--muted); }
 .opt-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.opt-chip { min-height: 44px; padding: 0 16px; border: 1.5px solid #D5D9DE; border-radius: 12px; background: #fff; font: 600 14px/1.2 var(--font); color: #1F2633; cursor: pointer; transition: border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease; }
+.opt-chip { min-height: 44px; padding: 0 16px; border: 1.5px solid #D5D9DE; border-radius: 999px; background: #fff; font: 600 14px/1.2 var(--font); color: #1F2633; cursor: pointer; transition: border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease; }
 .opt-chip:hover { border-color: #8A93A3; }
 .opt-chip[aria-checked="true"] { border-color: #172248; background: #F3F6FB; box-shadow: inset 0 0 0 1px #172248; }
 .opt-chip.is-na { color: #9AA0A6; border-style: dashed; }
