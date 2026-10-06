@@ -296,6 +296,7 @@
     paintThemeBtns();
     window.dispatchEvent(new CustomEvent('wu-theme', { detail: { night } }));
   }
+  document.addEventListener('click', e => { if (e.target.closest('[data-act="theme"]')) toggleTheme(); });
   const themeBtn = cls => `<button type="button" class="${cls}" data-act="theme" aria-label="Switch to night mode">${MOON}</button>`;
   const logoImgs = h => `<span class="site-nav__logo" style="height: ${h}px;"><img src="img/wu-logo.png" alt="WisdomUp"><img src="img/wu-logo-white.png" alt="" aria-hidden="true"></span>`;
   const DARK = '.hero, .pbanner, .loop__slide, .duo__card, .promo, .footer, .pd-stat--dark, .bulk-steps';
@@ -331,7 +332,6 @@
           <button type="button" class="site-nav__icon" data-act="menu" aria-label="Menu" aria-haspopup="dialog" aria-controls="mnav" aria-expanded="false" style="justify-self: start;"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M4 6.5h16M4 12h16M4 17.5h16"></path></svg></button>
           <a href="${url.home}" aria-label="WisdomUp home" style="display: flex; align-items: center; justify-content: center;">${logoImgs(26)}</a>
           <div style="justify-self: end; display: flex; align-items: center; gap: 2px;">
-            ${themeBtn('site-nav__icon')}
             <button type="button" class="site-nav__icon" data-act="search" aria-label="Search"><svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="${P_SEARCH}"></path></svg></button>
             <a class="site-nav__icon" href="${url.wishlist}" aria-label="Wishlist" style="position: relative;"><svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true" fill="none" stroke="#fff" stroke-width="2.1" stroke-linejoin="round"><path d="${P_HEART}"></path></svg><b class="site-nav__badge site-nav__wbadge" hidden></b></a>
             <button type="button" class="site-nav__icon" data-act="bag" aria-label="Cart"><svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${P_BAG}${P_HANDLE}"></path></svg><b class="site-nav__badge" hidden></b></button>
@@ -918,6 +918,7 @@
     wireSeo();
     search = mountSearch();
     menu = mountMenu();
+    paintThemeBtns(); // the menu panel's day/night button
     cartUI = mountCart();
     initMotion();
     mountToTop();
@@ -928,7 +929,6 @@
     if (nav) nav.addEventListener('click', e => {
       const a = e.target.closest('[data-act]');
       if (!a) return;
-      if (a.dataset.act === 'theme') toggleTheme();
       if (a.dataset.act === 'search') search.open();
       if (a.dataset.act === 'menu') menu.open(a);
       if (a.dataset.act === 'bag') cartUI.open(a);
@@ -1046,7 +1046,7 @@
       <aside class="mnav" id="mnav" role="dialog" aria-modal="true" aria-label="Menu" hidden>
         <header class="mnav__head">
           <a href="${url.home}" class="mnav__logo" aria-label="WisdomUp home"><img src="img/wu-logo.png" alt="WisdomUp"></a>
-          <button type="button" class="mnav__x" aria-label="Close menu"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/></svg></button>
+          <div class="mnav__tools">${themeBtn('mnav__theme')}<button type="button" class="mnav__x" aria-label="Close menu"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/></svg></button></div>
         </header>
         <div class="mnav__body">
           ${lead ? `<a class="mnav__promo" href="${url.product(lead.id)}">
@@ -1097,6 +1097,7 @@
     }
     drawer.addEventListener('click', e => {
       if (e.target.closest('.mnav__x')) return close();
+      if (e.target.closest('.mnav__theme')) return; // theme toggle handled globally; keep the panel open
       const h = e.target.closest('.mnav__acc-h');
       if (h) {
         const opening = h.getAttribute('aria-expanded') !== 'true';

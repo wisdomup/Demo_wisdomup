@@ -7,7 +7,7 @@
    · section headers: uppercase, left, white; "Shop all ↗" as a small red-tinted button
    · product rails sit straight on the stage (no colour bands)
    · a solid brand-red footer
-   Loaded after controls.css on every page; home page + shared chrome are complete, other pages get a safe dark base.
+   Loaded after controls.css on every page. Whole-flow pass done 2026-10-06: every page, drawer, overlay and form passes the contrast scan (text ≥ 3:1, no light surfaces).
    ========================================================================== */
 html[data-theme="night"] {
   color-scheme: dark;
@@ -18,7 +18,7 @@ html[data-theme="night"] {
   /* design-system tokens re-pointed */
   --page: var(--n-bg); --panel: var(--n-bg2); --card: var(--n-card); --chip: var(--n-raise); --field: var(--n-raise2); --line: var(--n-line);
   --ink: var(--n-text); --ink-2: #E3E5E8; --ink-body: var(--n-text2); --ink-muted: var(--n-muted); --ink-meta: var(--n-dim); --ink-strike: var(--n-dim);
-  --muted: var(--n-muted); --muted-strong: #B6BBC1; --accent-price: #FFFFFF; --navy: var(--n-text); --navy-deep: var(--n-bg2); --navy-link: #A9AFB6; --utility: var(--n-muted);
+  --muted: var(--n-muted); --muted-strong: #B6BBC1; --accent-price: #FFFFFF; --navy: var(--n-text); --navy-deep: var(--n-bg2); --navy-link: rgba(255,255,255,.86); /* footer contact line + links sit on the red footer */ --utility: var(--n-muted);
   --aqua-band: var(--n-raise); --form-label: var(--n-text2); --form-line: var(--n-line2); --form-required: var(--n-red-text); --focus: #FFFFFF; --frame-selected: #fff;
   --grad-cta: linear-gradient(90deg, #E8310F 0%, #C41A04 100%); --grad-cta-soft: linear-gradient(90deg, #2A2F35 0%, #1E2226 100%);
   --grad-heading: linear-gradient(90deg, #fff 0%, #fff 100%); --grad-gold: linear-gradient(90deg, #fff 0%, #E9E9EC 100%); --grad-ribbon: linear-gradient(180deg, #E8310F, #C41A04);
@@ -49,7 +49,7 @@ html[data-theme="night"] :is(.series .chip[aria-pressed="true"], .bk-chips .chip
 html[data-theme="night"] .quick .chip { color: var(--n-text); }
 html[data-theme="night"] .quick__art { background: var(--n-raise2); }
 /* Round icon tools keep their circles but go dark + hairline */
-html[data-theme="night"] :is(.loop__btn, .feat__btn, .shop-rail__step, .hero__arrow, .pdp2__chev, .wpc__wish, .pdp2__wish, .mnav__x, .cartd__x, .fdrawer__x, .search__close, .newsletter button) { background: var(--n-raise); color: var(--n-text); border-color: var(--n-line2); box-shadow: inset 0 0 0 1px var(--n-line2); }
+html[data-theme="night"] :is(.loop__btn, .feat__btn, .shop-rail__step, .hero__arrow, .pdp2__chev, .wpc__wish, .pdp2__wish, .mnav__x, .mnav__theme, .cartd__x, .fdrawer__x, .search__close, .newsletter button) { background: var(--n-raise); color: var(--n-text); border-color: var(--n-line2); box-shadow: inset 0 0 0 1px var(--n-line2); }
 html[data-theme="night"] :is(.loop__btn, .feat__btn, .shop-rail__step, .wpc__wish, .pdp2__wish):hover { background: var(--n-raise2); color: #fff; }
 html[data-theme="night"] .loop__btn--play { border-color: var(--n-line2); background: var(--n-raise); color: var(--n-text); }
 html[data-theme="night"] :is(.wpc__wish[aria-pressed="true"], .pdp2__wish[aria-pressed="true"]) { color: var(--n-red-text); border-color: var(--n-red-line); }
@@ -201,3 +201,162 @@ html[data-theme="night"] :is(.offer b, .gift b, .offer__head) { color: var(--n-t
 html[data-theme="night"] .gift { background: var(--n-bg2); box-shadow: inset 0 0 0 1px var(--n-line); }
 html[data-theme="night"] .offer__head { background: var(--n-raise); color: var(--n-text); }
 html[data-theme="night"] .offer { border-color: var(--n-line); }
+
+/* ---------- Menu panel in night: the Higgsfield rules applied (2026-10-06) — stage #0F1113, black promo panel with one red
+   glow, 8px chips, rounded-square icon tiles, hairline separators, dark+hairline round tools and footer buttons, white logo ---------- */
+html[data-theme="night"] .mnav { background: var(--n-bg); color: var(--n-text); box-shadow: inset -1px 0 0 var(--n-line2); border-radius: 0 16px 16px 0; }
+html[data-theme="night"] .mnav__head { border-bottom-color: var(--n-line); padding: 10px 12px 10px 16px; }
+html[data-theme="night"] .mnav__logo img { filter: brightness(0) invert(1); }
+html[data-theme="night"] :is(.mnav__x, .mnav__theme) { border: 1px solid var(--n-line2); background: var(--n-raise); color: #fff; box-shadow: none; }
+html[data-theme="night"] :is(.mnav__x, .mnav__theme):hover { background: var(--n-raise2); }
+html[data-theme="night"] .mnav :focus-visible { outline: 2px solid rgba(255,255,255,.45); outline-offset: 2px; }
+html[data-theme="night"] .mnav__body { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.18) transparent; }
+/* Promo: black panel, hairline, red glow bottom-right, red "Shop now" */
+html[data-theme="night"] .mnav__promo { background: radial-gradient(60% 90% at 100% 100%, rgba(217,30,5,.45) 0%, rgba(217,30,5,0) 65%), #000 !important; box-shadow: inset 0 0 0 1px var(--n-line2); border-radius: 16px; }
+html[data-theme="night"] .mnav__eyebrow { color: var(--n-red-text) !important; }
+html[data-theme="night"] .mnav__promo b, html[data-theme="night"] .mnav__promo-price { color: #fff; }
+html[data-theme="night"] .mnav__promo-cta { color: var(--n-red-text); }
+/* Category tiles: 12px corners + hairline, white labels */
+html[data-theme="night"] .mnav__tile-art .mnav__thumb { border-radius: 12px; box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] .mnav__tile-t { color: var(--n-text) !important; font-weight: 500; }
+html[data-theme="night"] .mnav__tile--all .mnav__thumb { background: var(--n-raise); color: #fff; }
+/* Quick chips: 8px dark chips */
+html[data-theme="night"] .mnav__chip { height: 30px; border-radius: 8px; background: var(--n-raise); color: var(--n-text); box-shadow: inset 0 0 0 1px var(--n-line); font-weight: 500; }
+html[data-theme="night"] .mnav__chip:active { background: var(--n-raise2); }
+/* Accordion: hairline rows, rounded-square icon tiles, muted chevrons */
+html[data-theme="night"] .mnav__cats { border-top-color: var(--n-line); }
+html[data-theme="night"] .mnav__acc { border-bottom-color: var(--n-line); }
+html[data-theme="night"] .mnav__acc-h { color: var(--n-text) !important; font-weight: 600; }
+html[data-theme="night"] .mnav__ic { border-radius: 8px; background: var(--n-raise); color: #fff; box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] .mnav__chev { color: var(--n-muted); }
+html[data-theme="night"] .mnav__prod .mnav__thumb { border-radius: 8px; box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] .mnav__prod b { color: var(--n-text) !important; font-weight: 500; }
+html[data-theme="night"] .mnav__prod small { color: var(--n-muted) !important; }
+html[data-theme="night"] .mnav__all { color: var(--n-red-text) !important; text-decoration: none !important; }
+/* Link groups + footer buttons */
+html[data-theme="night"] .mnav__label { color: var(--n-muted) !important; }
+html[data-theme="night"] .mnav__group a { color: #DADDE1 !important; }
+html[data-theme="night"] .mnav__group a[aria-current="page"] { color: #fff !important; }
+html[data-theme="night"] .mnav__foot { border-top-color: var(--n-line); }
+html[data-theme="night"] .mnav__foot a { border: 1px solid var(--n-line2); border-radius: 10px; background: var(--n-raise); color: #fff; box-shadow: none; font-weight: 600; }
+html[data-theme="night"] .mnav__foot a:hover { background: var(--n-raise2); }
+
+/* ==========================================================================
+   Whole-flow pass (2026-10-06, after the user's cart screenshot): every panel, form and overlay on every page goes dark,
+   and all the hard-coded navy/grey text colours (#172248, #3D4656, #464646, #1F2633 …) get night values.
+   Surfaces: stage #0F1113 → panels/forms #15181B → raised fields/chips #1E2226 → hover #2A2F35. Hairlines, no shadows, red accent only.
+   ========================================================================== */
+
+/* ---------- Cart drawer: the whole panel, header → lines → footer ---------- */
+html[data-theme="night"] .cartd { background: var(--n-bg); box-shadow: inset 1px 0 0 var(--n-line2); border-radius: 16px 0 0 16px; }
+html[data-theme="night"] .cartd__head { border-bottom-color: var(--n-line); }
+html[data-theme="night"] .cline { border-bottom-color: var(--n-line); }
+html[data-theme="night"] .cartd__foot { background: var(--n-bg2); border-top-color: var(--n-line); }
+html[data-theme="night"] .cartd__gift, html[data-theme="night"] .cartd__gift b { color: var(--n-text) !important; }
+html[data-theme="night"] .cartd__row { color: var(--n-text2) !important; }
+html[data-theme="night"] .cartd__row b { color: #fff !important; }
+html[data-theme="night"] .cartd__note { color: var(--n-muted) !important; }
+html[data-theme="night"] .qty--s button:disabled { color: var(--n-dim); }
+html[data-theme="night"] .cline__rm:hover { color: #fff !important; }
+
+/* ---------- Filter drawer (All Products) ---------- */
+html[data-theme="night"] .fdrawer { background: var(--n-bg); box-shadow: inset -1px 0 0 var(--n-line2); border-radius: 0 16px 16px 0; }
+html[data-theme="night"] .fdrawer__head { border-bottom: 1px solid var(--n-line); }
+html[data-theme="night"] .fdrawer__clear { color: var(--n-text2); }
+html[data-theme="night"] .fdrawer__foot { background: var(--n-bg2); border-top: 1px solid var(--n-line); }
+html[data-theme="night"] .facc { border-bottom-color: var(--n-line); }
+html[data-theme="night"] .facc__chev { color: var(--n-muted); }
+html[data-theme="night"] .fopt { color: var(--n-text2); }
+html[data-theme="night"] .fopt-group { border-top-color: var(--n-line); }
+html[data-theme="night"] .fopt__sw { box-shadow: inset 0 0 0 1px rgba(255,255,255,.22); }
+
+/* ---------- Search overlay ---------- */
+html[data-theme="night"] .search__field { background: var(--n-raise); color: var(--n-text); box-shadow: inset 0 0 0 1px var(--n-line2); }
+html[data-theme="night"] .search__field input::placeholder { color: var(--n-muted); }
+html[data-theme="night"] .search__label { background: transparent; padding: 0; color: var(--n-muted) !important; }
+html[data-theme="night"] .search__label b { background: none; -webkit-text-fill-color: var(--n-muted); color: var(--n-muted); }
+html[data-theme="night"] .search__label button { color: var(--n-red-text); }
+html[data-theme="night"] .search__pages a { border-color: var(--n-line2); }
+html[data-theme="night"] .search__pages a:hover { background: var(--n-raise2); color: #fff; }
+html[data-theme="night"] .ccard__media { background: var(--n-raise); }
+html[data-theme="night"] .ccard__tag { background: var(--n-card); color: var(--n-text); }
+html[data-theme="night"] .ccard__tag::before { background: radial-gradient(circle at 0 0, transparent 13.5px, var(--n-card) 14px); }
+html[data-theme="night"] .ccard__tag span { background: none; -webkit-text-fill-color: var(--n-text); color: var(--n-text); }
+
+/* ---------- Checkout: option cards, summary lines, totals, errors ---------- */
+html[data-theme="night"] .ck__secure, html[data-theme="night"] .ck__secure span { color: #7ED6A0; }
+html[data-theme="night"] .ck__sec { border-color: var(--n-line); }
+html[data-theme="night"] .ckopt { background: var(--n-raise); border-color: var(--n-line2); }
+html[data-theme="night"] .ckopt:hover { border-color: rgba(255,255,255,.32); }
+html[data-theme="night"] .ckopt__dot { background: var(--n-raise2); border-color: rgba(255,255,255,.35); }
+html[data-theme="night"] :is(.ckopt__t b, .ckopt__p, .ckline__t, .ckline__p) { color: var(--n-text); }
+html[data-theme="night"] .ck__tot > div { color: var(--n-text2); }
+html[data-theme="night"] .ck__tot, html[data-theme="night"] .ck__tot .ck__total { border-top-color: var(--n-line2); }
+html[data-theme="night"] .ck__tot .ck__total { color: #fff; }
+html[data-theme="night"] .ck__err { background: var(--n-red-soft); border-color: var(--n-red-line); color: #FFB4A6; }
+
+/* ---------- Forms everywhere (design-system .field + the page forms) ---------- */
+html[data-theme="night"] :is(.track__form, .track__result, .rv__form, .bk-form, .iform, .adm__login, .adm__stat, .adm__order, .manual, .kv, .quote-band, .panel-list, .mgrid .empty, .contact-card, .toc, .rv__sum, .rv__item, .ord__card, .ck__sec, .ck__sumcard) { background: var(--n-bg2); border-color: var(--n-line); box-shadow: none; }
+html[data-theme="night"] :is(.field input, .field textarea, .field select, .rv__sort select, .adm__cols select, .hsearch input) { background: var(--n-raise); color: var(--n-text); border-color: var(--n-line2); }
+html[data-theme="night"] :is(.field input, .field textarea)::placeholder { color: var(--n-dim); }
+html[data-theme="night"] .field label { color: var(--n-text2); }
+html[data-theme="night"] .field label i { color: var(--n-red-text); }
+html[data-theme="night"] :is(.field input, .field textarea):focus { outline-color: #fff; border-color: transparent; }
+html[data-theme="night"] .iform .field.is-bad :is(input, textarea) { border-color: var(--n-red-text); }
+html[data-theme="night"] .hsearch { border-color: var(--n-line2); }
+html[data-theme="night"] .bk-done button { color: var(--n-red-text); }
+html[data-theme="night"] .bk-hint.is-err { color: #FFB4A6; }
+html[data-theme="night"] .pays span { background: var(--n-raise); color: var(--n-text2); box-shadow: inset 0 0 0 1px var(--n-line); }
+
+/* ---------- Reviews ---------- */
+html[data-theme="night"] .rv__bar { color: var(--n-text2); }
+html[data-theme="night"] .rv__bar:not(:disabled):hover, html[data-theme="night"] .rv__bar[aria-pressed="true"] { background: var(--n-raise2); }
+html[data-theme="night"] .rv__bar i { background: linear-gradient(90deg, #E2A92C var(--w), var(--n-raise2) var(--w)); }
+html[data-theme="night"] .rv__help { background: var(--n-raise); border-color: var(--n-line2); color: var(--n-text2); }
+html[data-theme="night"] .rv__help:hover { border-color: rgba(255,255,255,.35); color: #fff; }
+html[data-theme="night"] :is(.rv__ver, .rv__note--ok) { color: #7ED6A0 !important; }
+
+/* ---------- Info pages: tables, bands, badges, timeline, posts, manuals, cities ---------- */
+html[data-theme="night"] .kv > * { border-bottom-color: var(--n-line); }
+html[data-theme="night"] .kv > b { background: var(--n-raise); }
+html[data-theme="night"] .quote-band { box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] .callout { border-color: var(--n-line2); }
+html[data-theme="night"] .callout svg { color: var(--n-red-text); }
+html[data-theme="night"] .toc a:hover { background: var(--n-raise2); color: #fff; }
+html[data-theme="night"] .toc a[aria-current="true"] { background: var(--n-text); color: #111; }
+html[data-theme="night"] .manual__art { background: var(--n-raise); }
+html[data-theme="night"] .cities span { border-color: var(--n-line2); }
+html[data-theme="night"] .post__cat { background: rgba(15,17,19,.82); color: #fff; }
+html[data-theme="night"] .badge-soft { background: rgba(255,196,0,.16); color: #FFD86B; }
+html[data-theme="night"] .badge-soft--bad { background: var(--n-red-soft) !important; color: #FFB4A6 !important; }
+html[data-theme="night"] .timeline li::before { background: var(--n-line2); }
+html[data-theme="night"] .timeline i { background: var(--n-raise2); border-color: rgba(255,255,255,.3); }
+html[data-theme="night"] .timeline .is-done i, html[data-theme="night"] .timeline .is-done::before { background: var(--n-red); border-color: var(--n-red); }
+html[data-theme="night"] .timeline .is-now i { border-color: var(--n-red-text); box-shadow: 0 0 0 4px var(--n-red-soft); }
+html[data-theme="night"] .timeline .is-now i::after { background: var(--n-red-text); }
+html[data-theme="night"] :is(.prose li, .seo li, .manual__a ol li)::marker { color: var(--n-muted); }
+html[data-theme="night"] .opt-chip.is-na { color: var(--n-dim); }
+
+/* ---------- Text: the hard-coded dark colours → white / soft white ---------- */
+html[data-theme="night"] :is(.isec__head p, .isec__head .h-light, .bk-intro > p, .bk-done p, .empty p, .perk b, .perk span:last-child, .post, .post:hover, .post__body p, .tile, .tile p, .kv > *, .toc a, .manual__a ol, .contact-card small, .cta-band p, .callout, .hnone, .mgrid__more p, .ord__steps li, .rv__pick-l, .rv__tools, .adm__login p, .adm__cols p, .adm__cols li, .bk-range .h-light, .range-head .h-light) { color: var(--n-text2); }
+html[data-theme="night"] :is(.quote-band p, .cta-band h2, .callout b, .kv > b, .contact-card b, .track__head b, .timeline b, .manual__q b, .cities span, .iform__h, .wish-count, .bk-done h2, .bk-intro h1, .empty h2, .bk-group legend, .rv__pick legend, .tile b, .post__body h3, .article__head h1, .ihero h1, .adm__bar b, .adm__login h1, .adm__stat b, .adm__order header b, .ord__hero p, .ord__card p, .ord__steps b, .rv__item p, .pdp2__rate b, .rv__avg b, .highlights div, .overview__head h2, .overview__head p, .specs-row, .pdp2__label, .bulk__h, .pp__h) { color: var(--n-text); }
+/* inline navy on a few page headings (e.g. track.html h1) */
+html[data-theme="night"] :is([style*="color: #172248"], [style*="color:#172248"], [style*="color: #273F85"], [style*="color:#273F85"]) { color: var(--n-text) !important; }
+html[data-theme="night"] :is([style*="color: #3D4656"], [style*="color: #464646"], [style*="color: #1F2633"]) { color: var(--n-text2) !important; }
+
+/* ---------- Footer: the contact line + plain text on the red ---------- */
+html[data-theme="night"] .footer-wrap .footer :is(p, small, li) { color: rgba(255,255,255,.88); }
+
+/* ---------- Admin ---------- */
+html[data-theme="night"] .adm__bar { background: rgba(15,17,19,.9); border-bottom-color: var(--n-line); }
+html[data-theme="night"] .adm__order { border-left-color: var(--n-muted); }
+html[data-theme="night"] .adm__order--new { border-left-color: #FFD86B; }
+html[data-theme="night"] .adm__order--delivered { border-left-color: #7ED6A0; }
+html[data-theme="night"] .adm__order--cancelled { border-left-color: var(--n-red-text); }
+html[data-theme="night"] .adm__pill { background: var(--n-raise2); color: var(--n-text); }
+html[data-theme="night"] .adm__pill--new { background: rgba(255,196,0,.16); color: #FFD86B; }
+html[data-theme="night"] .adm__pill--delivered { background: rgba(56,180,110,.16); color: #7ED6A0; }
+html[data-theme="night"] .adm__pill--cancelled { background: var(--n-red-soft); color: #FFB4A6; }
+html[data-theme="night"] .adm__tot { border-top-color: var(--n-line); }
+html[data-theme="night"] .adm__tools .policy__links a[aria-current="true"] { background: var(--n-text); color: #111; }
+html[data-theme="night"] .adm__err { color: #FFB4A6 !important; }
