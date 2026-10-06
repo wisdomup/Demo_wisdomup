@@ -147,14 +147,22 @@
      Sends the standard shop events: PageView, ViewContent, Search, AddToCart, AddToWishlist, InitiateCheckout,
      Purchase and Lead — with product ids (sku), value and currency, so ads and catalogue matching work. ---------- */
   const PIXEL_ID = /^\d{8,20}$/.test(String(SHOP.facebookPixelId || '').trim()) ? String(SHOP.facebookPixelId).trim() : '';
-  if (PIXEL_ID && !window.fbq) {
+  // Cookie choices (2026-10-06): the Pixel is the site's only non-essential item, so it loads ONLY after the visitor allows
+  // marketing cookies in the cookie popup (localStorage wu-consent = { v: 1, marketing, at }).
+  const CONSENT_KEY = 'wu-consent';
+  const consentGet = () => { try { const c = JSON.parse(localStorage.getItem(CONSENT_KEY)); return c && c.v === 1 ? c : null; } catch (e) { return null; } };
+  const marketingOK = () => !!(consentGet() || {}).marketing;
+  function loadPixel() {
+    if (!PIXEL_ID || !marketingOK()) return;
+    if (window.fbq) { window.fbq('consent', 'grant'); return; }
     /* eslint-disable */
     !function (f, b, e, v, n, t, s) { if (f.fbq) return; n = f.fbq = function () { n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments); }; if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0'; n.queue = []; t = b.createElement(e); t.async = !0; t.src = v; s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s); }(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
     /* eslint-enable */
     window.fbq('init', PIXEL_ID);
     window.fbq('track', 'PageView');
   }
-  const px = (event, data, opts) => { if (PIXEL_ID && window.fbq) window.fbq('track', event, data || {}, opts); };
+  loadPixel();
+  const px = (event, data, opts) => { if (PIXEL_ID && window.fbq && marketingOK()) window.fbq('track', event, data || {}, opts); };
   const pxItem = (p, sku, qty = 1) => { const v = (skuIndex[sku] || {}).v || {}; const price = v.price || p.price; return { content_ids: [sku || p.code], content_name: p.title, content_category: p.cat, content_type: 'product', contents: [{ id: sku || p.code, quantity: qty, item_price: price }], value: price * qty, currency: 'PKR' }; };
   const skuIndex = {};
   D.products.forEach(p => (p.variants.length ? p.variants : [{ sku: p.code, attrs: {}, price: p.price, thumb: p.thumb, bg: p.bg, ar: p.ar }])
@@ -954,7 +962,7 @@
     if (!el) return;
     // Full-bleed, square footer that the page lifts off as you reach the end (the block is fixed under the page and
     // revealed through the wrap). Four groups — Products / Explore / Support / Contact — columns on desktop, accordion on phones.
-    const contact = { title: 'Contact', links: [['We’re here to help ›', url.help], ['support@wisdomup.pk', 'mailto:support@wisdomup.pk'], ['+92 327 9800153', 'tel:+923279800153']] };
+    const contact = { title: 'Contact', links: [['We’re here to help ›', url.help], ['support@wisdomup.pk', 'mailto:support@wisdomup.pk'], ['+92 327 9800153', 'tel:+923279800153'], ['Cookie preferences', '#cookie-preferences']] };
     const groups = D.footer.map(c => ({ title: c.title, links: c.links.map(l => Array.isArray(l) ? l : [String(l), linkFor(String(l))]) })).concat(contact);
     el.innerHTML = `
       <div class="footer-fixed">
@@ -972,7 +980,10 @@
         </footer>
         <div class="subfooter"><span>Copyright © ${YEAR} WisdomUp. All rights reserved.</span><span>Cash on Delivery · JazzCash · EasyPaisa · Bank transfer</span></div>
       </div>`;
-    el.addEventListener('click', e => { const a = e.target.closest('.footer a[href="#"]'); if (a) e.preventDefault(); });
+    el.addEventListener('click', e => {
+      const a = e.target.closest('.footer a[href="#"]'); if (a) e.preventDefault();
+      const ck = e.target.closest('a[href="#cookie-preferences"]'); if (ck) { e.preventDefault(); if (consentUI) consentUI.open('manage'); }
+    });
     // Link groups collapse into a one-open-at-a-time accordion (same behaviour as the FAQ) when the footer stacks.
     const FT_ACC = matchMedia('(max-width: 767px)');
     const groupEls = [...el.querySelectorAll('.ft__group')];
@@ -1072,10 +1083,10 @@
   const RV_TEXT = 'h1, h2, .sec-title, .eyebrow, .ihero__lede, .overview__head p, .seo__head p, .mdesc, .pbanner__copy';
   const RV_BLOCK = '.wpc, .tile, .post, .stat, .pd-stat, .ck__sec, .ord__card, .rv__sum, .rv__item, .faq__item, .seo__card, .duo__card, '
     + '.promo-band, .loop, .series, .bulk, .pp, .trust__item, .step, .manual, .panel-list, .cta-band, .ck__sumcard, .mgrid__more, .empty, .ord__hero, .track__form, .iform, .bk-form';
-  const RV_SKIP = '#site-nav, .mnav, .cartd, .fdrawer, .search, .hero, .buybar, .toast, .wu-util, .quick, .visually-hidden, .seo__more';
+  const RV_SKIP = '#site-nav, .mnav, .cartd, .fdrawer, .search, .ckc, .hero, .buybar, .toast, .wu-util, .quick, .visually-hidden, .seo__more';
   let revealer = null;
   // ---------- Motion engine (MOTION-REPORT.md, approved 2026-10-06): reveals, grid staggers, scroll-driven curtain/clip, liquid fills, magnets ----------
-  const FILL_SEL = '.btn-pill, .btn-buy, .btn-navy, .btn-outline, .btn-cart, .shop-rail__all, .loop__cta, .pp__cta, .seo__toggle, .fdrawer__apply, .ck__place, .cartd__go, .mnav__foot a, .nh-btn, .totop, .quick .chip, .wpc__cta';
+  const FILL_SEL = '.btn-pill, .btn-buy, .btn-navy, .btn-outline, .btn-cart, .shop-rail__all, .loop__cta, .pp__cta, .seo__toggle, .fdrawer__apply, .ck__place, .cartd__go, .mnav__foot a, .nh-btn, .totop, .quick .chip, .wpc__cta, .ckc__btn';
   const MAG_SEL = '.loop__btn, .feat__btn, .shop-rail__step, .hero__arrow, .pdp2__chev, .wpc__wish, .pdp2__wish, .totop, .mnav__x, .cartd__x, .fdrawer__x, .mnav__theme, .nh-tile__add, .mnav__back';
   const X_SEL = '.mnav__x, .cartd__x, .fdrawer__x';
   const SD_CLIP = '.promo, .bulk, .duo__card, .cta-band, .quote-band, .pp__card, .nh-show, .nh-glow, .nh-live, .feat__slide';
@@ -1230,7 +1241,7 @@
       // liquid fills and magnets (pointer devices only)
       if (isFine) {
         const q = sel => [...(root.matches && root.matches(sel) ? [root] : []), ...root.querySelectorAll(sel)];
-        q(FILL_SEL).forEach(b => { if (!b.closest('#site-nav') && b.querySelector('svg, img') === null || b.matches('.btn-buy, .btn-cart, .btn-pill, .btn-navy, .btn-outline, .shop-rail__all, .seo__toggle, .pp__cta, .mnav__foot a, .nh-btn, .loop__cta, .fdrawer__apply, .ck__place, .cartd__go, .totop, .quick .chip, .wpc__cta')) b.classList.add('wu-fill'); });
+        q(FILL_SEL).forEach(b => { if (!b.closest('#site-nav') && b.querySelector('svg, img') === null || b.matches('.btn-buy, .btn-cart, .btn-pill, .btn-navy, .btn-outline, .shop-rail__all, .seo__toggle, .pp__cta, .mnav__foot a, .nh-btn, .loop__cta, .fdrawer__apply, .ck__place, .cartd__go, .totop, .quick .chip, .wpc__cta, .ckc__btn')) b.classList.add('wu-fill'); });
         q(MAG_SEL).forEach(b => { b.classList.add('wu-mag'); if (b.matches(X_SEL)) b.classList.add('is-x'); });
       }
       collect(root);
@@ -1332,6 +1343,7 @@
     paintThemeBtns(); // the menu panel's day/night button
     cartUI = mountCart();
     qaddUI = mountQuickAdd();
+    consentUI = mountConsent();
     initMotion();
     mountToTop();
     runEdges();
@@ -1541,6 +1553,144 @@
     return { open, close };
   }
   let qaddUI = null;
+
+  // ---------- Cookie choices (2026-10-06, layout copied from formula1.com's consent popup) ----------
+  // Layer 1 (notice): logo, uppercase heading, the facts, a hairline, two red capsules (Essential only / Accept all) and an
+  // outlined "Manage settings". Layer 2 (manage): left heading, the two red capsules, one row per category (switch +
+  // chevron that folds out the details), "Go back" / "Save choices". Centred modal ≥640px, bottom sheet on phones; no
+  // close ×, no scrim or drag dismissal — a choice is required. Everything said here must stay true: the shop's own
+  // storage is local (cart, wishlist, orders, reviews, checkout details, theme, grid view); the ONLY cookies are the
+  // Meta Pixel's, and it loads only with marketing allowed. The footer's "Cookie preferences" opens layer 2 again.
+  function mountConsent() {
+    const LOGO = '<div class="ckc__logo"><img src="img/wu-logo.png" alt="WisdomUp"><img src="img/wu-logo-white.png" alt="" aria-hidden="true"></div>';
+    const CATS = [
+      { id: 'essential', name: 'Essential', always: true, desc: 'Your cart, wishlist, orders placed from this device, reviews you wrote, saved checkout details and display choices (day or night, grid view). Kept in this browser only and never shared with advertisers. The shop cannot work without it, so it is always on.' },
+      { id: 'marketing', name: 'Marketing', desc: 'Meta Pixel (Facebook and Instagram). It records page views, searches, add-to-cart and purchases — the product, price and quantity, never your name, phone number or address — so we can measure our ads and show them to people who have visited the shop. It sets Meta cookies in this browser.' },
+    ];
+    const el = document.createElement('div');
+    el.className = 'ckc'; el.id = 'ckc'; el.hidden = true;
+    el.innerHTML = `
+      <div class="ckc__scrim"></div>
+      <section class="ckc__box" role="dialog" aria-modal="true" aria-labelledby="ckc-h1">
+        <div class="ckc__layer" data-layer="notice">
+          <div class="ckc__scroll">
+            ${LOGO}
+            <h2 class="ckc__h" id="ckc-h1">Your cookie choices on this site</h2>
+            <div class="ckc__text">
+              <p>WisdomUp keeps your cart, wishlist, orders and saved checkout details in this browser. That storage is <b>essential</b> — the shop needs it to work — so it can’t be switched off.</p>
+              <p>With your permission we also use <b>marketing cookies</b> from Meta to:</p>
+              <ul><li>Measure which Facebook and Instagram ads bring visits and orders.</li><li>Show our ads to people who have visited the shop.</li></ul>
+              <p>Select ‘Accept all’ to allow marketing cookies, or ‘Essential only’ to keep them off. To decide category by category, select ‘Manage settings’. You can change your choice at any time from ‘Cookie preferences’ at the foot of every page.</p>
+            </div>
+          </div>
+          <div class="ckc__acts">
+            <button type="button" class="ckc__btn ckc__btn--red" data-ck="essential">Essential only</button>
+            <button type="button" class="ckc__btn ckc__btn--red" data-ck="all">Accept all</button>
+            <button type="button" class="ckc__btn ckc__btn--line ckc__btn--wide" data-ck="manage">Manage settings</button>
+          </div>
+        </div>
+        <div class="ckc__layer" data-layer="manage" hidden>
+          <div class="ckc__scroll">
+            ${LOGO}
+            <h2 class="ckc__h ckc__h--left" id="ckc-h2">Manage your choices</h2>
+            <div class="ckc__text"><p>Switch marketing cookies on or off below, then select ‘Save choices’. Essential storage stays on because the cart, wishlist and checkout depend on it. Open a category to see exactly what it does.</p></div>
+            <div class="ckc__quick">
+              <button type="button" class="ckc__btn ckc__btn--red" data-ck="essential">Essential only</button>
+              <button type="button" class="ckc__btn ckc__btn--red" data-ck="all">Accept all</button>
+            </div>
+            <ul class="ckc__cats">${CATS.map(c => `
+              <li class="ckc__cat">
+                <div class="ckc__row">
+                  <span class="ckc__name" id="ckc-n-${c.id}">${c.name}</span>
+                  ${c.always ? '<span class="ckc__always">Always on</span>' : `<button type="button" class="ckc__switch" role="switch" aria-checked="false" aria-labelledby="ckc-n-${c.id}" data-cat="${c.id}"><i></i></button>`}
+                  <button type="button" class="ckc__more" aria-expanded="false" aria-controls="ckc-d-${c.id}" aria-label="About ${c.name.toLowerCase()} cookies">${icon('chev-r', 18)}</button>
+                </div>
+                <div class="ckc__desc" id="ckc-d-${c.id}" hidden><p>${c.desc}</p></div>
+              </li>`).join('')}
+            </ul>
+          </div>
+          <div class="ckc__acts ckc__acts--foot">
+            <button type="button" class="ckc__btn ckc__btn--line" data-ck="back">Go back</button>
+            <button type="button" class="ckc__btn ckc__btn--line" data-ck="save">Save choices</button>
+          </div>
+        </div>
+      </section>`;
+    document.body.append(el);
+    const box = el.querySelector('.ckc__box'), sw = el.querySelector('.ckc__switch');
+    const layers = { notice: el.querySelector('[data-layer="notice"]'), manage: el.querySelector('[data-layer="manage"]') };
+    let layer = 'notice', hideT = 0, opener = null, anims = [];
+    const setSwitch = on => sw.setAttribute('aria-checked', on);
+    // the blocks of a layer rise in one after another (the menu's glide curve, 100ms apart)
+    const glide = (root, from = 'translate3d(0, 16px, 0)') => {
+      anims.forEach(a => a.cancel()); anims = [];
+      if (reduced() || !root.animate) return;
+      const blocks = [...root.querySelector('.ckc__scroll').children, root.querySelector('.ckc__acts')];
+      blocks.forEach((b, i) => anims.push(b.animate([{ opacity: 0, transform: from }, { opacity: 1, transform: 'none' }],
+        { duration: 600, delay: Math.min(i * 100, 700), easing: 'cubic-bezier(.075,.82,.165,1)', fill: 'backwards' })));
+    };
+    const show = name => {
+      const prev = layers[layer], next = layers[name];
+      layer = name;
+      box.setAttribute('aria-labelledby', name === 'notice' ? 'ckc-h1' : 'ckc-h2');
+      if (prev !== next) {
+        prev.hidden = true; next.hidden = false;
+        next.querySelector('.ckc__scroll').scrollTop = 0;
+        glide(next, name === 'manage' ? 'translate3d(30px, 0, 0)' : 'translate3d(-30px, 0, 0)');
+      }
+      const f = next.querySelector('.ckc__btn');
+      if (f) f.focus({ preventScroll: true });
+    };
+    function open(name = 'notice') {
+      clearTimeout(hideT);
+      opener = document.activeElement;
+      setSwitch(marketingOK());
+      layers.notice.hidden = name !== 'notice'; layers.manage.hidden = name !== 'manage'; layer = name;
+      box.setAttribute('aria-labelledby', name === 'notice' ? 'ckc-h1' : 'ckc-h2');
+      el.querySelectorAll('.ckc__more').forEach(b => { b.setAttribute('aria-expanded', 'false'); $(b.getAttribute('aria-controls')).hidden = true; });
+      el.hidden = false;
+      document.documentElement.style.overflow = 'hidden';
+      requestAnimationFrame(() => requestAnimationFrame(() => { el.classList.add('is-open'); glide(layers[name]); }));
+      setTimeout(() => { const f = layers[name].querySelector('.ckc__btn'); if (f) f.focus({ preventScroll: true }); }, 80);
+    }
+    function close() {
+      el.classList.remove('is-open');
+      document.documentElement.style.overflow = '';
+      const done = () => { el.hidden = true; if (opener && opener.isConnected && opener !== document.body) opener.focus({ preventScroll: true }); };
+      if (reduced()) done(); else hideT = setTimeout(done, 850);
+    }
+    const save = marketing => {
+      const was = marketingOK();
+      try { localStorage.setItem(CONSENT_KEY, JSON.stringify({ v: 1, marketing: !!marketing, at: new Date().toISOString() })); } catch (e) {}
+      if (marketing) loadPixel();
+      else if (was && window.fbq) window.fbq('consent', 'revoke');
+      close();
+      toast(marketing ? 'Cookie choices saved — marketing cookies on' : 'Cookie choices saved — essential only');
+    };
+    el.addEventListener('click', e => {
+      const more = e.target.closest('.ckc__more');
+      if (more) { const on = more.getAttribute('aria-expanded') !== 'true'; more.setAttribute('aria-expanded', on); slide($(more.getAttribute('aria-controls')), on); return; }
+      if (e.target.closest('.ckc__switch')) { setSwitch(sw.getAttribute('aria-checked') !== 'true'); return; }
+      const b = e.target.closest('[data-ck]');
+      if (!b) return;
+      const k = b.dataset.ck;
+      if (k === 'all') save(true);
+      else if (k === 'essential') save(false);
+      else if (k === 'save') save(sw.getAttribute('aria-checked') === 'true');
+      else if (k === 'manage') show('manage');
+      else if (k === 'back') { if (consentGet() && layer === 'manage' && opener && opener.closest && opener.closest('.footer')) close(); else show('notice'); }
+    });
+    el.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && layer === 'manage') { e.preventDefault(); el.querySelector('[data-ck="back"]').click(); return; }
+      if (e.key !== 'Tab') return;
+      const f = [...layers[layer].querySelectorAll('button')].filter(x => x.offsetParent !== null);
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+    if (!consentGet()) setTimeout(() => open('notice'), 700); // first visit: ask once the page has painted
+    return { open, close, get: consentGet };
+  }
+  let consentUI = null;
   const quickAdd = (id, btn) => { const p = D.byId(id); if (!p || p.soldOut) return false; if (!(p.variants && p.variants.length > 1) || !qaddUI) { add(id); return true; } qaddUI.open(p, btn); return true; };
 
   function mountMenu() {
@@ -1724,6 +1874,7 @@
     initChrome, placeNav, setActiveCat, navOffset, scrollToEl,
     openSearch: () => search && search.open(),
     toggleTheme, isNight, slide, staggerCards, revealWords, sheetDrag, quickAdd,
+    consent: { open: n => consentUI && consentUI.open(n), get: consentGet },
     seo, abs, clip, ldCrumbs, ldFaq, px, pxItem, YEAR, SITE,
   };
 })();

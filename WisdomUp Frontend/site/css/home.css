@@ -60,10 +60,10 @@ button { font-family: inherit; }
 .site-nav .navbtn--util:hover { background: transparent; }
 .site-nav .navbtn--all:hover { background: rgba(255,255,255,.20); }
 .site-nav a.navbtn[aria-current="true"] { background: rgba(8, 6, 6, .55); border: .5px solid rgba(226,232,255,.12); }
-.site-nav__badge { position: absolute; top: 4px; right: 2px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 999px; background: var(--accent-red, #E3312D); color: #fff; font: 700 10px/16px var(--font); box-sizing: border-box; }
+.site-nav__badge { position: absolute; z-index: 3; top: 4px; right: 2px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 999px; background: var(--accent-red, #E3312D); color: #fff; font: 700 10px/16px var(--font); text-align: center; box-sizing: border-box; box-shadow: 0 0 0 1.5px rgba(0,0,0,.22), 0 2px 6px rgba(0,0,0,.35); pointer-events: none; } /* sits ON the glass: above the edge light (z 2), lifted by a soft shadow */
 .site-nav__narrow { flex: 1; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; min-width: 0; }
 .site-nav__icon { width: 40px; height: 40px; border: 0; padding: 0; background: transparent; display: grid; place-items: center; cursor: pointer; color: #fff; position: relative; }
-.site-nav__narrow .site-nav__badge { top: 1px; right: 0; }
+.site-nav__narrow .site-nav__badge { top: 4px; right: 4px; } /* pinned to the 21px glyph's top-right corner, not the 40px tap box — stays inside the 43px capsule, clear of its rounded end */
 .site-nav .navbtn--util .site-nav__badge { top: -3px; right: -4px; }
 
 /* ---------- Quick-filter chips ---------- */
@@ -74,6 +74,7 @@ button { font-family: inherit; }
 .quick .chip[aria-pressed="true"] { box-shadow: inset 0 0 0 1px rgba(26,26,26,.85); }
 .quick .chip:focus-visible { outline: 2px solid #2350C8; outline-offset: 3px; }
 .quick__in { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+.quick .chip { flex: none; } /* never squeeze a chip (the fill's overflow:hidden would clip its label) — the row scrolls when it can't fit */
 .quick__art { width: 32px; height: 32px; border-radius: 999px; background: #fff; display: grid; place-items: center; flex: none; overflow: hidden; }
 .quick__art > span { display: block; width: 26px; height: 26px; }
 @keyframes wu-chips { to { transform: translateX(-50%); } }
@@ -767,3 +768,61 @@ body:has(.buybar.is-on) .totop { bottom: calc(96px + env(safe-area-inset-bottom)
 .cartd__go { width: 100%; text-decoration: none; }
 @media (prefers-reduced-motion: reduce) { .cartd, .cartd-scrim { transition: none; } }
 @media (min-width: 640px) { .cartd { width: 400px; } } /* same width as the Filters panel */
+
+/* ==========================================================================
+   Cookie choices (2026-10-06) — layout copied from formula1.com's consent popup, in WisdomUp's type and capsules.
+   Centred white modal (≤720px, 16px corners) ≥640px; a bottom sheet on phones. Logo → uppercase heading → text →
+   hairline → two red capsules + one outlined capsule. Manage layer: left heading, red capsules, category rows with a
+   switch and a fold-out. Motion in motion.css; night colours in night.css.
+   ========================================================================== */
+.ckc { position: fixed; inset: 0; z-index: 120; display: grid; place-items: center; padding: 16px; font-family: var(--font); }
+.ckc[hidden] { display: none; }
+.ckc__scrim { position: absolute; inset: 0; background: rgba(11,11,11,.42); }
+.ckc__box { position: relative; display: flex; flex-direction: column; width: min(720px, 100%); max-height: min(760px, calc(100dvh - 32px)); background: #fff; color: #1F2633; border-radius: 16px; box-shadow: 0 30px 80px rgba(0,0,0,.28); overflow: hidden; }
+.ckc__layer { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+.ckc__layer[hidden] { display: none; }
+.ckc__scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 24px 40px 8px; }
+.ckc__logo { display: flex; justify-content: center; margin-bottom: 14px; }
+.ckc__logo img { height: 30px; width: auto; display: block; }
+.ckc__logo img + img { display: none; }
+.ckc__h { margin: 0 0 14px; font: 800 18px/1.2 var(--font); letter-spacing: .01em; text-transform: uppercase; text-align: center; color: #0B0B0B; text-wrap: balance; }
+.ckc__h--left { text-align: left; }
+.ckc__text { font: 400 14px/1.6 var(--font); color: #3D4656; }
+.ckc__text p { margin: 0 0 12px; }
+.ckc__text b { font-weight: 700; color: #0B0B0B; }
+.ckc__text ul { margin: 0 0 12px; padding-left: 22px; }
+.ckc__text li { margin: 2px 0; padding-left: 2px; }
+.ckc__acts { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; padding: 16px 40px 24px; border-top: 1px solid #E6E7EA; }
+.ckc__acts--foot { grid-template-columns: repeat(2, minmax(0, 180px)); justify-content: center; }
+.ckc__btn { display: inline-flex; align-items: center; justify-content: center; height: var(--ctl, 40px); padding: 0 var(--ctl-pad, 16px); border: 0; border-radius: 999px; font: 600 14px/1 var(--font); letter-spacing: .01em; white-space: nowrap; cursor: pointer; }
+.ckc__btn--red { background: #D91E05; color: #fff; }
+.ckc__btn--line { background: transparent; color: #0B0B0B; box-shadow: inset 0 0 0 1.5px #0B0B0B; }
+.ckc__btn--wide { grid-column: 1 / -1; }
+.ckc__btn:focus-visible, .ckc__more:focus-visible, .ckc__switch:focus-visible { outline: 2px solid #2350C8; outline-offset: 3px; }
+.ckc__quick { display: flex; justify-content: center; gap: 11px; margin: 4px 0 18px; }
+.ckc__quick .ckc__btn { min-width: 150px; }
+.ckc__cats { list-style: none; margin: 0 0 8px; padding: 0; border-top: 1px solid #E6E7EA; }
+.ckc__cat { border-bottom: 1px solid #E6E7EA; }
+.ckc__row { display: flex; align-items: center; gap: 11px; min-height: 60px; }
+.ckc__name { flex: 1; font: 600 15px/1.3 var(--font); color: #0B0B0B; }
+.ckc__always { font: 600 13px/1 var(--font); color: #2E7D32; }
+.ckc__switch { position: relative; flex: none; width: 44px; height: 24px; padding: 0; border: 0; border-radius: 999px; background: #C9CDD3; cursor: pointer; }
+.ckc__switch i { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 999px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25); }
+.ckc__switch[aria-checked="true"] { background: #D91E05; }
+.ckc__switch[aria-checked="true"] i { transform: translateX(20px); }
+.ckc__more { flex: none; display: grid; place-items: center; width: var(--ctl-s, 34px); height: var(--ctl-s, 34px); padding: 0; border: 0; border-radius: 999px; background: #F1F2F4; color: #0B0B0B; cursor: pointer; }
+.ckc__more svg { transition: transform var(--m-primary, 500ms cubic-bezier(.3,1,.3,1)); }
+.ckc__more[aria-expanded="true"] svg { transform: rotate(90deg); }
+.ckc__desc p { margin: 0; padding: 0 56px 16px 0; font: 400 13px/1.6 var(--font); color: #3D4656; }
+@media (max-width: 639px) {
+  .ckc { padding: 0; place-items: end stretch; }
+  .ckc__box { width: 100%; max-height: calc(100dvh - 60px); border-radius: 20px 20px 0 0; box-shadow: 0 -12px 40px rgba(0,0,0,.22); }
+  .ckc__scroll { padding: 22px 20px 6px; }
+  .ckc__h { font-size: 16px; }
+  .ckc__text { font-size: 13px; }
+  .ckc__acts { padding: 14px 20px calc(16px + env(safe-area-inset-bottom)); gap: 8px; }
+  .ckc__acts--foot { grid-template-columns: 1fr 1fr; }
+  .ckc__btn { padding: 0 10px; }
+  .ckc__quick .ckc__btn { min-width: 0; flex: 1; }
+  .ckc__desc p { padding-right: 0; }
+}

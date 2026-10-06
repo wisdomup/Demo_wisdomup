@@ -16,7 +16,7 @@ html[data-theme="night"] {
   --n-text: #F2F3F5; --n-text2: #C9CDD2; --n-muted: #9AA0A6; --n-dim: #6F757C;
   --n-red: #D91E05; --n-red-hi: #F0300F; --n-red-text: #FF6A4A; --n-red-soft: rgba(217,30,5,.14); --n-red-line: rgba(217,30,5,.38);
   /* design-system tokens re-pointed */
-  --page: var(--n-bg); --panel: var(--n-bg2); --card: var(--n-card); --chip: var(--n-raise); --field: var(--n-raise2); --line: var(--n-line);
+  --page: var(--n-bg); --panel: var(--n-bg2); --card: var(--n-card); --field: var(--n-raise2); /* no --chip here: it is the chip HEIGHT (32px, controls.css) — a colour in it made every night chip collapse to 26px */ --line: var(--n-line);
   --ink: var(--n-text); --ink-2: #E3E5E8; --ink-body: var(--n-text2); --ink-muted: var(--n-muted); --ink-meta: var(--n-dim); --ink-strike: var(--n-dim);
   --muted: var(--n-muted); --muted-strong: #B6BBC1; --accent-price: #FFFFFF; --navy: var(--n-text); --navy-deep: var(--n-bg2); --navy-link: rgba(255,255,255,.86); /* footer contact line + links sit on the red footer */ --utility: var(--n-muted);
   --aqua-band: var(--n-raise); --form-label: var(--n-text2); --form-line: var(--n-line2); --form-required: var(--n-red-text); --focus: #FFFFFF; --frame-selected: #fff;
@@ -98,6 +98,7 @@ html[data-theme="night"] .pp__h { color: #fff; }
 html[data-theme="night"] :is(.pp__sub, .pp__note) { color: var(--n-muted); }
 html[data-theme="night"] .bulk__h { color: #fff; }
 html[data-theme="night"] :is(.bulk__p, .bulk__pt) { color: var(--n-text2); }
+html[data-theme="night"] .bulk__pt { background: var(--n-raise); }
 html[data-theme="night"] .bulk__pt i { background: var(--n-red); }
 html[data-theme="night"] .bulk__alt { color: var(--n-red-text); }
 html[data-theme="night"] .eyebrow { color: var(--n-red-text); }
@@ -375,3 +376,72 @@ html[data-theme="night"] :is(.qadd__title a, .qadd__price, .qadd__label span) { 
 html[data-theme="night"] :is(.qadd__kicker, .qadd__label, .qadd__label small) { color: var(--n-muted); }
 html[data-theme="night"] .qadd__kicker b { color: var(--n-text2); }
 html[data-theme="night"] .qadd__more { color: var(--n-red-text); }
+
+/* Cookie choices (2026-10-06) — the night panel skin: dark box, white type, red capsules, white outlines */
+html[data-theme="night"] .ckc__scrim { background: rgba(0,0,0,.6); }
+html[data-theme="night"] .ckc__box { background: var(--n-bg2); color: var(--n-text2); box-shadow: inset 0 0 0 1px var(--n-line2), 0 30px 80px rgba(0,0,0,.6); }
+html[data-theme="night"] .ckc__logo img { display: none; }
+html[data-theme="night"] .ckc__logo img + img { display: block; }
+html[data-theme="night"] :is(.ckc__h, .ckc__text b, .ckc__name) { color: var(--n-text); }
+html[data-theme="night"] :is(.ckc__text, .ckc__desc p) { color: var(--n-muted); }
+html[data-theme="night"] :is(.ckc__acts, .ckc__cats, .ckc__cat) { border-color: var(--n-line); }
+html[data-theme="night"] .ckc__btn--red { background: var(--n-red); color: #fff; }
+html[data-theme="night"] .ckc__btn--line { color: #fff; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.88); }
+html[data-theme="night"] .ckc__always { color: #7BD88F; }
+html[data-theme="night"] .ckc__switch { background: var(--n-raise2); }
+html[data-theme="night"] .ckc__switch[aria-checked="true"] { background: var(--n-red); }
+html[data-theme="night"] .ckc__more { background: var(--n-raise); color: var(--n-text); box-shadow: inset 0 0 0 1px var(--n-line2); }
+html[data-theme="night"] :is(.ckc__btn, .ckc__more, .ckc__switch):focus-visible { outline-color: #fff; }
+
+/* ==========================================================================
+   PRODUCT PAGE — night premium pass (2026-10-06, "find the colour inconsistency … premium").
+   One palette, no day leftovers: stage #0F1113 → panels #15181B with a faint top sheen and a white-7% hairline →
+   raised #1E2226; type white / #C9CDD2 / #9AA0A6; ONE accent = brand red (Buy, New tags, the offer, icon details,
+   stat glows); green only for "In stock"; gold only for review stars. Colours and surfaces only — no layout change.
+   ========================================================================== */
+html[data-theme="night"] { --pd-panel: linear-gradient(180deg, rgba(255,255,255,.028) 0%, rgba(255,255,255,0) 42%), var(--n-bg2); --pd-edge: inset 0 1px 0 rgba(255,255,255,.045); }
+/* every info panel on the page shares one surface */
+html[data-theme="night"] :is(.pdp2 .offer, .pdp2 .gift, .pdp2 .highlights, #spec-list, .rv__sum, #pd-faq-list) { background: var(--pd-panel); }
+html[data-theme="night"] :is(.pdp2 .offer, .pdp2 .highlights, #spec-list, .rv__sum) { box-shadow: var(--pd-edge), inset 0 0 0 1px var(--n-line); }
+
+/* "New" tag on the gallery and on product cards: the night accent, solid (was a dark gradient / a muddy red tint on light photos) */
+html[data-theme="night"] :is(.pdp2__badge, .wpc__badge) { background: var(--n-red) !important; color: #fff !important; box-shadow: 0 6px 16px rgba(217,30,5,.35) !important; }
+
+/* Offer: a red-tinted header with a solid red % mark (the day cream divider and blue mark are gone) */
+html[data-theme="night"] .offer__head { background: linear-gradient(90deg, rgba(217,30,5,.20) 0%, rgba(217,30,5,.05) 100%); border-bottom-color: rgba(217,30,5,.28); color: #fff; }
+html[data-theme="night"] .offer__head span { background: var(--n-red); color: #fff; box-shadow: 0 0 0 4px rgba(217,30,5,.16); }
+
+/* Assurance trio: the day icons (dark-grey truck, multicolour medal, teal triangle) redrawn as white line icons with one
+   red detail, each on a soft round well */
+html[data-theme="night"] .assure__i svg { width: 22px; height: 22px; padding: 9px; box-sizing: content-box; border-radius: 999px; color: #fff; background: radial-gradient(100% 100% at 30% 20%, rgba(255,255,255,.09), rgba(255,255,255,.02)); box-shadow: inset 0 0 0 1px rgba(255,255,255,.10); }
+html[data-theme="night"] .assure__i svg :is(g, rect, path, circle) { stroke: currentColor; stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; }
+html[data-theme="night"] .assure__i svg g { fill: none; }
+html[data-theme="night"] .assure__i[href*="shipping"] svg circle { fill: var(--n-bg2); stroke: var(--n-red-text); }
+html[data-theme="night"] .assure__i[href*="warranty"] svg path { fill: none; }
+html[data-theme="night"] .assure__i[href*="warranty"] svg circle:first-of-type { fill: none; }
+html[data-theme="night"] .assure__i[href*="warranty"] svg circle:last-of-type { fill: var(--n-red); stroke: none; }
+html[data-theme="night"] .assure__i[href*="returns"] svg path { stroke: var(--n-red-text); }
+html[data-theme="night"] .assure__i b { color: #fff; }
+html[data-theme="night"] .assure { box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] :is(.assure > div, .assure > a) { background: var(--pd-panel, var(--n-bg2)); }
+
+/* Stat cards: ONE dark family (the light-blue day card made its white heading unreadable; the first was warm brown),
+   told apart by where the glow sits — red, white, red */
+html[data-theme="night"] .pd-stat { color: #fff !important; border-color: var(--n-line) !important; box-shadow: inset 0 1px 0 rgba(255,255,255,.05); }
+html[data-theme="night"] .pd-stat:nth-child(3n+1) { background: radial-gradient(110% 95% at 100% 0%, rgba(217,30,5,.34) 0%, rgba(217,30,5,0) 58%), linear-gradient(165deg, #1D2024 0%, #111316 100%) !important; }
+html[data-theme="night"] .pd-stat:nth-child(3n+2) { background: radial-gradient(110% 95% at 0% 100%, rgba(255,255,255,.12) 0%, rgba(255,255,255,0) 58%), linear-gradient(165deg, #1D2024 0%, #111316 100%) !important; }
+html[data-theme="night"] .pd-stat:nth-child(3n) { background: radial-gradient(110% 95% at 100% 100%, rgba(217,30,5,.26) 0%, rgba(217,30,5,0) 58%), linear-gradient(165deg, #1D2024 0%, #111316 100%) !important; }
+html[data-theme="night"] .pd-stat .pd-stat__v { background: linear-gradient(180deg, #FFFFFF 0%, #B9BFC7 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+html[data-theme="night"] .pd-stat .pd-stat__t { color: #fff; letter-spacing: .04em; }
+html[data-theme="night"] .pd-stat .pd-stat__s { color: var(--n-muted); opacity: 1; }
+
+/* Small leftovers: the "+" in Add to cart (was a stray #222 disc), payment tags, section tabs in the nav's glass */
+html[data-theme="night"] .btn-cart .plus { background: rgba(255,255,255,.12); color: #fff; border-radius: 999px; }
+html[data-theme="night"] .pays span { background: transparent; color: var(--n-text2); box-shadow: inset 0 0 0 1px var(--n-line2); }
+html[data-theme="night"] .pdtabs__in { background: rgba(21,24,27,.72); -webkit-backdrop-filter: blur(20px) saturate(140%); backdrop-filter: blur(20px) saturate(140%); box-shadow: inset 0 0 0 .5px rgba(226,232,255,.14), 0 10px 30px rgba(0,0,0,.35); }
+html[data-theme="night"] .pdp2__now { color: #fff; }
+/* Product names on cards are headings, not text links: the blanket night `a { red }` rule out-ranked `.wpc__title a { inherit }` and turned every card title red */
+html[data-theme="night"] .wpc__title a { color: inherit; }
+html[data-theme="night"] .wpc__title { color: var(--n-text); }
+html[data-theme="night"] .pdp2__stage { box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 30px 60px rgba(0,0,0,.35); }
+

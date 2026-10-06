@@ -88,6 +88,28 @@ html[data-theme="night"] .wpc__cta { --fill: #fff; --fill-text: #D91E05; }
   html[data-theme="night"] .wpc__cta.wu-fill:not(:disabled):not([aria-disabled="true"]):hover { background: var(--n-red); box-shadow: none; }
   .wpc__cta.wu-fill .wpc__cta-ic, .wpc__cta.wu-fill .wpc__cta-t { position: relative; }
 }
+/* Cookie choices (2026-10-06): modal 600ms drawer curve + 800ms scrim; phones rise as a sheet; buttons get the liquid fill
+   (day red/outline → ink, night red → white with red text, outline → white) */
+.ckc__scrim { opacity: 0; transition: opacity var(--m-scrim); }
+.ckc.is-open .ckc__scrim { opacity: 1; }
+.ckc__box { opacity: 0; transform: translate3d(0, 2rem, 0) scale(.98); transition: transform var(--m-drawer), opacity var(--m-primary); }
+.ckc.is-open .ckc__box { opacity: 1; transform: none; }
+@media (max-width: 639px) {
+  .ckc__box { opacity: 1; transform: translate3d(0, 104%, 0); }
+  .ckc.is-open .ckc__box { transform: none; }
+}
+.ckc__switch i { transition: transform var(--m-primary); }
+.ckc__switch { transition: background-color var(--m-primary); }
+.ckc__btn--red, .ckc__btn--line { --fill: #0B0B0B; --fill-text: #fff; }
+html[data-theme="night"] .ckc__btn--red { --fill: #fff; --fill-text: #D91E05; }
+html[data-theme="night"] .ckc__btn--line { --fill: #fff; --fill-text: #111; }
+@media (hover: hover) and (pointer: fine) {
+  .ckc__btn--line.wu-fill:hover { box-shadow: inset 0 0 0 1.5px #0B0B0B; }
+  html[data-theme="night"] .ckc__btn--line.wu-fill:hover { box-shadow: inset 0 0 0 1.5px #fff; }
+  .ckc__more { transition: background-color var(--m-primary); }
+  .ckc__more:hover { background: #E6E7EA; }
+  html[data-theme="night"] .ckc__more:hover { background: var(--n-raise2); }
+}
 /* back-to-top keeps its fixed position and show/hide motion when it gets the fill */
 .totop.wu-fill { position: fixed; transition: opacity 240ms ease, transform 320ms cubic-bezier(.2,.7,.2,1), color var(--m-primary) 100ms, box-shadow var(--m-primary); }
 @media (hover: hover) and (pointer: fine) { .totop.wu-fill:hover { box-shadow: inset 0 0 0 .5px rgba(255,255,255,.6), 0 10px 24px rgba(0,0,0,.18); } }

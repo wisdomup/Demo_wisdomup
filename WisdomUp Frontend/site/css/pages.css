@@ -124,7 +124,7 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
 .highlights div { display: flex; gap: 12px; align-items: baseline; font: 400 15px/1.5 var(--font); color: #464646; }
 .highlights i { flex: none; width: 6px; height: 6px; border-radius: 999px; background: #2350C8; transform: translateY(-2px); }
 .pays { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font: 500 13px/1 var(--font); color: var(--muted); }
-.pays span { padding: 7px 10px; border-radius: 6px; background: #F3F3F3; font: 700 12px/1 var(--font); color: #464646; letter-spacing: .02em; }
+.pays span { padding: 7px 11px; border-radius: 999px; background: #F3F3F3; font: 700 12px/1 var(--font); color: #464646; letter-spacing: .02em; }
 .pdtabs { position: sticky; top: 16px; z-index: 6; display: flex; justify-content: center; margin-top: var(--sec); transition: top 320ms cubic-bezier(.2,.7,.2,1); pointer-events: none; }
 .pdtabs.is-up { top: 16px; }
 .pdtabs__in { pointer-events: auto; display: flex; gap: 6px; padding: 6px; border-radius: 999px; background: rgba(208,212,212,.62); backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%); box-shadow: 0 10px 24px rgba(0,0,0,.08); max-width: calc(100vw - 32px); overflow-x: auto; scrollbar-width: none; }
