@@ -1003,7 +1003,6 @@
   // Footer foot (2026-10-07, copied from formula1.com's footer foot, compact): the Display mode menu + solid social icons
   // (WhatsApp, Instagram, YouTube, Facebook, X) left, copyright right. Links come only from shop.js (`social` + the
   // WhatsApp number); an icon without a link is shown but is not a link (never invent an address).
-  const SF_CHEV = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"/></svg>';
   const SF_MODES = [['system', 'System'], ['day', 'Day mode'], ['night', 'Night mode']];
   const svg20 = d => `<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="currentColor">${d}</svg>`;
   const SF_ICONS = {
@@ -1013,39 +1012,66 @@
     YouTube: svg20('<path fill-rule="evenodd" d="M21.58 7.19a2.5 2.5 0 0 0-1.77-1.77C18.25 5 12 5 12 5s-6.25 0-7.81.42a2.5 2.5 0 0 0-1.77 1.77C2 8.75 2 12 2 12s0 3.25.42 4.81a2.5 2.5 0 0 0 1.77 1.77C5.75 19 12 19 12 19s6.25 0 7.81-.42a2.5 2.5 0 0 0 1.77-1.77C22 15.25 22 12 22 12s0-3.25-.42-4.81zM10 15V9l5.2 3z"/>'),
     WhatsApp: svg20('<path fill-rule="evenodd" d="M12.04 2a9.9 9.9 0 0 0-8.5 14.98L2 22l5.16-1.5A9.92 9.92 0 1 0 12.04 2zm4.52 11.99c-.25-.12-1.47-.72-1.69-.8-.23-.09-.39-.13-.56.12-.16.25-.64.8-.78.97-.15.16-.29.18-.54.06a6.76 6.76 0 0 1-3.36-2.94c-.25-.44.25-.41.72-1.36.08-.16.04-.31-.02-.43-.06-.13-.56-1.35-.77-1.84-.2-.48-.4-.42-.56-.42h-.48a.92.92 0 0 0-.66.31 2.78 2.78 0 0 0-.87 2.07c0 1.22.89 2.4 1.01 2.57.13.16 1.75 2.67 4.24 3.75 1.58.68 2.19.74 2.98.62.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.14-1.18-.06-.11-.22-.17-.47-.29z"/>')
   };
-  // The Display mode menu: a capsule button that opens a small list upward (System / Day mode / Night mode), the chosen
-  // one marked with a dot. Closes on a pick, Escape, Tab-out or an outside click; arrow keys move between the options.
+  // The Display mode control IS the All Products sort capsule (`.msort`, 2026-10-07 "follow the stroke and animation of the
+  // Featured button"): the same 1.5px stroke, liquid fill, morph, round × and text-link options — mirrored to open UPWARD
+  // (`.msort--up`) because it sits at the foot of the page: the panel starts exactly on the button (bottom-left anchored)
+  // and its clip-path grows to the whole panel in 500ms; "Display mode" fades out, the title fades in, the × turns in,
+  // the options fade in 50ms apart. Closes on ×, a pick, Escape, Tab or an outside click (folds back into the button).
   function mountModeMenu(box) {
     if (!box) return;
-    const btn = box.querySelector('.sf__mode-btn'), list = box.querySelector('.sf__menu'), opts = [...list.querySelectorAll('.sf__opt')];
-    let timer = 0;
-    const mark = () => opts.forEach(o => o.setAttribute('aria-checked', o.dataset.mode === themeMode()));
-    const open = (focus) => {
-      clearTimeout(timer); mark();
-      list.hidden = false; btn.setAttribute('aria-expanded', 'true'); document.body.classList.add('sf-menu-open');
-      requestAnimationFrame(() => requestAnimationFrame(() => list.classList.add('is-open')));
-      if (focus) (opts.find(o => o.getAttribute('aria-checked') === 'true') || opts[0]).focus();
-      document.addEventListener('pointerdown', outside, true);
+    const btn = box.querySelector('.msort__btn'), panel = box.querySelector('.msort__panel'), list = box.querySelector('.msort__list');
+    const opts = [...list.querySelectorAll('.msort__opt')];
+    let active = 0, closing = 0;
+    const isOpen = () => !panel.hidden && panel.classList.contains('is-open');
+    const mark = () => {
+      opts.forEach(o => o.setAttribute('aria-selected', o.dataset.mode === themeMode()));
+      btn.setAttribute('aria-label', 'Display mode: ' + (SF_MODES.find(([m]) => m === themeMode()) || SF_MODES[1])[1]);
     };
-    const close = (refocus) => {
-      if (btn.getAttribute('aria-expanded') !== 'true') return;
-      btn.setAttribute('aria-expanded', 'false'); list.classList.remove('is-open'); document.body.classList.remove('sf-menu-open');
-      document.removeEventListener('pointerdown', outside, true);
-      timer = setTimeout(() => { list.hidden = true; }, reduced() ? 0 : 600);
-      if (refocus) btn.focus();
-    };
-    const outside = e => { if (!box.contains(e.target)) close(false); };
-    btn.addEventListener('click', e => (btn.getAttribute('aria-expanded') === 'true' ? close(false) : open(e.detail === 0)));
-    btn.addEventListener('keydown', e => { if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); open(true); } });
-    list.addEventListener('click', e => { const o = e.target.closest('.sf__opt'); if (!o) return; setTheme(o.dataset.mode); mark(); close(true); });
+    const markActive = i => { active = (i + opts.length) % opts.length; opts.forEach((o, k) => o.classList.toggle('is-active', k === active)); list.setAttribute('aria-activedescendant', opts[active].id); };
+    function open() {
+      clearTimeout(closing); mark();
+      const r = btn.getBoundingClientRect();
+      panel.classList.add('is-setup'); // no transitions while it is measured and placed, so the morph starts exactly on the button
+      panel.style.left = '0px';
+      panel.hidden = false;
+      // anchored to the button's bottom-left; slides left only if it would leave the screen (12px margin)
+      const vwid = document.documentElement.clientWidth, pw = panel.offsetWidth, g = 12;
+      const shift = Math.max(0, Math.min(r.left - g, r.left + pw - (vwid - g)));
+      panel.style.left = (-shift) + 'px';
+      panel.style.setProperty('--sb-w', r.width + 'px');
+      panel.style.setProperty('--sb-h', r.height + 'px');
+      panel.style.setProperty('--sb-l', shift + 'px');
+      panel.style.setProperty('--sb-r', Math.max(0, pw - shift - r.width) + 'px');
+      void panel.querySelector('.msort__sheet').offsetWidth; // commit the closed shape before transitions come back
+      panel.classList.remove('is-setup');
+      requestAnimationFrame(() => requestAnimationFrame(() => panel.classList.add('is-open')));
+      btn.setAttribute('aria-expanded', 'true');
+      document.body.classList.add('sf-menu-open');
+      list.focus({ preventScroll: true });
+      markActive(Math.max(0, opts.findIndex(o => o.dataset.mode === themeMode())));
+    }
+    function close(focusBtn) {
+      if (panel.hidden) return;
+      panel.classList.remove('is-open');
+      btn.setAttribute('aria-expanded', 'false');
+      document.body.classList.remove('sf-menu-open');
+      const done = () => { panel.hidden = true; };
+      if (reduced()) done(); else closing = setTimeout(done, 560);
+      if (focusBtn) btn.focus({ preventScroll: true });
+    }
+    const pick = m => { setTheme(m); mark(); close(true); };
+    mark();
+    btn.addEventListener('click', () => (isOpen() ? close() : open()));
+    box.querySelector('.msort__x').addEventListener('click', () => close(true));
+    list.addEventListener('click', e => { const o = e.target.closest('[data-mode]'); if (o) pick(o.dataset.mode); });
     list.addEventListener('keydown', e => {
-      const i = opts.indexOf(document.activeElement);
-      if (e.key === 'Escape') { e.preventDefault(); close(true); }
-      else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); opts[(i + (e.key === 'ArrowDown' ? 1 : opts.length - 1)) % opts.length].focus(); }
-      else if (e.key === 'Home' || e.key === 'End') { e.preventDefault(); opts[e.key === 'Home' ? 0 : opts.length - 1].focus(); }
-      else if (e.key === 'Tab') close(false);
+      if (e.key === 'ArrowDown') { e.preventDefault(); markActive(active + 1); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); markActive(active - 1); }
+      else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(opts[active].dataset.mode); }
+      else if (e.key === 'Escape' || e.key === 'Tab') close(e.key === 'Escape');
     });
-    btn.addEventListener('keydown', e => { if (e.key === 'Escape') close(true); });
+    panel.addEventListener('keydown', e => { if (e.key === 'Escape') close(true); });
+    document.addEventListener('click', e => { if (!panel.hidden && !box.contains(e.target)) close(); });
   }
   function renderFooter() {
     const el = $('footer');
@@ -1074,11 +1100,18 @@
         <div class="subfooter">
           <div class="sf__row">
             <div class="sf__left">
-              <div class="sf__mode">
-                <button type="button" class="sf__mode-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="sf-mode"><span>Display mode</span>${SF_CHEV}</button>
-                <ul class="sf__menu" id="sf-mode" role="menu" aria-label="Display mode" hidden>
-                  ${SF_MODES.map(([m, t]) => `<li role="none"><button type="button" class="sf__opt" role="menuitemradio" aria-checked="false" data-mode="${m}" data-no-fill tabindex="-1"><span>${t}</span><i aria-hidden="true"></i></button></li>`).join('')}
-                </ul>
+              <div class="msort msort--up sf__mode">
+                <button type="button" class="msort__btn" aria-haspopup="listbox" aria-expanded="false" aria-controls="dm-list" aria-label="Display mode"><span class="msort__cur">Display mode</span><span class="msort__dot" aria-hidden="true"></span></button>
+                <div class="msort__panel" hidden>
+                  <div class="msort__sheet">
+                    <div class="msort__head">
+                      <span class="msort__now" aria-hidden="true"><b>Display mode</b></span>
+                      <span class="msort__title" aria-hidden="true">Display mode</span>
+                      <button type="button" class="msort__x" aria-label="Close display mode menu" data-no-fill><svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+                    </div>
+                    <ul class="msort__list" id="dm-list" role="listbox" aria-label="Display mode" tabindex="-1">${SF_MODES.map(([m, t], i) => `<li class="msort__opt" role="option" id="dm-${m}" data-mode="${m}" aria-selected="false" style="--i: ${i};"><span>${t}</span></li>`).join('')}</ul>
+                  </div>
+                </div>
               </div>
               <div class="sf__social">${socials.map(([n, h]) => h
                 ? `<a class="sf__soc" href="${esc(h)}" target="_blank" rel="noopener noreferrer" aria-label="WisdomUp on ${n}" title="${n}" data-no-fill>${SF_ICONS[n]}</a>`

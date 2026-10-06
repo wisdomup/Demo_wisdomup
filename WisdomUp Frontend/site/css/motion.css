@@ -208,6 +208,9 @@ html[data-theme="night"] .ckc__btn--line { --fill: #fff; --fill-text: #111; }
    even on the straights AND the curves at every frame of the morph */
 .msort__sheet { --rad: calc(var(--sb-h, 40px) / 2); --e: 1.5px; /* the same stroke as the closed capsule */ clip-path: inset(0 var(--sb-r, 0px) calc(100% - var(--sb-h, 40px)) var(--sb-l, calc(100% - var(--sb-w, 120px))) round var(--rad)); transition: clip-path var(--m-primary); }
 .msort__sheet::before { clip-path: inset(var(--e) calc(var(--sb-r, 0px) + var(--e)) calc(100% - var(--sb-h, 40px) + var(--e)) calc(var(--sb-l, calc(100% - var(--sb-w, 120px))) + var(--e)) round calc(var(--rad) - var(--e))); transition: clip-path var(--m-primary); }
+/* opening UPWARD (footer Display mode, .msort--up): the same morph from the button's rectangle at the panel's bottom edge */
+.msort--up .msort__sheet { clip-path: inset(calc(100% - var(--sb-h, 40px)) var(--sb-r, 0px) 0 var(--sb-l, 0px) round var(--rad)); }
+.msort--up .msort__sheet::before { clip-path: inset(calc(100% - var(--sb-h, 40px) + var(--e)) calc(var(--sb-r, 0px) + var(--e)) var(--e) calc(var(--sb-l, 0px) + var(--e)) round calc(var(--rad) - var(--e))); }
 .msort__panel.is-open .msort__sheet { clip-path: inset(0 round var(--rad)); }
 .msort__panel.is-open .msort__sheet::before { clip-path: inset(var(--e) round calc(var(--rad) - var(--e))); }
 .msort__panel.is-setup .msort__sheet, .msort__panel.is-setup .msort__sheet::before { transition: none !important; } /* :is() can't hold a pseudo-element */
