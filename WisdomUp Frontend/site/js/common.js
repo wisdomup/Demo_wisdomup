@@ -99,7 +99,12 @@
   }
   /* ---------- Cart: line items (sku + qty) kept on this device. Prices always come from the catalogue,
      and the order server recomputes them again, so a stale or edited cart can never change what is charged. ---------- */
-  const SHOP = window.WU_SHOP || { freeDeliveryFrom: 40000, maxQty: 10, giftWrap: 490, delivery: { standard: { fee: 250, freeOver: true } } };
+  const SHOP = window.WU_SHOP || { freeDeliveryFrom: 20000, maxQty: 10, giftWrap: 490, delivery: { standard: { fee: 250, freeOver: true } } };
+  // Copy that quotes the free-delivery threshold ({FREE_FROM} in wu-data.js) always follows shop.js
+  const FREE_FROM = D.rs(SHOP.freeDeliveryFrom);
+  const fillFree = t => typeof t === 'string' ? t.replace(/\{FREE_FROM\}/g, FREE_FROM) : t;
+  (D.trust || []).forEach(t => { t.label = fillFree(t.label); });
+  if (Array.isArray(D.faqs)) D.faqs = D.faqs.map(f => Array.isArray(f) ? f.map(fillFree) : f);
   /* ---------- SEO: one place sets the tab title, description, canonical link, social preview and structured data.
      Static pages get these tags in their HTML from tools/build_seo.py; pages built from the catalogue (a category,
      a product, a blog post) call WU.seo() to describe themselves. Addresses always use the live domain (SHOP.siteUrl),
@@ -590,13 +595,14 @@
     host.classList.add('is-anim');
     let closing = 0;
     const open = () => { clearTimeout(closing); host.hidden = false; document.documentElement.style.overflow = 'hidden'; paint(); requestAnimationFrame(() => host.classList.add('is-open')); setTimeout(() => input.focus(), 30); typeHint(input); };
-    const close = () => { host.classList.remove('is-open'); document.documentElement.style.overflow = ''; stopHint(); const done = () => { host.hidden = true; }; if (reduced()) done(); else closing = setTimeout(done, 650); };
+    const close = () => { host.classList.remove('is-open'); document.documentElement.style.overflow = ''; stopHint(); const done = () => { host.hidden = true; }; if (reduced()) done(); else closing = setTimeout(done, 850); };
     input.addEventListener('input', paint);
     let sentQ = ''; // tell the pixel what was searched, once per finished query
     input.addEventListener('change', () => { const q = input.value.trim(); if (q.length > 1 && q !== sentQ) { sentQ = q; px('Search', { search_string: q }); } });
     input.addEventListener('keydown', e => { if (e.key === 'Enter') { const a = grid.querySelector('a') || pagesEl.querySelector('a'); if (a) location.href = a.href; } });
     host.addEventListener('click', e => { if (e.target === host || e.target.closest('.search__close')) close(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && !host.hidden) close(); });
+    sheetDrag(host.querySelector('.search'), close, { scroller: () => host.querySelector('.search'), head: '.search__field' });
     return { open, close };
   }
 
@@ -690,10 +696,10 @@
       next.toggleAttribute('data-dim', t.scrollLeft + t.clientWidth >= t.scrollWidth - 4);
     };
     const show = i => {
-      if (i === cur) return;
+      if (i === cur || !panes[i]) return;
       const from = tracks[cur], to = tracks[i];
       cur = i;
-      root.querySelectorAll('[data-tab]').forEach((c, k) => c.setAttribute('aria-selected', k === i));
+      root.querySelectorAll('.shop-rail__tabs [data-tab]').forEach((c, k) => c.setAttribute('aria-selected', k === i));
       if (all && panes[i].allHref) all.href = panes[i].allHref;
       const swap = () => {
         tracks.forEach((t, k) => { t.hidden = k !== i; });
@@ -706,7 +712,7 @@
       a.onfinish = () => { a.cancel(); swap(); };
     };
     root.addEventListener('click', e => {
-      const tab = e.target.closest('[data-tab]');
+      const tab = e.target.closest('.shop-rail__tabs [data-tab]'); // only the tab chips (the rail sections carry their own data-tab)
       if (tab) { show(+tab.dataset.tab); return; }
       const s = e.target.closest('[data-step]');
       if (!s) return;
@@ -832,39 +838,71 @@
   function renderFooter() {
     const el = $('footer');
     if (!el) return;
+    // Full-bleed, square footer that the page lifts off as you reach the end (the block is fixed under the page and
+    // revealed through the wrap). Four groups — Products / Explore / Support / Contact — columns on desktop, accordion on phones.
+    const contact = { title: 'Contact', links: [['We’re here to help ›', url.help], ['support@wisdomup.pk', 'mailto:support@wisdomup.pk'], ['+92 327 9800153', 'tel:+923279800153']] };
+    const groups = D.footer.map(c => ({ title: c.title, links: c.links.map(l => Array.isArray(l) ? l : [String(l), linkFor(String(l))]) })).concat(contact);
     el.innerHTML = `
-      <footer class="footer">
-        ${D.footer.map((c, i) => `<div class="ft__group"><h4><button type="button" class="ft__q" aria-expanded="false" aria-controls="ft-g${i}"><span>${esc(c.title)}</span><span class="ft__chev">${icon('chev-r', 18)}</span></button></h4><div class="ft__links" id="ft-g${i}">${c.links.map(l => { const h = linkFor(l); return `<a href="${h}"${isHere(h) ? ' aria-current="page"' : ''}>${esc(l)}</a>`; }).join('')}</div></div>`).join('')}
-        <div>
-          <a href="${url.home}" aria-label="WisdomUp home"><img src="img/wu-logo-white.png" alt="Wisdomup" style="height: 40px; display: block; margin-bottom: 20px;"></a>
-          <p style="margin: 0 0 12px; font: 400 13px var(--font);"><a class="ft__help" href="${url.help}">We're here to help ›</a></p>
-          <p style="margin: 0 0 12px; font: 400 13px var(--font); color: var(--navy-link);">support@wisdomup.pk · +92 327 9800153</p>
-          <p class="footer__nl-msg" style="margin: 22px 0 12px; font: 400 13px var(--font);">New launches and live-only deals, straight to your inbox.</p>
-          <form class="newsletter"><input type="email" placeholder="Email address" aria-label="Email address"><button aria-label="Subscribe" type="submit">${icon('arrow', 18)}</button></form>
-        </div>
-      </footer>
-      <div class="subfooter"><span>Copyright © 2026 WisdomUp. All rights reserved.</span><span>Cash on Delivery · JazzCash · EasyPaisa · Bank transfer</span></div>`;
+      <div class="footer-fixed">
+        <footer class="footer">
+          <div class="footer__top">
+            <a class="footer__brand" href="${url.home}" aria-label="WisdomUp home"><img src="img/wu-logo-white.png" alt="WisdomUp"></a>
+            <div class="footer__nl">
+              <p class="footer__nl-msg">New launches and live-only deals, straight to your inbox.</p>
+              <form class="newsletter"><input type="email" placeholder="Email address" aria-label="Email address"><button aria-label="Subscribe" type="submit">${icon('arrow', 18)}</button></form>
+            </div>
+          </div>
+          <div class="footer__grid">
+            ${groups.map((c, i) => `<div class="ft__group"><h4><button type="button" class="ft__q" aria-expanded="false" aria-controls="ft-g${i}"><span>${esc(c.title)}</span><span class="ft__chev">${icon('chev-r', 18)}</span></button></h4><div class="ft__links" id="ft-g${i}" hidden>${c.links.map(([t, h]) => `<a href="${h}"${here() === h ? ' aria-current="page"' : ''}>${esc(t)}</a>`).join('')}</div></div>`).join('')}
+          </div>
+        </footer>
+        <div class="subfooter"><span>Copyright © ${YEAR} WisdomUp. All rights reserved.</span><span>Cash on Delivery · JazzCash · EasyPaisa · Bank transfer</span></div>
+      </div>`;
     el.addEventListener('click', e => { const a = e.target.closest('.footer a[href="#"]'); if (a) e.preventDefault(); });
     // Link groups collapse into a one-open-at-a-time accordion (same behaviour as the FAQ) when the footer stacks.
     const FT_ACC = matchMedia('(max-width: 767px)');
-    const groups = [...el.querySelectorAll('.ft__group')];
-    const setGroup = open => groups.forEach(g => {
+    const groupEls = [...el.querySelectorAll('.ft__group')];
+    const setGroup = open => groupEls.forEach(g => {
       const on = !FT_ACC.matches || g === open;
       g.querySelector('.ft__q').setAttribute('aria-expanded', on);
       g.querySelector('.ft__q').tabIndex = FT_ACC.matches ? 0 : -1;
       if (FT_ACC.matches) slide(g.querySelector('.ft__links'), on); else g.querySelector('.ft__links').hidden = !on;
     });
-    groups.forEach(g => g.querySelector('.ft__q').addEventListener('click', () => {
+    groupEls.forEach(g => g.querySelector('.ft__q').addEventListener('click', () => {
       if (!FT_ACC.matches) return;
       setGroup(g.querySelector('.ft__q').getAttribute('aria-expanded') === 'true' ? null : g);
     }));
-    const current = groups.find(g => g.querySelector('[aria-current="page"]')) || null; // open the group for this page
+    const current = groupEls.find(g => g.querySelector('[aria-current="page"]')) || null; // open the group for this page
     FT_ACC.addEventListener('change', () => setGroup(current));
     setGroup(current);
     el.querySelector('.newsletter').addEventListener('submit', e => {
       e.preventDefault();
       if (e.currentTarget.querySelector('input').value) el.querySelector('.footer__nl-msg').textContent = 'Thanks — you’re on the list.';
     });
+    // The reveal: the wrap keeps the footer's height in the flow, the footer itself is fixed to the viewport bottom and
+    // clipped to the wrap, so the page slides up and uncovers it. Falls back to a normal footer when it would be taller
+    // than the screen, for reduced motion, or without clip-path.
+    const fixed = el.querySelector('.footer-fixed');
+    let fitting = false;
+    const fit = () => {
+      if (fitting) return;
+      fitting = true;
+      const h = fixed.offsetHeight;
+      const ok = !reduced() && window.CSS && CSS.supports('clip-path', 'inset(0)') && h < innerHeight - 24;
+      el.classList.toggle('is-fixed', ok);
+      if (ok) {
+        el.style.height = h + 'px'; el.style.marginBottom = '';
+        // anything below the wrap (the page's bottom padding) would clip the footer's last pixels: pull the page end up to the wrap
+        const gap = Math.max(0, document.documentElement.scrollHeight - (el.offsetTop + el.offsetHeight));
+        if (gap) el.style.marginBottom = (-gap) + 'px';
+      } else { el.style.height = ''; el.style.marginBottom = ''; }
+      fitting = false;
+    };
+    if ('ResizeObserver' in window) new ResizeObserver(() => fit()).observe(fixed);
+    window.addEventListener('resize', fit);
+    window.addEventListener('load', fit);
+    fit();
+    setTimeout(fit, 800);
   }
 
   /* ---------- Smooth in-page scrolling that clears the fixed nav + any sticky bar ---------- */
@@ -902,6 +940,18 @@
       toTop.blur();
     });
     document.body.append(toTop);
+    // When the copyright band is on screen the button rides above it instead of covering it
+    let raf = 0;
+    const lift = () => {
+      raf = 0;
+      const sub = document.querySelector('.subfooter');
+      const over = sub ? Math.max(0, Math.round(innerHeight - sub.getBoundingClientRect().top)) : 0;
+      toTop.style.setProperty('--totop-lift', over + 'px');
+    };
+    const soon = () => { if (!raf) raf = requestAnimationFrame(lift); };
+    window.addEventListener('scroll', soon, { passive: true });
+    window.addEventListener('resize', soon);
+    lift();
   }
   let menu;
   /* ---------- Motion: quiet scroll reveal (text rises 8px and un-blurs; blocks rise and fade; siblings stagger) ---------- */
@@ -911,7 +961,7 @@
   const RV_SKIP = '#site-nav, .mnav, .cartd, .fdrawer, .search, .hero, .buybar, .toast, .wu-util, .quick, .visually-hidden, .seo__more';
   let revealer = null;
   // ---------- Motion engine (MOTION-REPORT.md, approved 2026-10-06): reveals, grid staggers, scroll-driven curtain/clip, liquid fills, magnets ----------
-  const FILL_SEL = '.btn-pill, .btn-buy, .btn-navy, .btn-outline, .btn-cart, .shop-rail__all, .loop__cta, .pp__cta, .seo__toggle, .fdrawer__apply, .ck__place, .cartd__go, .mnav__foot a, .nh-btn';
+  const FILL_SEL = '.btn-pill, .btn-buy, .btn-navy, .btn-outline, .btn-cart, .shop-rail__all, .loop__cta, .pp__cta, .seo__toggle, .fdrawer__apply, .ck__place, .cartd__go, .mnav__foot a, .nh-btn, .totop';
   const MAG_SEL = '.loop__btn, .feat__btn, .shop-rail__step, .hero__arrow, .pdp2__chev, .wpc__wish, .pdp2__wish, .totop, .mnav__x, .cartd__x, .fdrawer__x, .mnav__theme, .nh-tile__add, .mnav__back';
   const X_SEL = '.mnav__x, .cartd__x, .fdrawer__x';
   const SD_CLIP = '.promo, .bulk, .duo__card, .cta-band, .quote-band, .pp__card, .nh-show, .nh-glow, .nh-live, .feat__slide';
@@ -936,6 +986,37 @@
       t.replaceWith(frag);
     });
     return i;
+  }
+
+  // Phone sheets (< 640px): every slide-in panel (menu, filters, cart, search) is a bottom sheet that drags down to close —
+  // from its header/handle, or from its list once that list is scrolled to the top (bugatti.store gesture, 2026-10-06).
+  function sheetDrag(panel, close, { scroller, head } = {}) {
+    if (!panel) return;
+    let sy = null, sx = 0, dy = 0, axis = null, armed = false;
+    panel.addEventListener('touchstart', e => {
+      if (vw() >= 640) { sy = null; return; }
+      sy = e.touches[0].clientY; sx = e.touches[0].clientX; dy = 0; axis = null;
+      const sc = scroller && scroller();
+      armed = !!(head && e.target.closest(head)) || !sc || !sc.contains(e.target) || sc.scrollTop <= 0;
+    }, { passive: true });
+    panel.addEventListener('touchmove', e => {
+      if (sy == null || !armed || axis === 'none') return;
+      const my = e.touches[0].clientY - sy, mx = e.touches[0].clientX - sx;
+      if (!axis) { if (Math.abs(my) < 10 && Math.abs(mx) < 10) return; axis = my > Math.abs(mx) * 1.5 ? 'y' : 'none'; if (axis === 'none') return; }
+      dy = Math.max(0, my);
+      panel.classList.add('is-dragging');
+      panel.style.transform = `translate3d(0, ${dy}px, 0)`;
+    }, { passive: true });
+    const end = () => {
+      if (sy == null) return;
+      const go = axis === 'y' && dy > Math.max(90, panel.offsetHeight * .15);
+      panel.classList.remove('is-dragging');
+      panel.style.transform = ''; // the CSS transition carries it on from the finger's position
+      if (go) close();
+      sy = null; axis = null; dy = 0;
+    };
+    panel.addEventListener('touchend', end);
+    panel.addEventListener('touchcancel', end);
   }
 
   // A heading whose text is written after load (the All Products title) pours in the same way
@@ -1035,7 +1116,7 @@
       // liquid fills and magnets (pointer devices only)
       if (isFine) {
         const q = sel => [...(root.matches && root.matches(sel) ? [root] : []), ...root.querySelectorAll(sel)];
-        q(FILL_SEL).forEach(b => { if (!b.closest('#site-nav') && b.querySelector('svg, img') === null || b.matches('.btn-buy, .btn-cart, .btn-pill, .btn-navy, .btn-outline, .shop-rail__all, .seo__toggle, .pp__cta, .mnav__foot a, .nh-btn, .loop__cta, .fdrawer__apply, .ck__place, .cartd__go')) b.classList.add('wu-fill'); });
+        q(FILL_SEL).forEach(b => { if (!b.closest('#site-nav') && b.querySelector('svg, img') === null || b.matches('.btn-buy, .btn-cart, .btn-pill, .btn-navy, .btn-outline, .shop-rail__all, .seo__toggle, .pp__cta, .mnav__foot a, .nh-btn, .loop__cta, .fdrawer__apply, .ck__place, .cartd__go, .totop')) b.classList.add('wu-fill'); });
         q(MAG_SEL).forEach(b => { b.classList.add('wu-mag'); if (b.matches(X_SEL)) b.classList.add('is-x'); });
       }
       collect(root);
@@ -1050,7 +1131,7 @@
         el.style.setProperty('--sd-r', (parseFloat(getComputedStyle(el).borderTopLeftRadius) || 24) + 'px');
         sd.push(el);
       });
-      const f = document.querySelector('.footer-wrap .footer');
+      const f = document.querySelector('.footer-wrap');
       if (f && !f.dataset.sd) { f.dataset.sd = 'footer'; sd.push(f); }
     };
     const drive = () => {
@@ -1224,6 +1305,7 @@
     });
     $('cartd-gift').addEventListener('change', e => setGift(e.target.checked));
     scrim.addEventListener('click', close);
+    sheetDrag(drawer, close, { scroller: () => $('cartd-body'), head: '.cartd__head' });
     drawer.addEventListener('keydown', e => {
       if (e.key === 'Escape') return close();
       if (e.key !== 'Tab') return;
@@ -1345,7 +1427,7 @@
       document.documentElement.style.overflow = '';
       if (opener && opener.setAttribute) opener.setAttribute('aria-expanded', 'false');
       const done = () => { drawer.hidden = scrim.hidden = true; drawer.style.transform = ''; unpush(true); if (opener && opener.isConnected) opener.focus(); };
-      if (reduced()) done(); else setTimeout(done, isNight() ? 850 : 360);
+      if (reduced()) done(); else setTimeout(done, 850);
     }
     drawer.addEventListener('click', e => {
       if (e.target.closest('.mnav__x')) return close();
@@ -1357,9 +1439,7 @@
       }
       const h = e.target.closest('.mnav__acc-h');
       if (h) {
-        if (isNight()) { if (h.getAttribute('aria-expanded') === 'true') unpush(); else push(h); return; }
-        const opening = h.getAttribute('aria-expanded') !== 'true';
-        drawer.querySelectorAll('.mnav__acc-h').forEach(x => setAcc(x, x === h && opening)); // one open at a time
+        if (h.getAttribute('aria-expanded') === 'true') unpush(); else push(h); // departments push a sub-level (both themes)
         return;
       }
       // Same-page category links (#cat-…) only change the hash: close so the page can react
@@ -1375,11 +1455,11 @@
       if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
       else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
     });
-    // Swipe to close — the left drawer swipes left; the night phone sheet (bugatti.store style) drags down, but only
+    // Swipe to close — the left drawer swipes left; the phone sheet (bugatti.store style, both themes) drags down, but only
     // from the header or when the list is already scrolled to the top. Vertical scrolling and swipes that start on a
     // sideways-scrolling row (tiles, chips) never move the panel.
     let sy = null, axis = null, dy = 0, fromHead = false, atTop = true;
-    const sheet = () => isNight() && vw() < 640;
+    const sheet = () => vw() < 640; // phones: the bottom sheet in both themes
     const scrollsX = el => { for (let n = el; n && n !== drawer; n = n.parentElement) if (n.scrollWidth > n.clientWidth + 1 && /auto|scroll/.test(getComputedStyle(n).overflowX)) return true; return false; };
     drawer.addEventListener('touchstart', e => {
       sx = e.touches[0].clientX; sy = e.touches[0].clientY; dx = 0; dy = 0;
@@ -1401,7 +1481,9 @@
     }, { passive: true });
     const endDrag = () => {
       drawer.classList.remove('is-dragging');
-      if ((axis === 'x' && dx < -70) || (axis === 'y' && dy > 90)) close(); else drawer.style.transform = '';
+      const go = (axis === 'x' && dx < -70) || (axis === 'y' && dy > Math.max(90, drawer.offsetHeight * .15));
+      drawer.style.transform = ''; // the transition carries it on from the finger's position
+      if (go) close();
       sx = null; axis = null; dx = 0; dy = 0;
     };
     drawer.addEventListener('touchend', endDrag);
@@ -1418,7 +1500,7 @@
     productCard, colorsOf, photoBg, photoFit, ratingOf, reviewsOf, seedOf, mountRail, mountHero, mountAccordion, DEPTS, typeLabel,
     initChrome, placeNav, setActiveCat, navOffset, scrollToEl,
     openSearch: () => search && search.open(),
-    toggleTheme, isNight, slide, staggerCards, revealWords,
+    toggleTheme, isNight, slide, staggerCards, revealWords, sheetDrag,
     seo, abs, clip, ldCrumbs, ldFaq, px, pxItem, YEAR, SITE,
   };
 })();

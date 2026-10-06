@@ -72,6 +72,9 @@ html[data-theme="night"] :is(.btn-outline, .btn-cart, .seo__toggle, .mnav__foot 
   /* chips, tabs, option pickers: colour changes with the hover curve (no lift) */
   .chip, .fbtn, .opt-chip, .policy__links a, .search__pages a, .mnav__chip, .pdtabs .chip, .nh-chip, .nh-seg button { transition: background-color var(--m-primary), color var(--m-primary), box-shadow var(--m-primary), border-color var(--m-primary); }
 }
+/* back-to-top keeps its fixed position and show/hide motion when it gets the fill */
+.totop.wu-fill { position: fixed; transition: opacity 240ms ease, transform 320ms cubic-bezier(.2,.7,.2,1), color var(--m-primary) 100ms, box-shadow var(--m-primary); }
+@media (hover: hover) and (pointer: fine) { .totop.wu-fill:hover { box-shadow: inset 0 0 0 .5px rgba(255,255,255,.6), 0 10px 24px rgba(0,0,0,.18); } }
 /* loading state: text hidden, a 2px bar sweeps across (grows from the left, shrinks to the right), 1.2s loop */
 .wu-fill.is-loading, .btn-buy.is-loading, .ck__place.is-loading { color: transparent !important; pointer-events: none; }
 .wu-fill.is-loading::after, .btn-buy.is-loading::after, .ck__place.is-loading::after { content: ""; position: absolute; left: 50%; top: 50%; width: min(50px, 34%); height: 2px; margin: -1px 0 0 min(-25px, -17%); background: currentColor; color: var(--fill-text, #fff); transform-origin: 0 50%; animation: wu-sweep 1.2s ease infinite; }
@@ -153,6 +156,53 @@ html[data-theme="night"] :is(.btn-outline, .btn-cart, .seo__toggle, .mnav__foot 
 .msort__list.is-anim.is-open .msort__opt:nth-child(5) { transition-delay: 430ms; }
 .msort__list.is-anim.is-open .msort__opt:nth-child(n+6) { transition-delay: 500ms; }
 
+/* ---------- Panels: ONE system for every slide-in (2026-10-06, bugatti.store) — menu, filters, cart, search, both themes ----------
+   · ≥640px: menu + filters slide from the left, cart from the right, search drops from the top — 600ms (.7,0,.2,1)
+   · phones: all four are BOTTOM SHEETS — top 60px, 20px top corners, 48×4 handle, rise with translateY, drag down to close (sheetDrag in common.js)
+   · scrims fade 800ms, contents fade 500ms (100ms delay on close), panels are released 850ms after closing */
+.cartd.is-dragging, .fdrawer.is-dragging, .mnav.is-dragging, .scrim .search.is-dragging { transition: none; }
+.scrim.is-anim { background: none !important; }
+.scrim.is-anim::before { content: ""; position: fixed; inset: 0; background: rgba(23,34,72,.45); opacity: 0; transition: opacity var(--m-scrim); }
+html[data-theme="night"] .scrim.is-anim::before { background: rgba(0,0,0,.6); }
+.scrim.is-anim.is-open::before { opacity: 1; }
+.scrim.is-anim, .scrim.is-anim.is-open { opacity: 1; }
+.scrim.is-anim .search { position: relative; z-index: 1; }
+@media (max-width: 639px) {
+  :is(.mnav, .fdrawer, .cartd), html[data-theme="night"] :is(.mnav, .fdrawer, .cartd) {
+    top: 60px; bottom: 0; left: 0; right: 0; width: auto; max-width: none;
+    border-radius: 20px 20px 0 0; box-shadow: 0 -12px 40px rgba(0,0,0,.16);
+  }
+  :is(.mnav, .fdrawer, .cartd) { transform: translate3d(0, 104%, 0); } /* kept apart so the theme-scoped geometry never outranks .is-open */
+  html[data-theme="night"] :is(.mnav, .fdrawer, .cartd) { box-shadow: inset 0 1px 0 var(--n-line2); }
+  :is(.mnav, .fdrawer, .cartd).is-open { transform: none; }
+  :is(.mnav, .fdrawer, .cartd)::before, .scrim.is-anim .search::before { content: ""; position: absolute; z-index: 4; top: 10px; left: 50%; width: 48px; height: 4px; margin-left: -24px; border-radius: 999px; background: rgba(0,0,0,.14); pointer-events: none; }
+  html[data-theme="night"] :is(.mnav, .fdrawer, .cartd)::before, html[data-theme="night"] .scrim.is-anim .search::before { background: rgba(255,255,255,.12); }
+  .mnav__head, html[data-theme="night"] .mnav__head { padding-top: 22px; }
+  .fdrawer__head { padding-top: 26px; }
+  .cartd__head { padding-top: 14px; }
+  .scrim.is-anim { padding: 0; }
+  .scrim.is-anim .search, html[data-theme="night"] .scrim.is-anim .search {
+    position: fixed; top: 60px; left: 0; right: 0; bottom: 0; width: auto; max-height: none;
+    padding: 28px 16px calc(16px + env(safe-area-inset-bottom)); border-radius: 20px 20px 0 0;
+    opacity: 1; overscroll-behavior: contain;
+  }
+  .scrim.is-anim .search { transform: translate3d(0, 104%, 0); }
+  html[data-theme="night"] .scrim.is-anim .search { box-shadow: inset 0 1px 0 var(--n-line2); }
+  .scrim.is-anim.is-open .search { transform: none; }
+}
+/* Menu sub-levels (both themes): a department row pushes its list in from the right (500ms) while the menu slides −30% */
+.mnav { overflow: hidden; }
+.mnav__body { position: relative; }
+.mnav__body > * { transition: transform var(--m-primary); }
+.mnav__body.is-pushed > * { transform: translateX(-30%); }
+.mnav__sub { position: absolute; left: 0; right: 0; z-index: 2; display: flex; flex-direction: column; background: #fff; transform: translateX(100%); transition: transform var(--m-primary); }
+.mnav__sub.is-in { transform: none; }
+.mnav__back { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 48px; padding: 0 12px; border: 0; border-bottom: 1px solid #EEF0F2; background: none; color: #0B0B0B; font: 700 15px/1.2 var(--font); text-align: left; cursor: pointer; }
+.mnav__back svg { flex: none; width: 20px; height: 20px; }
+.mnav__sub-body { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 8px 12px 16px; display: flex; flex-direction: column; gap: 2px; }
+.mnav .mnav__acc-h .mnav__chev, .mnav .mnav__acc-h[aria-expanded] .mnav__chev { transform: rotate(-90deg); }
+.mnav__acc-p { display: none !important; }
+
 /* ---------- Accordions and fold-outs: chevrons turn with the hover curve (heights animate in JS: 250ms ease + 150ms content) ---------- */
 .faq__chev, .ft__chev, .mnav__chev, .facc__chev, .seo__toggle svg { transition: transform var(--m-primary); }
 .wu-slide { overflow: hidden; }
@@ -166,9 +216,8 @@ html[data-theme="night"] :is(.btn-outline, .btn-cart, .seo__toggle, .mnav__foot 
 .rv__bar i { transition: --w var(--m-smooth) 100ms; }
 
 /* ---------- Scroll-driven: the footer slides down into place as it enters (a dark curtain lifts); banners open from a clipped centre ---------- */
-.footer-wrap { overflow: hidden; }
-.wu-motion .footer-wrap .footer { position: relative; transform: translate3d(0, calc(-30% * (1 - var(--sd-p, 1))), 0); will-change: transform; }
-.wu-motion .footer-wrap .footer::after { content: ""; position: absolute; inset: 0; z-index: 5; border-radius: inherit; background: #000; opacity: calc(.45 * (1 - var(--sd-p, 1))); pointer-events: none; }
+.wu-motion .footer-wrap .footer { position: relative; }
+.wu-motion .footer-wrap .footer::after { content: ""; position: absolute; inset: 0; z-index: 5; background: #000; opacity: calc(.35 * (1 - var(--sd-p, 1))); pointer-events: none; }
 .wu-motion [data-sd="clip"].is-clipping { clip-path: inset(calc(20% * var(--sd-q, 0)) calc(35% * var(--sd-q, 0)) 0 calc(35% * var(--sd-q, 0)) round var(--sd-r, 24px)); will-change: clip-path; }
 
 /* ---------- Press: controls settle to 98% ---------- */
@@ -178,10 +227,10 @@ html[data-theme="night"] :is(.btn-outline, .btn-cart, .seo__toggle, .mnav__foot 
 
 @media (prefers-reduced-motion: reduce) {
   .wu-motion [data-rv], .wu-motion [data-rv="words"] .wu-w { opacity: 1 !important; transform: none !important; transition: none !important; }
-  .wu-motion .footer-wrap .footer { transform: none !important; }
   .wu-motion .footer-wrap .footer::after { display: none; }
   .wu-motion [data-sd="clip"].is-clipping { clip-path: none !important; }
   .wu-fill::before { display: none; }
+  .mnav__body > *, .mnav__sub, .scrim.is-anim::before, .scrim.is-anim .search { transition: none !important; }
   .wu-mag > svg { transition: none !important; transform: none !important; }
   .wu-fill.is-loading::after { animation: none; }
   *, *::before, *::after { transition-duration: 1ms !important; animation-duration: 1ms !important; }

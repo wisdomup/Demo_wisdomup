@@ -54,7 +54,7 @@
     .map(([k, v]) => ({ v, t: k, s: '' }))
     .concat([{ v: 'Warranty', t: 'Brand cover', s: 'Manufacturing defects covered — see the warranty policy.' }]);
   const FAQS = (FAQ[dept.id] || []).concat([
-    ['How long does delivery take?', 'Standard delivery takes 3–5 working days anywhere in Pakistan; express arrives in 1–2. Orders above Rs.40,000 ship free.'],
+    ['How long does delivery take?', 'Standard delivery takes 3–5 working days anywhere in Pakistan; express arrives in 1–2. Orders above ' + WU.D.rs((window.WU_SHOP || {}).freeDeliveryFrom || 20000) + ' ship free.'],
     ['Can I pay cash on delivery?', 'Yes — pay by Cash on Delivery, JazzCash, EasyPaisa or bank transfer.'],
     ['Can I return it?', 'Yes — every order has a 7-day money-back guarantee if the product is in its original condition and packaging.'],
   ]);
@@ -191,9 +191,10 @@
   };
   let qty = 1;
   const paintOffer = () => {
-    const left = 40000 - V[cur].price * qty;
+    const FREE_FROM = (window.WU_SHOP || {}).freeDeliveryFrom || 20000;
+    const left = FREE_FROM - V[cur].price * qty;
     $('offer-text').textContent = left > 0
-      ? `Orders above Rs.40,000 ship free nationwide. Add ${WU.D.rs(left)} more to qualify.`
+      ? `Orders above ${WU.D.rs(FREE_FROM)} ship free nationwide. Add ${WU.D.rs(left)} more to qualify.`
       : 'Great news — this order qualifies for free nationwide shipping.';
   };
   function showImage(src) {

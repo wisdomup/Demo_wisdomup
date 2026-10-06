@@ -49,6 +49,8 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
 .nav-spacer { height: 96px; }
 @media (max-width: 639px) { .nav-spacer { height: 67px; } }
 .crumbs { margin: 0 var(--gutter, 28px); display: flex; flex-wrap: wrap; gap: 8px; font: 500 14px/1.4 var(--font); color: var(--muted); }
+/* Pages with a banner: the trail sits under it with a fine gap (requested 2026-10-06) */
+.ihero + .crumbs { margin-top: 16px; }
 .crumbs a { color: var(--muted); }
 .crumbs a:hover { color: #273F85; text-decoration: underline; text-underline-offset: 3px; }
 .crumbs [aria-current] { color: #464646; }
@@ -291,7 +293,7 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
 /* Listing header (Zenni-style): breadcrumb → title → one-line blurb → pills → count + sort */
 /* Listing header — one centred stack that leads the eye down to the centred filter capsule:
    small quiet breadcrumb → big title → one-line blurb (read more) → capsule → grid toolbar (count left, sort right). */
-.mhead { display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 22px var(--gutter, 12px) 0; padding-bottom: 10px; text-align: center; }
+.mhead { display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 17px var(--gutter, 12px) 0; padding-bottom: 10px; text-align: center; }
 .mcrumbs { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 8px; max-width: 100%; font: 500 13px/1 var(--font); letter-spacing: .01em; color: var(--muted); }
 .mcrumbs a { display: inline-flex; color: var(--muted); }
 .mcrumbs a:hover { color: #172248; }
@@ -420,7 +422,7 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
 
 /* Wider screens: same components, roomier sizes */
 @media (min-width: 640px) {
-  .mhead { margin: 34px var(--gutter, 28px) 0; gap: 12px; padding-bottom: 14px; }
+  .mhead { margin: 17px var(--gutter, 28px) 0; gap: 12px; padding-bottom: 14px; } /* same fine gap under the banner as the info pages */
   .mtitle { font-size: clamp(34px, 3.4vw, 48px); }
   .mdesc { max-width: 720px; font-size: 16px; }
   .mdesc__more { font-size: 15px; }

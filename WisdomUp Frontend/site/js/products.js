@@ -357,11 +357,13 @@
     if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
     else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
   });
-  // Swipe the panel left to close — only for a clearly sideways swipe. Vertical scrolling, and swipes
+  // Wider screens: swipe the panel left to close — only for a clearly sideways swipe. Vertical scrolling, and swipes
   // that start on a sideways-scrolling row (tiles, chips), never move the panel.
   let sx = null, sy = null, dx = 0, axis = null;
   const scrollsX = el => { for (let n = el; n && n !== drawer; n = n.parentElement) if (n.scrollWidth > n.clientWidth + 1 && /auto|scroll/.test(getComputedStyle(n).overflowX)) return true; return false; };
-  drawer.addEventListener('touchstart', e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; dx = 0; axis = scrollsX(e.target) ? 'y' : null; }, { passive: true });
+  drawer.addEventListener('touchstart', e => { if (innerWidth < 640) { sx = null; return; } sx = e.touches[0].clientX; sy = e.touches[0].clientY; dx = 0; axis = scrollsX(e.target) ? 'y' : null; }, { passive: true });
+  // Phones: the filter panel is a bottom sheet (same system as the menu) — drag it down to close
+  WU.sheetDrag(drawer, () => closeDrawer(), { scroller: () => drawer.querySelector('.fdrawer__body'), head: '.fdrawer__head' });
   drawer.addEventListener('touchmove', e => {
     if (sx == null || axis === 'y') return;
     const mx = e.touches[0].clientX - sx, my = e.touches[0].clientY - sy;

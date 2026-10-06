@@ -88,7 +88,7 @@ PAGES = {
         desc="WisdomUp's 7-day money-back guarantee in Pakistan: how to return or exchange a product, what condition it must be in, and how refunds are paid."),
     'shipping.html': dict(path='shipping.html', crumb='Shipping Policy',
         title='Shipping & Delivery in Pakistan — Cash on Delivery | WisdomUp',
-        desc='WisdomUp delivers to every city in Pakistan: standard delivery in 3–5 working days, express in 1–2, free shipping above Rs.40,000 and Cash on Delivery.'),
+        desc='WisdomUp delivers to every city in Pakistan: standard delivery in 3–5 working days, express in 1–2, free shipping above Rs.20,000 and Cash on Delivery.'),
     'track.html': dict(path='track.html', crumb='Order Tracker',
         title='Track Your Order — WisdomUp Order Tracker',
         desc='Track your WisdomUp order with your order number and phone number, and see delivery times across Pakistan.'),

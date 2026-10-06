@@ -216,7 +216,6 @@ a.trust__item { text-decoration: none; border-radius: 12px; transition: color 18
 a.trust__item:hover { color: #172248 !important; }
 a.trust__item:hover span { text-decoration: underline; text-underline-offset: 3px; }
 .footer-wrap .footer a[aria-current="page"] { color: #fff; font-weight: 700; }
-.footer-wrap .footer a.ft__help { display: inline; padding: 0; color: #fff; text-decoration: underline; text-underline-offset: 3px; }
 .wu-util .utility a[aria-current="page"] { color: #172248; font-weight: 700; }
 .duo__more { color: #fff; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
 .duo__more:hover { color: #fff; }

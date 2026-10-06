@@ -27,10 +27,10 @@ window.WU_STORE = (function () {
     types: C.types,
     typeLabel: t => (C.types[t] || {}).label || t,
     utility: [{ label: 'Live Shopping', tone: 'gold' }, { label: 'Bulk Order' }, { label: 'Corporate Order' }, { label: 'Express Delivery' }, { label: 'Order Tracker' }, { label: 'Help Center' }],
-    trust: [{ icon: 'truck', label: 'Fast, free shipping\nover Rs.40,000' }, { icon: 'smile', label: '7-day money-back\nguarantee' }, { icon: 'medal', label: 'Hassle-free\nwarranty' }, { icon: 'shield', label: 'Lifetime customer\nsupport' }],
+    trust: [{ icon: 'truck', label: 'Fast, free shipping\nover {FREE_FROM}' }, { icon: 'smile', label: '7-day money-back\nguarantee' }, { icon: 'medal', label: 'Hassle-free\nwarranty' }, { icon: 'shield', label: 'Lifetime customer\nsupport' }],
     faqs: [
       ['What is your return policy?', 'We offer a 7-day return policy from the date of delivery.\nProducts must be in original condition and packaging.\nTo start a return, contact support with your order details.'],
-      ['How long does shipping take?', 'Standard shipping takes 3–5 working days within Pakistan.\nExpress delivery arrives in 1–2 working days.\nOrders above Rs.40,000 ship free.'],
+      ['How long does shipping take?', 'Standard shipping takes 3–5 working days within Pakistan.\nExpress delivery arrives in 1–2 working days.\nOrders above {FREE_FROM} ship free.'],
       ['Do your products come with a warranty?', 'Every WisdomUp product has at least a 6-month warranty.\nPremium products carry up to 2 years.\nWarranty covers manufacturing defects and hardware failures.'],
       ['Are your earbuds compatible with iOS and Android?', 'Yes — all Bluetooth earbuds and headphones pair with iOS, Android, Windows, macOS and other Bluetooth devices.'],
       ['What payment methods do you accept?', 'Cash on Delivery, JazzCash, EasyPaisa and bank transfer. For JazzCash, EasyPaisa and bank transfer, send the total to our account and share the receipt on WhatsApp.'],
