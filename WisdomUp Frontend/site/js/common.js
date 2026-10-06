@@ -307,13 +307,19 @@
   const MOON = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M20.5 14.4A8.5 8.5 0 0 1 9.6 3.5a8.5 8.5 0 1 0 10.9 10.9z"/></svg>';
   const isNight = () => document.documentElement.getAttribute('data-theme') === 'night';
   const paintThemeBtns = () => document.querySelectorAll('[data-act="theme"]').forEach(b => { b.innerHTML = isNight() ? SUN : MOON; b.setAttribute('aria-label', isNight() ? 'Switch to day mode' : 'Switch to night mode'); b.title = b.getAttribute('aria-label'); });
-  function toggleTheme() {
-    const night = !isNight();
+  // Saved mode: 'day' | 'night' | 'system' (follows the device; picked in the footer's Display mode menu). No choice = day.
+  const darkOS = matchMedia('(prefers-color-scheme: dark)');
+  const themeMode = () => { try { const t = localStorage.getItem('wu-theme'); return t === 'night' || t === 'system' ? t : 'day'; } catch (e) { return 'day'; } };
+  function setTheme(mode) {
+    try { localStorage.setItem('wu-theme', mode); } catch (e) { /* private mode: the choice just isn't remembered */ }
+    const night = mode === 'night' || (mode === 'system' && darkOS.matches);
+    if (night === isNight()) return;
     if (night) document.documentElement.setAttribute('data-theme', 'night'); else document.documentElement.removeAttribute('data-theme');
-    try { localStorage.setItem('wu-theme', night ? 'night' : 'day'); } catch (e) { /* private mode: the choice just isn't remembered */ }
     paintThemeBtns();
     window.dispatchEvent(new CustomEvent('wu-theme', { detail: { night } }));
   }
+  const toggleTheme = () => setTheme(isNight() ? 'day' : 'night');
+  darkOS.addEventListener('change', () => { if (themeMode() === 'system') setTheme('system'); });
   document.addEventListener('click', e => { if (e.target.closest('[data-act="theme"]')) toggleTheme(); });
   const themeBtn = cls => `<button type="button" class="${cls}" data-act="theme" aria-label="Switch to night mode">${MOON}</button>`;
   const logoImgs = h => `<span class="site-nav__logo" style="height: ${h}px;"><img src="img/wu-logo.png" alt="WisdomUp"><img src="img/wu-logo-white.png" alt="" aria-hidden="true"></span>`;
@@ -994,9 +1000,59 @@
   }
 
   /* ---------- Footer ---------- */
+  // Footer foot (2026-10-07, copied from formula1.com's footer foot, compact): the Display mode menu + solid social icons
+  // (WhatsApp, Instagram, YouTube, Facebook, X) left, copyright right. Links come only from shop.js (`social` + the
+  // WhatsApp number); an icon without a link is shown but is not a link (never invent an address).
+  const SF_CHEV = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"/></svg>';
+  const SF_MODES = [['system', 'System'], ['day', 'Day mode'], ['night', 'Night mode']];
+  const svg20 = d => `<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="currentColor">${d}</svg>`;
+  const SF_ICONS = {
+    Facebook: svg20('<path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.9 3.78-3.9 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12z"/>'),
+    X: svg20('<path d="M17.75 3h3.07l-6.7 7.66L22 21h-6.17l-4.83-6.32L5.46 21H2.39l7.17-8.2L2 3h6.33l4.37 5.78zm-1.08 16.18h1.7L7.4 4.73H5.58z"/>'),
+    Instagram: svg20('<path fill-rule="evenodd" d="M12 2.2c-2.66 0-3 .01-4.04.06-1.05.05-1.76.21-2.39.46a4.8 4.8 0 0 0-1.74 1.13 4.8 4.8 0 0 0-1.13 1.74c-.25.63-.41 1.34-.46 2.39C2.21 9 2.2 9.34 2.2 12s.01 3 .06 4.04c.05 1.05.21 1.76.46 2.39.25.65.59 1.2 1.13 1.74.55.54 1.1.88 1.74 1.13.63.25 1.34.41 2.39.46 1.04.05 1.38.06 4.04.06s3-.01 4.04-.06c1.05-.05 1.76-.21 2.39-.46a4.8 4.8 0 0 0 1.74-1.13 4.8 4.8 0 0 0 1.13-1.74c.25-.63.41-1.34.46-2.39.05-1.04.06-1.38.06-4.04s-.01-3-.06-4.04c-.05-1.05-.21-1.76-.46-2.39a4.8 4.8 0 0 0-1.13-1.74 4.8 4.8 0 0 0-1.74-1.13c-.63-.25-1.34-.41-2.39-.46C15 2.21 14.66 2.2 12 2.2zm0 1.77c2.62 0 2.93.01 3.96.06.96.04 1.48.2 1.82.34.46.18.79.39 1.13.73.34.34.55.67.73 1.13.14.34.3.86.34 1.82.05 1.03.06 1.34.06 3.96s-.01 2.93-.06 3.96c-.04.96-.2 1.48-.34 1.82-.18.46-.39.79-.73 1.13-.34.34-.67.55-1.13.73-.34.14-.86.3-1.82.34-1.03.05-1.34.06-3.96.06s-2.93-.01-3.96-.06c-.96-.04-1.48-.2-1.82-.34a3 3 0 0 1-1.13-.73 3 3 0 0 1-.73-1.13c-.14-.34-.3-.86-.34-1.82-.05-1.03-.06-1.34-.06-3.96s.01-2.93.06-3.96c.04-.96.2-1.48.34-1.82.18-.46.39-.79.73-1.13.34-.34.67-.55 1.13-.73.34-.14.86-.3 1.82-.34 1.03-.05 1.34-.06 3.96-.06zM12 7.05a4.95 4.95 0 1 0 0 9.9 4.95 4.95 0 0 0 0-9.9zm0 8.17a3.22 3.22 0 1 1 0-6.44 3.22 3.22 0 0 1 0 6.44zm6.3-8.37a1.16 1.16 0 1 1-2.32 0 1.16 1.16 0 0 1 2.32 0z"/>'),
+    YouTube: svg20('<path fill-rule="evenodd" d="M21.58 7.19a2.5 2.5 0 0 0-1.77-1.77C18.25 5 12 5 12 5s-6.25 0-7.81.42a2.5 2.5 0 0 0-1.77 1.77C2 8.75 2 12 2 12s0 3.25.42 4.81a2.5 2.5 0 0 0 1.77 1.77C5.75 19 12 19 12 19s6.25 0 7.81-.42a2.5 2.5 0 0 0 1.77-1.77C22 15.25 22 12 22 12s0-3.25-.42-4.81zM10 15V9l5.2 3z"/>'),
+    WhatsApp: svg20('<path fill-rule="evenodd" d="M12.04 2a9.9 9.9 0 0 0-8.5 14.98L2 22l5.16-1.5A9.92 9.92 0 1 0 12.04 2zm4.52 11.99c-.25-.12-1.47-.72-1.69-.8-.23-.09-.39-.13-.56.12-.16.25-.64.8-.78.97-.15.16-.29.18-.54.06a6.76 6.76 0 0 1-3.36-2.94c-.25-.44.25-.41.72-1.36.08-.16.04-.31-.02-.43-.06-.13-.56-1.35-.77-1.84-.2-.48-.4-.42-.56-.42h-.48a.92.92 0 0 0-.66.31 2.78 2.78 0 0 0-.87 2.07c0 1.22.89 2.4 1.01 2.57.13.16 1.75 2.67 4.24 3.75 1.58.68 2.19.74 2.98.62.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.14-1.18-.06-.11-.22-.17-.47-.29z"/>')
+  };
+  // The Display mode menu: a capsule button that opens a small list upward (System / Day mode / Night mode), the chosen
+  // one marked with a dot. Closes on a pick, Escape, Tab-out or an outside click; arrow keys move between the options.
+  function mountModeMenu(box) {
+    if (!box) return;
+    const btn = box.querySelector('.sf__mode-btn'), list = box.querySelector('.sf__menu'), opts = [...list.querySelectorAll('.sf__opt')];
+    let timer = 0;
+    const mark = () => opts.forEach(o => o.setAttribute('aria-checked', o.dataset.mode === themeMode()));
+    const open = (focus) => {
+      clearTimeout(timer); mark();
+      list.hidden = false; btn.setAttribute('aria-expanded', 'true'); document.body.classList.add('sf-menu-open');
+      requestAnimationFrame(() => requestAnimationFrame(() => list.classList.add('is-open')));
+      if (focus) (opts.find(o => o.getAttribute('aria-checked') === 'true') || opts[0]).focus();
+      document.addEventListener('pointerdown', outside, true);
+    };
+    const close = (refocus) => {
+      if (btn.getAttribute('aria-expanded') !== 'true') return;
+      btn.setAttribute('aria-expanded', 'false'); list.classList.remove('is-open'); document.body.classList.remove('sf-menu-open');
+      document.removeEventListener('pointerdown', outside, true);
+      timer = setTimeout(() => { list.hidden = true; }, reduced() ? 0 : 600);
+      if (refocus) btn.focus();
+    };
+    const outside = e => { if (!box.contains(e.target)) close(false); };
+    btn.addEventListener('click', e => (btn.getAttribute('aria-expanded') === 'true' ? close(false) : open(e.detail === 0)));
+    btn.addEventListener('keydown', e => { if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); open(true); } });
+    list.addEventListener('click', e => { const o = e.target.closest('.sf__opt'); if (!o) return; setTheme(o.dataset.mode); mark(); close(true); });
+    list.addEventListener('keydown', e => {
+      const i = opts.indexOf(document.activeElement);
+      if (e.key === 'Escape') { e.preventDefault(); close(true); }
+      else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); opts[(i + (e.key === 'ArrowDown' ? 1 : opts.length - 1)) % opts.length].focus(); }
+      else if (e.key === 'Home' || e.key === 'End') { e.preventDefault(); opts[e.key === 'Home' ? 0 : opts.length - 1].focus(); }
+      else if (e.key === 'Tab') close(false);
+    });
+    btn.addEventListener('keydown', e => { if (e.key === 'Escape') close(true); });
+  }
   function renderFooter() {
     const el = $('footer');
     if (!el) return;
+    const social = SHOP.social || {};
+    const socials = [['WhatsApp', /^\d{10,15}$/.test(String(SHOP.whatsapp || '')) ? 'https://wa.me/' + SHOP.whatsapp : ''],
+      ['Instagram', social.instagram], ['YouTube', social.youtube], ['Facebook', social.facebook], ['X', social.x]].map(([n, h]) => [n, /^https:\/\//.test(String(h || '')) ? h : '']);
     // Full-bleed, square footer that the page lifts off as you reach the end (the block is fixed under the page and
     // revealed through the wrap). Four groups — Products / Explore / Support / Contact — columns on desktop, accordion on phones.
     const contact = { title: 'Contact', links: [['We’re here to help ›', url.help], ['support@wisdomup.pk', 'mailto:support@wisdomup.pk'], ['+92 327 9800153', 'tel:+923279800153'], ['Cookie preferences', '#cookie-preferences']] };
@@ -1015,8 +1071,24 @@
             ${groups.map((c, i) => `<div class="ft__group"><h4><button type="button" class="ft__q" aria-expanded="false" aria-controls="ft-g${i}"><span>${esc(c.title)}</span><span class="ft__chev">${icon('chev-r', 18)}</span></button></h4><div class="ft__links" id="ft-g${i}" hidden>${c.links.map(([t, h]) => `<a href="${h}"${here() === h ? ' aria-current="page"' : ''}>${esc(t)}</a>`).join('')}</div></div>`).join('')}
           </div>
         </footer>
-        <div class="subfooter"><span>Copyright © ${YEAR} WisdomUp. All rights reserved.</span><span>Cash on Delivery · JazzCash · EasyPaisa · Bank transfer</span></div>
+        <div class="subfooter">
+          <div class="sf__row">
+            <div class="sf__left">
+              <div class="sf__mode">
+                <button type="button" class="sf__mode-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="sf-mode"><span>Display mode</span>${SF_CHEV}</button>
+                <ul class="sf__menu" id="sf-mode" role="menu" aria-label="Display mode" hidden>
+                  ${SF_MODES.map(([m, t]) => `<li role="none"><button type="button" class="sf__opt" role="menuitemradio" aria-checked="false" data-mode="${m}" data-no-fill tabindex="-1"><span>${t}</span><i aria-hidden="true"></i></button></li>`).join('')}
+                </ul>
+              </div>
+              <div class="sf__social">${socials.map(([n, h]) => h
+                ? `<a class="sf__soc" href="${esc(h)}" target="_blank" rel="noopener noreferrer" aria-label="WisdomUp on ${n}" title="${n}" data-no-fill>${SF_ICONS[n]}</a>`
+                : `<span class="sf__soc" aria-hidden="true" title="${n}">${SF_ICONS[n]}</span>`).join('')}</div>
+            </div>
+            <p class="sf__copy">© ${YEAR} WisdomUp. All rights reserved.</p>
+          </div>
+        </div>
       </div>`;
+    mountModeMenu(el.querySelector('.sf__mode'));
     el.addEventListener('click', e => {
       const a = e.target.closest('.footer a[href="#"]'); if (a) e.preventDefault();
       const ck = e.target.closest('a[href="#cookie-preferences"]'); if (ck) { e.preventDefault(); if (consentUI) consentUI.open('manage'); }
@@ -1988,7 +2060,7 @@
     productCard, colorsOf, photoBg, photoFit, ratingOf, reviewsOf, seedOf, mountRail, mountHero, mountAccordion, DEPTS, typeLabel,
     initChrome, placeNav, setActiveCat, navOffset, scrollToEl,
     openSearch: () => search && search.open(),
-    toggleTheme, isNight, slide, staggerCards, revealWords, sheetDrag, quickAdd, budget: BUDGET, STAR_OUTLINE,
+    toggleTheme, setTheme, themeMode, isNight, slide, staggerCards, revealWords, sheetDrag, quickAdd, budget: BUDGET, STAR_OUTLINE,
     consent: { open: n => consentUI && consentUI.open(n), get: consentGet },
     seo, abs, clip, ldCrumbs, ldFaq, px, pxItem, YEAR, SITE,
   };

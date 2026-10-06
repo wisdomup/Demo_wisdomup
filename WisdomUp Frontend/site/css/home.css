@@ -514,8 +514,33 @@ html[data-theme="night"] :is(.on-light-dots, .on-light) .dot { color: #fff; }
 .footer-wrap .newsletter input { font-size: 16px; height: 100%; min-width: 0; color: #111; } /* ≥16px stops iOS zoom-on-focus */
 .footer-wrap .newsletter input::placeholder { color: #8A8D93; }
 .footer-wrap .newsletter button { cursor: pointer; width: 40px; height: 40px; background: #111; color: #fff; }
-.subfooter { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 2px 18px; margin: 0; padding: 14px var(--gutter, 28px) 16px; text-align: center; font: 400 11px/1.4 var(--font); letter-spacing: .02em; color: var(--ink-muted, #7B7B7B); }
-.subfooter span + span::before { content: "·"; margin-right: 18px; opacity: .6; }
+/* Footer foot (2026-10-07, copied from formula1.com's footer foot, kept compact): one row — Display mode capsule +
+   solid social icons left, copyright right — on the page background, under the footer block. */
+.subfooter { display: block; position: relative; z-index: 1; margin: 0; padding: 20px var(--gutter, 28px) 24px; font-family: var(--font); color: #111; }
+.sf__row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 16px; }
+.sf__left { display: flex; align-items: center; gap: 24px; min-width: 0; }
+.sf__mode { position: relative; flex: none; }
+.sf__mode-btn { display: inline-flex; align-items: center; gap: 4px; height: var(--ctl-s, 34px); padding: 0 14px; border: 2px solid currentColor; border-radius: 999px; background: transparent; color: inherit; font: 700 13px/1 var(--font); letter-spacing: .01em; white-space: nowrap; cursor: pointer; }
+.sf__mode-btn svg { flex: none; transition: transform var(--m-primary, 500ms cubic-bezier(.3,1,.3,1)); }
+.sf__mode-btn[aria-expanded="true"] svg { transform: rotate(180deg); }
+.sf__mode-btn:focus-visible, .sf__opt:focus-visible, .sf__soc:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+/* the list opens UPWARD, 12px above the button (formula1.com): 2px edge, 4px inset, 8px between 32px capsule rows */
+.sf__menu { position: absolute; left: 0; bottom: calc(100% + 12px); z-index: 5; box-sizing: border-box; min-width: 100%; width: max-content; margin: 0; padding: 4px; list-style: none; display: flex; flex-direction: column; gap: 8px; border: 2px solid #111; border-radius: 22px; background: #fff; color: #111; box-shadow: 0 12px 32px rgba(0, 0, 0, .12); opacity: 0; transform: translateY(10px); transition: opacity 500ms cubic-bezier(.3,1,.3,1), transform 600ms cubic-bezier(.7,0,.2,1); }
+.sf__menu.is-open { opacity: 1; transform: none; }
+.sf__menu[hidden] { display: none; }
+.sf__opt { all: unset; box-sizing: border-box; width: 100%; height: 32px; padding: 0 12px; display: flex; align-items: center; gap: 8px; border-radius: 999px; font: 400 15px/1 var(--font); white-space: nowrap; cursor: pointer; transition: background-color 200ms ease; }
+.sf__opt i { display: none; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.sf__opt[aria-checked="true"] { font-weight: 600; }
+.sf__opt[aria-checked="true"] i { display: block; }
+.sf__social { display: flex; align-items: center; gap: 8px; }
+.sf__soc { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; color: inherit; transition: background-color 200ms ease; }
+.sf__soc svg { width: 20px; height: 20px; }
+@media (hover: hover) and (pointer: fine) { .sf__opt:hover, a.sf__soc:hover { background: rgba(17, 17, 17, .08); } }
+.sf__opt:focus-visible { background: rgba(17, 17, 17, .08); outline-offset: -2px; }
+.sf__copy { margin: 0; text-align: right; font: 600 12px/16px var(--font); color: #767B83; }
+@media (max-width: 1023px) { .sf__left { gap: 16px; } }
+@media (max-width: 639px) { .sf__row { grid-template-columns: minmax(0, 1fr); gap: 12px; } } /* phones: the copyright drops under the row, still right-aligned */
+@media (prefers-reduced-motion: reduce) { .sf__menu { transition: none; } }
 @media (max-width: 767px) {
   .footer-wrap .footer { padding: 36px 20px 24px; }
   .footer__top { flex-direction: column; align-items: stretch; gap: 20px; padding-bottom: 24px; }
@@ -528,8 +553,7 @@ html[data-theme="night"] :is(.on-light-dots, .on-light) .dot { color: #fff; }
   .ft__chev { display: block; }
   .ft__links { padding: 0 0 16px; }
   .ft__q:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-  .subfooter { flex-direction: column; gap: 2px; padding: 12px 20px calc(14px + env(safe-area-inset-bottom)); }
-  .subfooter span + span::before { display: none; }
+  .subfooter { padding: 16px 20px calc(20px + env(safe-area-inset-bottom)); }
 }
 
 /* ---------- Toast ---------- */
@@ -747,6 +771,7 @@ html[data-theme="night"] :is(.on-light-dots, .on-light) .dot { color: #fff; }
 .totop.is-on { opacity: 1; transform: none; pointer-events: auto; }
 /* back-to-top (2026-10-06): the nav's smoked glass + hairline, white arrow; hover = Bugatti liquid fill (white rises, arrow turns ink) + magnet */
 .totop:focus-visible { outline: 2px solid #0B0B0B; outline-offset: 3px; }
+body.sf-menu-open .totop.is-on { opacity: 0; pointer-events: none; } /* out of the way of the footer's Display mode menu */
 body:has(.buybar.is-on) .totop { bottom: calc(96px + env(safe-area-inset-bottom) + var(--totop-lift, 0px)); } /* sit above the product page buy bar */
 @media (prefers-reduced-motion: reduce) { .totop { transition: opacity 120ms ease; transform: none; } }
 

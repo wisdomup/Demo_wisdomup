@@ -2,6 +2,7 @@
 // so prices, fees and payment options can never disagree. Keep this file valid JSON after the "=".
 // siteUrl = the live address (used for canonical links, the sitemap and social previews; re-run tools/build_seo.py after
 // changing it). facebookPixelId = your Meta Pixel ID (digits only); leave "" to keep the pixel switched off.
+// social = full https:// links to your pages (footer icons after WhatsApp); an icon stays visible but unlinked until its link is filled.
 window.WU_SHOP = {
   "currency": "PKR",
   "siteUrl": "https://wisdomup.pk/",
@@ -30,5 +31,6 @@ window.WU_SHOP = {
     "bank": { "label": "Bank transfer", "note": "Transfer the total to our bank account, then share the receipt on WhatsApp.", "bank": "", "accountTitle": "", "iban": "" }
   },
   "whatsapp": "923279800153",
+  "social": { "instagram": "", "youtube": "", "facebook": "", "x": "" },
   "statuses": ["new", "confirmed", "paid", "shipped", "delivered", "cancelled"]
 };

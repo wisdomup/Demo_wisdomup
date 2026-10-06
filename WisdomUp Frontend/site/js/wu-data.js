@@ -14,7 +14,7 @@ window.WU_STORE = (function () {
     const pct = salePct(p);
     p.variants.forEach(v => { deal(v, pct); v.priceText = rs(v.price); });
     deal(p, pct);
-    p.priceText = (p.from ? 'From ' : '') + rs(p.price);
+    p.priceText = rs(p.price); // no "From" anywhere (2026-10-06, user: remove the word on every product card); products with options show their lowest price
     p.rating = null;
   });
   const byId = id => products.find(p => p.id === id);
