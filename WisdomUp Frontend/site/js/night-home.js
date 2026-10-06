@@ -70,6 +70,7 @@
   const bandItems = () => variety(D.products.filter(BANDS[band][2]).sort(byPrice)).slice(0, 12);
   const paintBand = () => {
     $('nh-budget-grid').outerHTML = grid(bandItems(), 'nh-budget-grid');
+    WU.staggerCards($('nh-budget-grid'));
     $('nh-budget-all').href = url.products + '?price=' + BANDS[band][0];
     host.querySelectorAll('[data-nh-band]').forEach((b, i) => b.setAttribute('aria-pressed', i === band));
     paintWish();

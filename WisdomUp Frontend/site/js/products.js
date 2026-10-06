@@ -154,6 +154,7 @@
     const h1 = entry.h1 || (state.cat ? `${entry.name} Price in Pakistan` : `${entry.name} in Pakistan`);
     const path = state.cat ? url.cat(state.cat) : state.dept ? url.dept(state.dept) : pure ? url.filter(state.filter) : url.products;
     $('mtitle').textContent = h1;
+    WU.revealWords($('mtitle'));
     $('mdesc-t').textContent = fill(entry.intro[0]);
     WU.seo({
       title: entry.title ? fill(entry.title) : state.cat ? `${entry.name} Price in Pakistan ${WU.YEAR} | WisdomUp` : `${entry.name} in Pakistan — Prices ${WU.YEAR} | WisdomUp`,
@@ -226,8 +227,10 @@
   let sortActive = 0;
   const sortOpts = () => [...sortList.querySelectorAll('.msort__opt')];
   const markActive = i => { const o = sortOpts(); sortActive = (i + o.length) % o.length; o.forEach((x, k) => x.classList.toggle('is-active', k === sortActive)); sortList.setAttribute('aria-activedescendant', o[sortActive].id); o[sortActive].scrollIntoView({ block: 'nearest' }); };
-  function openSort() { sortList.hidden = false; sortBtn.setAttribute('aria-expanded', 'true'); sortList.focus(); markActive(Object.keys(SORTS).indexOf(state.sort)); }
-  function closeSort(focusBtn) { sortList.hidden = true; sortBtn.setAttribute('aria-expanded', 'false'); if (focusBtn) sortBtn.focus(); }
+  let sortClosing = 0;
+  sortList.classList.add('is-anim');
+  function openSort() { clearTimeout(sortClosing); sortList.hidden = false; requestAnimationFrame(() => sortList.classList.add('is-open')); sortBtn.setAttribute('aria-expanded', 'true'); sortList.focus(); markActive(Object.keys(SORTS).indexOf(state.sort)); }
+  function closeSort(focusBtn) { sortList.classList.remove('is-open'); sortBtn.setAttribute('aria-expanded', 'false'); const done = () => { sortList.hidden = true; }; if (WU.reduced()) done(); else sortClosing = setTimeout(done, 450); if (focusBtn) sortBtn.focus(); }
   function pickSort(k) { state.sort = k; syncUrl(); render(); closeSort(true); }
   sortBtn.addEventListener('click', () => (sortList.hidden ? openSort() : closeSort()));
   sortList.addEventListener('click', e => { const o = e.target.closest('[data-sort]'); if (o) pickSort(o.dataset.sort); });
@@ -287,7 +290,7 @@
     $('apply-filters').disabled = !n;
     $('clear-filters').hidden = !activeCount(draft) && draft.sort === 'featured';
   }
-  const setSection = (sec, open) => { const h = sec.querySelector('.facc__h'); h.setAttribute('aria-expanded', open); sec.querySelector('.facc__p').hidden = !open; };
+  const setSection = (sec, open) => { const h = sec.querySelector('.facc__h'); const was = h.getAttribute('aria-expanded') === 'true'; h.setAttribute('aria-expanded', open); if (was !== open) WU.slide(sec.querySelector('.facc__p'), open); else sec.querySelector('.facc__p').hidden = !open; };
   drawer.addEventListener('click', e => {
     const h = e.target.closest('.facc__h');
     if (h) setSection(h.closest('.facc'), h.getAttribute('aria-expanded') !== 'true');
@@ -314,7 +317,7 @@
     openBtn.setAttribute('aria-expanded', 'false');
     document.documentElement.style.overflow = '';
     const done = () => { drawer.hidden = scrim.hidden = true; drawer.style.transform = ''; if (after) after(); else if (lastFocus) lastFocus.focus(); };
-    if (WU.reduced()) done(); else setTimeout(done, 360);
+    if (WU.reduced()) done(); else setTimeout(done, 850);
   }
   openBtn.addEventListener('click', () => openDrawer());
   document.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => openDrawer(b.dataset.open)));

@@ -521,6 +521,22 @@
   };
 
   /* ---------- Search overlay ---------- */
+  // The search box types its own hint ("Search earbuds, …") with a blinking caret when it opens
+  let hintTimer = 0;
+  function stopHint() { clearInterval(hintTimer); hintTimer = 0; }
+  function typeHint(input) {
+    stopHint();
+    if (reduced() || input.value) return;
+    const full = input.dataset.hint || (input.dataset.hint = input.placeholder);
+    let i = 0, blink = 0;
+    input.placeholder = '';
+    hintTimer = setInterval(() => {
+      if (input.value) { input.placeholder = full; stopHint(); return; }
+      if (i <= full.length) input.placeholder = full.slice(0, i++) + '|';
+      else if (blink < 48) input.placeholder = full + (Math.floor(blink++ / 8) % 2 ? '\u00a0' : '|');
+      else { input.placeholder = full; stopHint(); }
+    }, 45);
+  }
   function mountSearch() {
     const host = document.createElement('div');
     host.className = 'scrim';
@@ -571,8 +587,10 @@
           <div class="ccard__foot"><span class="ccard__price">${esc(p.priceText)}</span>${p.wasText ? `<s class="ccard__was">${esc(p.wasText)}</s>` : ''}</div>
         </a>`).join('');
     };
-    const open = () => { host.hidden = false; document.documentElement.style.overflow = 'hidden'; paint(); setTimeout(() => input.focus(), 30); };
-    const close = () => { host.hidden = true; document.documentElement.style.overflow = ''; };
+    host.classList.add('is-anim');
+    let closing = 0;
+    const open = () => { clearTimeout(closing); host.hidden = false; document.documentElement.style.overflow = 'hidden'; paint(); requestAnimationFrame(() => host.classList.add('is-open')); setTimeout(() => input.focus(), 30); typeHint(input); };
+    const close = () => { host.classList.remove('is-open'); document.documentElement.style.overflow = ''; stopHint(); const done = () => { host.hidden = true; }; if (reduced()) done(); else closing = setTimeout(done, 650); };
     input.addEventListener('input', paint);
     let sentQ = ''; // tell the pixel what was searched, once per finished query
     input.addEventListener('change', () => { const q = input.value.trim(); if (q.length > 1 && q !== sentQ) { sentQ = q; px('Search', { search_string: q }); } });
@@ -644,34 +662,62 @@
   });
 
   /* ---------- Shop rail (aqua band; card counts locked by wu-rail.css) ---------- */
-  function mountRail(root, { title, items, allHref = url.products, allLabel = 'Shop all', headingTag = 'h2', id } = {}) {
+  function mountRail(root, { title, items, tabs, tabsLabel = 'Choose a range', allHref = url.products, allLabel = 'Shop all', headingTag = 'h2', id } = {}) {
+    // tabs: [{ label, items, allHref }] — one section with a chip row under the heading and one locked rail track per tab
+    // (home "Shop by Budget", 2026-10-06). Without `tabs` it is the plain rail.
+    const panes = tabs && tabs.length ? tabs : [{ items, allHref }];
+    let cur = 0;
     root.classList.add('shop-rail');
+    root.classList.toggle('shop-rail--tabs', !!tabs);
     root.innerHTML = `
       <div class="shop-rail__head">
         <${headingTag} class="sec-title shop-rail__title"${id ? ` id="${id}"` : ''}>${esc(title)}</${headingTag}>
         <div class="shop-rail__ctrls">
-          ${allHref ? `<a href="${allHref}" class="shop-rail__all">${esc(allLabel)}</a>` : ''}
+          ${panes[0].allHref ? `<a href="${panes[0].allHref}" class="shop-rail__all">${esc(allLabel)}</a>` : ''}
           <button type="button" class="shop-rail__step" data-step="-1" aria-label="Previous products">${icon('chev-l', 18)}</button>
           <button type="button" class="shop-rail__step" data-step="1" aria-label="Next products">${icon('chev-r', 18)}</button>
         </div>
       </div>
-      <div class="wu-rail">${items.map(p => productCard(p)).join('')}</div>`;
-    const track = root.querySelector('.wu-rail');
+      ${tabs ? `<div class="shop-rail__tabs" role="tablist" aria-label="${esc(tabsLabel)}">${tabs.map((t, i) => `<button type="button" role="tab" class="chip" data-tab="${i}" aria-selected="${i === 0}">${esc(t.label)}</button>`).join('')}</div>` : ''}
+      ${panes.map((t, i) => `<div class="wu-rail"${tabs ? ` role="tabpanel" aria-label="${esc(t.label)}"` : ''}${i ? ' hidden' : ''}>${(t.items || []).map(p => productCard(p)).join('')}</div>`).join('')}`;
+    const tracks = [...root.querySelectorAll('.wu-rail')];
     const [prev, next] = root.querySelectorAll('.shop-rail__step');
+    const all = root.querySelector('.shop-rail__all');
+    const track = () => tracks[cur];
     const sync = () => {
-      prev.toggleAttribute('data-dim', track.scrollLeft < 4);
-      next.toggleAttribute('data-dim', track.scrollLeft + track.clientWidth >= track.scrollWidth - 4);
+      const t = track();
+      prev.toggleAttribute('data-dim', t.scrollLeft < 4);
+      next.toggleAttribute('data-dim', t.scrollLeft + t.clientWidth >= t.scrollWidth - 4);
+    };
+    const show = i => {
+      if (i === cur) return;
+      const from = tracks[cur], to = tracks[i];
+      cur = i;
+      root.querySelectorAll('[data-tab]').forEach((c, k) => c.setAttribute('aria-selected', k === i));
+      if (all && panes[i].allHref) all.href = panes[i].allHref;
+      const swap = () => {
+        tracks.forEach((t, k) => { t.hidden = k !== i; });
+        to.scrollLeft = 0; sync();
+        if (!reduced() && to.animate) to.animate([{ opacity: 0, transform: 'translateY(2rem)' }, { opacity: 1, transform: 'none' }], { duration: 150, easing: 'ease-out' });
+        staggerCards(to);
+      };
+      if (reduced() || !from.animate) { swap(); return; }
+      const a = from.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(2rem)' }], { duration: 150, easing: 'ease-in', fill: 'forwards' });
+      a.onfinish = () => { a.cancel(); swap(); };
     };
     root.addEventListener('click', e => {
+      const tab = e.target.closest('[data-tab]');
+      if (tab) { show(+tab.dataset.tab); return; }
       const s = e.target.closest('[data-step]');
       if (!s) return;
-      const card = track.firstElementChild ? track.firstElementChild.getBoundingClientRect().width + 20 : 300;
-      track.scrollBy({ left: +s.dataset.step * card * Math.max(1, Math.floor(track.clientWidth / card) - 1) });
+      const t = track();
+      const card = t.firstElementChild ? t.firstElementChild.getBoundingClientRect().width + 20 : 300;
+      t.scrollBy({ left: +s.dataset.step * card * Math.max(1, Math.floor(t.clientWidth / card) - 1) });
     });
-    track.addEventListener('scroll', sync, { passive: true });
+    tracks.forEach(t => t.addEventListener('scroll', () => { if (t === track()) sync(); }, { passive: true }));
     window.addEventListener('resize', sync);
     sync();
-    return track;
+    return track();
   }
 
   /* ---------- Lifestyle hero (crossfade) ---------- */
@@ -699,11 +745,20 @@
         ${slides.map((_, k) => `<button type="button" class="dot" role="tab" aria-label="Slide ${k + 1}" aria-selected="${k === 0}"></button>`).join('')}
       </div></div>`;
     const slideEls = el.querySelectorAll('.hero__slide'), dots = el.querySelectorAll('.dot');
+    const revealCopy = () => {
+      const copy = slideEls[i].querySelector('.hero__copy');
+      if (!copy || reduced() || !copy.animate) return;
+      [...copy.children].forEach((c, k) => c.animate([{ opacity: 0, transform: 'translateY(90%)' }, { opacity: 1, transform: 'none' }], { duration: 1000, delay: 120 + k * 80, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards' }));
+    };
     const go = v => {
-      i = (v + n) % n;
+      const next = (v + n) % n;
+      if (next === i) return;
+      i = next;
       slideEls.forEach((s, k) => s.classList.toggle('is-on', k === i));
       dots.forEach((d, k) => d.setAttribute('aria-selected', k === i));
+      revealCopy();
     };
+    setTimeout(revealCopy, 150);
     el.addEventListener('click', e => {
       const t = e.target;
       if (t.closest('.hero__arrow--prev')) go(i - 1);
@@ -716,7 +771,7 @@
     el.addEventListener('touchend', e => { if (hx == null) return; const dx = e.changedTouches[0].clientX - hx; if (Math.abs(dx) > 40) go(i + (dx < 0 ? 1 : -1)); hx = null; });
     el.addEventListener('mouseenter', () => { hover = true; });
     el.addEventListener('mouseleave', () => { hover = false; });
-    if (!reduced()) setInterval(() => { if (!hover) go(i + 1); }, 5000);
+    if (!reduced()) setInterval(() => { if (!hover) go(i + 1); }, 6000);
   }
 
   /* ---------- Accordion (FAQ pattern: one open at a time) ---------- */
@@ -746,8 +801,9 @@
       const open = q.getAttribute('aria-expanded') !== 'true';
       listEl.querySelectorAll('.faq__q').forEach(b => {
         const on = b === q && open;
+        if ((b.getAttribute('aria-expanded') === 'true') === on) return;
         b.setAttribute('aria-expanded', on);
-        b.nextElementSibling.hidden = !on;
+        slide(b.nextElementSibling, on);
       });
     });
   }
@@ -796,7 +852,7 @@
       const on = !FT_ACC.matches || g === open;
       g.querySelector('.ft__q').setAttribute('aria-expanded', on);
       g.querySelector('.ft__q').tabIndex = FT_ACC.matches ? 0 : -1;
-      g.querySelector('.ft__links').hidden = !on;
+      if (FT_ACC.matches) slide(g.querySelector('.ft__links'), on); else g.querySelector('.ft__links').hidden = !on;
     });
     groups.forEach(g => g.querySelector('.ft__q').addEventListener('click', () => {
       if (!FT_ACC.matches) return;
@@ -854,9 +910,88 @@
     + '.promo-band, .loop, .series, .bulk, .pp, .trust__item, .step, .manual, .panel-list, .cta-band, .ck__sumcard, .mgrid__more, .empty, .ord__hero, .track__form, .iform, .bk-form';
   const RV_SKIP = '#site-nav, .mnav, .cartd, .fdrawer, .search, .hero, .buybar, .toast, .wu-util, .quick, .visually-hidden, .seo__more';
   let revealer = null;
+  // ---------- Motion engine (MOTION-REPORT.md, approved 2026-10-06): reveals, grid staggers, scroll-driven curtain/clip, liquid fills, magnets ----------
+  const FILL_SEL = '.btn-pill, .btn-buy, .btn-navy, .btn-outline, .btn-cart, .shop-rail__all, .loop__cta, .pp__cta, .seo__toggle, .fdrawer__apply, .ck__place, .cartd__go, .mnav__foot a, .nh-btn';
+  const MAG_SEL = '.loop__btn, .feat__btn, .shop-rail__step, .hero__arrow, .pdp2__chev, .wpc__wish, .pdp2__wish, .totop, .mnav__x, .cartd__x, .fdrawer__x, .mnav__theme, .nh-tile__add, .mnav__back';
+  const X_SEL = '.mnav__x, .cartd__x, .fdrawer__x';
+  const SD_CLIP = '.promo, .bulk, .duo__card, .cta-band, .quote-band, .pp__card, .nh-show, .nh-glow, .nh-live, .feat__slide';
+  const GRID_SEL = '.wu-rail > *, .mgrid > *, .nh-grid > *';
+  const ZOOM_SEL = '.promo img, .feat__slide img, .feat__slide video, .pp__card img';
+  const fine = () => matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const phone = () => matchMedia('(max-width: 639px)').matches;
+
+  // Every word of a heading becomes its own span so the line pours in (30ms per word); markup like <b> and <a> is kept
+  function splitWords(el) {
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    const nodes = []; let n;
+    while ((n = walker.nextNode())) if (n.textContent.trim()) nodes.push(n);
+    let i = 0;
+    nodes.forEach(t => {
+      const frag = document.createDocumentFragment();
+      t.textContent.split(/(\s+)/).forEach(part => {
+        if (!part) return;
+        if (/^\s+$/.test(part)) { frag.append(part); return; }
+        const w = document.createElement('span'); w.className = 'wu-w'; w.textContent = part; w.style.setProperty('--rv-d', (i++ * 30) + 'ms'); frag.append(w);
+      });
+      t.replaceWith(frag);
+    });
+    return i;
+  }
+
+  // A heading whose text is written after load (the All Products title) pours in the same way
+  function revealWords(el) {
+    if (!el || reduced() || !document.documentElement.classList.contains('wu-motion')) return;
+    el.setAttribute('data-rv', 'words'); el.classList.remove('is-in');
+    splitWords(el);
+    requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('is-in')));
+  }
+
+  // Accordion panels: height 250ms ease while the content fades and rises 10px (150ms, overlapping 100ms); close reverses
+  function slide(panel, open) {
+    if (!panel) return;
+    if (panel.getAnimations) panel.getAnimations().forEach(a => a.cancel());
+    if (reduced() || !panel.animate) { panel.hidden = !open; return; }
+    const cs = () => getComputedStyle(panel);
+    if (open) {
+      panel.hidden = false;
+      if (cs().display === 'none') return;
+      const h = panel.scrollHeight, pt = cs().paddingTop, pb = cs().paddingBottom;
+      panel.classList.add('wu-slide');
+      const a = panel.animate([{ height: '0px', paddingTop: '0px', paddingBottom: '0px' }, { height: h + 'px', paddingTop: pt, paddingBottom: pb }], { duration: 250, easing: 'ease' });
+      panel.animate([{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 150, delay: 100, fill: 'backwards', easing: 'ease-out' });
+      a.onfinish = a.oncancel = () => panel.classList.remove('wu-slide');
+    } else {
+      if (panel.hidden) return;
+      if (cs().display === 'none') { panel.hidden = true; return; }
+      const h = panel.offsetHeight, pt = cs().paddingTop, pb = cs().paddingBottom;
+      panel.classList.add('wu-slide');
+      panel.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 150, fill: 'forwards', easing: 'ease-out' });
+      const a = panel.animate([{ height: h + 'px', paddingTop: pt, paddingBottom: pb }, { height: '0px', paddingTop: '0px', paddingBottom: '0px' }], { duration: 250, easing: 'ease' });
+      a.onfinish = () => { panel.hidden = true; panel.classList.remove('wu-slide'); panel.getAnimations().forEach(x => x.cancel()); };
+      a.oncancel = () => panel.classList.remove('wu-slide');
+    }
+  }
+
+  // Grid items enter 50px lower and fade in, 500ms ease, 100ms apart (phones 30px / 300ms / 50ms) — used when a tab swaps its cards
+  function staggerCards(container) {
+    if (!container) return;
+    const items = [...container.children];
+    items.forEach(el => el.classList.add('is-in'));
+    if (reduced() || !container.animate) return;
+    const H = innerHeight, W = innerWidth;
+    const d = phone() ? 30 : 50, t = phone() ? 300 : 500, gap = phone() ? 50 : 100;
+    let k = 0;
+    items.forEach(el => {
+      const b = el.getBoundingClientRect();
+      if (b.top > H || b.bottom < 0 || b.left > W || b.right < 0) return;
+      el.animate([{ opacity: 0, transform: `translateY(${d}px)` }, { opacity: 1, transform: 'none' }], { duration: t, delay: k++ * gap, easing: 'ease', fill: 'backwards' });
+    });
+  }
+
   function initMotion() {
     if (reduced() || !('IntersectionObserver' in window)) return;
     document.documentElement.classList.add('wu-motion');
+    const isFine = fine();
     revealer = new IntersectionObserver(entries => {
       const byParent = new Map();
       entries.forEach(e => {
@@ -866,22 +1001,73 @@
         byParent.set(e.target.parentElement, list);
       });
       byParent.forEach(list => list.forEach((el, i) => {
-        el.style.setProperty('--rv-d', Math.min(i, 4) * 60 + 'ms');
+        if (el.dataset.rv === 'grid') el.style.setProperty('--rv-d', Math.min(i, 12) * (phone() ? 50 : 100) + 'ms');
         el.classList.add('is-in');
         revealer.unobserve(el);
       }));
     }, { rootMargin: '0px 0px -6% 0px', threshold: 0.08 });
+    const kindOf = el => {
+      if (el.matches(ZOOM_SEL)) return 'zoom';
+      if (el.matches(GRID_SEL)) return 'grid';
+      if (el.matches('h1, h2, .sec-title')) {
+        const cs = getComputedStyle(el);
+        if (cs.webkitBackgroundClip === 'text' || cs.backgroundClip === 'text' || el.querySelector('img, svg, button, input')) return 'up-large';
+        return 'words';
+      }
+      return 'up';
+    };
     const mark = root => {
       if (!root.querySelectorAll) return;
-      const add = (el, kind) => {
-        // once per element; never inside fixed chrome; never inside something that already reveals (no double fades)
-        if (el.hasAttribute('data-rv') || el.closest(RV_SKIP) || (el.parentElement && el.parentElement.closest('[data-rv]'))) return;
+      const add = el => {
+        // once per element; never inside fixed chrome; never inside something that already reveals (no double fades); banners open by scroll instead
+        if (el.hasAttribute('data-rv') || el.closest(RV_SKIP) || (el.parentElement && el.parentElement.closest('[data-rv]')) || el.matches(SD_CLIP)) return;
+        const kind = kindOf(el);
+        if (kind === 'zoom' && getComputedStyle(el.parentElement).overflow !== 'hidden') { el.setAttribute('data-rv', 'up'); revealer.observe(el); return; }
+        if (kind === 'words') splitWords(el);
         el.setAttribute('data-rv', kind);
         revealer.observe(el);
       };
-      const pick = (sel, kind) => { if (root.matches && root.matches(sel)) add(root, kind); root.querySelectorAll(sel).forEach(el => add(el, kind)); };
-      pick(RV_BLOCK, 'block');
-      pick(RV_TEXT, 'text');
+      const pick = sel => { if (root.matches && root.matches(sel)) add(root); root.querySelectorAll(sel).forEach(add); };
+      pick(ZOOM_SEL);
+      pick(GRID_SEL);
+      pick(RV_BLOCK + ', .nh-tile, .nh-feat, .nh-strip a, .nh-chips');
+      pick(RV_TEXT + ', .nh-h, .nh-sub');
+      // liquid fills and magnets (pointer devices only)
+      if (isFine) {
+        const q = sel => [...(root.matches && root.matches(sel) ? [root] : []), ...root.querySelectorAll(sel)];
+        q(FILL_SEL).forEach(b => { if (!b.closest('#site-nav') && b.querySelector('svg, img') === null || b.matches('.btn-buy, .btn-cart, .btn-pill, .btn-navy, .btn-outline, .shop-rail__all, .seo__toggle, .pp__cta, .mnav__foot a, .nh-btn, .loop__cta, .fdrawer__apply, .ck__place, .cartd__go')) b.classList.add('wu-fill'); });
+        q(MAG_SEL).forEach(b => { b.classList.add('wu-mag'); if (b.matches(X_SEL)) b.classList.add('is-x'); });
+      }
+      collect(root);
+    };
+    // Scroll-driven pieces: the footer slides into place under a lifting curtain; banners open from a clipped centre
+    const sd = [];
+    const collect = root => {
+      if (!root.querySelectorAll) return;
+      [...(root.matches && root.matches(SD_CLIP) ? [root] : []), ...root.querySelectorAll(SD_CLIP)].forEach(el => {
+        if (el.dataset.sd || el.closest(RV_SKIP)) return;
+        el.dataset.sd = 'clip';
+        el.style.setProperty('--sd-r', (parseFloat(getComputedStyle(el).borderTopLeftRadius) || 24) + 'px');
+        sd.push(el);
+      });
+      const f = document.querySelector('.footer-wrap .footer');
+      if (f && !f.dataset.sd) { f.dataset.sd = 'footer'; sd.push(f); }
+    };
+    const drive = () => {
+      const vh = innerHeight;
+      sd.forEach(el => {
+        if (!el.isConnected) return;
+        const b = el.getBoundingClientRect();
+        if (el.dataset.sd === 'footer') {
+          const p = Math.max(0, Math.min(1, (vh - b.top) / Math.max(1, Math.min(b.height, vh) * .9)));
+          el.style.setProperty('--sd-p', p.toFixed(3));
+          return;
+        }
+        const p = Math.max(0, Math.min(1, (vh - b.top) / Math.max(1, Math.min(b.height, vh * .6))));
+        if (p >= 1) { if (el.classList.contains('is-clipping')) { el.classList.remove('is-clipping'); el.style.removeProperty('--sd-q'); } return; }
+        el.classList.add('is-clipping');
+        el.style.setProperty('--sd-q', (1 - p).toFixed(3));
+      });
     };
     mark(document.body);
     // Safety net: also reveal by position on scroll/resize, so content can never stay invisible
@@ -894,6 +1080,7 @@
         const b = el.getBoundingClientRect();
         if (b.top < H && b.left < W && b.right > 0) { el.classList.add('is-in'); revealer.unobserve(el); } // in view or already scrolled past
       });
+      drive();
     };
     const soon = () => { if (!tick) tick = requestAnimationFrame(sweep); };
     window.addEventListener('scroll', soon, { passive: true });
@@ -907,6 +1094,35 @@
       muts.forEach(m => m.addedNodes.forEach(n => { if (n.nodeType === 1) queued.push(n); }));
       if (queued.length) requestAnimationFrame(() => { const q = queued; queued = []; q.forEach(n => n.isConnected && mark(n)); setTimeout(sweep, 700); });
     }).observe(document.body, { childList: true, subtree: true });
+    if (!isFine) return;
+    // Liquid fill: on enter the circle starts below (+76%) and rises to 0; on leave it carries on upward (−76%)
+    document.addEventListener('pointerenter', e => {
+      const b = e.target;
+      if (!(b instanceof Element) || e.pointerType === 'touch') return;
+      if (b.classList.contains('wu-fill')) {
+        b.classList.add('wu-fill--snap'); b.style.setProperty('--fill-y', '76%');
+        void b.offsetWidth;
+        b.classList.remove('wu-fill--snap'); b.style.setProperty('--fill-y', '0%');
+      }
+    }, true);
+    document.addEventListener('pointerleave', e => {
+      const b = e.target;
+      if (!(b instanceof Element) || e.pointerType === 'touch') return;
+      if (b.classList.contains('wu-fill')) b.style.setProperty('--fill-y', '-76%');
+      if (b === magEl) { magReset(); magEl = null; }
+    }, true);
+    // Magnet: the icon follows the pointer by (offset − ½) × strength (10px) and springs back on leave
+    let magEl = null;
+    const magReset = () => { if (!magEl) return; magEl.style.setProperty('--mag-t', '900ms'); magEl.style.setProperty('--mx', '0px'); magEl.style.setProperty('--my', '0px'); };
+    document.addEventListener('pointermove', e => {
+      if (e.pointerType === 'touch') return;
+      const m = e.target.closest && e.target.closest('.wu-mag');
+      if (m !== magEl) { magReset(); magEl = m; if (m) m.style.setProperty('--mag-t', '400ms'); }
+      if (!m) return;
+      const r = m.getBoundingClientRect(), k = +(m.dataset.magnet || 10);
+      m.style.setProperty('--mx', (((e.clientX - r.left) / r.width - .5) * k).toFixed(1) + 'px');
+      m.style.setProperty('--my', (((e.clientY - r.top) / r.height - .5) * k).toFixed(1) + 'px');
+    }, { passive: true });
   }
 
   function initChrome({ active = null } = {}) {
@@ -997,7 +1213,7 @@
       drawer.classList.remove('is-open'); scrim.classList.remove('is-open');
       document.documentElement.style.overflow = '';
       const done = () => { drawer.hidden = scrim.hidden = true; if (opener && opener.isConnected) opener.focus(); };
-      if (reduced()) done(); else setTimeout(done, 360);
+      if (reduced()) done(); else setTimeout(done, 850);
     }
     drawer.addEventListener('click', e => {
       if (e.target.closest('.cartd__x')) return close();
@@ -1077,7 +1293,42 @@
     document.body.append(...el.children);
     const drawer = $('mnav'), scrim = drawer.previousElementSibling;
     let opener = null, sx = null, dx = 0;
-    const setAcc = (h, open) => { h.setAttribute('aria-expanded', open); $(h.getAttribute('aria-controls')).hidden = !open; };
+    const setAcc = (h, open) => { const was = h.getAttribute('aria-expanded') === 'true'; h.setAttribute('aria-expanded', open); if (was !== open) slide($(h.getAttribute('aria-controls')), open); else $(h.getAttribute('aria-controls')).hidden = !open; };
+    // NIGHT: the bugatti.store menu motion (measured 2026-10-06) — the blocks stagger in (translateX −20px → 0, 600ms
+    // easeOutCirc, 100ms apart) and a department row pushes a sub-level in from the right while the list slides −30%.
+    const body = drawer.querySelector('.mnav__body');
+    let blockAnims = [];
+    const blocks = () => [...body.children].flatMap(c => c.classList.contains('mnav__cats') ? [...c.children] : [c]);
+    const staggerIn = () => {
+      blockAnims.forEach(a => a.cancel()); blockAnims = [];
+      if (reduced() || !body.animate) return;
+      blockAnims = blocks().map((b, i) => b.animate([{ transform: 'translateX(-20px)' }, { transform: 'translateX(0)' }],
+        { duration: 600, delay: Math.min(i * 100, 700), easing: 'cubic-bezier(.075,.82,.165,1)', fill: 'backwards' }));
+    };
+    const unpush = instant => {
+      const s = drawer.querySelector('.mnav__sub');
+      body.classList.remove('is-pushed'); body.inert = false;
+      if (!s) return;
+      drawer.querySelectorAll('.mnav__acc-h').forEach(x => x.setAttribute('aria-expanded', 'false'));
+      s.classList.remove('is-in');
+      if (instant || reduced()) s.remove(); else setTimeout(() => s.remove(), 520);
+    };
+    const push = h => {
+      blockAnims.forEach(a => a.finish()); blockAnims = [];
+      unpush(true);
+      const label = h.textContent.trim();
+      const s = document.createElement('div');
+      s.className = 'mnav__sub'; s.setAttribute('role', 'group'); s.setAttribute('aria-label', label);
+      s.innerHTML = `<button type="button" class="mnav__back" aria-label="Back to menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5.5 8.5 12 15 18.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>${esc(label)}</span></button><div class="mnav__sub-body">${$(h.getAttribute('aria-controls')).innerHTML}</div>`;
+      s.style.top = drawer.querySelector('.mnav__head').offsetHeight + 'px';
+      s.style.bottom = drawer.querySelector('.mnav__foot').offsetHeight + 'px';
+      drawer.append(s);
+      h.setAttribute('aria-expanded', 'true');
+      body.inert = true;
+      requestAnimationFrame(() => { s.classList.add('is-in'); body.classList.add('is-pushed'); });
+      setTimeout(() => s.querySelector('.mnav__back').focus({ preventScroll: true }), 60);
+    };
+    window.addEventListener('wu-theme', () => { unpush(true); blockAnims.forEach(a => a.cancel()); blockAnims = []; drawer.querySelectorAll('.mnav__acc-h').forEach(x => setAcc(x, false)); });
     function open(btn) {
       opener = btn || document.activeElement;
       const n = drawer.querySelector('[data-wcount]'), w = wish.length;
@@ -1085,21 +1336,28 @@
       drawer.hidden = scrim.hidden = false;
       document.documentElement.style.overflow = 'hidden';
       if (btn) btn.setAttribute('aria-expanded', 'true');
-      requestAnimationFrame(() => { drawer.classList.add('is-open'); scrim.classList.add('is-open'); });
+      unpush(true);
+      requestAnimationFrame(() => { drawer.classList.add('is-open'); scrim.classList.add('is-open'); staggerIn(); });
       setTimeout(() => drawer.querySelector('.mnav__x').focus(), 60);
     }
     function close() {
       drawer.classList.remove('is-open'); scrim.classList.remove('is-open');
       document.documentElement.style.overflow = '';
       if (opener && opener.setAttribute) opener.setAttribute('aria-expanded', 'false');
-      const done = () => { drawer.hidden = scrim.hidden = true; drawer.style.transform = ''; if (opener && opener.isConnected) opener.focus(); };
-      if (reduced()) done(); else setTimeout(done, 360);
+      const done = () => { drawer.hidden = scrim.hidden = true; drawer.style.transform = ''; unpush(true); if (opener && opener.isConnected) opener.focus(); };
+      if (reduced()) done(); else setTimeout(done, isNight() ? 850 : 360);
     }
     drawer.addEventListener('click', e => {
       if (e.target.closest('.mnav__x')) return close();
       if (e.target.closest('.mnav__theme')) return; // theme toggle handled globally; keep the panel open
+      if (e.target.closest('.mnav__back')) {
+        const h = drawer.querySelector('.mnav__acc-h[aria-expanded="true"]');
+        unpush(); if (h) setTimeout(() => h.focus({ preventScroll: true }), 0);
+        return;
+      }
       const h = e.target.closest('.mnav__acc-h');
       if (h) {
+        if (isNight()) { if (h.getAttribute('aria-expanded') === 'true') unpush(); else push(h); return; }
         const opening = h.getAttribute('aria-expanded') !== 'true';
         drawer.querySelectorAll('.mnav__acc-h').forEach(x => setAcc(x, x === h && opening)); // one open at a time
         return;
@@ -1117,20 +1375,37 @@
       if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
       else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
     });
-    // Swipe the panel left to close — only for a clearly sideways swipe. Vertical scrolling, and swipes
-    // that start on a sideways-scrolling row (tiles, chips), never move the panel.
-    let sy = null, axis = null;
+    // Swipe to close — the left drawer swipes left; the night phone sheet (bugatti.store style) drags down, but only
+    // from the header or when the list is already scrolled to the top. Vertical scrolling and swipes that start on a
+    // sideways-scrolling row (tiles, chips) never move the panel.
+    let sy = null, axis = null, dy = 0, fromHead = false, atTop = true;
+    const sheet = () => isNight() && vw() < 640;
     const scrollsX = el => { for (let n = el; n && n !== drawer; n = n.parentElement) if (n.scrollWidth > n.clientWidth + 1 && /auto|scroll/.test(getComputedStyle(n).overflowX)) return true; return false; };
-    drawer.addEventListener('touchstart', e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; dx = 0; axis = scrollsX(e.target) ? 'y' : null; }, { passive: true });
-    drawer.addEventListener('touchmove', e => {
-      if (sx == null || axis === 'y') return;
-      const mx = e.touches[0].clientX - sx, my = e.touches[0].clientY - sy;
-      if (!axis) { if (Math.abs(mx) < 10 && Math.abs(my) < 10) return; axis = Math.abs(mx) > Math.abs(my) * 1.5 ? 'x' : 'y'; if (axis === 'y') return; }
-      dx = Math.min(0, mx);
-      drawer.classList.add('is-dragging'); drawer.style.transform = `translateX(${dx}px)`;
+    drawer.addEventListener('touchstart', e => {
+      sx = e.touches[0].clientX; sy = e.touches[0].clientY; dx = 0; dy = 0;
+      axis = scrollsX(e.target) ? 'scroll' : null;
+      fromHead = !!e.target.closest('.mnav__head'); atTop = !body.contains(e.target) || body.scrollTop <= 0;
     }, { passive: true });
-    drawer.addEventListener('touchend', () => { drawer.classList.remove('is-dragging'); if (axis === 'x' && dx < -70) close(); else drawer.style.transform = ''; sx = null; axis = null; dx = 0; });
-    drawer.addEventListener('touchcancel', () => { drawer.classList.remove('is-dragging'); drawer.style.transform = ''; sx = null; axis = null; dx = 0; });
+    drawer.addEventListener('touchmove', e => {
+      if (sx == null || axis === 'scroll') return;
+      const mx = e.touches[0].clientX - sx, my = e.touches[0].clientY - sy;
+      if (!axis) {
+        if (Math.abs(mx) < 10 && Math.abs(my) < 10) return;
+        if (sheet()) axis = my > Math.abs(mx) * 1.5 && (fromHead || atTop) ? 'y' : 'scroll';
+        else axis = Math.abs(mx) > Math.abs(my) * 1.5 ? 'x' : 'scroll';
+        if (axis === 'scroll') return;
+      }
+      if (axis === 'x') { dx = Math.min(0, mx); drawer.style.transform = `translateX(${dx}px)`; }
+      else { dy = Math.max(0, my); drawer.style.transform = `translateY(${dy}px)`; }
+      drawer.classList.add('is-dragging');
+    }, { passive: true });
+    const endDrag = () => {
+      drawer.classList.remove('is-dragging');
+      if ((axis === 'x' && dx < -70) || (axis === 'y' && dy > 90)) close(); else drawer.style.transform = '';
+      sx = null; axis = null; dx = 0; dy = 0;
+    };
+    drawer.addEventListener('touchend', endDrag);
+    drawer.addEventListener('touchcancel', () => { drawer.classList.remove('is-dragging'); drawer.style.transform = ''; sx = null; axis = null; dx = 0; dy = 0; });
     window.addEventListener('resize', () => { if (!drawer.hidden && vw() >= 640 && !document.querySelector('[data-act="menu"]')?.offsetParent) close(); });
     return { open, close };
   }
@@ -1143,7 +1418,7 @@
     productCard, colorsOf, photoBg, photoFit, ratingOf, reviewsOf, seedOf, mountRail, mountHero, mountAccordion, DEPTS, typeLabel,
     initChrome, placeNav, setActiveCat, navOffset, scrollToEl,
     openSearch: () => search && search.open(),
-    toggleTheme, isNight,
+    toggleTheme, isNight, slide, staggerCards, revealWords,
     seo, abs, clip, ldCrumbs, ldFaq, px, pxItem, YEAR, SITE,
   };
 })();

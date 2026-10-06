@@ -197,6 +197,12 @@ a.feat__slide:hover { color: #111; }
 .shop-rail__all:hover { filter: brightness(1.2); color: #fff; }
 .shop-rail__step { width: 44px; height: 44px; padding: 0; border: 0; border-radius: 999px; background: #fff; color: #464646; display: grid; place-items: center; cursor: pointer; transition: opacity 180ms cubic-bezier(.2,.7,.2,1); }
 .shop-rail__step[data-dim] { opacity: .4; }
+/* Tabbed rail (home "Shop by Budget"): one head, a chip row under it, one locked .wu-rail track per tab (the others are hidden) */
+.shop-rail__tabs { display: flex; gap: var(--gap-2, 8px); margin: -20px 0 -12px; padding: 4px var(--gutter, 28px); overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; }
+.shop-rail__tabs::-webkit-scrollbar { display: none; }
+.shop-rail__tabs .chip { flex: none; border: 0; cursor: pointer; white-space: nowrap; }
+.shop-rail .wu-rail[hidden] { display: none !important; }
+@media (max-width: 639px) { .shop-rail__tabs { margin: -6px 0 -4px; } }
 @media (max-width: 639px) { .shop-rail__step { display: none; } }
 
 /* ---------- WUProductCard (designed at 430px, scales with cqw) ---------- */

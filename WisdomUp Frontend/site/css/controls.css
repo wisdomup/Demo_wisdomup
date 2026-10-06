@@ -55,7 +55,7 @@
   transition: background-color 180ms ease, box-shadow 180ms ease, color 180ms ease;
 }
 .chip:hover, .series .chip:hover, .bk-chips .chip:hover, .policy__links a:hover { background: var(--chip-bg-hover); box-shadow: inset 0 0 0 1px var(--chip-line-hover); color: var(--ctl-ink); }
-.series .chip[aria-pressed="true"], .bk-chips .chip[aria-pressed="true"] { background: var(--ctl-ink); box-shadow: none; color: #fff; }
+.series .chip[aria-pressed="true"], .bk-chips .chip[aria-pressed="true"], .shop-rail__tabs .chip[aria-selected="true"] { background: var(--ctl-ink); box-shadow: none; color: #fff; }
 /* Quick chips keep their photo; the 32px photo sits 4px inside the 40px pill */
 .quick .chip { padding: 0 var(--ctl-pad) 0 4px; background: var(--chip-bg); box-shadow: inset 0 0 0 1px var(--chip-line); color: #1A1A1A; }
 .quick .chip:hover { box-shadow: inset 0 0 0 1px var(--chip-line-hover); }

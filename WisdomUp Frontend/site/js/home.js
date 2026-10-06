@@ -175,10 +175,17 @@
   const byPrice = (a, b) => a.price - b.price;
   const variety = list => { const first = list.filter((p, i) => list.findIndex(x => x.type === p.type) === i); return first.concat(list.filter(p => !first.includes(p))); };
   const under1 = variety(D.products.filter(p => p.price < 1000).sort(byPrice));
-  mountRail($('rail-u1'), { title: 'Under Rs.1,000', items: under1.slice(0, 16), allHref: url.products + '?price=u1' });
-  // Under Rs.2,000 leads with the Rs.1,000–1,999 band so it doesn't repeat the rail above
-  const band = variety(D.products.filter(p => p.price >= 1000 && p.price < 2000).sort(byPrice));
-  mountRail($('rail-u2'), { title: 'Under Rs.2,000', items: band.concat(under1.filter(p => !band.includes(p))).slice(0, 16), allHref: url.products + '?price=u2' });
+  // Each wider band leads with its own price range so the tabs don't repeat each other, then fills with the cheaper picks
+  const band2 = variety(D.products.filter(p => p.price >= 1000 && p.price < 2000).sort(byPrice));
+  const band5 = variety(D.products.filter(p => p.price >= 2000 && p.price < 5000).sort(byPrice));
+  const under2 = band2.concat(under1.filter(p => !band2.includes(p)));
+  const under5 = band5.concat(under2.filter(p => !band5.includes(p)));
+  // Shop by Budget: ONE rail with tabs (requested 2026-10-06; replaced the separate Under Rs.1,000 / Under Rs.2,000 rails)
+  mountRail($('rail-budget'), { title: 'Shop by Budget', tabsLabel: 'Budget', tabs: [
+    { label: 'Under Rs.1,000', items: under1.slice(0, 16), allHref: url.products + '?price=u1' },
+    { label: 'Under Rs.2,000', items: under2.slice(0, 16), allHref: url.products + '?price=u2' },
+    { label: 'Under Rs.5,000', items: under5.slice(0, 16), allHref: url.products + '?price=u5' },
+  ] });
 
   /* ---------- Creator mics + Live countdown ---------- */
   document.querySelector('.duo__art').innerHTML = photo(P('mkf-01'), 'duo__ph', true, WIDE);

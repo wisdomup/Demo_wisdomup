@@ -1,59 +1,195 @@
 /* ==========================================================================
-   WisdomUp motion — small, slow, quiet. Loaded after controls.css on every page.
-   · Scroll reveal: content rises 8px and fades in once (headings also un-blur 2px); siblings stagger 60ms.
-   · Hover / press: controls lift 1px and press to 98%; cards rise 2px; links ease their colour.
-   Only active when JS adds .wu-motion (so nothing is ever hidden if scripts fail) and never for
-   people who ask their device to reduce motion.
+   WisdomUp motion — the bugatti.store motion system, rebuilt in our own code (MOTION-REPORT.md, approved 2026-10-06).
+   Loaded LAST on every page. Same motion in day and night; only the fill colours differ.
+   · Six curves: hover 500ms (.3,1,.3,1) · fast 300 / short 200 (.7,0,.3,1) · drawers 600 (.7,0,.2,1) + scrim 800
+     · reveals 1000–1500 (.16,1,.3,1) · item glides (.075,.82,.165,1) · springs settle, nothing bounces backwards.
+   · Hover, fill, magnet effects only for (hover: hover) and (pointer: fine); reduced motion turns everything off.
+   · Reveals only hide content once JS adds .wu-motion; the position sweep in initMotion() guarantees nothing stays invisible.
    ========================================================================== */
 :root {
+  --m-primary: 500ms cubic-bezier(.3, 1, .3, 1);
+  --m-fast: 300ms cubic-bezier(.7, 0, .3, 1);
+  --m-short: 200ms cubic-bezier(.7, 0, .3, 1);
+  --m-smooth: 700ms cubic-bezier(.7, 0, .3, 1);
+  --m-drawer: 600ms cubic-bezier(.7, 0, .2, 1);
+  --m-scrim: 800ms cubic-bezier(.7, 0, .2, 1);
+  --e-hover: cubic-bezier(.3, 1, .3, 1);
+  --e-reveal: cubic-bezier(.16, 1, .3, 1);
+  --e-glide: cubic-bezier(.075, .82, .165, 1);
+  --e-glide-fade: cubic-bezier(.19, 1, .22, 1);
+  --e-spring: cubic-bezier(.3, 1.3, .4, 1);
+  /* kept for older rules */
   --ease-out: cubic-bezier(.22, .61, .36, 1);
   --ease-soft: cubic-bezier(.2, .7, .2, 1);
-  --t-fast: 180ms;
-  --t-med: 260ms;
-  --t-reveal: 640ms;
+  --t-fast: 180ms; --t-med: 260ms; --t-reveal: 640ms;
+}
+@property --pct { syntax: '<percentage>'; inherits: false; initial-value: 0%; }
+@property --w { syntax: '<percentage>'; inherits: false; initial-value: 0%; }
+
+/* ---------- Scroll reveals: fade-up (2rem, 1.5s), fade-up-large (90%, 1s), words (30ms/word), zoom-out (1.3 → 1, 1.3s), grid (50px/500ms/100ms) ---------- */
+.wu-motion [data-rv] { opacity: 0; transition: opacity var(--rv-t, 1500ms) var(--e-reveal) var(--rv-d, 0ms), transform var(--rv-t, 1500ms) var(--e-reveal) var(--rv-d, 0ms); will-change: transform, opacity; }
+.wu-motion [data-rv="up"] { transform: translate3d(0, min(2rem, 90%), 0); }
+.wu-motion [data-rv="up-large"] { --rv-t: 1000ms; transform: translate3d(0, 90%, 0); }
+.wu-motion [data-rv="zoom"] { --rv-t: 1300ms; opacity: 1; transform: scale(1.3); }
+.wu-motion [data-rv="grid"] { --rv-t: 500ms; transform: translate3d(0, 50px, 0); transition-timing-function: ease; }
+.wu-motion [data-rv="words"] { opacity: 1; transform: none; transition: none; }
+.wu-motion [data-rv="words"] .wu-w { display: inline-block; opacity: 0; transform: translate3d(0, 90%, 0); transition: opacity 1000ms var(--e-reveal) var(--rv-d, 0ms), transform 1000ms var(--e-reveal) var(--rv-d, 0ms); }
+.wu-motion [data-rv].is-in, .wu-motion [data-rv="words"].is-in .wu-w { opacity: 1; transform: none; }
+.wu-motion [data-rv="zoom"].is-in { transform: scale(1); }
+@media (max-width: 639px) { .wu-motion [data-rv="grid"] { --rv-t: 300ms; transform: translate3d(0, 30px, 0); } }
+
+/* ---------- Buttons: liquid fill (a circle rises from below on enter, leaves upward), text colour swaps 100ms behind ---------- */
+.wu-fill { position: relative; overflow: hidden; isolation: isolate; transition: color var(--m-primary) 100ms, box-shadow var(--m-primary), border-color var(--m-primary), opacity var(--m-fast); }
+.wu-fill::before { content: ""; position: absolute; z-index: -1; left: -25%; top: -50%; width: 150%; height: 200%; border-radius: 50%; background: var(--fill, #fff); transform: translate3d(0, var(--fill-y, -76%), 0); transition: transform 600ms var(--e-hover); pointer-events: none; }
+.wu-fill.wu-fill--snap::before { transition: none; }
+.wu-fill:disabled::before, .wu-fill[aria-disabled="true"]::before { display: none; }
+/* day: every button inverts into its own text colour */
+.btn-pill, .btn-buy, .ck__place, .cartd__go { --fill: #fff; --fill-text: #2350C8; }
+.btn-navy, .shop-rail__all { --fill: #fff; --fill-text: #172248; }
+.btn-outline, .seo__toggle, .pp__cta { --fill: #172248; --fill-text: #fff; }
+.btn-cart, .loop__cta, .mnav__foot a { --fill: #0B0B0B; --fill-text: #fff; }
+.fdrawer__apply { --fill: #fff; --fill-text: #0B0B0B; }
+/* night: red fills white (text red), white fills dark, dark hairline buttons fill white */
+html[data-theme="night"] :is(.btn-buy, .ck__place, .cartd__go, .fdrawer__apply, .nh-btn--primary) { --fill: #fff; --fill-text: #D91E05; }
+html[data-theme="night"] :is(.btn-pill, .btn-navy, .pp__cta, .loop__cta, .shop-rail__all) { --fill: #111; --fill-text: #fff; }
+html[data-theme="night"] :is(.btn-outline, .btn-cart, .seo__toggle, .mnav__foot a, .nh-btn:not(.nh-btn--primary), .nh-btn--ghost) { --fill: #fff; --fill-text: #111; }
+@media (hover: hover) and (pointer: fine) {
+  .wu-fill:not(:disabled):not([aria-disabled="true"]):hover { color: var(--fill-text) !important; filter: none; transform: none; box-shadow: none; }
+  /* the old hover backgrounds/filters go: the fill is the hover */
+  .btn-buy:hover, .btn-pill:hover, .btn-navy:hover, .shop-rail__all:hover { filter: none; }
+  .btn-outline:hover, .seo__toggle:hover { background: transparent; }
+  .loop__cta:hover { background: #fff; }
+  .pp__cta:hover { box-shadow: none; }
+  .btn-cart:not(:disabled):hover { background: var(--chip-bg, #F1F2F4); }
+  .mnav__foot a:hover { background: transparent; }
+  .fdrawer__apply:hover { background: #0B0B0B; }
+  html[data-theme="night"] :is(.btn-buy, .cartd__go, .ck__place):not(:disabled):hover { background: var(--n-red); }
+  html[data-theme="night"] :is(.btn-pill, .btn-navy, .pp__cta, .loop__cta, .shop-rail__all):hover { background: var(--n-text); }
+  html[data-theme="night"] :is(.btn-outline, .btn-cart, .seo__toggle, .mnav__foot a):hover { background: var(--n-raise); }
+  html[data-theme="night"] .fdrawer__apply:hover { background: var(--n-red); }
+  html[data-theme="night"] .shop-rail__all:hover { background: var(--n-red-soft, rgba(217,30,5,.14)); }
+  html[data-theme="night"] .wu-fill.shop-rail__all { --fill: var(--n-red); --fill-text: #fff; }
+  /* chips, tabs, option pickers: colour changes with the hover curve (no lift) */
+  .chip, .fbtn, .opt-chip, .policy__links a, .search__pages a, .mnav__chip, .pdtabs .chip, .nh-chip, .nh-seg button { transition: background-color var(--m-primary), color var(--m-primary), box-shadow var(--m-primary), border-color var(--m-primary); }
+}
+/* loading state: text hidden, a 2px bar sweeps across (grows from the left, shrinks to the right), 1.2s loop */
+.wu-fill.is-loading, .btn-buy.is-loading, .ck__place.is-loading { color: transparent !important; pointer-events: none; }
+.wu-fill.is-loading::after, .btn-buy.is-loading::after, .ck__place.is-loading::after { content: ""; position: absolute; left: 50%; top: 50%; width: min(50px, 34%); height: 2px; margin: -1px 0 0 min(-25px, -17%); background: currentColor; color: var(--fill-text, #fff); transform-origin: 0 50%; animation: wu-sweep 1.2s ease infinite; }
+@keyframes wu-sweep { 0%, 100% { transform: scaleX(0); transform-origin: 0 50%; } 33%, 44% { transform: scaleX(1); } 44.1%, 88% { transform-origin: 100% 50%; } 88.1% { transform: scaleX(0); } }
+
+/* ---------- Round tools: magnetic pull (the icon follows the pointer, springs back), close × rotates 90° ---------- */
+.wu-mag > svg { transition: transform var(--mag-t, 400ms) var(--e-spring); transform: translate3d(var(--mx, 0px), var(--my, 0px), 0) rotate(var(--rot, 0deg)); }
+@media (hover: hover) and (pointer: fine) {
+  .wu-mag.is-x:hover > svg { --rot: 90deg; }
+  .search__close { transition: transform var(--m-primary), color var(--m-primary); }
+  .search__close:hover { transform: rotate(90deg); }
+  .loop__btn, .feat__btn, .shop-rail__step, .hero__arrow, .pdp2__chev, .wpc__wish, .pdp2__wish, .totop, .mnav__x, .cartd__x, .fdrawer__x, .mnav__theme, .nh-tile__add, .mnav__back { transition: background-color var(--m-primary), color var(--m-primary), box-shadow var(--m-primary), border-color var(--m-primary), opacity var(--m-fast), transform var(--m-primary); }
+  .hero__arrow:hover { transform: none; }
+  .wpc__wish:hover { transform: none; }
+  .pp__cta:hover { transform: none; }
 }
 
-/* ---------- Scroll reveal ---------- */
-.wu-motion [data-rv] {
-  opacity: 0;
-  transform: translate3d(0, 8px, 0);
-  transition: opacity var(--t-reveal) var(--ease-out), transform var(--t-reveal) var(--ease-out), filter var(--t-reveal) var(--ease-out);
-  transition-delay: var(--rv-d, 0ms);
+/* ---------- Links: the underline draws from the left; arrow links nudge their arrow ---------- */
+.prose a, .faq__a a, .faq__p a, .seo a, .assure a, .offer a, .ck__terms a, .cline__t, .wpc__title a, .mdesc__more, .ft__help, .footer-wrap .footer a:not(.ft__help):not(.footer__nl-msg) {
+  text-decoration: none; background-image: linear-gradient(currentColor, currentColor); background-repeat: no-repeat; background-position: 0 100%; background-size: 0 1px; transition: background-size var(--m-primary), color var(--m-primary);
 }
-.wu-motion [data-rv="text"] { filter: blur(2px); }
-.wu-motion [data-rv].is-in { opacity: 1; transform: none; filter: none; }
+.footer-wrap .footer a:not(.ft__help) { width: max-content; max-width: 100%; }
+.ft__help, .cline__t { background-size: 100% 1px; }
+@media (hover: hover) and (pointer: fine) {
+  .prose a:hover, .faq__a a:hover, .faq__p a:hover, .seo a:hover, .assure a:hover, .offer a:hover, .ck__terms a:hover, .wpc__title a:hover, .mdesc__more:hover, .footer-wrap .footer a:not(.ft__help):hover { background-size: 100% 1px; text-decoration: none; }
+  .ft__help:hover, .cline__t:hover { background-position: 100% 100%; background-size: 0 1px; text-decoration: none; }
+  .link-arrow, .tile__go, .mnav__all, .duo__more { transition: color var(--m-primary); }
+  .link-arrow:hover, .tile__go:hover { text-decoration: none; opacity: 1; }
+  .link-arrow svg, .tile__go svg, .mnav__all svg, .seo__toggle svg, .nh-btn svg { transition: transform var(--m-primary); }
+  .link-arrow:hover svg, .tile__go:hover svg, .mnav__all:hover svg { transform: translateX(4px); }
+}
 
-/* ---------- Controls: lift on hover, settle on press ---------- */
-.btn-pill, .btn-buy, .btn-navy, .btn-outline, .btn-cart, .shop-rail__all, .loop__cta, .pp__cta, .seo__toggle,
-.chip, .opt-chip, .policy__links a, .search__pages a, .mnav__chip, .rv__help, .cline__rm, .totop,
-.shop-rail__step, .hero__arrow, .loop__btn, .pdp2__chev, .pdp2__wish, .wpc__wish, .wpc__cta, .navbtn {
-  transition: transform var(--t-fast) var(--ease-soft), box-shadow var(--t-med) var(--ease-soft), background-color var(--t-med) var(--ease-soft), color var(--t-med) var(--ease-soft), border-color var(--t-med) var(--ease-soft), opacity var(--t-med) var(--ease-soft);
+/* ---------- Nav: the category pill grows behind the label (scale .6 → 1 + fade) instead of snapping on ---------- */
+.site-nav .navbtn:not(.navbtn--util):not(.site-nav__icon) { position: relative; isolation: isolate; }
+.site-nav .navbtn:not(.navbtn--util):not(.site-nav__icon)::before { content: ""; position: absolute; z-index: -1; inset: 0; border-radius: inherit; background: rgba(255,255,255,.14); opacity: 0; transform: scale(.6); transition: transform var(--m-primary), opacity var(--m-primary); pointer-events: none; }
+.site-nav .navbtn--all::before { background: rgba(255,255,255,.16); }
+@media (hover: hover) and (pointer: fine) {
+  .site-nav .navbtn:not(.navbtn--util):hover { background: transparent; }
+  .site-nav .navbtn--all:hover { background: rgba(226,232,255,.06); }
+  .site-nav .navbtn:not(.navbtn--util):hover::before, .site-nav .navbtn[aria-expanded="true"]::before { opacity: 1; transform: scale(1); }
 }
-@media (hover: hover) {
-  .btn-pill:hover, .btn-buy:not(:disabled):hover, .btn-navy:hover, .btn-outline:hover, .btn-cart:not(:disabled):hover,
-  .shop-rail__all:hover, .loop__cta:hover, .seo__toggle:hover, .opt-chip:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(23, 34, 72, .12);
-  }
-  .chip:hover, .policy__links a:hover, .search__pages a:hover { transform: translateY(-1px); }
-  .shop-rail__step:not([data-dim]):hover, .pdp2__wish:hover, .totop.is-on:hover { transform: translateY(-1px); }
-  /* Product cards: a 2px rise and a soft shadow (size unchanged) */
-  .wpc__card { transition: transform var(--t-med) var(--ease-soft), box-shadow var(--t-med) var(--ease-soft); }
-  .wpc:hover .wpc__card { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(23, 34, 72, .08); }
-  /* Text links ease in their underline */
-  .link-arrow, .tile__go, .crumbs a, .ft__help, .mdesc__more { transition: color var(--t-med) var(--ease-soft), opacity var(--t-med) var(--ease-soft); }
-  .link-arrow:hover, .tile__go:hover { opacity: .78; }
-  .tile { transition: transform var(--t-med) var(--ease-soft), box-shadow var(--t-med) var(--ease-soft); }
-  .tile:hover { transform: translateY(-2px); }
+.site-nav .navbtn[aria-expanded="true"] { background: transparent; }
+.site-nav .navbtn { transition: color var(--m-primary); }
+
+/* ---------- Cards and media: the image zooms to 1.05 with the hover curve; no lifts ---------- */
+.wpc__photo { transition: transform var(--m-primary); }
+@media (hover: hover) and (pointer: fine) {
+  .wpc__media:hover .wpc__photo { transform: scale(1.05); }
+  .wpc__cta:not(:disabled):hover { transform: none; }
+  .wpc__cta { transition: background-color var(--m-primary), color var(--m-primary), box-shadow var(--m-primary); }
+  .nh-tile__img img, .nh-trio__media img { transition: transform var(--m-primary); }
+  .nh-tile:hover .nh-tile__img img { transform: scale(1.05); }
+  .tile, .post, .duo__card, .nh-feat, .nh-strip a { transition: background-color var(--m-primary), color var(--m-primary), box-shadow var(--m-primary); }
+  .tile:hover, .post:hover { transform: none; }
 }
+.dot { transition: width var(--m-primary), background-color var(--m-primary), box-shadow var(--m-primary), opacity var(--m-primary); }
+
+/* ---------- Drawers, overlays, menus: panel 600ms (.7,0,.2,1) · scrim 800ms · contents fade 500ms (100ms delay on close) ---------- */
+.cartd, .fdrawer, .mnav { transition: transform var(--m-drawer); }
+.cartd-scrim, .fscrim, .mnav-scrim, .scrim { transition: opacity var(--m-scrim); }
+.wu-motion :is(.cartd, .fdrawer, .mnav) > * { opacity: 0; transition: opacity var(--m-primary) 100ms; }
+.wu-motion :is(.cartd, .fdrawer, .mnav).is-open > * { opacity: 1; transition-delay: 0s; }
+.wu-motion :is(.cartd, .fdrawer, .mnav).is-dragging > * { transition: none; }
+.wu-motion .mnav > .mnav__sub { opacity: 1; }
+/* search overlay: scrim fades, the panel drops 16px into place */
+.scrim.is-anim { opacity: 0; }
+.scrim.is-anim .search { opacity: 0; transform: translate3d(0, -16px, 0); transition: opacity var(--m-drawer), transform var(--m-drawer); }
+.scrim.is-anim.is-open { opacity: 1; }
+.scrim.is-anim.is-open .search { opacity: 1; transform: none; }
+/* sort menu: drops in, options glide from the right one after another */
+.msort__list.is-anim { opacity: 0; transform: translate3d(0, -8px, 0) scale(.98); transform-origin: 100% 0; transition: opacity var(--m-drawer), transform var(--m-drawer); }
+.msort__list.is-anim .msort__opt { opacity: 0; transform: translate3d(20%, 0, 0); transition: transform 1000ms var(--e-glide), opacity 1000ms var(--e-glide-fade); }
+.msort__list.is-anim.is-open { opacity: 1; transform: none; }
+.msort__list.is-anim.is-open .msort__opt { opacity: 1; transform: none; }
+.msort__list.is-anim.is-open .msort__opt:nth-child(1) { transition-delay: 150ms; }
+.msort__list.is-anim.is-open .msort__opt:nth-child(2) { transition-delay: 220ms; }
+.msort__list.is-anim.is-open .msort__opt:nth-child(3) { transition-delay: 290ms; }
+.msort__list.is-anim.is-open .msort__opt:nth-child(4) { transition-delay: 360ms; }
+.msort__list.is-anim.is-open .msort__opt:nth-child(5) { transition-delay: 430ms; }
+.msort__list.is-anim.is-open .msort__opt:nth-child(n+6) { transition-delay: 500ms; }
+
+/* ---------- Accordions and fold-outs: chevrons turn with the hover curve (heights animate in JS: 250ms ease + 150ms content) ---------- */
+.faq__chev, .ft__chev, .mnav__chev, .facc__chev, .seo__toggle svg { transition: transform var(--m-primary); }
+.wu-slide { overflow: hidden; }
+
+/* ---------- Sticky buy bar: rises 15px and fades in over 1s (expo) once the main buy button scrolls away ---------- */
+.buybar { opacity: 0; visibility: hidden; transform: translate(-50%, 15px); transition: transform 1000ms var(--e-reveal), opacity 1000ms var(--e-reveal), visibility 0s linear 1000ms; }
+.buybar.is-on { opacity: 1; visibility: visible; transform: translate(-50%, 0); transition-delay: 0s; }
+
+/* ---------- Progress bars: the free-delivery line and review bars grow to their value (700ms smooth, 100ms late) ---------- */
+.cartd__ship i { transition: --pct var(--m-smooth) 100ms; }
+.rv__bar i { transition: --w var(--m-smooth) 100ms; }
+
+/* ---------- Scroll-driven: the footer slides down into place as it enters (a dark curtain lifts); banners open from a clipped centre ---------- */
+.footer-wrap { overflow: hidden; }
+.wu-motion .footer-wrap .footer { position: relative; transform: translate3d(0, calc(-30% * (1 - var(--sd-p, 1))), 0); will-change: transform; }
+.wu-motion .footer-wrap .footer::after { content: ""; position: absolute; inset: 0; z-index: 5; border-radius: inherit; background: #000; opacity: calc(.45 * (1 - var(--sd-p, 1))); pointer-events: none; }
+.wu-motion [data-sd="clip"].is-clipping { clip-path: inset(calc(20% * var(--sd-q, 0)) calc(35% * var(--sd-q, 0)) 0 calc(35% * var(--sd-q, 0)) round var(--sd-r, 24px)); will-change: clip-path; }
+
+/* ---------- Press: controls settle to 98% ---------- */
 .btn-pill:active, .btn-buy:not(:disabled):active, .btn-navy:active, .btn-outline:active, .btn-cart:not(:disabled):active,
 .shop-rail__all:active, .loop__cta:active, .chip:active, .opt-chip:active, .policy__links a:active,
-.mnav__chip:active, .rv__help:active, .pdp2__wish:active, .wpc__wish:active, .wpc__cta:active, .totop:active, .loop__btn:active {
-  transform: scale(.98);
-  transition-duration: 90ms;
-}
+.mnav__chip:active, .rv__help:active, .pdp2__wish:active, .wpc__wish:active, .wpc__cta:active, .totop:active, .loop__btn:active, .fbtn:active { transform: scale(.98); transition-duration: 90ms; }
 
 @media (prefers-reduced-motion: reduce) {
-  .wu-motion [data-rv] { opacity: 1 !important; transform: none !important; filter: none !important; transition: none !important; }
+  .wu-motion [data-rv], .wu-motion [data-rv="words"] .wu-w { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .wu-motion .footer-wrap .footer { transform: none !important; }
+  .wu-motion .footer-wrap .footer::after { display: none; }
+  .wu-motion [data-sd="clip"].is-clipping { clip-path: none !important; }
+  .wu-fill::before { display: none; }
+  .wu-mag > svg { transition: none !important; transform: none !important; }
+  .wu-fill.is-loading::after { animation: none; }
   *, *::before, *::after { transition-duration: 1ms !important; animation-duration: 1ms !important; }
+}
+
+/* ---------- Night home buttons: the fill is the hover (base colours stay) ---------- */
+@media (hover: hover) and (pointer: fine) {
+  html[data-theme="night"] .nh .nh-btn:hover { background: var(--red-10); }
+  html[data-theme="night"] .nh .nh-btn--primary:hover { background: var(--red); }
+  html[data-theme="night"] .nh .nh-btn--ghost:hover { background: rgba(255,255,255,.06); }
 }
