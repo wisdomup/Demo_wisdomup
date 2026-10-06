@@ -16,7 +16,7 @@
   // Series spotlight: the TS true wireless family
   const SERIES = ['ts-11anc', 'ts-12', 'ts-13', 'ts-11', 'ts-10'].filter(P);
   const PROMOS = [
-    { id: 'cj-46', kicker: '3-in-1 wireless charger', chips: ['15W phone', 'Earbuds + watch'], bg: 'linear-gradient(120deg,#1c2a44,#0a0f1a)' },
+    { id: 'cj-46', kicker: '3-in-1 wireless charger', chips: ['15W phone', 'Earbuds + watch'], bg: 'linear-gradient(120deg,#2a2a2e,#0a0f1a)' },
     { id: 'cdb-18', kicker: 'Magnetic power bank', chips: ['10,000mAh', '15W wireless'], bg: 'linear-gradient(120deg,#1b1b1b,#050505)' },
     { id: 'cc-16', kicker: 'Fast car charger', chips: ['33W PD', 'USB + USB-C'], bg: 'linear-gradient(120deg,#4a2a18,#a4582a)' },
     { id: 'ocd-28', kicker: 'Wall charger + cable', chips: ['20W', 'EU or UK plug'], bg: 'linear-gradient(120deg,#0f2d2a,#050a0a)' },
@@ -30,7 +30,7 @@
     { id: 'ts-11anc', kicker: 'Noise cancelling · TS-11ANC', title: 'Silence, on demand.', sub: 'Active noise cancelling and Bluetooth 6.0 in a pocket-sized case.', tag: 'Earbuds', bg: 'linear-gradient(120deg,#22304a,#0b0f18)' },
     { id: 'yx-28', kicker: 'Party speaker · YX-28', title: 'Bring the venue home.', sub: '150W, an RGB light show and an 18,000mAh battery.', tag: 'Speakers', bg: 'linear-gradient(120deg,#2a1640,#120a24)' },
     { id: 'os-6', kicker: 'Open-ear · OS-6', title: 'Hear the city. Keep the music.', sub: 'Open-ear comfort with Bluetooth 6.0.', tag: 'Earbuds', bg: 'linear-gradient(120deg,#3a0f12,#0d0505)' },
-    { id: 'cdb-18', kicker: 'Magnetic power bank · CDB-18', title: 'Snap on. Power up.', sub: '15W magnetic wireless charging with a built-in watch charger.', tag: 'Power Banks', bg: 'linear-gradient(120deg,#1c2a44,#0a0f1a)' },
+    { id: 'cdb-18', kicker: 'Magnetic power bank · CDB-18', title: 'Snap on. Power up.', sub: '15W magnetic wireless charging with a built-in watch charger.', tag: 'Power Banks', bg: 'linear-gradient(120deg,#2a2a2e,#0a0f1a)' },
     { id: 'txd-01', kicker: 'Electric shaver · TXD-01', title: 'A closer, cleaner shave.', sub: 'Five stainless steel blades and 100+ minutes per charge.', tag: 'Grooming', bg: 'linear-gradient(120deg,#2a2622,#0d0c0b)' },
   ].filter(s => P(s.id)).map(s => ({ ...s, ctaLabel: `Shop ${P(s.id).code} · ${P(s.id).priceText}` }));
   const TAG_SVG = '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M1 2.2V7.4c0 .4.2.8.5 1.1l6.9 6.9a1.5 1.5 0 0 0 2.1 0l4.9-4.9a1.5 1.5 0 0 0 0-2.1L8.5 1.5A1.6 1.6 0 0 0 7.4 1H2.2C1.5 1 1 1.5 1 2.2Zm3.5 1.3a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4Z"></path></svg>';

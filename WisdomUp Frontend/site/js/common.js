@@ -669,20 +669,17 @@
           <div class="wpc__body">
             <div class="wpc__head">
               <h3 class="wpc__title"><a href="${href}" aria-label="${esc(p.title)}">${esc(cardName(p))}</a></h3>
-              <div class="wpc__model"><span>${esc(p.code)}</span><i aria-hidden="true"></i><span>${esc(p.cat)}</span></div>
-              ${(() => { const rv = reviews.summary(p.id); return rv.count ? `<span class="wpc__rating" aria-label="Rated ${rv.avg.toFixed(1)} out of 5 from ${rv.count} review${rv.count > 1 ? 's' : ''}">${STAR_SVG}<span>${rv.avg.toFixed(1)}</span><small>(${rv.count})</small></span>` : `<span class="wpc__rating wpc__rating--none" aria-label="No reviews yet">${STAR_OUTLINE}<span>0.0</span></span>`; })()}
+              <div class="wpc__model"><span class="wpc__code">${esc(p.code)}</span><i aria-hidden="true"></i><span class="wpc__cat">${esc(p.cat)}</span>${(() => { const rv = reviews.summary(p.id); return rv.count ? `<span class="wpc__rating" aria-label="Rated ${rv.avg.toFixed(1)} out of 5 from ${rv.count} review${rv.count > 1 ? 's' : ''}">${STAR_SVG}<span>${rv.avg.toFixed(1)}</span><small>(${rv.count})</small></span>` : `<span class="wpc__rating wpc__rating--none" aria-label="No reviews yet">${STAR_OUTLINE}<span>0.0</span></span>`; })()}</div>
             </div>
-            <div class="wpc__rule" aria-hidden="true"></div>
-            <div class="wpc__deal">${p.off ? `${p.off}% off` : ''}</div>
-            <div class="wpc__row wpc__pricerow">
-              <span class="wpc__prices"><span class="wpc__price">${/^From\s/.test(p.priceText) ? `<small>From</small>${esc(p.priceText.replace(/^From\s+/, ''))}` : esc(p.priceText)}</span>${p.wasText ? `<s class="wpc__was" aria-label="Regular price ${esc(p.wasText)}">${esc(p.wasText)}</s>` : ''}</span>
-              ${colours.length > 1 ? `<div class="wpc__swatches" role="radiogroup" aria-label="Colour">
-                ${colours.map((c, i) => `<button type="button" class="wpc__swatch" role="radio" aria-label="${esc(c.name)}" aria-checked="${i === 0}" style="background: ${c.hex}; --sw: ${c.hex};"></button>`).join('')}
-              </div>` : opts_n ? `<span class="wpc__opts">${opts_n} options</span>` : ''}
-            </div>
-            <div class="wpc__eta">${etaFor(seed, off)}</div>
-            <div class="wpc__row wpc__foot">
-              <dl class="wpc__specs">${specTrio(p).map(([v, k]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>
+            ${colours.length > 1 ? `<div class="wpc__swatches" role="radiogroup" aria-label="Colour">${colours.map((c, i) => `<button type="button" class="wpc__swatch" role="radio" aria-label="${esc(c.name)}" aria-checked="${i === 0}" style="background: ${c.hex}; --sw: ${c.hex};"></button>`).join('')}</div>` : ''}
+            ${(() => { // real options on the card (Shokz-style): the first option type as chips; else the spec trio
+              const axis = p.axes && p.axes[0], vals = axis ? [...new Set(p.variants.map(v => v.attrs[axis]).filter(Boolean))] : [];
+              if (vals.length > 1) return `<div class="wpc__opt"><span class="wpc__optlabel">${esc(axis)}</span><div class="wpc__optchips" role="radiogroup" aria-label="${esc(axis)}">${vals.slice(0, 3).map(val => `<button type="button" class="wpc__optchip" role="radio" aria-checked="false" data-axis="${esc(axis)}" data-val="${esc(val)}">${esc(val)}</button>`).join('')}${vals.length > 3 ? `<span class="wpc__optmore">+${vals.length - 3}</span>` : ''}</div><span class="wpc__opts">${opts_n} options</span></div>`;
+              const trio = specTrio(p);
+              return trio.length ? `<dl class="wpc__specs">${trio.map(([v, k]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>` : '';
+            })()}
+            <div class="wpc__prices"><span class="wpc__price">${esc(p.priceText.replace(/^From\s+/, ''))}</span>${p.wasText ? `<s class="wpc__was" aria-label="Regular price ${esc(p.wasText)}">${esc(p.wasText)}</s>` : ''}${p.off ? `<span class="wpc__off">−${p.off}%</span>` : ''}</div>
+            <div class="wpc__foot">
               ${opts_n
                 ? `<a class="wpc__cta" href="${href}"${off ? ' aria-disabled="true"' : ''}><span class="wpc__cta-t">${off ? 'Sold out' : 'Choose'}</span><span class="wpc__cta-ic">${icon('chev-r', 16)}</span></a>`
                 : `<button type="button" class="wpc__cta"${off ? ' disabled aria-disabled="true"' : ''}><span class="wpc__cta-ic">${icon('cart', 16)}</span><span class="wpc__cta-t">${off ? 'Sold out' : 'Add to cart'}</span></button>`}
@@ -695,7 +692,19 @@
     const choose = e.target.closest('a.wpc__cta');
     if (choose && !(e.metaKey || e.ctrlKey || e.shiftKey || e.button)) {
       const pid = choose.closest('.wpc') && choose.closest('.wpc').dataset.pid, prod = D.byId(pid);
-      if (prod && !prod.soldOut && prod.variants && prod.variants.length > 1 && qaddUI) { e.preventDefault(); qaddUI.open(prod, choose); }
+      if (prod && !prod.soldOut && prod.variants && prod.variants.length > 1 && qaddUI) { e.preventDefault(); qaddUI.open(prod, choose, choose.closest('.wpc').dataset.sku); }
+      return;
+    }
+    const oc = e.target.closest('.wpc__optchip');
+    if (oc) {
+      const card = oc.closest('.wpc'), prod = D.byId(card.dataset.pid);
+      const v = prod && prod.variants.find(x => x.attrs[oc.dataset.axis] === oc.dataset.val);
+      if (!v) return;
+      oc.parentElement.querySelectorAll('.wpc__optchip').forEach(x => x.setAttribute('aria-checked', x === oc));
+      card.dataset.sku = v.sku;
+      const pr = card.querySelector('.wpc__prices');
+      pr.innerHTML = `<span class="wpc__price">${esc(v.priceText)}</span>${v.wasText ? `<s class="wpc__was" aria-label="Regular price ${esc(v.wasText)}">${esc(v.wasText)}</s>` : ''}${v.off ? `<span class="wpc__off">−${v.off}%</span>` : ''}`;
+      const ph = card.querySelector('.wpc__photo'); if (ph && (v.thumb || v.img)) ph.src = v.thumb || v.img;
       return;
     }
     const sw = e.target.closest('.wpc__swatch');
@@ -996,7 +1005,7 @@
       <div class="footer-fixed">
         <footer class="footer">
           <div class="footer__top">
-            <a class="footer__brand" href="${url.home}" aria-label="WisdomUp home"><img src="img/wu-logo-white.png" alt="WisdomUp"></a>
+            <a class="footer__brand" href="${url.home}" aria-label="WisdomUp home"><img src="img/wu-logo.png" alt="WisdomUp"><img src="img/wu-logo-white.png" alt="" aria-hidden="true"></a>
             <div class="footer__nl">
               <p class="footer__nl-msg">New launches and live-only deals, straight to your inbox.</p>
               <form class="newsletter"><input type="email" placeholder="Email address" aria-label="Email address"><button aria-label="Subscribe" type="submit">${icon('arrow', 18)}</button></form>
@@ -1131,10 +1140,10 @@
   }
   let menu;
   /* ---------- Motion: quiet scroll reveal (text rises 8px and un-blurs; blocks rise and fade; siblings stagger) ---------- */
-  const RV_TEXT = 'h1, h2, .sec-title, .eyebrow, .ihero__lede, .overview__head p, .seo__head p, .mdesc, .pbanner__copy';
+  const RV_TEXT = 'h1, h2, h3, .sec-title, .eyebrow, .ihero__lede, .overview__head p, .seo__head p, .mdesc, .pbanner__copy, p, .prose li, blockquote'; // 2026-10-06: every paragraph and sub-heading too (bugatti.store)
   const RV_BLOCK = '.wpc, .tile, .post, .stat, .pd-stat, .ck__sec, .ord__card, .rv__sum, .rv__item, .faq__item, .seo__card, .duo__card, '
     + '.promo-band, .loop, .series, .bulk, .pp, .trust__item, .step, .manual, .panel-list, .cta-band, .ck__sumcard, .mgrid__more, .empty, .ord__hero, .track__form, .iform, .bk-form';
-  const RV_SKIP = '#site-nav, .mnav, .cartd, .fdrawer, .search, .ckc, .hero, .buybar, .toast, .wu-util, .quick, .visually-hidden, .seo__more';
+  const RV_SKIP = '#site-nav, .mnav, .cartd, .fdrawer, .search, .ckc, .hero, .buybar, .toast, .wu-util, .quick, .visually-hidden, .seo__more, .footer-wrap, label';
   let revealer = null;
   // ---------- Motion engine (MOTION-REPORT.md, approved 2026-10-06): reveals, grid staggers, scroll-driven curtain/clip, liquid fills, magnets ----------
   const FILL_SEL = '.btn-pill, .btn-buy, .btn-navy, .btn-outline, .btn-cart, .shop-rail__all, .loop__cta, .pp__cta, .seo__toggle, .fdrawer__apply, .ck__place, .cartd__go, .mnav__foot a, .nh-btn, .totop, .quick .chip, .wpc__cta, .ckc__btn, .msort__btn';
@@ -1157,7 +1166,9 @@
       t.textContent.split(/(\s+)/).forEach(part => {
         if (!part) return;
         if (/^\s+$/.test(part)) { frag.append(part); return; }
-        const w = document.createElement('span'); w.className = 'wu-w'; w.textContent = part; w.style.setProperty('--rv-d', (i++ * 30) + 'ms'); frag.append(w);
+        const m = document.createElement('span'); m.className = 'wu-wm'; // the mask: the word rises from behind the line
+        const w = document.createElement('span'); w.className = 'wu-w'; w.textContent = part; w.style.setProperty('--rv-d', (250 + i++ * 30) + 'ms');
+        m.append(w); frag.append(m);
       });
       t.replaceWith(frag);
     });
@@ -1268,7 +1279,13 @@
       if (el.matches(GRID_SEL)) return 'grid';
       if (el.matches('h1, h2, .sec-title')) {
         const cs = getComputedStyle(el);
-        if (cs.webkitBackgroundClip === 'text' || cs.backgroundClip === 'text' || el.querySelector('img, svg, button, input')) return 'up-large';
+        if (el.querySelector('img, svg, button, input')) return 'up-large';
+        if (cs.webkitBackgroundClip === 'text' || cs.backgroundClip === 'text') {
+          // a gradient that is really one colour (the heading token since the 2026-10-06 colour scheme) can split: paint it flat
+          const stops = (cs.backgroundImage.match(/rgba?\([^)]+\)/g) || []);
+          if (stops.length && stops.every(c => c === stops[0])) { el.classList.add('wu-flat'); return 'words'; }
+          return 'up-large'; // a real multi-colour gradient (gold names) moves as one piece
+        }
         return 'words';
       }
       return 'up';
@@ -1591,9 +1608,9 @@
       panel.querySelector('[data-q="1"]').disabled = qty >= (SHOP.maxQty || 10);
       $('qadd-go').textContent = `Add to cart · ${D.rs(v.price * qty)}`;
     };
-    function open(prod, btn) {
+    function open(prod, btn, sku) {
       p = prod; V = p.variants && p.variants.length ? p.variants : [{ sku: p.code, attrs: {}, price: p.price, was: p.was, wasText: p.wasText, off: p.off, img: p.src, thumb: p.thumb, bg: p.bg }];
-      cur = 0; qty = 1; opener = btn || document.activeElement;
+      cur = Math.max(0, V.findIndex(v => v.sku === sku)); qty = 1; opener = btn || document.activeElement; // the card's chosen option, if any
       body.innerHTML = `
         <div class="qadd__media" id="qadd-media"><img id="qadd-img" src="" alt="${esc(p.title)}"></div>
         <div class="qadd__info">
@@ -1669,7 +1686,7 @@
     el.className = 'ckc'; el.id = 'ckc'; el.hidden = true;
     el.innerHTML = `
       <div class="ckc__scrim"></div>
-      <section class="ckc__box" role="dialog" aria-modal="true" aria-labelledby="ckc-h1">
+      <section class="ckc__box" role="dialog" aria-modal="true" aria-labelledby="ckc-h1" tabindex="-1">
         <div class="ckc__layer" data-layer="notice">
           <div class="ckc__scroll">
             ${LOGO}
@@ -1735,8 +1752,7 @@
         next.querySelector('.ckc__scroll').scrollTop = 0;
         glide(next, name === 'manage' ? 'translate3d(30px, 0, 0)' : 'translate3d(-30px, 0, 0)');
       }
-      const f = next.querySelector('.ckc__btn');
-      if (f) f.focus({ preventScroll: true });
+      box.focus({ preventScroll: true }); // the dialog itself, not a button — so no focus ring appears on a button nobody tabbed to
     };
     function open(name = 'notice') {
       clearTimeout(hideT);
@@ -1748,7 +1764,7 @@
       el.hidden = false;
       document.documentElement.style.overflow = 'hidden';
       requestAnimationFrame(() => requestAnimationFrame(() => { el.classList.add('is-open'); glide(layers[name]); }));
-      setTimeout(() => { const f = layers[name].querySelector('.ckc__btn'); if (f) f.focus({ preventScroll: true }); }, 80);
+      setTimeout(() => box.focus({ preventScroll: true }), 80); // focus the dialog (announced by screen readers); Tab reaches the buttons
     }
     function close() {
       el.classList.remove('is-open');
@@ -1782,7 +1798,8 @@
       if (e.key !== 'Tab') return;
       const f = [...layers[layer].querySelectorAll('button')].filter(x => x.offsetParent !== null);
       const first = f[0], last = f[f.length - 1];
-      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      if (document.activeElement === box) { e.preventDefault(); (e.shiftKey ? last : first).focus(); }
+      else if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
       else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
     });
     if (!consentGet()) setTimeout(() => open('notice'), 700); // first visit: ask once the page has painted

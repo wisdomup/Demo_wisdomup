@@ -71,7 +71,6 @@ html[data-theme="night"] .wpc__media { border-radius: 12px; }
 html[data-theme="night"] .wpc__title { color: var(--n-text); }
 html[data-theme="night"] .wpc__price { color: #fff; }
 html[data-theme="night"] :is(.wpc__kind, .wpc__rating, .wpc__rating small, .wpc__opts) { color: var(--n-muted); }
-html[data-theme="night"] .wpc__eta { color: #7ED6A0; }
 html[data-theme="night"] .wpc__badge { background: var(--n-red-soft); color: var(--n-red-text); box-shadow: inset 0 0 0 1px var(--n-red-line); border-radius: 999px; }
 html[data-theme="night"] .wpc__wish { background: rgba(26, 29, 33, .85); }
 
@@ -348,7 +347,7 @@ html[data-theme="night"] :is(.isec__head p, .isec__head .h-light, .bk-intro > p,
 html[data-theme="night"] :is(.quote-band p, .cta-band h2, .callout b, .kv > b, .contact-card b, .track__head b, .timeline b, .manual__q b, .cities span, .iform__h, .wish-count, .bk-done h2, .bk-intro h1, .empty h2, .bk-group legend, .rv__pick legend, .tile b, .post__body h3, .article__head h1, .ihero h1, .adm__bar b, .adm__login h1, .adm__stat b, .adm__order header b, .ord__hero p, .ord__card p, .ord__steps b, .rv__item p, .pdp2__rate b, .rv__avg b, .highlights div, .overview__head h2, .overview__head p, .specs-row, .pdp2__label, .bulk__h, .pp__h) { color: var(--n-text); }
 /* inline navy on a few page headings (e.g. track.html h1) */
 html[data-theme="night"] :is([style*="color: #172248"], [style*="color:#172248"], [style*="color: #273F85"], [style*="color:#273F85"]) { color: var(--n-text) !important; }
-html[data-theme="night"] :is([style*="color: #3D4656"], [style*="color: #464646"], [style*="color: #1F2633"]) { color: var(--n-text2) !important; }
+html[data-theme="night"] :is([style*="color: #3D4656"], [style*="color: #464646"], [style*="color: #1F2633"], [style*="color: #1B1B1B"]) { color: var(--n-text2) !important; }
 
 /* ---------- Footer: the contact line + plain text on the red ---------- */
 html[data-theme="night"] .footer-wrap .footer :is(p, small, li) { color: rgba(255,255,255,.88); }
@@ -453,11 +452,10 @@ html[data-theme="night"] :is(.msort__cur, .msort__dot) { color: #fff !important;
 html[data-theme="night"] .msort__panel { --ms-edge: #fff; --ms-fill: #fff; filter: drop-shadow(0 18px 40px rgba(0,0,0,.55)); }
 
 /* Product card premium pass (2026-10-06) — night: the CTA stays the night RED pill, wrapped in the same edge-light ring */
-html[data-theme="night"] .wpc .wpc__cta:not(:disabled):not([aria-disabled="true"]) { --pill: var(--n-red); background: linear-gradient(var(--pill), var(--pill)) padding-box, var(--ring) border-box; box-shadow: 0 1.86cqw 5.116cqw rgba(217, 30, 5, .3); }
-html[data-theme="night"] .wpc .wpc__cta:not(:disabled):not([aria-disabled="true"]):hover { background: linear-gradient(var(--pill), var(--pill)) padding-box, var(--ring) border-box; }
+html[data-theme="night"] .wpc .wpc__cta:not(:disabled):not([aria-disabled="true"]) { background: var(--n-red); box-shadow: none; }
+html[data-theme="night"] .wpc .wpc__cta:not(:disabled):not([aria-disabled="true"]):hover { background: var(--n-red); }
 html[data-theme="night"] .wpc__model { color: var(--n-muted); }
-html[data-theme="night"] .wpc__model span:first-child { color: var(--n-text2); }
-html[data-theme="night"] .wpc__rule { background: rgba(255,255,255,.08); }
+html[data-theme="night"] .wpc__code { color: var(--n-text2); }
 html[data-theme="night"] .wpc__price small { color: var(--n-muted); }
 html[data-theme="night"] .wpc__specs > div { border-left-color: rgba(255,255,255,.1); }
 html[data-theme="night"] .wpc__specs dd { color: var(--n-text2); }
@@ -466,6 +464,31 @@ html[data-theme="night"] .wpc__swatch { box-shadow: inset 0 0 0 1px rgba(255,255
 html[data-theme="night"] .wpc__swatch[aria-checked="true"] { box-shadow: inset 0 0 0 1px rgba(255,255,255,.2), 0 0 0 2px var(--n-card), 0 0 0 3.5px var(--sw); }
 
 /* Sale + ratings (2026-10-06) — night colours */
-html[data-theme="night"] :is(.wpc__deal, .qadd__off) { color: var(--n-red-text); }
+html[data-theme="night"] .qadd__off { color: var(--n-red-text); }
+html[data-theme="night"] .wpc__off { background: rgba(217, 30, 5, .18); color: var(--n-red-text); }
 html[data-theme="night"] :is(.wpc__was, .qadd__was, .pdp2__was, .nh-tile__was) { color: #8A9097 !important; }
 html[data-theme="night"] .wpc__rating--none, html[data-theme="night"] .pdp2__rate--none, html[data-theme="night"] .pdp2__rate--none b { color: var(--n-muted) !important; }
+
+/* Card body calm pass (2026-10-06) — night */
+html[data-theme="night"] .wpc__title { color: var(--n-text); }
+html[data-theme="night"] .wpc__optlabel, html[data-theme="night"] .wpc__optmore { color: var(--n-muted); }
+html[data-theme="night"] .wpc__optchip { box-shadow: inset 0 0 0 1px rgba(255,255,255,.16); color: var(--n-text2); }
+html[data-theme="night"] .wpc__optchip[aria-checked="true"] { box-shadow: inset 0 0 0 1.5px #fff; color: #fff; }
+html[data-theme="night"] .wpc__opts { color: var(--n-text2); }
+html[data-theme="night"] .wpc__off { background: rgba(217, 30, 5, .18); color: var(--n-red-text); }
+
+/* Product page main button (2026-10-06): the same red capsule in night */
+html[data-theme="night"] .pdp2__add { background: var(--n-red); color: #fff; }
+html[data-theme="night"] .pdp2__add:disabled { background: var(--n-raise2); color: var(--n-muted); }
+html[data-theme="night"] .pdp2 .pdp2__off { background: rgba(217, 30, 5, .18); color: var(--n-red-text) !important; -webkit-text-fill-color: currentColor; }
+html[data-theme="night"] .buybar .buybar__p b { color: var(--n-text); }
+html[data-theme="night"] .pdp2 .offer a { color: var(--n-red-text); }
+html[data-theme="night"] .pdp2 .gift input { accent-color: var(--n-red) !important; }
+
+/* Day colour scheme (2026-10-06) made the day footer light — night keeps its red footer's white hairlines, field and logo */
+html[data-theme="night"] .footer__top, html[data-theme="night"] .ft__group { border-color: rgba(255,255,255,.16); }
+html[data-theme="night"] .footer-wrap .newsletter { background: transparent; }
+html[data-theme="night"] .footer-wrap .newsletter input::placeholder { color: rgba(255,255,255,.6); }
+html[data-theme="night"] .footer__nl-msg { color: rgba(255,255,255,.86) !important; }
+html[data-theme="night"] .footer__brand img { display: none; }
+html[data-theme="night"] .footer__brand img + img { display: block; }

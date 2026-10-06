@@ -46,9 +46,9 @@
   const DESC = `${p.title}${p.highlights.length ? ' — ' + p.highlights.slice(0, 3).join(', ').replace(/^./, c => c.toLowerCase()) : ''}. ${LEDE[dept.id]}`;
   const STAT_BG = [
     { cls: 'pd-stat--dark', bg: 'radial-gradient(90% 120% at 70% 40%, #3a3531 0%, #151312 60%, #0d0c0b 100%)', fg: '#fff' },
-    { cls: '', bg: 'linear-gradient(135deg, #E9F3FC 0%, #9FC7EE 100%)', fg: '#1c2a44' },
+    { cls: '', bg: 'linear-gradient(135deg, #F5F6F8 0%, #E6E8EC 100%)', fg: '#1B1B1B' }, // day scheme: neutral, no light blue
     { cls: 'pd-stat--light', bg: '#fff', fg: '#464646' },
-    { cls: 'pd-stat--dark', bg: 'linear-gradient(160deg, #2a1640 0%, #120a24 70%)', fg: '#fff' },
+    { cls: 'pd-stat--dark', bg: 'linear-gradient(160deg, #2A2A2E 0%, #121214 70%)', fg: '#fff' }, // day scheme: charcoal, no purple
   ];
   const STATS = p.specs.filter(([k]) => !/Colours|Design|Type|Charging port|Interface|Plugs|Input/.test(k)).slice(0, 3)
     .map(([k, v]) => ({ v, t: k, s: '' }))
@@ -129,10 +129,9 @@
           <div class="sw-dots">${colours.map(c => `<i title="${esc(c.name)}" style="background: ${c.hex};"></i>`).join('')}</div></div>` : ''}
         <div class="buybox" id="buybox">
           <div class="qty" role="group" aria-label="Quantity"><button type="button" data-q="-1" aria-label="Decrease quantity">−</button><output id="qty" aria-live="polite">1</output><button type="button" data-q="1" aria-label="Increase quantity">+</button></div>
-          <button type="button" class="btn-cart" data-add${p.soldOut ? ' disabled' : ''}><span class="plus">+</span>${p.soldOut ? 'Sold out' : 'Add to cart'}</button>
+          <button type="button" class="pdp2__add" data-add${p.soldOut ? ' disabled' : ''}>${icon('cart', 20)}<span>${p.soldOut ? 'Sold out' : 'Add to cart'}</span></button>
           ${WU.wishBtn(p, 'pdp2__wish')}
         </div>
-        <button type="button" class="btn-buy" data-buy${p.soldOut ? ' disabled' : ''}>${icon('cart', 30)}Buy Now</button>
         <label class="gift" style="cursor: pointer;"><input type="checkbox" id="gift" style="accent-color: var(--focus); width: 18px; height: 18px;"><span>Add gift wrapping @ <b>${esc(WU.D.rs(WU.SHOP.giftWrap))}</b></span></label>
         <div class="offer"><div class="offer__head">Free shipping on this order<span>%</span></div><div class="offer__body"><span id="offer-text"></span><a href="${url.shipping}" style="white-space: nowrap; margin-left: 12px;">Details ›</a></div></div>
         <div class="assure">
@@ -181,7 +180,7 @@
     <div class="buybar" id="buybar" aria-hidden="true">
       <div class="buybar__art" style="background: ${photoBg(p)};"><img id="bb-img" src="${V[cur].thumb || p.thumb}" alt="" style="width: 100%; height: 100%; object-fit: cover; object-position: 6% 50%;"></div>
       <div class="buybar__txt"><span class="buybar__t">${esc(p.code)} <small>${esc(typeLabel(p.type))}</small></span><span class="buybar__p"><b id="bb-price">${esc(V[cur].priceText)}</b></span></div>
-      <button type="button" class="btn-buy" data-add tabindex="-1"${p.soldOut ? ' disabled' : ''}>${icon('cart', 24)}${p.soldOut ? 'Sold out' : 'Add to cart'}</button>
+      <button type="button" class="pdp2__add buybar__add" data-add tabindex="-1"${p.soldOut ? ' disabled' : ''}>${icon('cart', 18)}<span>${p.soldOut ? 'Sold out' : 'Add to cart'}</span></button>
     </div>`;
 
   /* ---------- Variant selection: price, model, photo, specs and URL follow the choice ---------- */
@@ -263,10 +262,9 @@
     paintOffer();
   });
   document.addEventListener('click', e => {
-    // Add to cart: the chosen option (plug / cable / capacity…) and quantity; the cart panel opens to confirm
+    // Add to cart (the ONE main action since 2026-10-06 — "Buy Now" was removed): the chosen option and quantity go in and the
+    // cart panel opens, with its Checkout button
     if (e.target.closest('[data-add]') && !p.soldOut) add(p.id, qty, V[cur].sku, { open: true });
-    // Buy Now: add and go straight to checkout
-    if (e.target.closest('[data-buy]') && !p.soldOut) { add(p.id, qty, V[cur].sku); location.href = 'checkout.html'; }
   });
   $('gift').checked = WU.cart.gift();
   $('gift').addEventListener('change', e => { WU.cart.setGift(e.target.checked); toast(e.target.checked ? `Gift wrapping added (${WU.D.rs(WU.SHOP.giftWrap)})` : 'Gift wrapping removed'); });

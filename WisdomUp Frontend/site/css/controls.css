@@ -20,11 +20,11 @@
   --gap-3: 11px;
   --ctl-font: 600 14px/1 var(--font);
   --ctl-track: .01em;
-  --ctl-ink: #172248;
+  --ctl-ink: #1B1B1B;
   --chip-bg: #F1F2F4;
   --chip-bg-hover: #E8EAEE;
-  --chip-line: rgba(23, 34, 72, .08);
-  --chip-line-hover: rgba(23, 34, 72, .22);
+  --chip-line: rgba(0, 0, 0, .08);
+  --chip-line-hover: rgba(0, 0, 0, .22);
 }
 
 /* ---------- Buttons: primary (filled), secondary (outlined) — 40px pills ---------- */
@@ -172,7 +172,7 @@ button.link-arrow { height: var(--ctl); padding: 0; border: 0; background: none;
 .buybar__art { width: 52px; height: 52px; border-radius: 50%; background: #F1F2F4; }
 .buybar__txt { gap: 3px; }
 .buybar__t { font: 600 14px/1.2 var(--font); text-transform: none; letter-spacing: .01em; color: #0B0B0B; }
-.buybar__p b { font: 700 14px/1 var(--font); color: var(--accent-price, #2350C8); }
+.buybar__p b { font: 700 14px/1 var(--font); color: var(--accent-price, #111); }
 .buybar .btn-buy { height: var(--ctl); padding: 0 var(--ctl-pad) 0 12px; font-size: 14px; }
 .buybar .btn-buy svg { display: block; width: 18px; height: 18px; }
 @media (max-width: 639px) {
