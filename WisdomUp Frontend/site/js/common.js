@@ -1437,6 +1437,17 @@
     if (reduced() || !('IntersectionObserver' in window)) return;
     document.documentElement.classList.add('wu-motion');
     const isFine = fine();
+    // The stroke a button has at rest (2026-10-07, "keeping the liquidy effect … all strokes 1.5px, only the buttons"): 'b' = a border,
+    // 'r' = an inset ring. The hover keeps that stroke at 1.5px in the fill's colour (motion.css .wu-line-b / .wu-line-r) instead of
+    // dropping it while the fill is still rising.
+    const lineMark = b => {
+      if (b.classList.contains('wu-line-b') || b.classList.contains('wu-line-r')) return;
+      const cs = getComputedStyle(b);
+      const a = c => { const v = (String(c).match(/[\d.]+/g) || []).map(Number); return v.length > 3 ? v[3] : 1; };
+      if (['Top', 'Right', 'Bottom', 'Left'].some(k => parseFloat(cs['border' + k + 'Width']) > 0 && cs['border' + k + 'Style'] !== 'none' && a(cs['border' + k + 'Color']) > .05)) { b.classList.add('wu-line-b'); return; }
+      const m = String(cs.boxShadow).match(/(rgba?\([^)]*\))\s+0px\s+0px\s+0px\s+[\d.]+px\s+inset/);
+      if (m && a(m[1]) > .05) b.classList.add('wu-line-r');
+    };
     revealer = new IntersectionObserver(entries => {
       const byParent = new Map();
       entries.forEach(e => {
@@ -1486,7 +1497,7 @@
       // liquid fills and magnets (pointer devices only)
       if (isFine) {
         const q = sel => [...(root.matches && root.matches(sel) ? [root] : []), ...root.querySelectorAll(sel)];
-        q(FILL_SEL).forEach(b => { if (!b.closest('#site-nav') && b.querySelector('svg, img') === null || b.matches('.btn-buy, .btn-cart, .btn-pill, .btn-navy, .btn-outline, .shop-rail__all, .seo__toggle, .pp__cta, .mnav__foot a, .nh-btn, .loop__cta, .fdrawer__apply, .ck__place, .cartd__go, .totop, .quick .chip, .wpc__cta, .ckc__btn, .msort__btn')) b.classList.add('wu-fill'); });
+        q(FILL_SEL).forEach(b => { if (!b.closest('#site-nav') && b.querySelector('svg, img') === null || b.matches('.btn-buy, .btn-cart, .btn-pill, .btn-navy, .btn-outline, .shop-rail__all, .seo__toggle, .pp__cta, .mnav__foot a, .nh-btn, .loop__cta, .fdrawer__apply, .ck__place, .cartd__go, .totop, .quick .chip, .wpc__cta, .ckc__btn, .msort__btn')) { b.classList.add('wu-fill'); lineMark(b); } });
         q(MAG_SEL).forEach(b => { b.classList.add('wu-mag'); if (b.matches(X_SEL)) b.classList.add('is-x'); });
       }
       collect(root);
@@ -1576,7 +1587,8 @@
       if (cs.position !== 'static') b.style.position = cs.position; // keep absolute/fixed buttons where they are
       if (!round) b.style.borderRadius = '999px';                   // an inner square button fills as a circle
       const hasOwn = cs.transitionDuration.split(',').some(d => parseFloat(d) > 0); // keep the button's own transitions, add the colour swap
-      b.style.transition = (hasOwn ? cs.transition + ', ' : '') + 'color 500ms cubic-bezier(.3,1,.3,1) 100ms';
+      b.style.transition = (hasOwn ? cs.transition + ', ' : '') + 'color 500ms cubic-bezier(.3,1,.3,1) 100ms, border-color 500ms cubic-bezier(.3,1,.3,1) 100ms, box-shadow 500ms cubic-bezier(.3,1,.3,1) 100ms'; // the stroke turns with the text
+      lineMark(b);
       b.dataset.fillAuto = '';
       b.classList.add('wu-fill');
     };
@@ -1595,6 +1607,12 @@
       if (!(b instanceof Element) || e.pointerType === 'touch') return;
       if (!b.classList.contains('wu-fill') && !fillChecked.has(b)) { fillChecked.add(b); autoMark(b); }
       if (b.classList.contains('wu-fill') && b.hasAttribute('data-fill-auto')) autoColours(b);
+      // a BLACK fill on a DARK surface would lose the button's edge (2026-10-07, "when hover black the stroke shall be 1.5px white"):
+      // such a hover gets a 1.5px white outer stroke (--fill-edge, motion.css); on light surfaces the black fill already shows
+      if (b.classList.contains('wu-fill')) {
+        const f = solid(getComputedStyle(b, '::before').backgroundColor), dark = f && lumOf(f) < .03 && lumOf(backdrop(b.parentElement)) < .45;
+        if (dark) b.style.setProperty('--fill-edge', '#fff'); else b.style.removeProperty('--fill-edge');
+      }
       if (b.classList.contains('wu-fill')) {
         b.classList.add('wu-fill--snap'); b.style.setProperty('--fill-y', '76%');
         void b.offsetWidth;

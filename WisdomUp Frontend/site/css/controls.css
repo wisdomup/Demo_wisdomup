@@ -34,16 +34,16 @@
   border-radius: 999px; font: var(--ctl-font); letter-spacing: var(--ctl-track); white-space: nowrap;
 }
 .btn-buy svg, .btn-pill svg, .btn-navy svg, .btn-outline svg { width: 20px; height: 20px; flex: none; }
-.btn-cart { margin-top: 0; box-shadow: inset 0 0 0 1px var(--chip-line-hover); }
+.btn-cart { margin-top: 0; box-shadow: inset 0 0 0 1.5px var(--chip-line-hover); }
 .btn-cart .plus { width: 20px; height: 20px; font-size: 15px; }
-.btn-outline, .seo__toggle { border-width: 1px; }
+.btn-outline, .seo__toggle { border-width: 1.5px; }
 .hero__cta { min-width: 0; }
 .hero__cta .btn-buy { padding: 0 20px 0 14px; }
 .pp__cta b { font-weight: 800; margin: 0; }
 .pp__cta svg { width: 16px; height: 16px; }
 .fdrawer__apply { width: 100%; }
 .fdrawer__clear { height: var(--ctl); font: var(--ctl-font); letter-spacing: var(--ctl-track); }
-.mnav__foot a { height: var(--ctl); font: var(--ctl-font); letter-spacing: var(--ctl-track); border-width: 1px; }
+.mnav__foot a { height: var(--ctl); font: var(--ctl-font); letter-spacing: var(--ctl-track); border-width: 1.5px; }
 
 /* ---------- Chips and tabs — 40px pills, soft fill + hairline, navy when chosen ---------- */
 .chip, .quick .chip, .series .chip, .pdtabs .chip, .bk-chips .chip, .policy__links a, .search__pages a, .opt-chip, .fbtn {
@@ -51,32 +51,32 @@
   font: var(--ctl-font); letter-spacing: var(--ctl-track); white-space: nowrap;
 }
 .chip, .series .chip, .bk-chips .chip, .policy__links a {
-  background: var(--chip-bg); box-shadow: inset 0 0 0 1px var(--chip-line); color: var(--ctl-ink);
+  background: var(--chip-bg); box-shadow: inset 0 0 0 1.5px var(--chip-line); color: var(--ctl-ink);
   transition: background-color 180ms ease, box-shadow 180ms ease, color 180ms ease;
 }
-.chip:hover, .series .chip:hover, .bk-chips .chip:hover, .policy__links a:hover { background: var(--chip-bg-hover); box-shadow: inset 0 0 0 1px var(--chip-line-hover); color: var(--ctl-ink); }
+.chip:hover, .series .chip:hover, .bk-chips .chip:hover, .policy__links a:hover { background: var(--chip-bg-hover); box-shadow: inset 0 0 0 1.5px var(--chip-line-hover); color: var(--ctl-ink); }
 .series .chip[aria-pressed="true"], .bk-chips .chip[aria-pressed="true"], .shop-rail__tabs .chip[aria-selected="true"], .bbar__tabs .chip[aria-current="true"] { background: var(--ctl-ink); box-shadow: none; color: #fff; }
 /* Quick chips keep their photo; the 32px photo sits 4px inside the 40px pill */
-.quick .chip { padding: 0 var(--ctl-pad) 0 4px; background: var(--chip-bg); box-shadow: inset 0 0 0 1px var(--chip-line); color: #1A1A1A; }
-.quick .chip:hover { box-shadow: inset 0 0 0 1px var(--chip-line-hover); }
+.quick .chip { padding: 0 var(--ctl-pad) 0 4px; background: var(--chip-bg); box-shadow: inset 0 0 0 1.5px var(--chip-line); color: #1A1A1A; }
+.quick .chip:hover { box-shadow: inset 0 0 0 1.5px var(--chip-line-hover); }
 .quick__in { gap: var(--gap-2); }
 /* Product section tabs: chips inside a 56px glass bar (8px padding, 4px between) */
 .pdtabs__in { padding: var(--gap-2); gap: var(--gap-1); }
 .pdtabs .chip { background: transparent; box-shadow: none; }
 .pdtabs .chip[aria-current="true"] { background: #fff; box-shadow: var(--shadow-soft); }
 /* Filter pills: outlined, navy when a filter is set */
-.fbtn { gap: var(--gap-2); border-width: 1px; border-color: var(--ctl-ink); color: var(--ctl-ink); }
+.fbtn { gap: var(--gap-2); border-width: 1.5px; border-color: var(--ctl-ink); color: var(--ctl-ink); }
 .fbtn:not(.fbtn--dd) { padding: 0 var(--ctl-pad) 0 11px; }
 .fbtn--dd { gap: 6px; padding: 0 var(--ctl-pad); }
 .fbtn--dd.is-set { background: var(--ctl-ink); border-color: var(--ctl-ink); }
 .fbtn svg { width: 18px; height: 18px; }
-.search__pages a { border-width: 1px; }
-.opt-chip { border-width: 1px; }
+.search__pages a { border-width: 1.5px; }
+.opt-chip { border-width: 1.5px; }
 .opt-chip[aria-checked="true"] { background: var(--ctl-ink); border-color: var(--ctl-ink); color: #fff; box-shadow: none; }
 .opt-chip.is-na[aria-checked="true"] { color: #fff; }
 
 /* Small chips (compact menu) — the nav's 34px tool size */
-.mnav__chip { height: var(--ctl-s); padding: 0 14px; font: 600 13px/1 var(--font); letter-spacing: var(--ctl-track); background: var(--chip-bg); box-shadow: inset 0 0 0 1px var(--chip-line); color: var(--ctl-ink); }
+.mnav__chip { height: var(--ctl-s); padding: 0 14px; font: 600 13px/1 var(--font); letter-spacing: var(--ctl-track); background: var(--chip-bg); box-shadow: inset 0 0 0 1.5px var(--chip-line); color: var(--ctl-ink); }
 
 /* ---------- Icon buttons — 40px circles (arrows, wishlist, back to top) ---------- */
 .hero__arrow, .loop__btn, .pdp2__chev, .totop {
@@ -162,7 +162,7 @@ button.link-arrow { height: var(--ctl); padding: 0; border: 0; background: none;
   gap: var(--gap-3); padding: 8px 11px 8px 8px; border: 0; border-radius: 999px;
   background: rgba(255, 255, 255, .58);
   backdrop-filter: blur(16px) saturate(160%); -webkit-backdrop-filter: blur(16px) saturate(160%);
-  box-shadow: 0 4px 20px rgba(70, 70, 70, .15), inset 0 0 0 1px rgba(255, 255, 255, .7);
+  box-shadow: 0 4px 20px rgba(70, 70, 70, .15), inset 0 0 0 1.5px rgba(255, 255, 255, .7);
   isolation: isolate;
 }
 .buybar::before {   /* glossy gradient rim, like Ronin's */

@@ -39,21 +39,21 @@ html[data-theme="night"] :is(.btn-buy, .cartd__go, .ck__place, .fdrawer__apply, 
 html[data-theme="night"] :is(.btn-buy, .cartd__go, .wpc__cta):not(:disabled):hover { background: var(--n-red-hi); color: #fff; box-shadow: none; filter: none; }
 html[data-theme="night"] :is(.btn-pill, .btn-navy, .pp__cta, .loop__cta) { background: var(--n-text); color: #111; }
 html[data-theme="night"] :is(.btn-pill, .btn-navy, .pp__cta, .loop__cta):hover { background: #fff; color: #111; filter: none; }
-html[data-theme="night"] :is(.btn-outline, .btn-cart, .seo__toggle, .mnav__foot a) { background: var(--n-raise); color: var(--n-text); border-color: var(--n-line2); box-shadow: inset 0 0 0 1px var(--n-line2); }
+html[data-theme="night"] :is(.btn-outline, .btn-cart, .seo__toggle, .mnav__foot a) { background: var(--n-raise); color: var(--n-text); border-color: var(--n-line2); box-shadow: inset 0 0 0 1.5px var(--n-line2); }
 html[data-theme="night"] :is(.btn-outline, .btn-cart, .seo__toggle, .mnav__foot a):hover { background: var(--n-raise2); color: #fff; border-color: var(--n-line2); }
 html[data-theme="night"] :is(.btn-cart:disabled, .btn-buy:disabled, .wpc__cta:disabled, a.wpc__cta[aria-disabled="true"]) { background: var(--n-raise2); color: var(--n-muted); }
 /* Chips */
-html[data-theme="night"] :is(.chip, .quick .chip, .series .chip, .pdtabs .chip, .bk-chips .chip, .policy__links a, .search__pages a, .opt-chip, .fbtn, .mnav__chip, .cities span) { border-radius: 999px; background: var(--n-raise); color: var(--n-text); border-color: var(--n-line2); box-shadow: inset 0 0 0 1px var(--n-line); }
-html[data-theme="night"] :is(.chip, .policy__links a, .search__pages a, .opt-chip, .fbtn, .mnav__chip):hover { background: var(--n-raise2); color: #fff; box-shadow: inset 0 0 0 1px var(--n-line2); }
+html[data-theme="night"] :is(.chip, .quick .chip, .series .chip, .pdtabs .chip, .bk-chips .chip, .policy__links a, .search__pages a, .opt-chip, .fbtn, .mnav__chip, .cities span) { border-radius: 999px; background: var(--n-raise); color: var(--n-text); border-color: var(--n-line2); box-shadow: inset 0 0 0 1.5px var(--n-line); }
+html[data-theme="night"] :is(.chip, .policy__links a, .search__pages a, .opt-chip, .fbtn, .mnav__chip):hover { background: var(--n-raise2); color: #fff; box-shadow: inset 0 0 0 1.5px var(--n-line2); }
 html[data-theme="night"] :is(.series .chip[aria-pressed="true"], .bk-chips .chip[aria-pressed="true"], .bbar__tabs .chip[aria-current="true"], .opt-chip[aria-checked="true"], .fbtn--dd.is-set, .pdtabs .chip[aria-current="true"], .policy__links a[aria-current="true"]) { background: var(--n-text); color: #111; box-shadow: none; border-color: transparent; }
 html[data-theme="night"] .quick .chip { color: var(--n-text); }
 html[data-theme="night"] .quick__art { background: var(--n-raise2); }
 /* Round icon tools keep their circles but go dark + hairline */
-html[data-theme="night"] :is(.loop__btn, .feat__btn, .shop-rail__step, .hero__arrow, .pdp2__chev, .wpc__wish, .pdp2__wish, .mnav__x, .mnav__theme, .cartd__x, .fdrawer__x, .search__close, .newsletter button) { background: var(--n-raise); color: var(--n-text); border-color: var(--n-line2); box-shadow: inset 0 0 0 1px var(--n-line2); }
+html[data-theme="night"] :is(.loop__btn, .feat__btn, .shop-rail__step, .hero__arrow, .pdp2__chev, .wpc__wish, .pdp2__wish, .mnav__x, .mnav__theme, .cartd__x, .fdrawer__x, .search__close, .newsletter button) { background: var(--n-raise); color: var(--n-text); border-color: var(--n-line2); box-shadow: inset 0 0 0 1.5px var(--n-line2); }
 html[data-theme="night"] :is(.loop__btn, .feat__btn, .shop-rail__step, .wpc__wish, .pdp2__wish):hover { background: var(--n-raise2); color: #fff; }
 html[data-theme="night"] .loop__btn--play { border-color: var(--n-line2); background: var(--n-raise); color: var(--n-text); }
 html[data-theme="night"] :is(.wpc__wish[aria-pressed="true"], .pdp2__wish[aria-pressed="true"]) { color: var(--n-red-text); border-color: var(--n-red-line); }
-html[data-theme="night"] .totop { background-color: rgba(26, 29, 33, .78); background-image: none; color: #fff; box-shadow: inset 0 0 0 .5px var(--n-line2); }
+html[data-theme="night"] .totop { background-color: rgba(26, 29, 33, .78); background-image: none; color: #fff; box-shadow: inset 0 0 0 1.5px var(--n-line2); }
 html[data-theme="night"] .toast { background: var(--n-text); color: #111; }
 html[data-theme="night"] :is(.btn-pill, .btn-buy, .chip, .fbtn, .opt-chip, .faq__q, .seo__toggle, .mnav :focus-visible, .wpc__wish, .totop, .field input, .field textarea):focus-visible { outline-color: #fff; }
 
@@ -65,34 +65,34 @@ html[data-theme="night"] .wu-util .utility a { color: var(--n-muted); }
 html[data-theme="night"] .wu-util .utility a:hover, html[data-theme="night"] .wu-util .utility a[aria-current="page"] { color: #fff; }
 
 /* ---------- Product card: dark card, hairline, 16px / 12px corners, red CTA ---------- */
-html[data-theme="night"] .wpc__card { background: var(--n-card); border-radius: 16px; box-shadow: inset 0 0 0 1px var(--n-line); }
-html[data-theme="night"] .wpc:hover .wpc__card { box-shadow: inset 0 0 0 1px var(--n-line2); }
+html[data-theme="night"] .wpc__card { background: var(--n-card); border-radius: 16px; box-shadow: inset 0 0 0 1.5px var(--n-line); }
+html[data-theme="night"] .wpc:hover .wpc__card { box-shadow: inset 0 0 0 1.5px var(--n-line2); }
 html[data-theme="night"] .wpc__media { border-radius: 12px; }
 html[data-theme="night"] .wpc__title { color: var(--n-text); }
 html[data-theme="night"] .wpc__price { color: #fff; }
 html[data-theme="night"] :is(.wpc__kind, .wpc__rating, .wpc__rating small, .wpc__opts) { color: var(--n-muted); }
-html[data-theme="night"] .wpc__badge { background: var(--n-red-soft); color: var(--n-red-text); box-shadow: inset 0 0 0 1px var(--n-red-line); border-radius: 999px; }
+html[data-theme="night"] .wpc__badge { background: var(--n-red-soft); color: var(--n-red-text); box-shadow: inset 0 0 0 1.5px var(--n-red-line); border-radius: 999px; }
 html[data-theme="night"] .wpc__wish { background: rgba(26, 29, 33, .85); }
 
 /* ---------- Rails: straight on the stage; uniform header ---------- */
 html[data-theme="night"] :is(.shop-rail, .mgrid-band) { background: transparent; }
 html[data-theme="night"] .shop-rail__title { color: var(--n-text); }
-html[data-theme="night"] .shop-rail__all { background: var(--n-red-soft); color: var(--n-red-text); box-shadow: inset 0 0 0 1px var(--n-red-line); border-radius: 999px; }
+html[data-theme="night"] .shop-rail__all { background: var(--n-red-soft); color: var(--n-red-text); box-shadow: inset 0 0 0 1.5px var(--n-red-line); border-radius: 999px; }
 html[data-theme="night"] .shop-rail__all:hover { background: rgba(217,30,5,.26); color: #fff; }
 html[data-theme="night"] .shop-rail__all::after { content: " ↗"; }
 
 /* ---------- Home: hero, carousels, panels ---------- */
-html[data-theme="night"] .hero { box-shadow: inset 0 0 0 1px var(--n-line); } /* same geometry and position as day (shared banner, 2026-10-06) */
+html[data-theme="night"] .hero { box-shadow: inset 0 0 0 1.5px var(--n-line); } /* same geometry and position as day (shared banner, 2026-10-06) */
 html[data-theme="night"] .hero__sub { color: var(--n-muted); }
-html[data-theme="night"] .loop__slide { border-radius: 24px; background: linear-gradient(120deg, #1E2226, #0F1113) !important; box-shadow: inset 0 0 0 1px var(--n-line); }
-html[data-theme="night"] .feat__slide { border-radius: 24px; box-shadow: inset 0 0 0 1px var(--n-line); }
-html[data-theme="night"] .promo { background: var(--n-card) !important; border-radius: 24px; box-shadow: inset 0 0 0 1px var(--n-line); }
-html[data-theme="night"] .duo__card { border-radius: 24px; background: var(--n-bg2) !important; box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] .loop__slide { border-radius: 24px; background: linear-gradient(120deg, #1E2226, #0F1113) !important; box-shadow: inset 0 0 0 1.5px var(--n-line); }
+html[data-theme="night"] .feat__slide { border-radius: 24px; box-shadow: inset 0 0 0 1.5px var(--n-line); }
+html[data-theme="night"] .promo { background: var(--n-card) !important; border-radius: 24px; box-shadow: inset 0 0 0 1.5px var(--n-line); }
+html[data-theme="night"] .duo__card { border-radius: 24px; background: var(--n-bg2) !important; box-shadow: inset 0 0 0 1.5px var(--n-line); }
 html[data-theme="night"] .duo__card--live { background: radial-gradient(70% 90% at 100% 100%, rgba(217,30,5,.35) 0%, rgba(217,30,5,0) 60%), var(--n-bg2) !important; }
-html[data-theme="night"] .series { background: var(--n-bg2); border-radius: 24px; box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] .series { background: var(--n-bg2); border-radius: 24px; box-shadow: inset 0 0 0 1.5px var(--n-line); }
 html[data-theme="night"] :is(.series__code, .series__title, .series__now) { color: #fff; }
 html[data-theme="night"] :is(.series__meta, .series__was) { color: var(--n-muted); }
-html[data-theme="night"] .pp__card { background: var(--n-bg2); border-radius: 24px; box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] .pp__card { background: var(--n-bg2); border-radius: 24px; box-shadow: inset 0 0 0 1.5px var(--n-line); }
 html[data-theme="night"] .pp__h { color: #fff; }
 html[data-theme="night"] :is(.pp__sub, .pp__note) { color: var(--n-muted); }
 html[data-theme="night"] .bulk__h { color: #fff; }
@@ -104,7 +104,7 @@ html[data-theme="night"] .eyebrow { color: var(--n-red-text); }
 html[data-theme="night"] .eyebrow--warm { color: var(--n-muted); }
 html[data-theme="night"] .h-light b { color: #fff; }
 html[data-theme="night"] .trust__item { color: var(--n-muted) !important; }
-html[data-theme="night"] .trust { background: var(--n-bg2); border-radius: 16px; box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] .trust { background: var(--n-bg2); border-radius: 16px; box-shadow: inset 0 0 0 1.5px var(--n-line); }
 html[data-theme="night"] .hero .hero__bar .hero__arrow { background: none; box-shadow: none; border: 0; color: #fff; }
 html[data-theme="night"] .hero__bar { border-top-color: rgba(255, 255, 255, .14); }
 /* FAQ + SEO blocks */
@@ -135,7 +135,7 @@ html[data-theme="night"] .sf__soc { color: #fff; } /* not the blanket night link
 @media (hover: hover) and (pointer: fine) { html[data-theme="night"] a.sf__soc:hover { background: rgba(255, 255, 255, .1); } }
 
 /* ---------- Shared chrome: menu, cart, search ---------- */
-html[data-theme="night"] :is(.mnav, .cartd, .fdrawer, .search) { background: var(--n-bg2); color: var(--n-text); box-shadow: inset 0 0 0 1px var(--n-line2); }
+html[data-theme="night"] :is(.mnav, .cartd, .fdrawer, .search) { background: var(--n-bg2); color: var(--n-text); box-shadow: inset 0 0 0 1.5px var(--n-line2); }
 html[data-theme="night"] :is(.mnav-scrim, .cartd-scrim, .fscrim, .scrim) { background: rgba(0,0,0,.6); }
 html[data-theme="night"] :is(.mnav__acc-h, .mnav__group a, .mnav__prod b, .mnav__tile-t, .mnav__label, .mnav__acc-t, .mnav__all, .cartd__head h2, .cline__t, .cartd__row, .cartd__row b, .cartd__gift, .cartd__ship b, .cline__p, .cartd__empty, .search__field input, .ccard__title, .ccard__price, .fdrawer__head h2, .facc__h, .facc__chev, .fopt, .fdrawer__clear, .msort__cur, .mtitle, .mcrumbs, .mcrumbs b, .mdesc__more, .mcount__n b) { color: var(--n-text) !important; }
 html[data-theme="night"] :is(.mnav__prod small, .mnav__eyebrow, .cline__rm, .cartd__ship p, .cartd__note, .cartd__empty p, .ccard__meta, .ccard__was, .facc__v, .fopt small, .mcrumbs a, .mdesc, .mcount, .mcount__n, .search__label) { color: var(--n-muted) !important; }
@@ -143,7 +143,7 @@ html[data-theme="night"] .mnav__ic { background: var(--n-raise2); color: #fff; }
 html[data-theme="night"] .mnav__tile--all .mnav__thumb { background: var(--n-raise2); }
 html[data-theme="night"] .mnav__n { background: var(--n-red); }
 html[data-theme="night"] .mnav__group a[aria-current="page"]::after { background: var(--n-red); }
-html[data-theme="night"] .ccard { background: var(--n-card); box-shadow: inset 0 0 0 1px var(--n-line); border-radius: 16px; }
+html[data-theme="night"] .ccard { background: var(--n-card); box-shadow: inset 0 0 0 1.5px var(--n-line); border-radius: 16px; }
 html[data-theme="night"] .cartd__ship i { background: linear-gradient(90deg, var(--n-red) var(--pct), var(--n-raise2) var(--pct)); }
 html[data-theme="night"] .cartd__gift input, html[data-theme="night"] input[type="checkbox"], html[data-theme="night"] input[type="radio"] { accent-color: var(--n-red); }
 html[data-theme="night"] :is(.qty, .cline__img, .ckline__img) { background: var(--n-raise); color: var(--n-text); border-color: var(--n-line2); }
@@ -154,36 +154,36 @@ html[data-theme="night"] .mview__b { color: var(--n-muted); }
 html[data-theme="night"] .mview__b[aria-pressed="true"] { background: var(--n-raise2); color: #fff; }
 
 /* ---------- All Products: capsule + filter panel ---------- */
-html[data-theme="night"] .mbar__cap { background: rgba(30, 34, 38, .85); box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] .mbar__cap { background: rgba(30, 34, 38, .85); box-shadow: inset 0 0 0 1.5px var(--n-line); }
 html[data-theme="night"] :is(.mbar, .mfloat) .fbtn { color: var(--n-text); background: transparent; box-shadow: none; }
 html[data-theme="night"] :is(.mbar, .mfloat) .fbtn--dd.is-set { background: var(--n-text); color: #111; }
 html[data-theme="night"] :is(.mbar, .mfloat) .fbtn__n { background: var(--n-text); color: #111; }
 html[data-theme="night"] .fopt i { border-color: var(--n-line2); background: var(--n-raise); }
-html[data-theme="night"] .fopt input[type="radio"]:checked + i { border-color: var(--n-red); box-shadow: inset 0 0 0 5px var(--n-red); }
+html[data-theme="night"] .fopt input[type="radio"]:checked + i { border-color: var(--n-red); box-shadow: inset 0 0 0 1.5px var(--n-red); }
 html[data-theme="night"] .fopt input[type="checkbox"]:checked + i { border-color: var(--n-red); background-color: var(--n-red); }
 html[data-theme="night"] .fopt input:checked ~ span { color: #fff; }
 html[data-theme="night"] .fdrawer__apply:disabled { background: var(--n-raise2); color: var(--n-muted); }
 html[data-theme="night"] :is(.seo-lite h2, .seo-lite__h) { color: var(--n-text); }
 html[data-theme="night"] .seo-lite p { color: var(--n-muted); }
-html[data-theme="night"] .pbanner { box-shadow: inset 0 0 0 1px var(--n-line); border-radius: 24px; }
+html[data-theme="night"] .pbanner { box-shadow: inset 0 0 0 1.5px var(--n-line); border-radius: 24px; }
 
 /* ---------- Product page + other pages: a safe dark base (refined later) ---------- */
 html[data-theme="night"] :is(.pdp2__title, .pdp2__now, .pdp2__label, .pdp2__kicker b, .pd-stat__v, .highlights, .spec-table, .rv__avg b, .rv__item header b, .ck__h, .ck__sec h2, .ck__sumhead h2, .ck__total, .ord__hero h1, .ord__card h2, .ihero h1, .tile b, .post__body h3, .article__head h1, .prose h2, .prose h3, .prose strong, .contact-card b, .track__head b, .timeline b, .iform__h, .stat b, .quote-band p, .cta-band h2) { color: var(--n-text); }
 html[data-theme="night"] :is(.pdp2__was, .pdp2__stock, .pdp2__rate, .pdp2__kicker, .pdp2__label span, .pdp2__label small, .pays, .assure span, .prose, .ihero__lede, .tile p, .post__body p, .meta-line, .kv > *, .toc a, .contact-card small, .timeline span, .ck__terms, .ck__fine, .field small, .ckopt__t small, .ckline__t small, .ord__hero p, .ord__card p, .ord__steps li, .rv__item p, .rv__item footer, .rv__note, .cta-band p, .manual__a ol) { color: var(--n-text2); }
-html[data-theme="night"] :is(.ihero, .tile, .post, .ck__sec, .ck__sumcard, .ckopt, .ord__card, .ord__hero, .rv__sum, .rv__item, .contact-card, .callout, .kv > *, .toc, .cta-band, .stat, .adm__order, .pd-stat, .offer, .gift, .reviews-box, .spec-table, .highlights, .pdp2__stage, .bulk-steps, .bk-intro, .perk, .iform, .hsearch, .field input, .field textarea, .rv__sort select, .adm__cols select) { background: var(--n-bg2); border-color: var(--n-line); color: var(--n-text); box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] :is(.ihero, .tile, .post, .ck__sec, .ck__sumcard, .ckopt, .ord__card, .ord__hero, .rv__sum, .rv__item, .contact-card, .callout, .kv > *, .toc, .cta-band, .stat, .adm__order, .pd-stat, .offer, .gift, .reviews-box, .spec-table, .highlights, .pdp2__stage, .bulk-steps, .bk-intro, .perk, .iform, .hsearch, .field input, .field textarea, .rv__sort select, .adm__cols select) { background: var(--n-bg2); border-color: var(--n-line); color: var(--n-text); box-shadow: inset 0 0 0 1.5px var(--n-line); }
 html[data-theme="night"] :is(.field input, .field textarea, .hsearch input) { color: var(--n-text); }
-html[data-theme="night"] :is(.ckopt:has(input:checked), .ckopt input:checked + .ckopt__dot) { border-color: #fff; box-shadow: inset 0 0 0 1px #fff; background: var(--n-raise); }
-html[data-theme="night"] .ckopt input:checked + .ckopt__dot { box-shadow: inset 0 0 0 5px #fff; }
+html[data-theme="night"] :is(.ckopt:has(input:checked), .ckopt input:checked + .ckopt__dot) { border-color: #fff; box-shadow: inset 0 0 0 1.5px #fff; background: var(--n-raise); }
+html[data-theme="night"] .ckopt input:checked + .ckopt__dot { box-shadow: inset 0 0 0 1.5px #fff; }
 html[data-theme="night"] :is(.ck__sec h2 span, .ckline__img b, .fbtn__n, .ord__steps li::before) { background: var(--n-text); color: #111; }
 html[data-theme="night"] :is(.tile__ic, .perk__ic, .wish-empty__ic) { background: var(--n-raise2); color: #fff; }
 html[data-theme="night"] .link-arrow, html[data-theme="night"] .tile__go { color: var(--n-red-text); }
 html[data-theme="night"] :is(.prose a, .faq__p a, .faq__a a, .assure a, .offer a, .ck__terms a) { color: var(--n-red-text); }
 html[data-theme="night"] .pdp2__kicker a { background: var(--n-raise); color: var(--n-text); }
 html[data-theme="night"] .highlights i { background: var(--n-red); }
-html[data-theme="night"] .pdtabs__in { background: rgba(30, 34, 38, .85); box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] .pdtabs__in { background: rgba(30, 34, 38, .85); box-shadow: inset 0 0 0 1.5px var(--n-line); }
 html[data-theme="night"] .pdtabs .chip { color: var(--n-text); background: transparent; box-shadow: none; }
 html[data-theme="night"] .pdtabs .chip[aria-current="true"] { background: var(--n-text); color: #111; }
-html[data-theme="night"] .buybar { background: rgba(26, 29, 33, .86); box-shadow: inset 0 0 0 1px var(--n-line2); }
+html[data-theme="night"] .buybar { background: rgba(26, 29, 33, .86); box-shadow: inset 0 0 0 1.5px var(--n-line2); }
 html[data-theme="night"] :is(.buybar__t, .buybar__p b) { color: var(--n-text); }
 html[data-theme="night"] .buybar__t small { color: var(--n-muted); }
 
@@ -207,38 +207,38 @@ html[data-theme="night"] .thumb { background: var(--n-raise); }
 html[data-theme="night"] .thumb[aria-current="true"] { border-color: #fff; background: var(--n-raise2); }
 html[data-theme="night"] :is(.offer, .offer__body, .offer p, .offer span, .offer b, .gift, .gift b, .gift span, .gift p) { color: var(--n-text2); }
 html[data-theme="night"] :is(.offer b, .gift b, .offer__head) { color: var(--n-text); }
-html[data-theme="night"] .gift { background: var(--n-bg2); box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] .gift { background: var(--n-bg2); box-shadow: inset 0 0 0 1.5px var(--n-line); }
 html[data-theme="night"] .offer__head { background: var(--n-raise); color: var(--n-text); }
 html[data-theme="night"] .offer { border-color: var(--n-line); }
 
 /* ---------- Menu panel in night: the Higgsfield rules applied (2026-10-06) — stage #0F1113, black promo panel with one red
    glow, 8px chips, rounded-square icon tiles, hairline separators, dark+hairline round tools and footer buttons, white logo ---------- */
-html[data-theme="night"] .mnav { background: var(--n-bg); color: var(--n-text); box-shadow: inset -1px 0 0 var(--n-line2); border-radius: 0 16px 16px 0; }
+html[data-theme="night"] .mnav { background: var(--n-bg); color: var(--n-text); box-shadow: inset -1.5px 0 0 var(--n-line2); border-radius: 0 16px 16px 0; }
 html[data-theme="night"] .mnav__head { border-bottom-color: var(--n-line); padding: 10px 12px 10px 16px; }
 html[data-theme="night"] .mnav__logo img { filter: brightness(0) invert(1); }
-html[data-theme="night"] :is(.mnav__x, .mnav__theme) { border: 1px solid var(--n-line2); background: var(--n-raise); color: #fff; box-shadow: none; }
+html[data-theme="night"] :is(.mnav__x, .mnav__theme) { border: 1.5px solid var(--n-line2); background: var(--n-raise); color: #fff; box-shadow: none; }
 html[data-theme="night"] :is(.mnav__x, .mnav__theme):hover { background: var(--n-raise2); }
 html[data-theme="night"] .mnav :focus-visible { outline: 2px solid rgba(255,255,255,.45); outline-offset: 2px; }
 html[data-theme="night"] .mnav__body { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.18) transparent; }
 /* Promo: black panel, hairline, red glow bottom-right, red "Shop now" */
-html[data-theme="night"] .mnav__promo { background: radial-gradient(60% 90% at 100% 100%, rgba(217,30,5,.45) 0%, rgba(217,30,5,0) 65%), #000 !important; box-shadow: inset 0 0 0 1px var(--n-line2); border-radius: 16px; }
+html[data-theme="night"] .mnav__promo { background: radial-gradient(60% 90% at 100% 100%, rgba(217,30,5,.45) 0%, rgba(217,30,5,0) 65%), #000 !important; box-shadow: inset 0 0 0 1.5px var(--n-line2); border-radius: 16px; }
 html[data-theme="night"] .mnav__eyebrow { color: var(--n-red-text) !important; }
 html[data-theme="night"] .mnav__promo b, html[data-theme="night"] .mnav__promo-price { color: #fff; }
 html[data-theme="night"] .mnav__promo-cta { color: var(--n-red-text); }
 /* Category tiles: 12px corners + hairline, white labels */
-html[data-theme="night"] .mnav__tile-art .mnav__thumb { border-radius: 12px; box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] .mnav__tile-art .mnav__thumb { border-radius: 12px; box-shadow: inset 0 0 0 1.5px var(--n-line); }
 html[data-theme="night"] .mnav__tile-t { color: var(--n-text) !important; font-weight: 500; }
 html[data-theme="night"] .mnav__tile--all .mnav__thumb { background: var(--n-raise); color: #fff; }
 /* Quick chips: 8px dark chips */
-html[data-theme="night"] .mnav__chip { height: 30px; border-radius: 999px; background: var(--n-raise); color: var(--n-text); box-shadow: inset 0 0 0 1px var(--n-line); font-weight: 500; }
+html[data-theme="night"] .mnav__chip { height: 30px; border-radius: 999px; background: var(--n-raise); color: var(--n-text); box-shadow: inset 0 0 0 1.5px var(--n-line); font-weight: 500; }
 html[data-theme="night"] .mnav__chip:active { background: var(--n-raise2); }
 /* Accordion: hairline rows, rounded-square icon tiles, muted chevrons */
 html[data-theme="night"] .mnav__cats { border-top-color: var(--n-line); }
 html[data-theme="night"] .mnav__acc { border-bottom-color: var(--n-line); }
 html[data-theme="night"] .mnav__acc-h { color: var(--n-text) !important; font-weight: 600; }
-html[data-theme="night"] .mnav__ic { border-radius: 50%; background: var(--n-raise); color: #fff; box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] .mnav__ic { border-radius: 50%; background: var(--n-raise); color: #fff; box-shadow: inset 0 0 0 1.5px var(--n-line); }
 html[data-theme="night"] .mnav__chev { color: var(--n-muted); }
-html[data-theme="night"] .mnav__prod .mnav__thumb { border-radius: 8px; box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] .mnav__prod .mnav__thumb { border-radius: 8px; box-shadow: inset 0 0 0 1.5px var(--n-line); }
 html[data-theme="night"] .mnav__prod b { color: var(--n-text) !important; font-weight: 500; }
 html[data-theme="night"] .mnav__prod small { color: var(--n-muted) !important; }
 html[data-theme="night"] .mnav__all { color: var(--n-red-text) !important; text-decoration: none !important; }
@@ -247,7 +247,7 @@ html[data-theme="night"] .mnav__label { color: var(--n-muted) !important; }
 html[data-theme="night"] .mnav__group a { color: #DADDE1 !important; }
 html[data-theme="night"] .mnav__group a[aria-current="page"] { color: #fff !important; }
 html[data-theme="night"] .mnav__foot { border-top-color: var(--n-line); }
-html[data-theme="night"] .mnav__foot a { border: 1px solid var(--n-line2); border-radius: 999px; background: var(--n-raise); color: #fff; box-shadow: none; font-weight: 600; }
+html[data-theme="night"] .mnav__foot a { border: 1.5px solid var(--n-line2); border-radius: 999px; background: var(--n-raise); color: #fff; box-shadow: none; font-weight: 600; }
 html[data-theme="night"] .mnav__foot a:hover { background: var(--n-raise2); }
 
 /* ==========================================================================
@@ -257,7 +257,7 @@ html[data-theme="night"] .mnav__foot a:hover { background: var(--n-raise2); }
    ========================================================================== */
 
 /* ---------- Cart drawer: the whole panel, header → lines → footer ---------- */
-html[data-theme="night"] .cartd { background: var(--n-bg); box-shadow: inset 1px 0 0 var(--n-line2); border-radius: 16px 0 0 16px; }
+html[data-theme="night"] .cartd { background: var(--n-bg); box-shadow: inset 1.5px 0 0 var(--n-line2); border-radius: 16px 0 0 16px; }
 html[data-theme="night"] .cartd__head { border-bottom-color: var(--n-line); }
 html[data-theme="night"] .cline { border-bottom-color: var(--n-line); }
 html[data-theme="night"] .cartd__foot { background: var(--n-bg2); border-top-color: var(--n-line); }
@@ -269,18 +269,18 @@ html[data-theme="night"] .qty--s button:disabled { color: var(--n-dim); }
 html[data-theme="night"] .cline__rm:hover { color: #fff !important; }
 
 /* ---------- Filter drawer (All Products) ---------- */
-html[data-theme="night"] .fdrawer { background: var(--n-bg); box-shadow: inset -1px 0 0 var(--n-line2); border-radius: 0 16px 16px 0; }
-html[data-theme="night"] .fdrawer__head { border-bottom: 1px solid var(--n-line); }
+html[data-theme="night"] .fdrawer { background: var(--n-bg); box-shadow: inset -1.5px 0 0 var(--n-line2); border-radius: 0 16px 16px 0; }
+html[data-theme="night"] .fdrawer__head { border-bottom: 1.5px solid var(--n-line); }
 html[data-theme="night"] .fdrawer__clear { color: var(--n-text2); }
-html[data-theme="night"] .fdrawer__foot { background: var(--n-bg2); border-top: 1px solid var(--n-line); }
+html[data-theme="night"] .fdrawer__foot { background: var(--n-bg2); border-top: 1.5px solid var(--n-line); }
 html[data-theme="night"] .facc { border-bottom-color: var(--n-line); }
 html[data-theme="night"] .facc__chev { color: var(--n-muted); }
 html[data-theme="night"] .fopt { color: var(--n-text2); }
 html[data-theme="night"] .fopt-group { border-top-color: var(--n-line); }
-html[data-theme="night"] .fopt__sw { box-shadow: inset 0 0 0 1px rgba(255,255,255,.22); }
+html[data-theme="night"] .fopt__sw { box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.22); }
 
 /* ---------- Search overlay ---------- */
-html[data-theme="night"] .search__field { background: var(--n-raise); color: var(--n-text); box-shadow: inset 0 0 0 1px var(--n-line2); }
+html[data-theme="night"] .search__field { background: var(--n-raise); color: var(--n-text); box-shadow: inset 0 0 0 1.5px var(--n-line2); }
 html[data-theme="night"] .search__field input::placeholder { color: var(--n-muted); }
 html[data-theme="night"] .search__label { background: transparent; padding: 0; color: var(--n-muted) !important; }
 html[data-theme="night"] .search__label b { background: none; -webkit-text-fill-color: var(--n-muted); color: var(--n-muted); }
@@ -315,7 +315,7 @@ html[data-theme="night"] .iform .field.is-bad :is(input, textarea) { border-colo
 html[data-theme="night"] .hsearch { border-color: var(--n-line2); }
 html[data-theme="night"] .bk-done button { color: var(--n-red-text); }
 html[data-theme="night"] .bk-hint.is-err { color: #FFB4A6; }
-html[data-theme="night"] .pays span { background: var(--n-raise); color: var(--n-text2); box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] .pays span { background: var(--n-raise); color: var(--n-text2); box-shadow: inset 0 0 0 1.5px var(--n-line); }
 
 /* ---------- Reviews ---------- */
 html[data-theme="night"] .rv__bar { color: var(--n-text2); }
@@ -328,7 +328,7 @@ html[data-theme="night"] :is(.rv__ver, .rv__note--ok) { color: #7ED6A0 !importan
 /* ---------- Info pages: tables, bands, badges, timeline, posts, manuals, cities ---------- */
 html[data-theme="night"] .kv > * { border-bottom-color: var(--n-line); }
 html[data-theme="night"] .kv > b { background: var(--n-raise); }
-html[data-theme="night"] .quote-band { box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] .quote-band { box-shadow: inset 0 0 0 1.5px var(--n-line); }
 html[data-theme="night"] .callout { border-color: var(--n-line2); }
 html[data-theme="night"] .callout svg { color: var(--n-red-text); }
 html[data-theme="night"] .toc a:hover { background: var(--n-raise2); color: #fff; }
@@ -341,7 +341,7 @@ html[data-theme="night"] .badge-soft--bad { background: var(--n-red-soft) !impor
 html[data-theme="night"] .timeline li::before { background: var(--n-line2); }
 html[data-theme="night"] .timeline i { background: var(--n-raise2); border-color: rgba(255,255,255,.3); }
 html[data-theme="night"] .timeline .is-done i, html[data-theme="night"] .timeline .is-done::before { background: var(--n-red); border-color: var(--n-red); }
-html[data-theme="night"] .timeline .is-now i { border-color: var(--n-red-text); box-shadow: 0 0 0 4px var(--n-red-soft); }
+html[data-theme="night"] .timeline .is-now i { border-color: var(--n-red-text); box-shadow: 0 0 0 1.5px var(--n-red-soft); }
 html[data-theme="night"] .timeline .is-now i::after { background: var(--n-red-text); }
 html[data-theme="night"] :is(.prose li, .seo li, .manual__a ol li)::marker { color: var(--n-muted); }
 html[data-theme="night"] .opt-chip.is-na { color: var(--n-dim); }
@@ -382,7 +382,7 @@ html[data-theme="night"] .qadd__more { color: var(--n-red-text); }
 
 /* Cookie choices (2026-10-06) — the night panel skin: dark box, white type, red capsules, white outlines */
 html[data-theme="night"] .ckc__scrim { background: rgba(0,0,0,.6); }
-html[data-theme="night"] .ckc__box { background: var(--n-bg2); color: var(--n-text2); box-shadow: inset 0 0 0 1px var(--n-line2), 0 30px 80px rgba(0,0,0,.6); }
+html[data-theme="night"] .ckc__box { background: var(--n-bg2); color: var(--n-text2); box-shadow: inset 0 0 0 1.5px var(--n-line2), 0 30px 80px rgba(0,0,0,.6); }
 html[data-theme="night"] .ckc__logo img { display: none; }
 html[data-theme="night"] .ckc__logo img + img { display: block; }
 html[data-theme="night"] :is(.ckc__h, .ckc__text b, .ckc__name) { color: var(--n-text); }
@@ -393,7 +393,7 @@ html[data-theme="night"] .ckc__btn--line { color: #fff; box-shadow: inset 0 0 0 
 html[data-theme="night"] .ckc__always { color: #7BD88F; }
 html[data-theme="night"] .ckc__switch { background: var(--n-raise2); }
 html[data-theme="night"] .ckc__switch[aria-checked="true"] { background: var(--n-red); }
-html[data-theme="night"] .ckc__more { background: var(--n-raise); color: var(--n-text); box-shadow: inset 0 0 0 1px var(--n-line2); }
+html[data-theme="night"] .ckc__more { background: var(--n-raise); color: var(--n-text); box-shadow: inset 0 0 0 1.5px var(--n-line2); }
 html[data-theme="night"] :is(.ckc__btn, .ckc__more, .ckc__switch):focus-visible { outline-color: #fff; }
 
 /* ==========================================================================
@@ -405,18 +405,18 @@ html[data-theme="night"] :is(.ckc__btn, .ckc__more, .ckc__switch):focus-visible 
 html[data-theme="night"] { --pd-panel: linear-gradient(180deg, rgba(255,255,255,.028) 0%, rgba(255,255,255,0) 42%), var(--n-bg2); --pd-edge: inset 0 1px 0 rgba(255,255,255,.045); }
 /* every info panel on the page shares one surface */
 html[data-theme="night"] :is(.pdp2 .offer, .pdp2 .gift, .pdp2 .highlights, #spec-list, .rv__sum, #pd-faq-list) { background: var(--pd-panel); }
-html[data-theme="night"] :is(.pdp2 .offer, .pdp2 .highlights, #spec-list, .rv__sum) { box-shadow: var(--pd-edge), inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] :is(.pdp2 .offer, .pdp2 .highlights, #spec-list, .rv__sum) { box-shadow: var(--pd-edge), inset 0 0 0 1.5px var(--n-line); }
 
 /* "New" tag on the gallery and on product cards: the night accent, solid (was a dark gradient / a muddy red tint on light photos) */
 html[data-theme="night"] :is(.pdp2__badge, .wpc__badge) { background: var(--n-red) !important; color: #fff !important; box-shadow: 0 6px 16px rgba(217,30,5,.35) !important; }
 
 /* Offer: a red-tinted header with a solid red % mark (the day cream divider and blue mark are gone) */
 html[data-theme="night"] .offer__head { background: linear-gradient(90deg, rgba(217,30,5,.20) 0%, rgba(217,30,5,.05) 100%); border-bottom-color: rgba(217,30,5,.28); color: #fff; }
-html[data-theme="night"] .offer__head span { background: var(--n-red); color: #fff; box-shadow: 0 0 0 4px rgba(217,30,5,.16); }
+html[data-theme="night"] .offer__head span { background: var(--n-red); color: #fff; box-shadow: 0 0 0 1.5px rgba(217,30,5,.16); }
 
 /* Assurance trio: the day icons (dark-grey truck, multicolour medal, teal triangle) redrawn as white line icons with one
    red detail, each on a soft round well */
-html[data-theme="night"] .assure__i svg { width: 22px; height: 22px; padding: 9px; box-sizing: content-box; border-radius: 999px; color: #fff; background: radial-gradient(100% 100% at 30% 20%, rgba(255,255,255,.09), rgba(255,255,255,.02)); box-shadow: inset 0 0 0 1px rgba(255,255,255,.10); }
+html[data-theme="night"] .assure__i svg { width: 22px; height: 22px; padding: 9px; box-sizing: content-box; border-radius: 999px; color: #fff; background: radial-gradient(100% 100% at 30% 20%, rgba(255,255,255,.09), rgba(255,255,255,.02)); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.10); }
 html[data-theme="night"] .assure__i svg :is(g, rect, path, circle) { stroke: currentColor; stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; }
 html[data-theme="night"] .assure__i svg g { fill: none; }
 html[data-theme="night"] .assure__i[href*="shipping"] svg circle { fill: var(--n-bg2); stroke: var(--n-red-text); }
@@ -425,12 +425,12 @@ html[data-theme="night"] .assure__i[href*="warranty"] svg circle:first-of-type {
 html[data-theme="night"] .assure__i[href*="warranty"] svg circle:last-of-type { fill: var(--n-red); stroke: none; }
 html[data-theme="night"] .assure__i[href*="returns"] svg path { stroke: var(--n-red-text); }
 html[data-theme="night"] .assure__i b { color: #fff; }
-html[data-theme="night"] .assure { box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] .assure { box-shadow: inset 0 0 0 1.5px var(--n-line); }
 html[data-theme="night"] :is(.assure > div, .assure > a) { background: var(--pd-panel, var(--n-bg2)); }
 
 /* Stat cards: ONE dark family (the light-blue day card made its white heading unreadable; the first was warm brown),
    told apart by where the glow sits — red, white, red */
-html[data-theme="night"] .pd-stat { color: #fff !important; border-color: var(--n-line) !important; box-shadow: inset 0 1px 0 rgba(255,255,255,.05); }
+html[data-theme="night"] .pd-stat { color: #fff !important; border-color: var(--n-line) !important; box-shadow: inset 0 1.5px 0 rgba(255,255,255,.05); }
 html[data-theme="night"] .pd-stat:nth-child(3n+1) { background: radial-gradient(110% 95% at 100% 0%, rgba(217,30,5,.34) 0%, rgba(217,30,5,0) 58%), linear-gradient(165deg, #1D2024 0%, #111316 100%) !important; }
 html[data-theme="night"] .pd-stat:nth-child(3n+2) { background: radial-gradient(110% 95% at 0% 100%, rgba(255,255,255,.12) 0%, rgba(255,255,255,0) 58%), linear-gradient(165deg, #1D2024 0%, #111316 100%) !important; }
 html[data-theme="night"] .pd-stat:nth-child(3n) { background: radial-gradient(110% 95% at 100% 100%, rgba(217,30,5,.26) 0%, rgba(217,30,5,0) 58%), linear-gradient(165deg, #1D2024 0%, #111316 100%) !important; }
@@ -440,13 +440,13 @@ html[data-theme="night"] .pd-stat .pd-stat__s { color: var(--n-muted); opacity: 
 
 /* Small leftovers: the "+" in Add to cart (was a stray #222 disc), payment tags, section tabs in the nav's glass */
 html[data-theme="night"] .btn-cart .plus { background: rgba(255,255,255,.12); color: #fff; border-radius: 999px; }
-html[data-theme="night"] .pays span { background: transparent; color: var(--n-text2); box-shadow: inset 0 0 0 1px var(--n-line2); }
-html[data-theme="night"] .pdtabs__in { background: rgba(21,24,27,.72); -webkit-backdrop-filter: blur(20px) saturate(140%); backdrop-filter: blur(20px) saturate(140%); box-shadow: inset 0 0 0 .5px rgba(226,232,255,.14), 0 10px 30px rgba(0,0,0,.35); }
+html[data-theme="night"] .pays span { background: transparent; color: var(--n-text2); box-shadow: inset 0 0 0 1.5px var(--n-line2); }
+html[data-theme="night"] .pdtabs__in { background: rgba(21,24,27,.72); -webkit-backdrop-filter: blur(20px) saturate(140%); backdrop-filter: blur(20px) saturate(140%); box-shadow: inset 0 0 0 1.5px rgba(226,232,255,.14), 0 10px 30px rgba(0,0,0,.35); }
 html[data-theme="night"] .pdp2__now { color: #fff; }
 /* Product names on cards are headings, not text links: the blanket night `a { red }` rule out-ranked `.wpc__title a { inherit }` and turned every card title red */
 html[data-theme="night"] .wpc__title a { color: inherit; }
 html[data-theme="night"] .wpc__title { color: var(--n-text); }
-html[data-theme="night"] .pdp2__stage { box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 30px 60px rgba(0,0,0,.35); }
+html[data-theme="night"] .pdp2__stage { box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.08), 0 30px 60px rgba(0,0,0,.35); }
 
 /* Sort morph (2026-10-06) — night skin: white outline capsule, dark panel with a white edge, white options */
 html[data-theme="night"] .msort__btn { box-shadow: inset 0 0 0 1.5px #fff; color: var(--n-text2); }
@@ -464,8 +464,8 @@ html[data-theme="night"] .wpc__price small { color: var(--n-muted); }
 html[data-theme="night"] .wpc__specs > div { border-left-color: rgba(255,255,255,.1); }
 html[data-theme="night"] .wpc__specs dd { color: var(--n-text2); }
 html[data-theme="night"] .wpc__specs dt { color: var(--n-muted); }
-html[data-theme="night"] .wpc__swatch { box-shadow: inset 0 0 0 1px rgba(255,255,255,.2), inset 0 1px 2px rgba(0,0,0,.3); }
-html[data-theme="night"] .wpc__swatch[aria-checked="true"] { box-shadow: inset 0 0 0 1px rgba(255,255,255,.2), 0 0 0 2px var(--n-card), 0 0 0 3.5px var(--sw); }
+html[data-theme="night"] .wpc__swatch { box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.2), inset 0 1px 2px rgba(0,0,0,.3); }
+html[data-theme="night"] .wpc__swatch[aria-checked="true"] { box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.2), 0 0 0 2px var(--n-card), 0 0 0 3.5px var(--sw); }
 
 /* Sale + ratings (2026-10-06) — night colours */
 html[data-theme="night"] .qadd__off { color: var(--n-red-text); }
@@ -476,7 +476,7 @@ html[data-theme="night"] .wpc__rating--none, html[data-theme="night"] .pdp2__rat
 /* Card body calm pass (2026-10-06) — night */
 html[data-theme="night"] .wpc__title { color: var(--n-text); }
 html[data-theme="night"] .wpc__optlabel, html[data-theme="night"] .wpc__optmore { color: var(--n-muted); }
-html[data-theme="night"] .wpc__optchip { box-shadow: inset 0 0 0 1px rgba(255,255,255,.16); color: var(--n-text2); }
+html[data-theme="night"] .wpc__optchip { box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.16); color: var(--n-text2); }
 html[data-theme="night"] .wpc__optchip[aria-checked="true"] { box-shadow: inset 0 0 0 1.5px #fff; color: #fff; }
 html[data-theme="night"] .wpc__opts { color: var(--n-text2); }
 html[data-theme="night"] .wpc__off { background: rgba(217, 30, 5, .18); color: var(--n-red-text); }
@@ -502,7 +502,7 @@ html[data-theme="night"] .footer__brand img + img { display: block; }
 html[data-theme="night"] :is(.bbar__h, .bsec__h) { color: var(--n-text); }
 html[data-theme="night"] :is(.bban__card, a.bban__card:hover) { color: #fff; }
 html[data-theme="night"] .bban__card::after { background: rgba(15, 17, 19, .62); }
-html[data-theme="night"] :is(.bban__card, .bcard__cover) { box-shadow: inset 0 0 0 1px var(--n-line); }
+html[data-theme="night"] :is(.bban__card, .bcard__cover) { box-shadow: inset 0 0 0 1.5px var(--n-line); }
 html[data-theme="night"] .bcard__cat { color: var(--n-red-text); }
 html[data-theme="night"] .bcard__cat:hover { color: #fff; }
 html[data-theme="night"] :is(.bcard__t, .bcard__t a, .bcard__t a:hover) { color: var(--n-text); }
