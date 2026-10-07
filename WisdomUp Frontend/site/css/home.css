@@ -403,6 +403,52 @@ html[data-theme="night"] :is(.on-light-dots, .on-light) .dot { color: #fff; }
 .bulk__pt i { width: 6px; height: 6px; border-radius: 999px; background: #1B1B1B; flex: none; }
 .bulk__cta { margin-top: 2px; }
 
+/* ---------- "See what we've been up to" (2026-10-07, insta360.com's campaign carousel — measured at 1440: 864×486 cards =
+   66% of the content width, 16:9, 32px gaps, the current card aligned with the heading, a 200px dark fade under white copy,
+   1.05 image zoom on hover, 48px glass arrows on hover — rebuilt in our design language: rail-heading type, dark ink / brand-red
+   story gradients with the catalogue photo framed like the hero's, our ring dots instead of progress lines). Day home only. */
+.news { --news-g: 32px; margin-top: var(--sec); overflow: hidden; }
+.news__h { margin: 0 var(--gutter, 28px) 40px; font-size: clamp(30px, 3.2vw, 48px); font-weight: 800; line-height: 1; letter-spacing: -.01em; color: #111; text-wrap: balance; } /* same size as the rail headings */
+.news__view { position: relative; }
+.news__track { display: flex; gap: var(--news-g); padding: 0 var(--gutter, 28px); touch-action: pan-y; -webkit-user-select: none; user-select: none; will-change: transform; }
+.news__track.is-drag { cursor: grabbing; }
+.news__card { position: relative; flex: 0 0 66%; aspect-ratio: 16 / 9; border-radius: clamp(18px, 2vw, 24px); overflow: hidden; isolation: isolate; color: #fff; text-decoration: none; -webkit-user-drag: none; -webkit-tap-highlight-color: transparent; }
+a.news__card:hover { color: #fff; }
+.news__card::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; z-index: 0; height: 200px; background: linear-gradient(to top, rgba(0,0,0,.5) 0%, rgba(0,0,0,.33) 40%, rgba(0,0,0,.12) 70%, rgba(0,0,0,0) 100%); pointer-events: none; } /* insta360's fade */
+.news__ph { position: absolute; z-index: 1; top: 9%; bottom: 9%; right: 5%; width: 46%; display: grid; place-items: center; pointer-events: none; }
+.news__ph img { display: block; max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; border-radius: 14px; box-shadow: 0 24px 48px rgba(0,0,0,.35); transition: transform 500ms cubic-bezier(.3,1,.3,1); -webkit-user-drag: none; }
+@media (hover: hover) and (pointer: fine) { .news__card:hover .news__ph img { transform: scale(1.05); } }
+.news__copy { position: absolute; left: 0; bottom: 0; z-index: 2; width: 52%; box-sizing: border-box; padding: 48px 32px 32px; display: flex; flex-direction: column; gap: 8px; }
+.news__k { margin-bottom: 4px; font: 600 12px/1 var(--font); letter-spacing: .2em; text-transform: uppercase; color: rgba(255,255,255,.72); }
+.news__t { font: 700 clamp(20px, 2vw, 28px)/1.15 var(--font); letter-spacing: -.01em; text-wrap: balance; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.news__s { font: 400 clamp(14px, 1.15vw, 16px)/1.35 var(--font); color: rgba(255,255,255,.84); text-wrap: pretty; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.news__card:focus-visible { outline: 2px solid #111; outline-offset: 3px; }
+/* arrows (also the blog's featured carousel, .bban__arrow — placed in info.css): our smoked-glass circle (the back-to-top look),
+   16px inside the gutter — over the current card's left edge and the peeking card; shown on hover with a mouse (or on keyboard
+   focus), never on touch screens */
+.news__arrow, .bban__arrow { position: absolute; top: 50%; z-index: 3; width: 48px; height: 48px; margin-top: -24px; padding: 0; border: 0; border-radius: 50%; display: grid; place-items: center; background: rgba(22, 18, 17, .64); -webkit-backdrop-filter: blur(20px) saturate(1.4); backdrop-filter: blur(20px) saturate(1.4); box-shadow: inset 0 0 0 .5px rgba(226, 232, 255, .22); color: #fff; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity 500ms cubic-bezier(.3,1,.3,1); }
+.news__arrow--prev { left: calc(var(--gutter, 28px) + 16px); }
+.news__arrow--next { right: calc(var(--gutter, 28px) + 16px); }
+.news__arrow svg, .bban__arrow svg { width: 18px; height: 18px; }
+@media (hover: hover) and (pointer: fine) { .news__view:hover .news__arrow, .bban__view:hover .bban__arrow { opacity: 1; pointer-events: auto; } }
+.news__arrow:focus-visible, .bban__arrow:focus-visible { opacity: 1; pointer-events: auto; outline: 2px solid #111; outline-offset: 3px; }
+.news__dots { display: flex; justify-content: center; margin-top: 24px; }
+@media (max-width: 1023px) { /* the gap stays ≥ the gutter, so no sliver of the previous card shows at the edge */
+  .news__h { margin-bottom: 32px; }
+  .news__card { flex-basis: 76%; aspect-ratio: 4 / 3; }
+  .news__ph { top: 8%; bottom: auto; left: 8%; right: 8%; width: auto; height: 50%; }
+  .news__copy { width: 100%; padding: 64px 24px 24px; }
+}
+@media (max-width: 639px) {
+  .news { --news-g: 16px; }
+  .news__h { margin-bottom: 24px; font-size: 26px; }
+  .news__card { flex-basis: 84%; aspect-ratio: 3 / 4; }
+  .news__ph { height: 44%; }
+  .news__t { font-size: 20px; }
+  .news__s { font-size: 14px; }
+  .news__dots { margin-top: 16px; }
+}
+
 /* ---------- Personalized printing ---------- */
 .pp { margin: var(--sec) var(--gutter, 28px) 0; }
 .pp__card { border-radius: clamp(24px, 6vw, 40px); background: #E9E9E9; overflow: hidden; display: grid; grid-template-columns: 1fr; align-items: center; }

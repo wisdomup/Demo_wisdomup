@@ -232,3 +232,72 @@ a.assure__i { text-decoration: none; transition: background-color 180ms ease; }
 .track__recent { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font: 500 13px/1 var(--font); color: var(--muted); }
 .track__recent .link-arrow { border: 0; background: none; padding: 0; cursor: pointer; }
 .badge-soft--bad { background: #FEF3F2 !important; color: #B42318 !important; }
+
+/* ---------- Blog index (2026-10-07, insta360.com/blog's format — measured at 1440 — in our design language) ----------
+   Blog bar (insta360: a 64px bar, "Blog" left, category tabs right, the active one underlined → ours: the H1 left, our chips
+   right, the chosen one filled); featured carousel (842×473 16:9 cards, 16px corners, centred, neighbours peeking under a light
+   veil, the title centred on a 180px dark fade, 48px arrows 80px beside the card → ours: the post's backdrop + its framed product
+   photo, our ring dots and smoked-glass arrows, motion from WU.mountGlide); grid (3 columns, 32px / 52px gaps; cover 16:9 with
+   16px corners, category, 24px title ≤3 lines, grey summary ≤3 lines, date at the foot → 2 columns on tablets, a hairline list
+   on phones). The breadcrumb sits 16px under the carousel (the banner rule). Night: night.css. */
+.bbar { display: flex; align-items: center; justify-content: space-between; gap: 12px 24px; min-height: var(--bar, 56px); margin: 0 var(--gutter, 28px); }
+.bbar__h { margin: 0; font: 700 20px/28px var(--font); letter-spacing: -.005em; color: #111; white-space: nowrap; }
+.bbar__tabs { display: flex; gap: var(--gap-2, 8px); min-width: 0; padding: 4px 0; overflow-x: auto; scrollbar-width: none; }
+.bbar__tabs::-webkit-scrollbar { display: none; }
+.bbar__tabs .chip { flex: none; display: inline-flex; align-items: center; text-decoration: none; }
+
+.bban { --bb-w: min(842px, calc(100vw - 2 * var(--gutter, 28px) - 96px)); --bb-g: 32px; margin-top: 24px; overflow: hidden; }
+.bban__view { position: relative; }
+.bban__track { display: flex; gap: var(--bb-g); touch-action: pan-y; -webkit-user-select: none; user-select: none; will-change: transform; }
+.bban__track.is-drag { cursor: grabbing; }
+.bban__card { position: relative; flex: 0 0 var(--bb-w); aspect-ratio: 16 / 9; display: block; border-radius: 16px; overflow: hidden; isolation: isolate; color: #fff; text-decoration: none; -webkit-user-drag: none; -webkit-tap-highlight-color: transparent; }
+a.bban__card:hover { color: #fff; }
+.bban__card::before { content: ""; position: absolute; left: 0; right: 0; bottom: 0; z-index: 0; height: 180px; background: linear-gradient(0deg, rgba(0,0,0,.7) 0%, rgba(0,0,0,.5) 50%, rgba(0,0,0,0) 100%); pointer-events: none; } /* insta360's title fade */
+.bban__card::after { content: ""; position: absolute; inset: 0; z-index: 3; background: rgba(245, 246, 248, .55); transition: opacity 500ms cubic-bezier(.3,1,.3,1); pointer-events: none; } /* the veil on the neighbours */
+.bban__card.is-current::after { opacity: 0; }
+.bban__ph { position: absolute; z-index: 1; left: 14%; right: 14%; top: 9%; height: 58%; display: grid; place-items: center; pointer-events: none; }
+.bban__ph img { display: block; max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 14px; box-shadow: 0 24px 48px rgba(0,0,0,.35); transition: transform 500ms cubic-bezier(.3,1,.3,1); -webkit-user-drag: none; }
+@media (hover: hover) and (pointer: fine) { .bban__card.is-current:hover .bban__ph img { transform: scale(1.05); } }
+.bban__t { position: absolute; z-index: 2; left: 0; right: 0; bottom: 32px; width: min(624px, calc(100% - 48px)); margin: 0 auto; text-align: center; font: 700 clamp(18px, 1.8vw, 24px)/1.33 var(--font); letter-spacing: -.01em; text-wrap: balance; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.bban__card:focus-visible { outline: 2px solid #111; outline-offset: 3px; }
+.bban__arrow--prev { left: max(8px, calc(50% - var(--bb-w) / 2 - 104px)); } /* centred 80px outside the card, like insta360 */
+.bban__arrow--next { right: max(8px, calc(50% - var(--bb-w) / 2 - 104px)); }
+.bban__dots { display: flex; justify-content: center; margin-top: 16px; }
+.bban + .crumbs { margin-top: 16px; }
+
+.bsec { margin: 40px var(--gutter, 28px) 0; }
+.bsec__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 32px; }
+.bsec__h { margin: 0; font-size: clamp(30px, 3.2vw, 48px); font-weight: 800; line-height: 1; letter-spacing: -.01em; color: #111; } /* the rail-heading size */
+.bsec__all { font: 500 15px/1.4 var(--font); color: #6B6E73; white-space: nowrap; }
+.bsec__all:hover { color: #111; }
+.bsec__all[hidden] { display: none; }
+.bgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 52px 32px; }
+.bcard { display: flex; flex-direction: column; min-width: 0; }
+.bcard__cover { position: relative; display: grid; place-items: center; aspect-ratio: 16 / 9; border-radius: 16px; overflow: hidden; isolation: isolate; }
+.bcard__ph { display: grid; place-items: center; width: 64%; height: 76%; pointer-events: none; }
+.bcard__ph img { display: block; max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 10px; box-shadow: 0 16px 32px rgba(0,0,0,.35); transition: transform 500ms cubic-bezier(.3,1,.3,1); }
+@media (hover: hover) and (pointer: fine) { .bcard:hover .bcard__ph img { transform: scale(1.05); } }
+.bcard__info { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; margin-top: 24px; padding-bottom: 20px; }
+.bcard__cat { font: 600 12px/1.2 var(--font); letter-spacing: .2em; text-transform: uppercase; color: #767B83; }
+.bcard__cat:hover { color: #111; }
+.bcard__t { margin: 0; font: 700 clamp(19px, 1.55vw, 24px)/1.3 var(--font); letter-spacing: -.01em; color: #111; text-wrap: balance; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.bcard__t a { color: inherit; background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat; transition: background-size 500ms cubic-bezier(.3,1,.3,1); } /* underline-draw on hover */
+.bcard__t a:hover, .bcard:hover .bcard__t a { color: inherit; background-size: 100% 1px; }
+.bcard__d { margin: 0; font: 400 16px/1.5 var(--font); color: #6B6E73; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.bcard__date { margin-top: auto; font: 500 14px/1.4 var(--font); color: #767B83; }
+@media (max-width: 1023px) { .bgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px 24px; } }
+@media (max-width: 639px) {
+  .bbar { flex-direction: column; align-items: stretch; gap: 6px; }
+  .bban { --bb-w: calc(100vw - 2 * var(--gutter, 12px) - 40px); --bb-g: 16px; margin-top: 16px; }
+  .bban__card { aspect-ratio: 4 / 3; }
+  .bban__card::before { height: 140px; }
+  .bban__ph { left: 10%; right: 10%; top: 8%; height: 52%; }
+  .bban__t { bottom: 20px; width: calc(100% - 32px); font-size: 17px; }
+  .bsec { margin-top: 28px; }
+  .bsec__head { margin-bottom: 8px; }
+  .bgrid { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .bcard { padding: 28px 0; border-bottom: 1px solid #E3E4E6; }
+  .bcard:first-child { padding-top: 16px; }
+  .bcard:last-child { border-bottom: 0; }
+  .bcard__info { margin-top: 18px; padding-bottom: 12px; }
+}

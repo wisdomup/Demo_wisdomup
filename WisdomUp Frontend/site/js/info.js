@@ -214,8 +214,59 @@
       <div class="post__media" style="background: ${p.bg};">${art(p.art, { alt: '' })}<span class="post__cat">${esc(p.cat)}</span></div>
       <div class="post__body"><span class="meta-line">${esc(p.date)} · ${p.mins} min read</span><h3>${esc(p.title)}</h3><p>${esc(p.excerpt)}</p><span class="tile__go">Read article ›</span></div>
     </a>`;
+  // Blog index (2026-10-07, insta360.com/blog's format in our design language): the blog bar's category chips filter the grid
+  // (real addresses blog.html?cat=…; the plain blog stays canonical), the featured carousel shows every post centred with its
+  // neighbours peeking (WU.mountGlide), and the grid lists the posts — cover (the post's backdrop + its first product's photo),
+  // category, title, summary, date. Facts only: everything comes from js/posts.js and catalog.js.
   const bl = $('blog-list');
-  if (bl) bl.innerHTML = POSTS.map((p, i) => postCard(p, i === 0)).join('');
+  if (bl) {
+    const catSlug = c => String(c).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    const CATS_B = [...new Set(POSTS.map(p => p.cat))];
+    const photoOf = p => ((p.products || []).map(id => D.byId(id)).find(Boolean) || {}).src || '';
+    const ph = (p, cls) => `<span class="${cls}"><img src="${photoOf(p)}" alt="" loading="lazy" draggable="false"></span>`;
+    // featured carousel
+    const btrack = $('bban-track'), NB = POSTS.length;
+    if (btrack && NB) {
+      btrack.innerHTML = [0, 1, 2].flatMap(c => POSTS.map(p => `
+        <a class="bban__card" href="${url.article(p.slug)}" draggable="false" style="background: ${p.bg};"${c !== 1 ? ' tabindex="-1" aria-hidden="true"' : ''}>${ph(p, 'bban__ph')}<span class="bban__t">${esc(p.title)}</span></a>`)).join('');
+      $('bban-dots').innerHTML = `<div class="dots on-light-dots" role="tablist" aria-label="Featured articles" style="position: static;">${POSTS.map((p, k) => `<button type="button" class="dot" role="tab" aria-label="Article ${k + 1} of ${NB}: ${esc(p.title)}"></button>`).join('')}</div>`;
+      WU.mountGlide({ root: $('blog-banner'), track: btrack, dots: [...$('bban-dots').querySelectorAll('.dot')], n: NB, align: 'center' });
+    } else if ($('blog-banner')) $('blog-banner').hidden = true;
+    // category chips + grid
+    const tabs = $('blog-tabs');
+    tabs.innerHTML = [['', 'All'], ...CATS_B.map(c => [catSlug(c), c])].map(([k, l]) => `<a class="chip" href="${k ? url.blog + '?cat=' + k : url.blog}" data-cat="${k}">${esc(l)}</a>`).join('');
+    const card = p => `
+      <article class="bcard">
+        <a class="bcard__cover" href="${url.article(p.slug)}" tabindex="-1" aria-hidden="true" style="background: ${p.bg};">${ph(p, 'bcard__ph')}</a>
+        <div class="bcard__info">
+          <a class="bcard__cat" href="${url.blog}?cat=${catSlug(p.cat)}" data-cat="${catSlug(p.cat)}">${esc(p.cat)}</a>
+          <h3 class="bcard__t"><a href="${url.article(p.slug)}">${esc(p.title)}</a></h3>
+          <p class="bcard__d">${esc(p.excerpt)}</p>
+        </div>
+        <div class="bcard__date">${esc(p.date)} · ${p.mins} min read</div>
+      </article>`;
+    const render = (cat, swap) => {
+      if (cat && !CATS_B.some(c => catSlug(c) === cat)) cat = '';
+      tabs.querySelectorAll('.chip').forEach(a => a.setAttribute('aria-current', String(a.dataset.cat === cat)));
+      $('bsec-h').textContent = cat ? CATS_B.find(c => catSlug(c) === cat) : 'Latest articles';
+      $('bsec-all').hidden = !cat;
+      bl.innerHTML = (cat ? POSTS.filter(p => catSlug(p.cat) === cat) : POSTS).map(card).join('');
+      if (swap) { WU.revealWords($('bsec-h')); WU.staggerCards(bl); }
+    };
+    // chips, the "All articles" link and the category on each card switch the grid in place (the address follows)
+    document.addEventListener('click', e => {
+      const a = e.target.closest('#blog-tabs .chip, .bcard__cat, #bsec-all');
+      if (!a || e.ctrlKey || e.metaKey || e.shiftKey || e.button > 0) return;
+      e.preventDefault();
+      const cat = a.dataset.cat || '';
+      const to = cat ? url.blog + '?cat=' + cat : url.blog;
+      history[(new URLSearchParams(location.search).get('cat') || '') === cat ? 'replaceState' : 'pushState']({ cat }, '', to); // no duplicate entries
+      render(cat, true);
+      if (!a.closest('#blog-tabs')) scrollToEl($('bsec-h').closest('.bsec'));
+    });
+    window.addEventListener('popstate', () => render(new URLSearchParams(location.search).get('cat') || '', true));
+    render(new URLSearchParams(location.search).get('cat') || '', false);
+  }
   const ar = $('article');
   if (ar) {
     const slug = new URLSearchParams(location.search).get('p') || location.hash.slice(1); // ?p=slug (old #slug links still work)

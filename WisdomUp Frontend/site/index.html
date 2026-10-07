@@ -171,6 +171,18 @@
     </div>
   </section>
 
+  <!-- "See what we've been up to" (2026-10-07, insta360.com's campaign carousel rebuilt in our design language): real WisdomUp
+       stories only — the Live show, the Creators Program, every blog post (js/posts.js) and corporate gifts. Cards: NEWS in home.js. -->
+  <section class="news" id="news" aria-roledescription="carousel" aria-labelledby="news-h">
+    <h2 class="sec-title news__h" id="news-h">See what we’ve been up to</h2>
+    <div class="news__view">
+      <div class="news__track" id="news-track"></div>
+      <button type="button" class="news__arrow news__arrow--prev" data-go="-1" aria-label="Previous story"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 2.5 4 6l3.5 3.5"/></svg></button>
+      <button type="button" class="news__arrow news__arrow--next" data-go="1" aria-label="Next story"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg></button>
+    </div>
+    <div class="news__dots" id="news-dots"></div>
+  </section>
+
   <div class="trust-wrap" id="trust"></div>
 
   <section class="faq" id="faq">
@@ -261,6 +273,7 @@
 <script src="js/wu-data.js"></script>
 <script src="js/ds-icons.js"></script>
 <script src="js/common.js"></script>
+<script src="js/posts.js"></script>
 <script src="js/home.js"></script>
 <script src="js/night-home.js"></script>
 </body>

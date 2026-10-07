@@ -1,4 +1,5 @@
-// WisdomUp blog posts (used by blog.html and article.html#<slug>). Product facts and prices match js/catalog.js.
+// WisdomUp blog posts (used by blog.html, article.html?p=<slug> and the home "See what we've been up to" carousel). Product facts
+// and prices match js/catalog.js. `bg` = the story's dark backdrop: ink, warm graphite or brand red only (the day colour rule — no navy/green).
 window.WU_POSTS = [
   {
     slug: 'open-ear-vs-true-wireless',
@@ -56,7 +57,7 @@ window.WU_POSTS = [
     title: 'Fast, safe charging at your desk and in the car',
     excerpt: 'How to set up a 3-in-1 wireless charger, which wall charger and cable to pick, and the small habits that protect your batteries.',
     date: 'September 2026', mins: 4, art: 'bank-ice',
-    bg: 'linear-gradient(120deg,#1c2a44,#0a0f1a)',
+    bg: 'linear-gradient(120deg,#2c2d30,#0c0c0d)',
     products: ['cj-46', 'ocd-28', 'cc-16', 'cj-44'],
     body: `
       <p>Most people own more devices than chargers. A good setup means everything is full in the morning without a tangle of cables, and your phone keeps charging on the drive to work.</p>
@@ -80,7 +81,7 @@ window.WU_POSTS = [
     title: 'Six ways to make your earbuds’ battery last longer',
     excerpt: 'Simple habits that keep earbuds and neckbands going for years — from charging routines to keeping the case clean.',
     date: 'August 2026', mins: 3, art: 'phones',
-    bg: 'linear-gradient(120deg,#33401c,#0d1206)',
+    bg: 'linear-gradient(120deg,#5a1208,#1a0503)',
     products: ['ts-2', 'ej-ly7', 'ts-11anc', 'os-6'],
     body: `
       <p>Lithium batteries wear a little with every charge cycle. You can't stop that, but you can slow it down. These habits apply to every WisdomUp earbud and neckband.</p>

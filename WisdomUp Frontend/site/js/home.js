@@ -162,6 +162,29 @@
     fpaint(false);
   }
 
+  /* ---------- "See what we've been up to" (2026-10-07, insta360.com's campaign carousel rebuilt in our design language) ----------
+     Real WisdomUp stories only (copy from live.html, creators.html, corporate.html and js/posts.js; photos from the catalogue).
+     The current card lines up with the heading and the next one peeks in (on ultra-wide screens the previous one too). Motion,
+     drag, loop and autoplay: WU.mountGlide (common.js). Ring dots below; glass arrows show on hover (mouse only). */
+  const RED = 'linear-gradient(120deg, #5A1208 0%, #1A0503 100%)', INK = 'linear-gradient(120deg, #2C2D30 0%, #0C0C0D 100%)', WARM = 'linear-gradient(120deg, #34302C 0%, #0E0D0C 100%)';
+  const NEWS = [
+    { k: 'WisdomUp Live', t: 'Watch it demoed. Add it to cart mid-stream.', s: 'A new show every Friday at 8 PM PKT, with live-only prices on whatever the host is holding.', href: url.live, id: 'ts-11anc', bg: RED },
+    { k: 'Creators Program', t: 'Create with WisdomUp. Earn with every share.', s: 'Early access to launches, creator pricing on gear and commission on sales from your link.', href: url.creators, id: 'mkf-01', bg: WARM },
+    ...(window.WU_POSTS || []).map(p => ({ k: p.cat, t: p.title, s: p.excerpt, href: url.article(p.slug), id: (p.products || []).find(P), bg: p.bg })), // the post's own backdrop, as on the blog
+    { k: 'Corporate gifts', t: 'Corporate gifts your team will actually use.', s: 'Branded earbuds, speakers, mics and chargers for employees, clients and events, with volume pricing and custom packaging.', href: url.corporate, id: 'cdb-18', bg: INK },
+  ].filter(n => n.id && P(n.id));
+  const news = $('news'), ntrack = $('news-track');
+  if (news && NEWS.length) {
+    const NN = NEWS.length;
+    ntrack.innerHTML = [0, 1, 2].flatMap(c => NEWS.map(n => `
+      <a class="news__card" href="${n.href}" draggable="false" style="background: ${n.bg};"${c !== 1 ? ' tabindex="-1" aria-hidden="true"' : ''}>
+        <span class="news__ph"><img src="${P(n.id).src}" alt="" loading="lazy" draggable="false"></span>
+        <span class="news__copy"><span class="news__k">${esc(n.k)}</span><span class="news__t">${esc(n.t)}</span><span class="news__s">${esc(n.s)}</span></span>
+      </a>`)).join('');
+    $('news-dots').innerHTML = `<div class="dots on-light-dots" role="tablist" aria-label="Stories" style="position: static;">${NEWS.map((n, k) => `<button type="button" class="dot" role="tab" aria-label="Story ${k + 1} of ${NN}: ${esc(n.t)}"></button>`).join('')}</div>`;
+    WU.mountGlide({ root: news, track: ntrack, dots: [...$('news-dots').querySelectorAll('.dot')], n: NN, align: 'start' });
+  }
+
   /* ---------- Shop rails ---------- */
   // New for 2026: one per product type first (variety), then the rest
   const fresh = D.products.filter(p => p.tabs.includes('new'));

@@ -783,6 +783,72 @@
     return track();
   }
 
+  /* ---------- Story carousels (2026-10-07: the home "See what we've been up to" and the blog's featured banner, both from
+     insta360.com, in our motion): `track` holds the N cards rendered THREE times (the middle copy is the real one; the others
+     are aria-hidden loop copies). align 'start' = the current card sits at the track's left padding (the gutter) and the next
+     one peeks in; 'center' = the current card is centred with both neighbours peeking. Glides 1000ms on the reveal curve,
+     follows a mouse/finger drag (release past 15% of a card or a quick flick moves on, otherwise it springs back in 600ms;
+     a drag never opens a card), loops, autoplays every 6s — paused on hover, off screen, in a hidden tab and for reduced
+     motion. `.is-current` marks the current card; `dots` (our ring dots) get aria-selected; [data-go] buttons inside
+     `root` step. Returns { go }. ---------- */
+  function mountGlide({ root, track, dots = [], n, align = 'start' }) {
+    const cards = [...track.children];
+    const GLIDE = 'transform 1000ms cubic-bezier(.16,1,.3,1)', BACK = 'transform 600ms cubic-bezier(.16,1,.3,1)';
+    let i = n, dragX = 0, timer = 0, hover = false, seen = false;
+    const cardW = () => cards[0].getBoundingClientRect().width;
+    const step = () => cardW() + (parseFloat(getComputedStyle(track).columnGap) || 0); // one card + the gap (exact, not rounded)
+    const offset = () => align === 'center' ? (track.parentElement.clientWidth - cardW()) / 2 - (parseFloat(getComputedStyle(track).paddingLeft) || 0) : 0;
+    const cur = () => ((i % n) + n) % n;
+    const paint = tr => { track.style.transition = tr && !reduced() ? tr : 'none'; track.style.transform = `translate3d(${offset() - i * step() + dragX}px, 0, 0)`; };
+    const mark = () => { dots.forEach((d, k) => d.setAttribute('aria-selected', k === cur())); cards.forEach((c, k) => c.classList.toggle('is-current', k === i)); };
+    const settle = () => { if (i < n || i >= 2 * n) { i = cur() + n; paint(null); mark(); } }; // back to the middle copy, invisibly
+    const restart = () => { clearTimeout(timer); if (!reduced() && !hover && seen && !document.hidden) timer = setTimeout(() => goBy(1), 6000); };
+    function goBy(d) {
+      if (!d) return restart();
+      if (i + d < 1 || i + d > 3 * n - 2) { settle(); void track.offsetWidth; } // never run off the copies
+      i += d; dragX = 0; paint(GLIDE); mark(); restart();
+      if (reduced()) settle();
+    }
+    track.addEventListener('transitionend', e => { if (e.target === track) settle(); });
+    root.addEventListener('click', e => {
+      const b = e.target.closest('[data-go]'); if (b && root.contains(b)) goBy(+b.dataset.go);
+      const d = dots.indexOf(e.target.closest('.dot')); if (d >= 0) goBy(d - cur());
+    });
+    if (dots[0]) dots[0].parentElement.addEventListener('keydown', e => {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      e.preventDefault(); goBy(e.key === 'ArrowRight' ? 1 : -1); dots[cur()].focus();
+    });
+    // keyboard focus on a card brings it into place (overflow is hidden, so undo any scroll the browser made)
+    track.addEventListener('focusin', e => { const k = cards.findIndex(c => c.contains(e.target)); track.parentElement.scrollLeft = 0; if (k >= 0 && k !== i) goBy(k - i); });
+    // drag / swipe (touch-action: pan-y on the track keeps vertical page scrolling)
+    let x0 = null, t0 = 0, moved = false, pid = null;
+    track.addEventListener('pointerdown', e => { if (e.button !== 0) return; x0 = e.clientX; t0 = performance.now(); moved = false; pid = e.pointerId; clearTimeout(timer); });
+    track.addEventListener('pointermove', e => {
+      if (x0 == null || e.pointerId !== pid) return;
+      const dx = e.clientX - x0;
+      if (!moved && Math.abs(dx) > 6) { moved = true; try { track.setPointerCapture(pid); } catch (err) { /* already released */ } track.classList.add('is-drag'); }
+      if (moved) { dragX = dx; paint(null); }
+    });
+    const release = () => {
+      if (x0 == null) return;
+      const dx = dragX, dt = Math.max(1, performance.now() - t0);
+      x0 = null; track.classList.remove('is-drag');
+      if (!moved) return restart();
+      if (Math.abs(dx) > step() * .15 || (Math.abs(dx) > 30 && Math.abs(dx) / dt > .5)) goBy(dx < 0 ? 1 : -1);
+      else { dragX = 0; paint(BACK); restart(); }
+    };
+    track.addEventListener('pointerup', release);
+    track.addEventListener('pointercancel', release);
+    track.addEventListener('click', e => { if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; } }, true); // a drag never opens a card
+    root.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') { hover = true; restart(); } });
+    root.addEventListener('pointerleave', () => { hover = false; restart(); });
+    if ('IntersectionObserver' in window) new IntersectionObserver(es => { seen = es[0].isIntersecting; restart(); }, { threshold: .3 }).observe(root);
+    document.addEventListener('visibilitychange', restart);
+    window.addEventListener('resize', () => paint(null));
+    paint(null); mark();
+    return { go: goBy };
+  }
+
   /* ---------- Lifestyle hero (crossfade) ---------- */
   const HERO_POS = { 'hero-os4': '50% 0%' };
   function mountHero(el, slides = D.lifestyle) {
@@ -1252,10 +1318,10 @@
   let revealer = null;
   // ---------- Motion engine (MOTION-REPORT.md, approved 2026-10-06): reveals, grid staggers, scroll-driven curtain/clip, liquid fills, magnets ----------
   const FILL_SEL = '.btn-pill, .btn-buy, .btn-navy, .btn-outline, .btn-cart, .shop-rail__all, .loop__cta, .pp__cta, .seo__toggle, .fdrawer__apply, .ck__place, .cartd__go, .mnav__foot a, .nh-btn, .totop, .quick .chip, .wpc__cta, .ckc__btn, .msort__btn';
-  const MAG_SEL = '.loop__btn, .feat__btn, .shop-rail__step, .hero__arrow, .pdp2__chev, .wpc__wish, .pdp2__wish, .totop, .mnav__x, .cartd__x, .fdrawer__x, .mnav__theme, .nh-tile__add, .mnav__back';
+  const MAG_SEL = '.loop__btn, .feat__btn, .news__arrow, .bban__arrow, .shop-rail__step, .hero__arrow, .pdp2__chev, .wpc__wish, .pdp2__wish, .totop, .mnav__x, .cartd__x, .fdrawer__x, .mnav__theme, .nh-tile__add, .mnav__back';
   const X_SEL = '.mnav__x, .cartd__x, .fdrawer__x';
-  const SD_CLIP = '.promo, .bulk, .duo__card, .cta-band, .quote-band, .pp__card, .nh-show, .nh-glow, .nh-live, .feat__slide';
-  const GRID_SEL = '.wu-rail > *, .mgrid > *, .nh-grid > *';
+  const SD_CLIP = '.promo, .bulk, .duo__card, .cta-band, .quote-band, .pp__card, .nh-show, .nh-glow, .nh-live, .feat__slide, .news__card';
+  const GRID_SEL = '.wu-rail > *, .mgrid > *, .nh-grid > *, .bgrid > *';
   const ZOOM_SEL = '.promo img, .feat__slide img, .feat__slide video, .pp__card img';
   const fine = () => matchMedia('(hover: hover) and (pointer: fine)').matches;
   const phone = () => matchMedia('(max-width: 639px)').matches;
@@ -2090,7 +2156,7 @@
     CATS, slug, url, catHref, linkFor,
     icons: { STAR_SVG }, btnBuy,
     store, add, toast, reviews, starsSvg, cart: { lines: cartLines, count: cartCount, totals: cartTotals, setQty, clear: clearCart, setGift, gift: () => giftWrap, open: b => cartUI && cartUI.open(b), skuInfo: sku => skuIndex[sku] }, SHOP, wished, toggleWish, wishBtn, paintWish, wishList: () => wish.slice(),
-    productCard, colorsOf, photoBg, photoFit, ratingOf, reviewsOf, seedOf, mountRail, mountHero, mountAccordion, DEPTS, typeLabel,
+    productCard, colorsOf, photoBg, photoFit, ratingOf, reviewsOf, seedOf, mountRail, mountHero, mountGlide, mountAccordion, DEPTS, typeLabel,
     initChrome, placeNav, setActiveCat, navOffset, scrollToEl,
     openSearch: () => search && search.open(),
     toggleTheme, setTheme, themeMode, isNight, slide, staggerCards, revealWords, sheetDrag, quickAdd, budget: BUDGET, STAR_OUTLINE,

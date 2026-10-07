@@ -47,19 +47,25 @@
   <div class="wu-util"><nav class="utility" aria-label="Utility" id="utility"></nav></div>
   <header class="nav site-nav" id="site-nav"></header>
   <div class="nav-spacer"></div>
-  <section class="ihero ihero--plain">
-    <div class="ihero__copy">
-      <div class="eyebrow">WisdomUp Blog</div>
-      <h1>Guides, how-tos and <b>creator tips.</b></h1>
-      <p class="ihero__lede">Straight answers on choosing, using and looking after your tech — from the team that builds it.</p>
-      
-      
+  <!-- Blog (rebuilt 2026-10-07 in insta360.com/blog's format, our design language): blog bar (title + category chips) →
+       featured carousel (centred card, neighbours peeking and dimmed) → breadcrumb → article grid. Filled by info.js from js/posts.js. -->
+  <section class="bbar" aria-label="Blog">
+    <h1 class="bbar__h">WisdomUp Blog</h1>
+    <nav class="bbar__tabs" id="blog-tabs" aria-label="Blog categories"></nav>
+  </section>
+  <section class="bban" id="blog-banner" aria-roledescription="carousel" aria-label="Featured articles">
+    <div class="bban__view">
+      <div class="bban__track" id="bban-track"></div>
+      <button type="button" class="bban__arrow bban__arrow--prev" data-go="-1" aria-label="Previous article"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 2.5 4 6l3.5 3.5"/></svg></button>
+      <button type="button" class="bban__arrow bban__arrow--next" data-go="1" aria-label="Next article"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg></button>
     </div>
-    
+    <div class="bban__dots" id="bban-dots"></div>
   </section>
   <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Home</a><span aria-hidden="true">›</span><span aria-current="page">Blog</span></nav>
-  <section class="isec" aria-label="Articles"><div class="posts" id="blog-list"></div></section>
-  <section class="cta-band"><div><h2>New launches and live-only deals</h2><p>Join the newsletter at the bottom of any page.</p></div><div class="cta-band__actions"><a class="btn-navy" href="products.html?filter=new">Shop new arrivals</a></div></section>
+  <section class="bsec" aria-labelledby="bsec-h">
+    <div class="bsec__head"><h2 class="sec-title bsec__h" id="bsec-h">Latest articles</h2><a class="bsec__all" id="bsec-all" href="blog.html" hidden>All articles ›</a></div>
+    <div class="bgrid" id="blog-list"></div>
+  </section>
 
   <div class="trust-wrap" id="trust"></div>
   <div class="footer-wrap" id="footer"></div>
