@@ -25,6 +25,7 @@ import os
 import re
 import select
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
@@ -111,16 +112,19 @@ def body_inner(doc):
     return m.group(1) if m else ''
 
 
-def render(page, query, work):
-    """Headless Chrome dump of the page as built by its own scripts (reduced motion, so no reveal/edge-light state)."""
+def render(page, query, tmp):
+    """Headless Chrome dump of the page as built by its own scripts (reduced motion, so no reveal/edge-light state).
+    Every page gets a FRESH profile folder: Chrome refuses a profile another Chrome (or a killed Chrome's helper processes)
+    still holds, which once made every 4th page fail. Chrome runs in its own process group so the whole family is stopped."""
     url = SERVER + page + '?' + '&'.join(filter(None, [query, '__raw=1']))
+    work = tempfile.mkdtemp(prefix='prof-', dir=tmp)
     cmd = [CHROME, '--headless=new', '--disable-gpu', '--no-first-run', '--no-default-browser-check', '--disable-extensions',
            '--disable-component-update', '--disable-background-networking', '--disable-sync', '--mute-audio', '--no-pings',
            '--disk-cache-size=1', '--media-cache-size=1', '--disable-gpu-shader-disk-cache', '--disable-breakpad',
            '--disable-features=OptimizationHints,OptimizationGuideModelDownloading,MediaRouter,Translate',
            '--force-prefers-reduced-motion', '--window-size=1280,900', '--virtual-time-budget=6000',
            f'--user-data-dir={work}', '--dump-dom', url]
-    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, start_new_session=True)
     buf, deadline = b'', time.time() + 60
     try:
         while time.time() < deadline:
@@ -133,8 +137,12 @@ def render(page, query, work):
                 if b'</html>' in buf:
                     break
     finally:
-        proc.kill()
+        try:
+            os.killpg(proc.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
         proc.wait()
+        shutil.rmtree(work, ignore_errors=True)
     out = buf.decode('utf-8', 'replace')
     if '</html>' not in out:
         raise RuntimeError(f'no page from Chrome for {page}?{query}')
@@ -146,16 +154,17 @@ SEO_TAG = re.compile(
     r'|<link rel="canonical"[^>]*>|<script type="application/ld\+json"[^>]*>.*?</script>', re.S)
 
 
-def build_one(t, work):
+def build_one(t, tmp):
     page, query, out_rel = t
     template = open(os.path.join(SITE, page), encoding='utf-8').read()
     for attempt in range(3):  # Chrome now and then returns nothing when the machine is busy — try again
         try:
-            dump = render(page, query, work)
+            dump = render(page, query, tmp)
             break
         except RuntimeError:
             if attempt == 2:
                 raise
+            time.sleep(1 + attempt)
     head = dump.split('</head>', 1)[0]
     if not re.search(re.escape(START) + '.*?' + re.escape(END), template, re.S):
         raise RuntimeError(f'{page}: no SEO block in the template (run tools/build_seo.py)')
@@ -178,6 +187,9 @@ def build_one(t, work):
     tnav = nav.search(template)
     if tnav:
         body = nav.sub(lambda m: tnav.group(0), body, count=1)
+    # the footer's bottom margin is measured on load (fitGap) and differs by a pixel or two between runs — the scripts set it
+    # again anyway, so leave it out and a rebuild without real changes leaves the files untouched
+    body = re.sub(r'(<div class="footer-wrap[^"]*" id="footer") style="[^"]*"', r'\1', body)
     body = re.sub(r'\n{3,}', '\n\n', body)
     out = re.sub(r'(<body[^>]*>).*(</body>)', lambda m: m.group(1) + body + m.group(2), out, count=1, flags=re.S)
     out = out.replace('<!-- pre-rendered', '<!-- (old) pre-rendered')
@@ -213,12 +225,11 @@ def main():
         todo = [t for t in todo if any(o in (t[0] + '?' + t[1]) for o in only)]
     tmp = tempfile.mkdtemp(prefix='wu-pre-')
     workers = min(4, len(todo)) or 1
-    profiles = [os.path.join(tmp, f'p{i}') for i in range(workers)]
     results, problems = [], []
     print(f'Pre-rendering {len(todo)} pages with {workers} Chrome workers…')
     t0 = time.time()
     with cf.ThreadPoolExecutor(workers) as ex:
-        futs = {ex.submit(build_one, t, profiles[i % workers]): t for i, t in enumerate(todo)}
+        futs = {ex.submit(build_one, t, tmp): t for t in todo}
         for f in cf.as_completed(futs):
             t = futs[f]
             try:
