@@ -31,27 +31,39 @@
 <div class="adm">
   <header class="adm__bar">
     <img src="img/wu-logo.png" alt="WisdomUp" height="30">
-    <b>Orders</b>
+    <b id="adm-title">Orders</b>
+    <nav class="policy__links adm__views" id="adm-views" aria-label="Admin views" hidden><a href="#orders" data-view="orders" aria-current="true">Orders</a><a href="#creators" data-view="creators">Creators</a></nav>
     <span class="adm__sp"></span>
     <button type="button" class="btn-outline" id="adm-refresh" hidden>Refresh</button>
     <button type="button" class="btn-outline" id="adm-out" hidden>Sign out</button>
   </header>
 
   <form class="adm__login" id="adm-login">
-    <h1>Order admin</h1>
-    <p>Enter the admin key to see orders. It is kept for this browser tab only.</p>
+    <h1>Shop admin</h1>
+    <p>Enter the admin key to see orders and creators. It is kept for this browser tab only.</p>
     <div class="field"><label for="adm-key">Admin key</label><input id="adm-key" type="password" autocomplete="current-password" required></div>
     <button type="submit" class="btn-navy">Show orders</button>
     <p class="adm__err" id="adm-err" role="alert" hidden></p>
   </form>
 
   <main class="adm__main" id="adm-main" hidden>
-    <div class="adm__stats" id="adm-stats"></div>
-    <div class="adm__tools">
-      <div class="policy__links" id="adm-filter" role="group" aria-label="Filter by status"></div>
-      <label class="hsearch adm__search"><input type="search" id="adm-q" placeholder="Search order, name, phone or city" aria-label="Search orders"></label>
-    </div>
-    <div class="adm__list" id="adm-list" aria-live="polite"></div>
+    <section id="adm-orders">
+      <div class="adm__stats" id="adm-stats"></div>
+      <div class="adm__tools">
+        <div class="policy__links" id="adm-filter" role="group" aria-label="Filter by status"></div>
+        <label class="hsearch adm__search"><input type="search" id="adm-q" placeholder="Search order, name, phone, city or creator code" aria-label="Search orders"></label>
+      </div>
+      <div class="adm__list" id="adm-list" aria-live="polite"></div>
+    </section>
+    <section id="adm-creators" hidden>
+      <div class="adm__stats" id="adm-cstats"></div>
+      <p class="adm__prog" id="adm-prog"></p>
+      <div class="adm__tools">
+        <div class="policy__links" id="adm-cfilter" role="group" aria-label="Filter creators by status"></div>
+        <label class="hsearch adm__search"><input type="search" id="adm-cq" placeholder="Search code, name, phone or handle" aria-label="Search creators"></label>
+      </div>
+      <div class="adm__list" id="adm-clist" aria-live="polite"></div>
+    </section>
   </main>
   <div class="toast" id="toast" role="status" hidden></div>
 </div>

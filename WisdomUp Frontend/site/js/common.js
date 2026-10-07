@@ -181,13 +181,15 @@
     const { p, v } = skuIndex[l.sku];
     return { sku: l.sku, qty: l.qty, p, v, attrs: v.attrs || {}, price: v.price, total: v.price * l.qty };
   });
-  // Totals for a delivery option; free standard delivery from SHOP.freeDeliveryFrom
+  // Totals for a delivery option; free standard delivery from SHOP.freeDeliveryFrom (judged on the items before a creator
+  // discount — the order server does exactly the same, see price_order() in api/orders.py)
   function cartTotals(delivery = 'standard') {
     const subtotal = cartLines().reduce((n, l) => n + l.total, 0);
     const opt = (SHOP.delivery || {})[delivery] || { fee: 0, freeOver: true };
     const fee = !cart.length ? 0 : opt.freeOver && subtotal >= SHOP.freeDeliveryFrom ? 0 : opt.fee;
     const gift = giftWrap && cart.length ? SHOP.giftWrap : 0;
-    return { subtotal, delivery: fee, giftWrap: gift, total: subtotal + fee + gift };
+    const discount = ref && ref.pct && cart.length ? pctOf(subtotal, ref.pct) : 0;
+    return { subtotal, discount, ref: ref ? ref.code : null, delivery: fee, giftWrap: gift, total: subtotal - discount + fee + gift };
   }
   function saveCart() {
     store.set('wu-cart', cart);
@@ -218,6 +220,54 @@
   const setGift = on => { giftWrap = !!on; saveCart(); };
   const clearCart = () => { cart = []; giftWrap = false; saveCart(); };
   let cartUI = null;
+
+  /* ---------- Creator codes (the creators program, 2026-10-08 — settings in shop.js "creators"; api/orders.py is the referee).
+     A creator's link (?ref=CODE on ANY page) is checked with the server, which counts the visit (once per device per code per
+     day), and is kept on this device for linkDays (wu-ref — the last creator link wins). While it is kept, the cart, checkout
+     and the order show discountPct off the items; the server checks the code and recomputes everything again. A code that
+     could not be checked (no connection, or the program's database is not connected yet) is kept WITHOUT a discount and named
+     in WhatsApp orders. A creator opening their own link on a device signed in to their dashboard (wu-creator) is not counted. */
+  const CR = SHOP.creators || {};
+  const REF_KEY = 'wu-ref', ME_KEY = 'wu-creator';
+  const TAG_SVG = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12.6V4.8a1.3 1.3 0 0 1 1.3-1.3h7.8l8 8a1.3 1.3 0 0 1 0 1.8l-7 7a1.3 1.3 0 0 1-1.8 0z"/><circle cx="8.2" cy="8.2" r="1.5"/></svg>';
+  const pctOf = (n, pct) => Math.floor((n * pct + 50) / 100); // whole rupees, half up — same as pct_of() on the server
+  const codeNorm = v => { const c = String(v || '').replace(/[^A-Za-z0-9]/g, '').toUpperCase(); return /^[A-Z0-9]{3,12}$/.test(c) ? c : null; };
+  const refLoad = () => { const r = store.get(REF_KEY, null); return CR.on && r && r.code && Date.now() - r.at < (CR.linkDays || 30) * 864e5 ? r : null; };
+  let ref = refLoad();
+  async function crApi(action, body, opts = {}) {
+    const res = await fetch('/api/orders?cr=' + action, { method: opts.method || 'POST', headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) }, body: body ? JSON.stringify(body) : undefined });
+    const data = await res.json().catch(() => ({ ok: false }));
+    if (!res.ok || !data.ok) throw Object.assign(new Error(data.error || 'The creator system did not answer. Please try again.'), { status: res.status, field: data.field, data });
+    return data;
+  }
+  const setRef = r => { ref = r; store.set(REF_KEY, r); saveCart(); }; // saveCart repaints every total
+  const clearRef = () => { ref = null; try { localStorage.removeItem(REF_KEY); } catch (e) { /* storage unavailable */ } saveCart(); };
+  // Check a code with the server and keep it. click = a visit from a creator link (counted for the creator).
+  async function applyRef(raw, { click = false, quiet = false } = {}) {
+    const code = codeNorm(raw);
+    if (!code) throw Object.assign(new Error('Creator codes are 3–12 letters or numbers.'), { field: 'ref' });
+    if ((store.get(ME_KEY, null) || {}).code === code) throw Object.assign(new Error('That is your own creator code — it gives your followers their discount.'), { own: true, field: 'ref' });
+    const d = await crApi('code', { code, click });
+    const r = { code: d.code, name: d.name, pct: d.discountPct, at: Date.now() };
+    setRef(r);
+    if (!quiet) toast(`${d.name}’s code ${d.code} applied — ${d.discountPct}% off your order`, TAG_SVG);
+    return r;
+  }
+  function captureRef() {
+    const u = new URL(location.href), raw = u.searchParams.get('ref');
+    if (raw == null) return;
+    u.searchParams.delete('ref'); // keep shared addresses and canonicals clean
+    history.replaceState(history.state, '', u.pathname + u.search + u.hash);
+    const code = codeNorm(raw);
+    if (!CR.on || !code) return;
+    const day = new Date().toISOString().slice(0, 10), seen = store.get('wu-ref-day', {}) || {};
+    applyRef(code, { click: seen[code] !== day }).then(() => store.set('wu-ref-day', { [code]: day })).catch(err => {
+      if (err.own) { toast('This is your own creator link — your followers get the discount', TAG_SVG); return; }
+      if (err.status === 404) return; // not an active code: nothing to apply
+      setRef({ code, name: '', pct: 0, at: Date.now(), unchecked: true });
+      toast(`Creator code ${code} saved — it is checked at checkout`, TAG_SVG);
+    });
+  }
 
   /* ---------- Reviews: written by shoppers, stored on this device until a shared review database is connected.
      No invented ratings anywhere: stars only appear when a product has real reviews. ---------- */
@@ -1652,6 +1702,7 @@
     paintThemeBtns(); // the menu panel's day/night button
     cartUI = mountCart();
     qaddUI = mountQuickAdd();
+    captureRef();
     consentUI = mountConsent();
     initMotion();
     mountToTop();
@@ -1719,6 +1770,7 @@
               <button type="button" data-sheet="gift" aria-controls="cartd-s-gift">${GIFT}<span>Gift wrap</span></button>
             </div>
             <div class="cartd__sum">
+              <div class="cartd__ref" id="cartd-ref" hidden></div>
               <div class="cartd__sumrow">
                 <p class="cartd__taxnote">Prices include taxes. <a href="shipping.html">Delivery</a> is chosen at checkout.</p>
                 <div class="cartd__totals"><span>Subtotal</span><b id="cartd-sub"></b></div>
@@ -1772,7 +1824,9 @@
       $('cartd-scroll').classList.toggle('is-empty', !lines.length);
       $('cartd-foot').hidden = !lines.length;
       $('cartd-gift').checked = giftWrap;
-      $('cartd-sub').textContent = D.rs(t.subtotal + t.giftWrap);
+      $('cartd-sub').textContent = D.rs(t.subtotal - t.discount + t.giftWrap);
+      $('cartd-ref').hidden = !ref;
+      if (ref) $('cartd-ref').innerHTML = `<span class="cartd__refcode">${TAG_SVG}<b>${esc(ref.code)}</b></span><span class="cartd__reft">${ref.pct ? `${ref.pct}% creator discount <b>−${esc(D.rs(t.discount))}</b>` : 'Creator code · checked at checkout'}</span><button type="button" class="cartd__refx" data-ref-rm>Remove</button>`;
       if (!$('cartd-p-seen').hidden) paintSeen();
     }
     // Tabs: the chosen title is solid, the other sits at 20% (500ms); the panels cross-fade
@@ -1831,6 +1885,7 @@
       if (q) { const l = cart.find(x => x.sku === q.dataset.sku); if (l) setQty(l.sku, l.qty + +q.dataset.q); return; }
       const rm = e.target.closest('[data-rm]');
       if (rm) { setQty(rm.dataset.rm, 0); toast('Removed from cart'); return; }
+      if (e.target.closest('[data-ref-rm]')) { clearRef(); toast('Creator code removed', TAG_SVG); return; }
       const sn = e.target.closest('[data-seen]');
       if (sn) { const p = D.byId(sn.dataset.seen); if (!p) return; if ((p.variants || []).length > 1) { close(); setTimeout(() => quickAdd(p.id, sn), 300); } else { add(p.id, 1); showTab('cart'); paint(); } }
     });
@@ -1975,7 +2030,7 @@
   function mountConsent() {
     const LOGO = '<div class="ckc__logo"><img src="img/wu-logo.png" alt="WisdomUp"><img src="img/wu-logo-white.png" alt="" aria-hidden="true"></div>';
     const CATS = [
-      { id: 'essential', name: 'Essential', always: true, desc: 'Your cart, wishlist, orders placed from this device, reviews you wrote, saved checkout details and display choices (day or night, grid view). Kept in this browser only and never shared with advertisers. The shop cannot work without it, so it is always on.' },
+      { id: 'essential', name: 'Essential', always: true, desc: 'Your cart, wishlist, orders placed from this device, reviews you wrote, saved checkout details, display choices (day or night, grid view) and the creator code from a creator’s link (so its discount reaches checkout; kept 30 days, removable in the cart). A creator’s link also adds one to that creator’s visit count — no personal details are sent. Kept in this browser only and never shared with advertisers. The shop cannot work without it, so it is always on.' },
       { id: 'marketing', name: 'Marketing', desc: 'Meta Pixel (Facebook and Instagram). It records page views, searches, add-to-cart and purchases — the product, price and quantity, never your name, phone number or address — so we can measure our ads and show them to people who have visited the shop. It sets Meta cookies in this browser.' },
     ];
     const el = document.createElement('div');
@@ -1988,7 +2043,7 @@
             ${LOGO}
             <h2 class="ckc__h" id="ckc-h1">Your cookie choices on this site</h2>
             <div class="ckc__text">
-              <p>WisdomUp keeps your cart, wishlist, recently viewed products, orders, saved checkout details and your order note in this browser. That storage is <b>essential</b> — the shop needs it to work — so it can’t be switched off.</p>
+              <p>WisdomUp keeps your cart, wishlist, recently viewed products, orders, saved checkout details, your order note and any creator code you arrived with in this browser. That storage is <b>essential</b> — the shop needs it to work — so it can’t be switched off.</p>
               <p>With your permission we also use <b>marketing cookies</b> from Meta to:</p>
               <ul><li>Measure which Facebook and Instagram ads bring visits and orders.</li><li>Show our ads to people who have visited the shop.</li></ul>
               <p>Select ‘Accept all’ to allow marketing cookies, or ‘Essential only’ to keep them off. To decide category by category, select ‘Manage settings’. You can change your choice at any time from ‘Cookie preferences’ at the foot of every page.</p>
@@ -2287,6 +2342,7 @@
     openSearch: () => search && search.open(),
     toggleTheme, setTheme, themeMode, isNight, slide, staggerCards, revealWords, sheetDrag, quickAdd, budget: BUDGET, STAR_OUTLINE,
     consent: { open: n => consentUI && consentUI.open(n), get: consentGet },
+    ref: { get: () => ref, apply: applyRef, clear: clearRef, api: crApi, norm: codeNorm, pctOf, TAG: TAG_SVG, me: () => store.get(ME_KEY, null), setMe: v => { if (v) store.set(ME_KEY, v); else try { localStorage.removeItem(ME_KEY); } catch (e) { /* storage unavailable */ } } },
     seo, abs, clip, ldCrumbs, ldFaq, px, pxItem, YEAR, SITE,
   };
 })();

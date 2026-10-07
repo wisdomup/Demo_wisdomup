@@ -54,8 +54,10 @@
         </div>`).join('');
       $('ck-gift').checked = cart.gift();
       $('ck-gift-p').textContent = rs(SHOP.giftWrap);
+      paintRef();
       $('ck-tot').innerHTML = `
         <div><dt>Subtotal</dt><dd>${esc(rs(t.subtotal))}</dd></div>
+        ${t.discount ? `<div class="ck__disc"><dt>Creator code ${esc(t.ref)} · ${WU.ref.get().pct}% off</dt><dd>−${esc(rs(t.discount))}</dd></div>` : ''}
         <div><dt>Delivery</dt><dd>${t.delivery ? esc(rs(t.delivery)) : 'Free'}</dd></div>
         ${t.giftWrap ? `<div><dt>Gift wrapping</dt><dd>${esc(rs(t.giftWrap))}</dd></div>` : ''}
         <div class="ck__total"><dt>Total</dt><dd>${esc(rs(t.total))}</dd></div>`;
@@ -64,6 +66,38 @@
       $('ck-place-form').textContent = label;
       paintOptions();
     }
+    /* ---------- Creator code (the creators program): the code from a creator's link, or one typed here. Checked with the
+       server before it shows a discount; the order server checks it again. ---------- */
+    let refOpen = false, refErr = '', refBusy = false;
+    function paintRef() {
+      const box = $('ck-ref'), r = WU.ref.get();
+      if (!box || !(SHOP.creators || {}).on) return;
+      if (r) {
+        box.innerHTML = `<div class="ck__refon"><span class="ck__refcode">${WU.ref.TAG}<b>${esc(r.code)}</b></span><span class="ck__reft">${r.pct ? `${esc(r.name || 'Creator')}’s code · <b>${r.pct}% off</b> your items` : 'Creator code · checking…'}</span><button type="button" class="ck__refx" data-ref-x>Remove</button></div>${refErr ? `<p class="ck__referr" role="alert">${esc(refErr)}</p>` : ''}`;
+        return;
+      }
+      box.innerHTML = refOpen
+        ? `<div class="ck__refform"><label class="visually-hidden" for="ck-ref-in">Creator code</label><input id="ck-ref-in" class="ck__refin" placeholder="Creator code, e.g. SARA" autocomplete="off" autocapitalize="characters" maxlength="16" enterkeyhint="done"><button type="button" class="btn-outline ck__refgo" data-ref-go${refBusy ? ' disabled' : ''}>${refBusy ? 'Checking…' : 'Apply'}</button></div>${refErr ? `<p class="ck__referr" role="alert">${esc(refErr)}</p>` : ''}`
+        : `<button type="button" class="ck__refopen" data-ref-open>${WU.ref.TAG}<span>Have a creator code?</span></button>`;
+    }
+    async function useCode(raw) {
+      refBusy = true; refErr = ''; paintRef();
+      try { await WU.ref.apply(raw); refOpen = false; }
+      catch (err) { refErr = err.status === 404 ? 'That creator code is not active.' : err.message; }
+      finally { refBusy = false; paintSummary(); const i = $('ck-ref-in'); if (i && refErr) { i.value = String(raw || ''); i.focus(); } }
+    }
+    $('ck-ref').addEventListener('click', e => {
+      if (e.target.closest('[data-ref-open]')) { refOpen = true; refErr = ''; paintRef(); $('ck-ref-in').focus(); }
+      if (e.target.closest('[data-ref-go]')) useCode($('ck-ref-in').value);
+      if (e.target.closest('[data-ref-x]')) { refErr = ''; refOpen = false; WU.ref.clear(); }
+    });
+    $('ck-ref').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'ck-ref-in') { e.preventDefault(); useCode(e.target.value); } });
+    // A kept code is checked again on arrival (it may have been paused, or saved while the server could not be reached)
+    const kept = WU.ref.get();
+    if (kept) WU.ref.apply(kept.code, { quiet: true }).catch(err => {
+      if (err.status === 404 || err.own) { WU.ref.clear(); refErr = err.own ? err.message : `The creator code ${kept.code} is no longer active, so it was removed.`; refOpen = true; paintSummary(); }
+    });
+
     form.addEventListener('change', e => {
       if (e.target.name === 'delivery') delivery = e.target.value;
       if (e.target.name === 'payment') payment = e.target.value;
@@ -114,7 +148,8 @@
     function orderText() {
       const t = cart.totals(delivery), v = n => (form.elements[n].value || '').trim();
       return [`New order from wisdomup website`, ...cart.lines().map(l => `• ${l.qty} × ${l.v.sku} ${l.p.title}${attrText(l.attrs) ? ' (' + attrText(l.attrs) + ')' : ''} — ${rs(l.total)}`),
-        `Delivery: ${SHOP.delivery[delivery].label} · Payment: ${SHOP.payments[payment].label}${cart.gift() ? ' · Gift wrap' : ''}`, `Total: ${rs(t.total)}`,
+        `Delivery: ${SHOP.delivery[delivery].label} · Payment: ${SHOP.payments[payment].label}${cart.gift() ? ' · Gift wrap' : ''}`,
+        ...(WU.ref.get() ? [`Creator code: ${WU.ref.get().code}${t.discount ? ` (−${rs(t.discount)})` : ' (please check)'}`] : []), `Total: ${rs(t.total)}`,
         `Name: ${v('name')} · Phone: ${v('phone')}`, `Address: ${[v('line'), v('area'), v('city')].filter(Boolean).join(', ')}`].join('\n');
     }
 
@@ -131,6 +166,7 @@
         address: { city: v('city'), area: v('area'), line: v('line'), notes: v('notes') },
         delivery, payment, giftWrap: cart.gift(), website: form.elements.website.value,
         items: cart.lines().map(l => ({ sku: l.sku, qty: l.qty })),
+        ref: WU.ref.get() ? WU.ref.get().code : undefined,
       };
       busy = true; paintSummary();
       document.querySelectorAll('.ck__place').forEach(b => { b.disabled = true; });
@@ -138,7 +174,8 @@
         const res = await fetch('/api/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
         const data = await res.json().catch(() => ({ ok: false }));
         if (!res.ok || !data.ok) {
-          if (data.field) { mark(data.field, data.error); const el = form.elements[data.field]; if (el && el.focus) el.focus(); }
+          if (data.field === 'ref') { refErr = data.error; paintRef(); WU.scrollToEl($('ck-ref')); }
+          else if (data.field) { mark(data.field, data.error); const el = form.elements[data.field]; if (el && el.focus) el.focus(); }
           else showError(data.error || 'We could not place your order online right now.', res.status >= 500 || res.status === 404 || res.status === 405 || !data.error);
           return;
         }
@@ -204,7 +241,7 @@
         </div>
         <section class="ord__card ord__sum"><h2>Order ${esc(o.number)}</h2>
           ${o.items.map(l => { const info = cart.skuInfo(l.sku) || {}; const p = info.p, v = info.v || {}; return `<div class="ckline">${p ? `<span class="ckline__img" style="background: ${photoBg(v.bg ? v : p)};"><img src="${v.thumb || p.thumb}" alt="" style="${photoFit(v.ar ? v : p)}"><b>${l.qty}</b></span>` : ''}<span class="ckline__t">${esc(l.title)}${attrText(l.attrs) ? `<small>${esc(attrText(l.attrs))}</small>` : ''}</span><span class="ckline__p">${esc(rs(l.total))}</span></div>`; }).join('')}
-          <dl class="ck__tot"><div><dt>Subtotal</dt><dd>${esc(rs(o.totals.subtotal))}</dd></div><div><dt>Delivery</dt><dd>${o.totals.delivery ? esc(rs(o.totals.delivery)) : 'Free'}</dd></div>${o.totals.giftWrap ? `<div><dt>Gift wrapping</dt><dd>${esc(rs(o.totals.giftWrap))}</dd></div>` : ''}<div class="ck__total"><dt>Total</dt><dd>${esc(rs(o.totals.total))}</dd></div></dl>
+          <dl class="ck__tot"><div><dt>Subtotal</dt><dd>${esc(rs(o.totals.subtotal))}</dd></div>${o.totals.discount ? `<div class="ck__disc"><dt>Creator code ${esc(o.ref || '')}</dt><dd>−${esc(rs(o.totals.discount))}</dd></div>` : ''}<div><dt>Delivery</dt><dd>${o.totals.delivery ? esc(rs(o.totals.delivery)) : 'Free'}</dd></div>${o.totals.giftWrap ? `<div><dt>Gift wrapping</dt><dd>${esc(rs(o.totals.giftWrap))}</dd></div>` : ''}<div class="ck__total"><dt>Total</dt><dd>${esc(rs(o.totals.total))}</dd></div></dl>
           <div class="ord__actions"><a class="btn-buy" href="track.html?n=${encodeURIComponent(o.number)}&p=${encodeURIComponent(o.customer.phone)}">Track this order</a><a class="btn-outline" href="${url.products}">Continue shopping</a><button type="button" class="btn-outline" onclick="window.print()">Print receipt</button></div>
         </section>
       </div>`;

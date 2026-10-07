@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en-PK">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- SEO:start (written by tools/build_seo.py — edit that file, not this block) -->
+<title>Creator Dashboard | WisdomUp</title>
+<meta name="description" content="Your WisdomUp creator link, visits, orders, commission and payouts.">
+<meta name="robots" content="noindex, follow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- SEO:end -->
+<script>try{var t=localStorage.getItem("wu-theme");if(t==="night"||t==="system"&&matchMedia("(prefers-color-scheme: dark)").matches)document.documentElement.setAttribute("data-theme","night")}catch(e){}</script>
+<link rel="icon" href="favicon.ico" sizes="32x32">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="stylesheet" href="css/ds/tokens/fonts.css">
+<link rel="stylesheet" href="css/ds/tokens/colors.css">
+<link rel="stylesheet" href="css/ds/tokens/typography.css">
+<link rel="stylesheet" href="css/ds/tokens/spacing.css">
+<link rel="stylesheet" href="css/ds/tokens/base.css">
+<link rel="stylesheet" href="css/ds/styles/components.css">
+<link rel="stylesheet" href="css/wu-rail.css">
+<link rel="stylesheet" href="css/home.css">
+<link rel="stylesheet" href="css/pages.css">
+<link rel="stylesheet" href="css/info.css">
+<link rel="stylesheet" href="css/creators.css">
+<link rel="stylesheet" href="css/controls.css">
+<link rel="stylesheet" href="css/night.css">
+<link rel="stylesheet" href="css/motion.css">
+</head>
+<body>
+<div class="page page--info page--crd">
+
+  <div class="wu-util"><nav class="utility" aria-label="Utility" id="utility"></nav></div>
+  <header class="nav site-nav" id="site-nav"></header>
+  <div class="nav-spacer"></div>
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Home</a><span aria-hidden="true">›</span><a href="creators.html">Creators Program</a><span aria-hidden="true">›</span><span aria-current="page">Dashboard</span></nav>
+
+  <main class="crd" id="crd">
+    <form class="crd-login iform" id="crd-login" novalidate hidden>
+      <div class="eyebrow">WisdomUp Creators</div>
+      <h1 class="crd-login__h">Creator dashboard</h1>
+      <p>Sign in with your creator code and the private key you got when you joined. It stays on this device until you sign out.</p>
+      <div class="field"><label for="crd-code">Creator code</label><input id="crd-code" name="code" autocomplete="username" autocapitalize="characters" placeholder="e.g. SARA" maxlength="12" required></div>
+      <div class="field"><label for="crd-key">Private key</label><input id="crd-key" name="key" type="password" autocomplete="current-password" placeholder="The key from your welcome screen" required></div>
+      <p class="crd-err" id="crd-err" role="alert" hidden></p>
+      <button type="submit" class="btn-buy" id="crd-go">Open my dashboard</button>
+      <p class="crd-login__alt">Lost your key? <a href="#" id="crd-lost" target="_blank" rel="noopener">Message us on WhatsApp</a> for a new one. Not a creator yet? <a href="creators.html#join">Join free</a>.</p>
+    </form>
+
+    <div class="crd-main" id="crd-main" hidden>
+      <header class="crd-top">
+        <div class="crd-top__who">
+          <div class="eyebrow">Creator dashboard</div>
+          <h1 class="crd-top__h" id="crd-hi">Hi</h1>
+          <div class="crd-top__tags" id="crd-tags"></div>
+        </div>
+        <div class="crd-top__acts"><button type="button" class="btn-outline" id="crd-refresh">Refresh</button><button type="button" class="btn-outline" id="crd-out">Sign out</button></div>
+      </header>
+      <div class="crd-note" id="crd-status" hidden></div>
+
+      <section class="crd-card crd-link" aria-labelledby="crd-link-h">
+        <h2 id="crd-link-h">Your link</h2>
+        <div class="crd-copyrow"><input class="crd-copyrow__in" id="crd-link" readonly aria-label="Your creator link"><button type="button" class="btn-buy" data-copy="crd-link">Copy link</button><button type="button" class="btn-outline" data-share="crd-link">Share</button></div>
+        <p class="crd-fine" id="crd-code-line"></p>
+      </section>
+
+      <section class="crd-stats" id="crd-stats" aria-label="Your numbers"></section>
+
+      <section class="crd-card crd-month" id="crd-month" aria-labelledby="crd-month-h"></section>
+
+      <section class="crd-card" aria-labelledby="crd-act-h">
+        <div class="crd-card__head"><h2 id="crd-act-h">Last 30 days</h2><span class="crd-fine" id="crd-act-sum"></span></div>
+        <div class="crd-chart" id="crd-chart"></div>
+      </section>
+
+      <div class="crd-two">
+        <section class="crd-card" aria-labelledby="crd-build-h">
+          <h2 id="crd-build-h">Link to any product</h2>
+          <p class="crd-fine">Search the shop, then copy a link that opens that product with your code.</p>
+          <label class="crd-search"><span class="visually-hidden">Search products</span><input type="search" id="crd-q" placeholder="Search earbuds, chargers, TS-11…" autocomplete="off"></label>
+          <div class="crd-results" id="crd-results"></div>
+        </section>
+        <section class="crd-card" aria-labelledby="crd-cap-h">
+          <h2 id="crd-cap-h">Ready-made captions</h2>
+          <p class="crd-fine">Copy one, then add #ad or #affiliate so your followers know you earn commission.</p>
+          <div class="crd-caps" id="crd-caps"></div>
+        </section>
+      </div>
+
+      <section class="crd-card" aria-labelledby="crd-ord-h">
+        <div class="crd-card__head"><h2 id="crd-ord-h">Orders from your link</h2><span class="crd-fine">No customer details are shown.</span></div>
+        <div class="crd-table" id="crd-orders"></div>
+      </section>
+
+      <div class="crd-two">
+        <section class="crd-card" aria-labelledby="crd-pay-h">
+          <h2 id="crd-pay-h">Payout details</h2>
+          <form id="crd-payform" novalidate>
+            <div class="bk-chips" id="crd-method" role="group" aria-label="Payout method"></div>
+            <div class="bk-fields">
+              <div class="field"><label for="crd-ptitle">Account title</label><input id="crd-ptitle" name="title" maxlength="80" autocomplete="off"></div>
+              <div class="field"><label for="crd-pnum" id="crd-pnum-l">Account number</label><input id="crd-pnum" name="number" maxlength="40" autocomplete="off"></div>
+            </div>
+            <p class="crd-err" id="crd-pay-err" role="alert" hidden></p>
+            <button type="submit" class="btn-outline">Save payout details</button>
+          </form>
+        </section>
+        <section class="crd-card" aria-labelledby="crd-paid-h">
+          <h2 id="crd-paid-h">Payouts</h2>
+          <div id="crd-payouts"></div>
+          <h2 class="crd-sub">Your best sellers</h2>
+          <div id="crd-top"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <div class="footer-wrap" id="footer"></div>
+  <div class="toast" id="toast" role="status" hidden></div>
+</div>
+
+<script src="js/catalog.js"></script>
+<script src="js/shop.js"></script>
+<script src="js/wu-data.js"></script>
+<script src="js/ds-icons.js"></script>
+<script src="js/common.js"></script>
+<script src="js/info.js"></script>
+<script src="js/creators.js"></script>
+</body>
+</html>

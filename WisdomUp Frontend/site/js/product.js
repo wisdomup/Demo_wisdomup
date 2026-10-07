@@ -142,6 +142,7 @@
           <button type="button" class="pdp2__add" data-add${p.soldOut ? ' disabled' : ''}>${icon('cart', 20)}<span>${p.soldOut ? 'Sold out' : 'Add to cart'}</span></button>
           ${WU.wishBtn(p, 'pdp2__wish')}
         </div>
+        ${WU.ref && WU.ref.me() && (WU.SHOP.creators || {}).on ? `<div class="pd-crlink"><span>${WU.ref.TAG}Creator <b>${esc(WU.ref.me().code)}</b> · your link to this product</span><button type="button" class="btn-outline" data-crlink>Copy link</button></div>` : ''}
         <label class="gift" style="cursor: pointer;"><input type="checkbox" id="gift" style="accent-color: var(--focus); width: 18px; height: 18px;"><span>Add gift wrapping @ <b>${esc(WU.D.rs(WU.SHOP.giftWrap))}</b></span></label>
         <div class="offer"><div class="offer__head">Free shipping on this order<span>%</span></div><div class="offer__body"><span id="offer-text"></span><a href="${url.shipping}" style="white-space: nowrap; margin-left: 12px;">Details ›</a></div></div>
         <div class="assure">
@@ -275,6 +276,13 @@
     // Add to cart (the ONE main action since 2026-10-06 — "Buy Now" was removed): the chosen option and quantity go in and the
     // cart panel opens, with its Checkout button
     if (e.target.closest('[data-add]') && !p.soldOut) add(p.id, qty, V[cur].sku, { open: true });
+    // Creators signed in on this device: copy this product (and the chosen option) with their code
+    if (e.target.closest('[data-crlink]')) {
+      const u = new URL(url.product(p.id), location.href);
+      if (p.variants.length) u.searchParams.set('sku', V[cur].sku);
+      u.searchParams.set('ref', WU.ref.me().code);
+      (navigator.clipboard ? navigator.clipboard.writeText(u.href) : Promise.reject()).then(() => toast('Your creator link to this product is copied', WU.ref.TAG), () => window.prompt('Copy your link', u.href));
+    }
   });
   $('gift').checked = WU.cart.gift();
   $('gift').addEventListener('change', e => { WU.cart.setGift(e.target.checked); toast(e.target.checked ? `Gift wrapping added (${WU.D.rs(WU.SHOP.giftWrap)})` : 'Gift wrapping removed'); });

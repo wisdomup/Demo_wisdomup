@@ -156,7 +156,7 @@
       const cancelled = o.status === 'cancelled';
       res.innerHTML = `<div class="track__head"><b>${esc(o.number)}</b><span class="badge-soft${cancelled ? ' badge-soft--bad' : ''}">${cancelled ? 'Cancelled' : esc((STEPS.find(([k]) => k === o.status) || [, o.status])[1])}</span></div>
         ${cancelled ? '<p style="margin: 0; font: 400 15px/1.6 var(--font); color: #3D4656;">This order was cancelled. If you didn\'t ask for this, please contact support.</p>' : `<ol class="timeline">${steps.map(([k, t], i) => `<li class="${i < at ? 'is-done' : i === at ? 'is-now' : ''}"><i aria-hidden="true"></i><div><b>${t}</b><span>${reached[k] ? when(reached[k]) : i === steps.length - 1 ? 'Expected in ' + esc((shop.delivery[o.delivery] || {}).eta || '3–5 working days') : 'Waiting'}</span></div></li>`).join('')}</ol>`}
-        <div class="kv"><b>Items</b><span>${o.items.map(l => `${esc(l.title)}${Object.keys(l.attrs || {}).length ? ' (' + esc(Object.values(l.attrs).join(', ')) + ')' : ''} × ${l.qty}`).join('<br>')}</span><b>Ship to</b><span>${esc(o.city)}</span><b>Total</b><span>${esc(WU.D.rs(o.totals.total))} · ${esc((shop.payments[o.payment] || {}).label || o.payment)}</span></div>`;
+        <div class="kv"><b>Items</b><span>${o.items.map(l => `${esc(l.title)}${Object.keys(l.attrs || {}).length ? ' (' + esc(Object.values(l.attrs).join(', ')) + ')' : ''} × ${l.qty}`).join('<br>')}</span><b>Ship to</b><span>${esc(o.city)}</span>${o.totals.discount ? `<b>Creator code</b><span>${esc(o.ref || '')} · −${esc(WU.D.rs(o.totals.discount))}</span>` : ''}<b>Total</b><span>${esc(WU.D.rs(o.totals.total))} · ${esc((shop.payments[o.payment] || {}).label || o.payment)}</span></div>`;
     }
     tf.addEventListener('submit', async e => {
       e.preventDefault();

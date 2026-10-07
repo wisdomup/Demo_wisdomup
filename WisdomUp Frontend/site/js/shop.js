@@ -22,6 +22,24 @@ window.WU_SHOP = {
       { "types": ["speakers", "charging-cables", "wall-chargers"], "pct": 10 }
     ]
   },
+  "creators": {
+    "on": true,
+    "demo": true,
+    "note": "DEMO creator (affiliate) program (2026-10-08) — confirm the numbers before launch. A creator's link (?ref=CODE on any page) or code typed at checkout gives the buyer discountPct off the items (after the sale; delivery and gift wrap excluded). The creator earns the tier's pct of that discounted item value on every DELIVERED order once returnDays have passed since delivery; the tier is set by the creator's sales (all orders not cancelled) in the calendar month the order was placed and applies to every order of that month. A link counts for linkDays (the last creator link clicked wins). Payouts monthly once the balance reaches minPayout. autoApprove true = new creators get a working code at once (admin can pause anyone); false = codes start as pending until approved in admin.",
+    "discountPct": 5,
+    "linkDays": 30,
+    "returnDays": 7,
+    "minPayout": 1000,
+    "autoApprove": true,
+    "tiers": [
+      { "name": "Starter", "from": 0, "pct": 8 },
+      { "name": "Pro", "from": 50000, "pct": 10 },
+      { "name": "Elite", "from": 150000, "pct": 12 }
+    ],
+    "platforms": ["Instagram", "TikTok", "YouTube", "Facebook", "Other"],
+    "audiences": ["Under 10K", "10K–50K", "50K–250K", "250K+"],
+    "payouts": ["jazzcash", "easypaisa", "bank"]
+  },
   "giftWrap": 490,
   "maxQty": 10,
   "payments": {
