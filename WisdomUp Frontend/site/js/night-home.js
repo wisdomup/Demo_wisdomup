@@ -32,6 +32,27 @@
     </article>`;
   const grid = (items, id) => `<div class="nh-grid"${id ? ` id="${id}"` : ''}>${items.map(tile).join('')}</div>`;
 
+  /* ---------- Live card (redesigned 2026-10-07, "this part looks ugly … make it beautiful"): a stage-lit black panel — badge +
+     schedule, the title and the Live page's own line, a countdown to the next show (Friday 8 PM PKT, worked out in Pakistan
+     time whatever the visitor's clock says) and a sound-wave strip that moves (still for reduced motion). Facts from live.html. ---------- */
+  const PKT = 5 * 36e5;
+  const nextShow = () => {
+    const now = Date.now(), p = new Date(now + PKT); // p's UTC fields = the time in Pakistan
+    let t = Date.UTC(p.getUTCFullYear(), p.getUTCMonth(), p.getUTCDate(), 20) - PKT + ((5 - p.getUTCDay() + 7) % 7) * 864e5;
+    if (t <= now) t += 7 * 864e5;
+    return t - now;
+  };
+  const liveCells = () => {
+    const ms = nextShow(), pad = n => String(n).padStart(2, '0');
+    return [[Math.floor(ms / 864e5), 'Days'], [Math.floor(ms / 36e5) % 24, 'Hours'], [Math.floor(ms / 6e4) % 60, 'Min'], [Math.floor(ms / 1e3) % 60, 'Sec']]
+      .map(([v, l]) => `<span class="nh-live__cell"><b>${pad(v)}</b><small>${l}</small></span>`).join('');
+  };
+  // 56 bars under a soft arch; each one breathes at its own pace (fixed numbers, so every visit looks the same)
+  const EQ = Array.from({ length: 56 }, (_, i) => {
+    const h = Math.round(22 + 70 * Math.sin(Math.PI * (i + .5) / 56) * (.55 + .45 * Math.abs(Math.sin(i * 1.7))));
+    return `<i style="height: ${h}%; --dur: ${(0.9 + ((i * 37) % 9) / 10).toFixed(1)}s; --del: -${(((i * 53) % 17) / 10).toFixed(1)}s;"></i>`;
+  }).join('');
+
   /* ---------- data ---------- */
   const fresh = variety(D.products.filter(p => p.tabs.includes('new')));
   const best = D.products.filter(p => p.tabs.includes('best'));
@@ -88,12 +109,21 @@
       </section>
       <section aria-label="Shop by department">
         <div class="nh-promo">
-          <a class="nh-live" href="${url.live}">
-            <span class="nh-tag nh-live__tag">Live shopping</span>
-            <h2 class="nh-live__h">WisdomUp Live</h2>
-            <p class="nh-live__p">Watch products demoed live and add them to your cart mid-stream at live-only prices.</p>
-            <div class="nh-live__row"><span class="nh-btn nh-btn--primary">Watch the show</span><span class="nh-live__when">Fridays · 8 PM PKT</span></div>
-          </a>
+          <div class="nh-live" role="group" aria-labelledby="nh-live-h">
+            <div class="nh-live__eq" aria-hidden="true">${EQ}</div>
+            <div class="nh-live__top"><span class="nh-live__badge"><i></i>Live shopping</span><span class="nh-live__when">Every Friday · 8 PM PKT</span></div>
+            <div class="nh-live__body">
+              <div class="nh-live__copy">
+                <h2 class="nh-live__h" id="nh-live-h">WisdomUp Live</h2>
+                <p class="nh-live__p">Watch it demoed. Add it to cart mid-stream — live-only prices on whatever the host is holding.</p>
+              </div>
+              <div class="nh-live__clock">
+                <span class="nh-live__k" id="nh-live-k">Next show in</span>
+                <div class="nh-live__cells" id="nh-live-cd" role="timer" aria-labelledby="nh-live-k">${liveCells()}</div>
+              </div>
+              <div class="nh-live__row"><a class="nh-btn nh-btn--primary" href="${url.live}">Watch the show</a><a class="nh-btn nh-btn--ghost nh-btn--lg" href="${url.filter('new')}">Shop new arrivals</a></div>
+            </div>
+          </div>
           <div class="nh-feats">${DEPTS.map(d => { const { ps, rep, name } = deptInfo(d); if (!ps.length) return ''; const min = Math.min(...ps.map(p => p.price)); return `
             <a class="nh-feat" href="${url.dept(d.id)}">
               <span class="nh-feat__ic" style="background: ${rep ? photoBg(rep) : ''};">${rep ? img(rep) : ''}</span>
@@ -157,6 +187,7 @@
     </div>`;
     if (D.faqs && D.faqs.length) mountAccordion($('nh-faq'), D.faqs, { idPrefix: 'nhfaq' });
     mountFan($('nh-fan'));
+    setInterval(() => { const el = $('nh-live-cd'); if (el && !host.hidden) el.innerHTML = liveCells(); }, 1000);
     paintWish();
     host.addEventListener('click', e => {
       const addBtn = e.target.closest('[data-nh-add]');
