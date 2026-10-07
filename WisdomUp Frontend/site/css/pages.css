@@ -49,6 +49,12 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
 .visually-hidden { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .nav-spacer { height: 96px; }
 @media (max-width: 639px) { .nav-spacer { height: 67px; } }
+/* 640–767px: the utility row is hidden (design system) but the nav still sits at 64px, so the spacer alone must clear its 120px
+   bottom — content used to start 24px UNDER the nav here (2026-10-07) */
+@media (min-width: 640px) and (max-width: 767px) { .nav-spacer { height: 120px; } }
+/* Breadcrumb at the top of a page without a banner (product, checkout, track, article, order, bulk/corporate): 16px clear of the
+   nav, like the 16px under a banner — it used to touch the nav's bottom edge on PC (2026-10-07) */
+@media (min-width: 640px) { .nav-spacer + .crumbs, .nav-spacer + main > .crumbs:first-child { margin-top: 16px; } }
 .crumbs { margin: 0 var(--gutter, 28px); display: flex; flex-wrap: wrap; gap: 8px; font: 500 14px/1.4 var(--font); color: var(--muted); }
 /* Pages with a banner: the trail sits under it with a fine gap (requested 2026-10-06) */
 .ihero + .crumbs { margin-top: 16px; }
@@ -137,7 +143,7 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
 .pays span { padding: 7px 11px; border-radius: 999px; background: #F3F3F3; font: 700 12px/1 var(--font); color: #464646; letter-spacing: .02em; }
 .pdtabs { position: sticky; top: 16px; z-index: 6; display: flex; justify-content: center; margin-top: var(--sec); transition: top 320ms cubic-bezier(.2,.7,.2,1); pointer-events: none; }
 .pdtabs.is-up { top: 16px; }
-.pdtabs__in { pointer-events: auto; display: flex; gap: 6px; padding: 6px; border-radius: 999px; background: rgba(208,212,212,.62); backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%); box-shadow: 0 10px 24px rgba(0,0,0,.08); max-width: calc(100vw - 32px); overflow-x: auto; scrollbar-width: none; }
+.pdtabs__in { position: relative; pointer-events: auto; display: flex; gap: 6px; padding: 6px; border-radius: 999px; background: rgba(208,212,212,.62); backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%); box-shadow: 0 10px 24px rgba(0,0,0,.08); max-width: calc(100vw - 32px); overflow-x: auto; scrollbar-width: none; }
 .pdtabs .chip { flex: none; height: 40px; border: 0; cursor: pointer; text-decoration: none; color: var(--ink); }
 .pdtabs .chip:hover { color: var(--ink); }
 .pdtabs .chip[aria-current="true"] { background: #fff; box-shadow: var(--shadow-soft); }

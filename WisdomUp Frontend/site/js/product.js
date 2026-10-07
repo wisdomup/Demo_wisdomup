@@ -12,6 +12,8 @@
     return;
   }
   WU.initChrome({ active: p.type });
+  // "Recently viewed" in the cart drawer (2026-10-07): the products opened on this device, newest first, at most 12
+  WU.store.set('wu-seen', [p.id].concat((WU.store.get('wu-seen', []) || []).filter(x => x !== p.id)).slice(0, 12));
 
   /* ---------- Content (per department) ---------- */
   const dept = DEPTS.find(d => d.types.includes(p.type)) || DEPTS[0];
@@ -368,5 +370,8 @@
   }
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('wu-nav', e => $('pdtabs').classList.toggle('is-up', e.detail.hidden));
+  // the section tabs carry the nav's rainbow edge light — the same glow and motion, nothing else of the nav's skin (2026-10-07)
+  WU.edge($('pdtabs').querySelector('.pdtabs__in'), () => true);
+  WU.edge($('buybar'), () => $('buybar').classList.contains('is-on')); // the floating buy bar too, while it is showing
   onScroll();
 })();

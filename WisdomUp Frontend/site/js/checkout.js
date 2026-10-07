@@ -75,6 +75,9 @@
     // Returning customers: contact and address are remembered on this device only
     const saved = store.get(CONTACT, null);
     if (saved) ['name', 'phone', 'email', 'city', 'area', 'line'].forEach(k => { if (saved[k] && form.elements[k]) form.elements[k].value = saved[k]; });
+    // the order note written in the cart drawer (wu-cart-note) fills the delivery notes, unless something is already typed
+    const cartNote = store.get('wu-cart-note', '');
+    if (cartNote && form.elements.notes && !form.elements.notes.value) form.elements.notes.value = cartNote;
 
     /* ---------- Validation (mirrors the server) ---------- */
     const RULES = {
@@ -142,6 +145,7 @@
         // Keep a copy on this device (with the address) for the confirmation page and "verified buyer" reviews
         store.set(ORDERS, [{ ...data.order, customer: body.customer, address: body.address }].concat(store.get(ORDERS, [])).slice(0, 20));
         store.set(CONTACT, { ...body.customer, ...body.address, notes: '' });
+        store.set('wu-cart-note', ''); // the note went with this order
         cart.clear();
         location.href = 'order.html?n=' + encodeURIComponent(data.order.number);
       } catch (err) {

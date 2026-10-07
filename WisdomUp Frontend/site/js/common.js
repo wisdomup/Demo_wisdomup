@@ -96,6 +96,7 @@
     if (!t) return;
     t.innerHTML = (svg || icon('bag', 18)) + '<span>' + esc(msg) + '</span>';
     t.hidden = false;
+    addEdge(t, () => !t.hidden); // floating capsules carry the nav's edge light (2026-10-07); re-added because the content was replaced
     clearTimeout(toastT);
     toastT = setTimeout(() => { t.hidden = true; }, 2400);
   }
@@ -1670,53 +1671,141 @@
   }
 
   /* ---------- Cart panel: slides in from the right (the menu owns the left) ---------- */
+  // CART DRAWER (rebuilt 2026-10-07 from bugatti.store's cart drawer — "copy the cart animation and the elements"; their Concept
+  // theme measured at 1280 and rebuilt in our code, both themes): a 576px panel (34px inner corners; a bottom sheet on phones) with
+  // TWO TABS in the header — "Cart" + its count and "Recently viewed" (20% until chosen, 500ms) — and a round ×; the cart tab =
+  // free-delivery line + bar, then the items (96px photo, title, options, price · stepper and "Remove" on the right); its foot = a
+  // row of three text tools split by hairlines (Order note · Delivery · Gift wrap — each opens a SHEET that rises from the drawer's
+  // foot in 600ms (.7,0,.2,1) over a soft veil) and a tinted band with the tax line, Subtotal and two 7/5 buttons (Check out ·
+  // Continue shopping). Facts only: we have no discount codes, so bugatti's "Discount" became our real gift-wrap option; the note
+  // pre-fills checkout's delivery notes; "Recently viewed" = products opened on this device (product.js, `wu-seen`).
+  const PEN = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9a2.1 2.1 0 0 0-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>';
+  const GIFT = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="8.5" width="17" height="4" rx="1"/><path d="M5 12.5V20h14v-7.5M12 8.5V20M12 8.5c-1.6-3.6-6-3.8-6-1.2 0 1.4 2.2 1.2 6 1.2zm0 0c1.6-3.6 6-3.8 6-1.2 0 1.4-2.2 1.2-6 1.2z"/></svg>';
+  const CLOSE_X = '<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/></svg>';
+  const NOTE_KEY = 'wu-cart-note', SEEN_KEY = 'wu-seen';
   function mountCart() {
     const el = document.createElement('div');
+    const sheet = (id, title, body) => `
+      <div class="cartd__sheet" id="cartd-s-${id}" hidden>
+        <div class="cartd__veil" data-sheet-x></div>
+        <div class="cartd__sheetbox" role="dialog" aria-modal="true" aria-labelledby="cartd-s-${id}-h">
+          <div class="cartd__sheethead"><span id="cartd-s-${id}-h">${title}</span><button type="button" class="cartd__sx mnav__x" data-sheet-x aria-label="Close">${CLOSE_X}</button></div>
+          <div class="cartd__sheetbody">${body}</div>
+        </div>
+      </div>`;
+    const dl = SHOP.delivery || {};
+    const shipFacts = Object.values(dl).map(o => `<li><b>${esc(o.label)}</b><span>${esc(o.eta)}</span><em>${o.fee ? esc(D.rs(o.fee)) : 'Free'}${o.freeOver ? ` · free over ${esc(D.rs(SHOP.freeDeliveryFrom))}` : ''}</em></li>`).join('');
     el.innerHTML = `
       <div class="cartd-scrim" hidden></div>
-      <aside class="cartd" id="cartd" role="dialog" aria-modal="true" aria-labelledby="cartd-h" hidden>
+      <aside class="cartd cartd--b" id="cartd" role="dialog" aria-modal="true" aria-label="Cart" hidden>
         <header class="cartd__head">
-          <h2 id="cartd-h">Your cart <span id="cartd-n"></span></h2>
-          <button type="button" class="cartd__x mnav__x" aria-label="Close cart"><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/></svg></button>
+          <div class="cartd__tabs" role="tablist" aria-label="Cart">
+            <button type="button" class="cartd__tab" role="tab" id="cartd-t-cart" aria-controls="cartd-p-cart" aria-selected="true"><span class="cartd__title">Cart</span><span class="cartd__count" id="cartd-n" hidden></span></button>
+            <button type="button" class="cartd__tab" role="tab" id="cartd-t-seen" aria-controls="cartd-p-seen" aria-selected="false" tabindex="-1"><span class="cartd__title">Recently viewed</span></button>
+          </div>
+          <button type="button" class="cartd__x mnav__x" aria-label="Close cart">${CLOSE_X}</button>
         </header>
-        <div class="cartd__ship" id="cartd-ship"></div>
-        <div class="cartd__body" id="cartd-body"></div>
-        <footer class="cartd__foot" id="cartd-foot">
-          <label class="cartd__gift"><input type="checkbox" id="cartd-gift"><span>Add gift wrapping</span><b>${esc(D.rs(SHOP.giftWrap))}</b></label>
-          <div class="cartd__row"><span>Subtotal</span><b id="cartd-sub"></b></div>
-          <p class="cartd__note">Delivery and payment are chosen at checkout · Cash on Delivery available</p>
-          <a class="btn-buy cartd__go" href="checkout.html" id="cartd-go">Checkout</a>
-        </footer>
+        <div class="cartd__panel" id="cartd-p-cart" role="tabpanel" aria-labelledby="cartd-t-cart">
+          <div class="cartd__scroll" id="cartd-scroll">
+            <div class="cartd__ship" id="cartd-ship"></div>
+            <div class="cartd__body" id="cartd-body"></div>
+          </div>
+          <footer class="cartd__foot" id="cartd-foot">
+            <div class="cartd__tools">
+              <button type="button" data-sheet="note" aria-controls="cartd-s-note">${PEN}<span>Order note</span></button>
+              <button type="button" data-sheet="ship" aria-controls="cartd-s-ship">${icon('truck', 18)}<span>Delivery</span></button>
+              <button type="button" data-sheet="gift" aria-controls="cartd-s-gift">${GIFT}<span>Gift wrap</span></button>
+            </div>
+            <div class="cartd__sum">
+              <div class="cartd__sumrow">
+                <p class="cartd__taxnote">Prices include taxes. <a href="shipping.html">Delivery</a> is chosen at checkout.</p>
+                <div class="cartd__totals"><span>Subtotal</span><b id="cartd-sub"></b></div>
+              </div>
+              <div class="cartd__btns"><a class="btn-buy cartd__go" href="checkout.html" id="cartd-go">${icon('cart', 18)}<span>Check out</span></a><button type="button" class="btn-outline cartd__more" data-cart-close>Continue shopping</button></div>
+            </div>
+          </footer>
+          ${sheet('note', 'Order note', `<label class="cartd__lbl" for="cartd-note-t">Delivery notes for the rider — a landmark, the best time to call…</label><textarea id="cartd-note-t" class="cartd__ta" rows="3" maxlength="300"></textarea><div><button type="button" class="btn-pill" id="cartd-note-save">Save note</button></div>`)}
+          ${sheet('ship', 'Delivery', `<ul class="cartd__facts">${shipFacts}</ul><p class="cartd__fine">Cash on Delivery, JazzCash, EasyPaisa or bank transfer — you choose at checkout.</p>`)}
+          ${sheet('gift', 'Gift wrap', `<label class="cartd__gift"><input type="checkbox" id="cartd-gift"><span>Add gift wrapping</span><b>${esc(D.rs(SHOP.giftWrap))}</b></label>`)}
+        </div>
+        <div class="cartd__panel" id="cartd-p-seen" role="tabpanel" aria-labelledby="cartd-t-seen" hidden>
+          <div class="cartd__scroll" id="cartd-seen"></div>
+        </div>
       </aside>`;
     document.body.append(...el.children);
     const drawer = $('cartd'), scrim = drawer.previousElementSibling;
-    let opener = null;
+    let opener = null, sheetOpen = null, sheetT = 0;
     const qtyBtns = l => `<div class="qty qty--s" role="group" aria-label="Quantity for ${esc(l.p.code)}"><button type="button" data-q="-1" data-sku="${esc(l.sku)}" aria-label="Decrease">−</button><output>${l.qty}</output><button type="button" data-q="1" data-sku="${esc(l.sku)}" aria-label="Increase"${l.qty >= SHOP.maxQty ? ' disabled' : ''}>+</button></div>`;
+    const media = (p, v, href) => `<a class="cline__img" href="${href}" tabindex="-1" aria-hidden="true" style="background: ${photoBg(v && v.bg ? v : p)};"><img src="${(v && v.thumb) || p.thumb}" alt="" style="${photoFit(v && v.ar ? v : p)}"></a>`;
+    const EMPTY_LINKS = [['All products', url.products], ['New arrivals', url.filter('new')], ['Best sellers', url.filter('best')], ['Under Rs.1,000', url.products + '?price=u1']];
+    function paintSeen() {
+      const ids = (store.get(SEEN_KEY, []) || []).filter(id => D.byId(id));
+      $('cartd-seen').innerHTML = ids.length ? `<div class="cartd__body">${ids.map(id => { const p = D.byId(id); const multi = (p.variants || []).length > 1; return `
+        <div class="cline">
+          ${media(p, null, url.product(p.id))}
+          <div class="cline__info"><a class="cline__t" href="${url.product(p.id)}">${esc(p.title)}</a><span class="cline__p">${esc(p.priceText)}${p.wasText ? ` <s>${esc(p.wasText)}</s>` : ''}</span></div>
+          <div class="cline__side"><button type="button" class="btn-outline cline__add" data-seen="${esc(p.id)}"${p.soldOut ? ' disabled' : ''}>${p.soldOut ? 'Sold out' : multi ? 'Choose' : 'Add'}</button></div>
+        </div>`; }).join('')}</div>`
+        : `<div class="cartd__empty"><b>Nothing here yet.</b><p>Products you open on this device show up here, so you can find them again.</p><ul class="cartd__links"><li><a href="${url.products}"><span>Browse all products</span>${icon('arrow', 16)}</a></li></ul></div>`;
+    }
     function paint() {
       const lines = cartLines(), t = cartTotals('standard'), n = cartCount();
-      $('cartd-n').textContent = n ? `(${n})` : '';
+      $('cartd-n').textContent = n; $('cartd-n').hidden = !n;
+      $('cartd-t-cart').setAttribute('aria-label', `Cart, ${n} ${n === 1 ? 'item' : 'items'}`);
       const left = SHOP.freeDeliveryFrom - t.subtotal;
       $('cartd-ship').innerHTML = !lines.length ? '' : left > 0
-        ? `<p>Add <b>${esc(D.rs(left))}</b> more for free standard delivery</p><i style="--pct: ${Math.min(100, Math.round(t.subtotal / SHOP.freeDeliveryFrom * 100))}%;"></i>`
-        : '<p><b>Free standard delivery</b> unlocked</p><i style="--pct: 100%;"></i>';
-      $('cartd-body').innerHTML = lines.length ? lines.map(l => `
+        ? `<p>Spend <b>${esc(D.rs(left))}</b> more for free standard delivery</p><i style="--pct: ${Math.min(100, Math.round(t.subtotal / SHOP.freeDeliveryFrom * 100))}%;"></i>`
+        : '<p>You get <b>free standard delivery</b>.</p><i style="--pct: 100%;"></i>';
+      $('cartd-body').innerHTML = lines.length ? lines.map(l => { const href = url.product(l.p.id) + (l.p.variants.length ? '&sku=' + encodeURIComponent(l.sku) : ''); return `
         <div class="cline">
-          <a class="cline__img" href="${url.product(l.p.id)}${l.p.variants.length ? '&sku=' + encodeURIComponent(l.sku) : ''}" style="background: ${photoBg(l.v.bg ? l.v : l.p)};"><img src="${l.v.thumb || l.p.thumb}" alt="" style="${photoFit(l.v.ar ? l.v : l.p)}"></a>
+          ${media(l.p, l.v, href)}
           <div class="cline__info">
-            <a class="cline__t" href="${url.product(l.p.id)}">${esc(l.p.title)}</a>
+            <a class="cline__t" href="${href}">${esc(l.p.title)}</a>
             ${Object.keys(l.attrs).length ? `<span class="cline__a">${esc(Object.values(l.attrs).join(' · '))}</span>` : ''}
             <span class="cline__p">${esc(D.rs(l.price))}${l.qty > 1 ? ` <small>× ${l.qty} = ${esc(D.rs(l.total))}</small>` : ''}</span>
-            <div class="cline__row">${qtyBtns(l)}<button type="button" class="cline__rm" data-rm="${esc(l.sku)}">Remove</button></div>
           </div>
-        </div>`).join('')
-        : `<div class="cartd__empty">${icon('bag', 28)}<b>Your cart is empty</b><p>Earbuds, chargers, cables and more — delivered across Pakistan.</p><a class="btn-pill" href="${url.products}">Shop all products</a></div>`;
+          <div class="cline__side">${qtyBtns(l)}<button type="button" class="cline__rm" data-rm="${esc(l.sku)}">Remove</button></div>
+        </div>`; }).join('')
+        : `<div class="cartd__empty"><b>Your cart is currently empty.</b><p>Not sure where to start?<br>Try these:</p><ul class="cartd__links">${EMPTY_LINKS.map(([l, h]) => `<li><a href="${h}"><span>${esc(l)}</span>${icon('arrow', 16)}</a></li>`).join('')}</ul></div>`;
+      $('cartd-scroll').classList.toggle('is-empty', !lines.length);
       $('cartd-foot').hidden = !lines.length;
       $('cartd-gift').checked = giftWrap;
       $('cartd-sub').textContent = D.rs(t.subtotal + t.giftWrap);
-      $('cartd-go').textContent = `Checkout · ${D.rs(t.subtotal + t.giftWrap)}`;
+      if (!$('cartd-p-seen').hidden) paintSeen();
+    }
+    // Tabs: the chosen title is solid, the other sits at 20% (500ms); the panels cross-fade
+    function showTab(which, focus) {
+      [['cart', 'cartd-t-cart', 'cartd-p-cart'], ['seen', 'cartd-t-seen', 'cartd-p-seen']].forEach(([k, t, pnl]) => {
+        const on = k === which;
+        $(t).setAttribute('aria-selected', on); $(t).tabIndex = on ? 0 : -1;
+        const panel = $(pnl);
+        if (on && panel.hidden) { panel.hidden = false; if (!reduced() && panel.animate) panel.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 500, easing: 'cubic-bezier(.3,1,.3,1)' }); }
+        else if (!on) panel.hidden = true;
+      });
+      if (which === 'seen') paintSeen();
+      if (focus) $(which === 'seen' ? 'cartd-t-seen' : 'cartd-t-cart').focus();
+    }
+    // Sheets inside the drawer (note / delivery / gift wrap): rise from the foot, 600ms; × , the veil or Escape folds them back
+    function openSheet(id) {
+      clearTimeout(sheetT);
+      if (sheetOpen) closeSheet(true);
+      const sh = $('cartd-s-' + id); sheetOpen = sh;
+      if (id === 'note') $('cartd-note-t').value = store.get(NOTE_KEY, '') || '';
+      sh.hidden = false;
+      requestAnimationFrame(() => requestAnimationFrame(() => sh.classList.add('is-open')));
+      drawer.querySelectorAll('[data-sheet]').forEach(b => b.setAttribute('aria-expanded', b.dataset.sheet === id));
+      setTimeout(() => (sh.querySelector('textarea, input') || sh.querySelector('.cartd__sx')).focus({ preventScroll: true }), 80);
+    }
+    function closeSheet(instant) {
+      const sh = sheetOpen; if (!sh) return;
+      sheetOpen = null; sh.classList.remove('is-open');
+      drawer.querySelectorAll('[data-sheet]').forEach(b => b.setAttribute('aria-expanded', 'false'));
+      if (instant || reduced()) sh.hidden = true; else sheetT = setTimeout(() => { sh.hidden = true; }, 620);
+      const btn = drawer.querySelector(`[data-sheet="${sh.id.replace('cartd-s-', '')}"]`); if (btn && !instant) btn.focus({ preventScroll: true });
     }
     function open(btn) {
       opener = btn || document.activeElement;
+      showTab('cart');
       paint();
       drawer.hidden = scrim.hidden = false;
       document.documentElement.style.overflow = 'hidden';
@@ -1724,25 +1813,37 @@
       setTimeout(() => drawer.querySelector('.cartd__x').focus(), 60);
     }
     function close() {
+      closeSheet(true);
       drawer.classList.remove('is-open'); scrim.classList.remove('is-open');
       document.documentElement.style.overflow = '';
       const done = () => { drawer.hidden = scrim.hidden = true; if (opener && opener.isConnected) opener.focus(); };
       if (reduced()) done(); else setTimeout(done, 850);
     }
     drawer.addEventListener('click', e => {
-      if (e.target.closest('.cartd__x')) return close();
+      if (e.target.closest('.cartd__x, [data-cart-close]')) return close();
+      if (e.target.closest('[data-sheet-x]')) return closeSheet();
+      const sb = e.target.closest('[data-sheet]'); if (sb) return openSheet(sb.dataset.sheet);
+      const tab = e.target.closest('.cartd__tab'); if (tab) return showTab(tab.id === 'cartd-t-seen' ? 'seen' : 'cart');
+      if (e.target.closest('#cartd-note-save')) { store.set(NOTE_KEY, $('cartd-note-t').value.trim().slice(0, 300)); closeSheet(); toast('Note saved for checkout'); return; }
       const q = e.target.closest('[data-q]');
       if (q) { const l = cart.find(x => x.sku === q.dataset.sku); if (l) setQty(l.sku, l.qty + +q.dataset.q); return; }
       const rm = e.target.closest('[data-rm]');
-      if (rm) { setQty(rm.dataset.rm, 0); toast('Removed from cart'); }
+      if (rm) { setQty(rm.dataset.rm, 0); toast('Removed from cart'); return; }
+      const sn = e.target.closest('[data-seen]');
+      if (sn) { const p = D.byId(sn.dataset.seen); if (!p) return; if ((p.variants || []).length > 1) { close(); setTimeout(() => quickAdd(p.id, sn), 300); } else { add(p.id, 1); showTab('cart'); paint(); } }
+    });
+    drawer.querySelector('.cartd__tabs').addEventListener('keydown', e => {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      e.preventDefault(); showTab($('cartd-t-cart').getAttribute('aria-selected') === 'true' ? 'seen' : 'cart', true);
     });
     $('cartd-gift').addEventListener('change', e => setGift(e.target.checked));
     scrim.addEventListener('click', close);
-    sheetDrag(drawer, close, { scroller: () => $('cartd-body'), head: '.cartd__head' });
+    sheetDrag(drawer, close, { scroller: () => drawer.querySelector('.cartd__panel:not([hidden]) .cartd__scroll'), head: '.cartd__head' });
     drawer.addEventListener('keydown', e => {
-      if (e.key === 'Escape') return close();
+      if (e.key === 'Escape') { e.stopPropagation(); return sheetOpen ? closeSheet() : close(); }
       if (e.key !== 'Tab') return;
-      const f = [...drawer.querySelectorAll('a[href], button:not([disabled]), input')].filter(x => x.offsetParent !== null);
+      const scope = sheetOpen ? sheetOpen.querySelector('.cartd__sheetbox') : drawer;
+      const f = [...scope.querySelectorAll('a[href], button:not([disabled]), input, textarea')].filter(x => x.offsetParent !== null && x.tabIndex !== -1);
       const first = f[0], last = f[f.length - 1];
       if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
       else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
@@ -1885,7 +1986,7 @@
             ${LOGO}
             <h2 class="ckc__h" id="ckc-h1">Your cookie choices on this site</h2>
             <div class="ckc__text">
-              <p>WisdomUp keeps your cart, wishlist, orders and saved checkout details in this browser. That storage is <b>essential</b> — the shop needs it to work — so it can’t be switched off.</p>
+              <p>WisdomUp keeps your cart, wishlist, recently viewed products, orders, saved checkout details and your order note in this browser. That storage is <b>essential</b> — the shop needs it to work — so it can’t be switched off.</p>
               <p>With your permission we also use <b>marketing cookies</b> from Meta to:</p>
               <ul><li>Measure which Facebook and Instagram ads bring visits and orders.</li><li>Show our ads to people who have visited the shop.</li></ul>
               <p>Select ‘Accept all’ to allow marketing cookies, or ‘Essential only’ to keep them off. To decide category by category, select ‘Manage settings’. You can change your choice at any time from ‘Cookie preferences’ at the foot of every page.</p>
@@ -2179,6 +2280,7 @@
     icons: { STAR_SVG }, btnBuy,
     store, add, toast, reviews, starsSvg, cart: { lines: cartLines, count: cartCount, totals: cartTotals, setQty, clear: clearCart, setGift, gift: () => giftWrap, open: b => cartUI && cartUI.open(b), skuInfo: sku => skuIndex[sku] }, SHOP, wished, toggleWish, wishBtn, paintWish, wishList: () => wish.slice(),
     productCard, colorsOf, photoBg, photoFit, ratingOf, reviewsOf, seedOf, mountRail, mountHero, mountGlide, mountAccordion, DEPTS, typeLabel,
+    edge: addEdge, // the nav's rainbow edge light on any capsule: WU.edge(host, () => shouldGlowNow)
     initChrome, placeNav, setActiveCat, navOffset, scrollToEl,
     openSearch: () => search && search.open(),
     toggleTheme, setTheme, themeMode, isNight, slide, staggerCards, revealWords, sheetDrag, quickAdd, budget: BUDGET, STAR_OUTLINE,
