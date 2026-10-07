@@ -271,20 +271,37 @@
   if (ar) {
     const slug = new URLSearchParams(location.search).get('p') || location.hash.slice(1); // ?p=slug (old #slug links still work)
     const p = POSTS.find(x => x.slug === slug) || POSTS[0];
+    const cover = (p.products || []).map(id => (D.byId(id) || {}).src).filter(Boolean)[0];
     WU.seo({
-      title: p.title + ' | WisdomUp Blog', description: p.excerpt, path: url.article(p.slug), type: 'article',
-      image: (p.products || []).map(id => (D.byId(id) || {}).src).filter(Boolean)[0],
+      title: (p.seoTitle || p.title) + ' | WisdomUp Blog', description: p.excerpt, path: url.article(p.slug), type: 'article', image: cover,
       ld: [
         { '@context': 'https://schema.org', '@type': 'Article', headline: p.title, description: p.excerpt, articleSection: p.cat, mainEntityOfPage: WU.abs(url.article(p.slug)),
-          author: { '@type': 'Organization', name: 'WisdomUp' }, publisher: { '@type': 'Organization', name: 'WisdomUp', logo: { '@type': 'ImageObject', url: WU.abs('img/wu-logo.png') } } },
+          ...(cover ? { image: WU.abs(cover) } : {}), ...(p.iso ? { datePublished: p.iso, dateModified: p.updated || p.iso } : {}), inLanguage: 'en-PK',
+          author: { '@type': 'Organization', name: 'WisdomUp', url: WU.abs(url.home) }, publisher: { '@type': 'Organization', name: 'WisdomUp', logo: { '@type': 'ImageObject', url: WU.abs('img/wu-logo.png') } } },
         WU.ldCrumbs([['Home', url.home], ['Blog', url.blog], [p.title, url.article(p.slug)]]),
       ],
     });
     $('crumb-title').textContent = p.title;
+    // Live facts in a post (2026-10-07, SEO guides): {price:id} = today's price from the catalogue + sale, and
+    // <div data-list="type[,type]" data-max data-min data-match="Spec=value" data-specs="Spec,Spec" data-limit></div> = every
+    // matching model, cheapest first, with its real specs and today's price — so a guide never quotes a stale price.
+    const body = p.body.replace(/\{price:([a-z0-9-]+)\}/g, (m, id) => (D.byId(id) || {}).priceText || m);
     ar.innerHTML = `
       <header class="article__head"><span class="eyebrow">${esc(p.cat)}</span><h1>${esc(p.title)}</h1><span class="meta-line">${esc(p.date)} · ${p.mins} min read · WisdomUp team</span></header>
       <div class="article__hero" style="background: ${p.bg};" aria-hidden="true">${art(p.art, { alt: '' })}</div>
-      <div class="prose">${p.body}</div>`;
+      <div class="prose">${body}</div>`;
+    const spec = (x, k) => ((x.specs || []).find(s => s[0] === k) || [])[1];
+    ar.querySelectorAll('[data-list]').forEach(el => {
+      const types = el.dataset.list.split(','), max = +el.dataset.max || Infinity, min = +el.dataset.min || 0;
+      const [mk, mv] = (el.dataset.match || '').split('=');
+      const show = (el.dataset.specs || '').split(',').filter(Boolean);
+      const all = D.products.filter(x => types.includes(x.type) && x.price >= min && x.price <= max && (!mk || spec(x, mk) === mv)).sort((a, b) => a.price - b.price);
+      const list = el.dataset.limit ? all.slice(0, +el.dataset.limit) : all;
+      if (!list.length) { el.remove(); return; }
+      el.className = 'kv kv--list';
+      el.innerHTML = list.map(x => `<b><a href="${url.product(x.id)}">${esc(x.title)}</a></b><span>${esc([...(show.length ? show.map(k => spec(x, k) && k + ': ' + spec(x, k)) : [x.meta]).filter(Boolean), x.priceText + (x.wasText ? ' (was ' + x.wasText + ')' : '')].join(' · '))}</span>`).join('')
+        + (all.length > list.length ? `<b class="kv__more"><a href="${url.cat(types[0])}">See all ${esc(((window.WU_CATALOG.types || {})[types[0]] || {}).label || 'products')} ›</a></b><span>${all.length - list.length} more${mk ? ' with ' + esc(mv) : ''}</span>` : '');
+    });
     const more = POSTS.filter(x => x.slug !== p.slug);
     $('more-posts').innerHTML = more.map(x => postCard(x)).join('');
     const rail = $('article-rail');

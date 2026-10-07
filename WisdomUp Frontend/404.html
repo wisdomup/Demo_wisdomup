@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en-PK">
+<head>
+<meta charset="utf-8">
+<base href="/">
+<!-- copied from site/404.html by tools/build_pages.py: edit that file and re-run -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- SEO:start (written by tools/build_seo.py — edit that file, not this block) -->
+<title>Page Not Found | WisdomUp</title>
+<meta name="description" content="This WisdomUp page has moved or no longer exists. Shop earbuds, chargers, power banks and more.">
+<meta name="robots" content="noindex, follow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- SEO:end -->
+<script>
+// A product, category or blog address with no pre-built page yet (added to the catalogue after the last
+// tools/build_pages.py run) still opens: reload it once in the browser-drawn version (__raw skips the pre-built pages).
+(function () {
+  if (/\/(product|products|article)\.html$/.test(location.pathname) && location.search && location.search.indexOf('__raw=') < 0)
+    location.replace(location.pathname + location.search + '&__raw=1');
+})();
+</script>
+<script>try{var t=localStorage.getItem("wu-theme");if(t==="night"||t==="system"&&matchMedia("(prefers-color-scheme: dark)").matches)document.documentElement.setAttribute("data-theme","night")}catch(e){}</script>
+<link rel="icon" href="favicon.ico" sizes="32x32">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="stylesheet" href="css/ds/tokens/fonts.css">
+<link rel="stylesheet" href="css/ds/tokens/colors.css">
+<link rel="stylesheet" href="css/ds/tokens/typography.css">
+<link rel="stylesheet" href="css/ds/tokens/spacing.css">
+<link rel="stylesheet" href="css/ds/tokens/base.css">
+<link rel="stylesheet" href="css/ds/styles/components.css">
+<link rel="stylesheet" href="css/wu-rail.css">
+<link rel="stylesheet" href="css/home.css">
+<link rel="stylesheet" href="css/pages.css">
+<link rel="stylesheet" href="css/info.css">
+<link rel="stylesheet" href="css/controls.css">
+<link rel="stylesheet" href="css/night.css">
+<link rel="stylesheet" href="css/motion.css">
+</head>
+<body>
+<div class="page page--info">
+
+  <div class="wu-util"><nav class="utility" aria-label="Utility" id="utility"></nav></div>
+  <header class="nav site-nav" id="site-nav"></header>
+  <div class="nav-spacer"></div>
+  <section class="ihero ihero--plain">
+    <div class="ihero__copy">
+      <div class="eyebrow">Error 404</div>
+      <h1>Page not <b>found.</b></h1>
+      <p class="ihero__lede">This page has moved or no longer exists. Search the shop, browse a category below, or start again from the home page.</p>
+      <div class="ihero__actions"><a class="btn-navy" href="products.html">Shop all products</a><a class="btn-outline" href="index.html">Go to the home page</a></div>
+    </div>
+  </section>
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Home</a><span aria-hidden="true">›</span><span aria-current="page">Page not found</span></nav>
+  <div class="rail-wrap"><section data-rail="best" data-title="Best sellers" data-all="products.html?filter=best"></section></div>
+  <div class="rail-wrap"><section data-rail="new" data-title="New for 2026" data-all="products.html?filter=new"></section></div>
+
+  <div class="trust-wrap" id="trust"></div>
+  <div class="footer-wrap" id="footer"></div>
+  <div class="toast" id="toast" role="status" hidden></div>
+</div>
+
+<script src="js/catalog.js"></script>
+<script src="js/shop.js"></script>
+<script src="js/wu-data.js"></script>
+<script src="js/ds-icons.js"></script>
+<script src="js/common.js"></script>
+<script src="js/info.js"></script>
+</body>
+</html>

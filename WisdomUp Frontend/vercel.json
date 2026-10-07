@@ -8,6 +8,131 @@
   },
   "rewrites": [
     {
+      "source": "/product.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "id",
+          "value": "(?<id>[a-z0-9-]+)"
+        }
+      ],
+      "missing": [
+        {
+          "type": "query",
+          "key": "__raw"
+        }
+      ],
+      "destination": "/site/_pre/p/:id.html"
+    },
+    {
+      "source": "/products.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "cat",
+          "value": "(?<cat>[a-z0-9-]+)"
+        }
+      ],
+      "missing": [
+        {
+          "type": "query",
+          "key": "__raw"
+        }
+      ],
+      "destination": "/site/_pre/c/:cat.html"
+    },
+    {
+      "source": "/products.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "dept",
+          "value": "(?<dept>[a-z0-9-]+)"
+        }
+      ],
+      "missing": [
+        {
+          "type": "query",
+          "key": "__raw"
+        }
+      ],
+      "destination": "/site/_pre/d/:dept.html"
+    },
+    {
+      "source": "/products.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "filter",
+          "value": "(?<filter>[a-z0-9-]+)"
+        }
+      ],
+      "missing": [
+        {
+          "type": "query",
+          "key": "__raw"
+        }
+      ],
+      "destination": "/site/_pre/f/:filter.html"
+    },
+    {
+      "source": "/article.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "p",
+          "value": "(?<slug>[a-z0-9-]+)"
+        }
+      ],
+      "missing": [
+        {
+          "type": "query",
+          "key": "__raw"
+        }
+      ],
+      "destination": "/site/_pre/a/:slug.html"
+    },
+    {
+      "source": "/products.html",
+      "missing": [
+        {
+          "type": "query",
+          "key": "__raw"
+        }
+      ],
+      "destination": "/site/_pre/products.html"
+    },
+    {
+      "source": "/blog.html",
+      "missing": [
+        {
+          "type": "query",
+          "key": "__raw"
+        }
+      ],
+      "destination": "/site/_pre/blog.html"
+    },
+    {
+      "source": "/index.html",
+      "missing": [
+        {
+          "type": "query",
+          "key": "__raw"
+        }
+      ],
+      "destination": "/site/_pre/index.html"
+    },
+    {
+      "source": "/",
+      "missing": [
+        {
+          "type": "query",
+          "key": "__raw"
+        }
+      ],
+      "destination": "/site/_pre/index.html"
+    },
+    {
       "source": "/",
       "destination": "/site/index.html"
     },

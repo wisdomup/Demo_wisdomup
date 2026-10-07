@@ -61,7 +61,7 @@ PAGES = {
         desc='WisdomUp makes wireless earbuds, speakers, creator mics, chargers and power banks sold in 50+ countries — now with local stock, warranty and support in Pakistan.'),
     'blog.html': dict(path='blog.html', crumb='Blog',
         title='WisdomUp Blog — Earbuds, Charging & Creator Guides',
-        desc='Buying guides and how-tos from WisdomUp: open-ear vs true wireless earbuds, clean audio for reels with a wireless mic, fast and safe charging, and battery care.'),
+        desc='Buying guides from WisdomUp: earbuds under Rs.5,000, which handsfree fits your phone, power bank charges, car Bluetooth, shavers vs trimmers.'),
     'article.html': dict(path='article.html', crumb='Article', dynamic=True,
         title='WisdomUp Blog — Guides & How-tos',
         desc='Guides, how-tos and buying advice from the WisdomUp team.'),
@@ -104,6 +104,8 @@ PAGES = {
     'order.html': dict(path='order.html', crumb='Order', index=False, title='Order Confirmed | WisdomUp', desc='Your WisdomUp order confirmation.'),
     'wishlist.html': dict(path='wishlist.html', crumb='Wishlist', index=False, title='Your Wishlist | WisdomUp', desc='Products you saved on WisdomUp.'),
     'admin.html': dict(path='admin.html', crumb='Admin', index=False, nofollow=True, title='Orders · WisdomUp Admin', desc=''),
+    '404.html': dict(path='404.html', crumb='Page not found', index=False, title='Page Not Found | WisdomUp',
+        desc='This WisdomUp page has moved or no longer exists. Shop earbuds, chargers, power banks and more.'),
 }
 
 OG_IMAGE = 'img/og-default.jpg'
@@ -173,7 +175,9 @@ def write_head(name, page):
 
 
 def sitemap():
-    posts = re.findall(r"slug:\s*'([^']+)'", open(os.path.join(SITE, 'js', 'posts.js'), encoding='utf-8').read())
+    # each post: slug, publish date (iso, if set) and its products (the first one's photo goes in the sitemap)
+    posts = [(m.group(1), (re.search(r"iso:\s*'([^']+)'", m.group(2)) or [None, None])[1], re.findall(r"'([a-z0-9-]+)'", (re.search(r'products:\s*\[([^\]]*)\]', m.group(2)) or [None, ''])[1]))
+             for m in re.finditer(r"slug:\s*'([^']+)'(.*?)body:", open(os.path.join(SITE, 'js', 'posts.js'), encoding='utf-8').read(), re.S)]
     types_live = {p['type'] for p in CATALOG['products']}
     urls = [('', '1.0', 'daily'), ('products.html', '0.9', 'daily'), ('products.html?filter=new', '0.8', 'daily'), ('products.html?filter=best', '0.8', 'weekly')]
     urls += [(f'products.html?dept={d["id"]}', '0.8', 'daily') for d in CATALOG['departments']]
@@ -183,12 +187,19 @@ def sitemap():
             if t in types_live and t not in seen:
                 seen.append(t)
     urls += [(f'products.html?cat={t}', '0.8', 'daily') for t in seen]
-    urls += [(f'product.html?id={p["id"]}', '0.7', 'weekly') for p in CATALOG['products']]
+    urls += [(f'product.html?id={p["id"]}', '0.7', 'weekly', [p['src']] if p.get('src') else [], None) for p in CATALOG['products']]
     urls += [(p['path'], '0.5', 'monthly') for n, p in PAGES.items() if p.get('index', True) and not p.get('dynamic') and n not in ('index.html', 'products.html')]
-    urls += [(f'article.html?p={s}', '0.5', 'monthly') for s in posts]
+    src = {p['id']: p.get('src') for p in CATALOG['products']}
+    for slug, iso, prods in posts:
+        urls.append((f'article.html?p={slug}', '0.6', 'monthly', [src[i] for i in prods if src.get(i)][:1], iso))
     lastmod = CATALOG.get('generated', TODAY)
-    body = ''.join(f'  <url><loc>{esc(BASE + u)}</loc><lastmod>{lastmod}</lastmod><changefreq>{freq}</changefreq><priority>{pr}</priority></url>\n' for u, pr, freq in urls)
-    open(os.path.join(SITE, 'sitemap.xml'), 'w', encoding='utf-8').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + body + '</urlset>\n')
+
+    def entry(u):
+        u, pr, freq, imgs, mod = (tuple(u) + ((), None))[:5]
+        pics = ''.join(f'<image:image><image:loc>{esc(BASE + i)}</image:loc></image:image>' for i in imgs)
+        return f'  <url><loc>{esc(BASE + u)}</loc><lastmod>{mod or lastmod}</lastmod><changefreq>{freq}</changefreq><priority>{pr}</priority>{pics}</url>\n'
+    body = ''.join(entry(u) for u in urls)
+    open(os.path.join(SITE, 'sitemap.xml'), 'w', encoding='utf-8').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n' + body + '</urlset>\n')
     return len(urls)
 
 
@@ -203,6 +214,8 @@ Disallow: /*sort=
 Disallow: /*price=
 Disallow: /*conn=
 Disallow: /*feat=
+# Browser-drawn copies of pre-built pages (tools/build_pages.py) — same content, same canonical
+Disallow: /*__raw=
 
 Sitemap: {BASE}sitemap.xml
 """

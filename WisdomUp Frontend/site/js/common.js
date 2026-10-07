@@ -498,8 +498,10 @@
       pMark = null;
     }
     if (!pBar || pBar.offsetParent === null) return null;
+    if (!pMark && pBar.previousElementSibling?.classList.contains('wu-pmark')) pMark = pBar.previousElementSibling; // pre-rendered page
     if (!pMark) {
       pMark = document.createElement('div');
+      pMark.className = 'wu-pmark';
       pMark.setAttribute('aria-hidden', 'true');
       pMark.style.cssText = 'height: 0; margin: 0; padding: 0;';
       pBar.before(pMark);

@@ -78,7 +78,15 @@
   // ---- SEO: title, description, canonical address, social preview and structured data for this product ----
   const canon = url.product(p.id);
   const stock = p.soldOut ? 'OutOfStock' : 'InStock';
+  // Shipping for Google's merchant listings (2026-10-07): standard delivery from shop.js — its fee (free when this product alone
+  // reaches the free-delivery threshold) and the "3–5 working days" we quote everywhere as the total delivery time.
+  const STD = WU.SHOP.delivery.standard, days = (String(STD.eta || '').match(/\d+/g) || []).map(Number);
+  const ship = { '@type': 'OfferShippingDetails', shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'PK' },
+    shippingRate: { '@type': 'MonetaryAmount', value: STD.freeOver && Math.min(...V.map(v => v.price)) >= WU.SHOP.freeDeliveryFrom ? 0 : STD.fee, currency: 'PKR' },
+    ...(days.length ? { deliveryTime: { '@type': 'ShippingDeliveryTime', handlingTime: { '@type': 'QuantitativeValue', minValue: 0, maxValue: 0, unitCode: 'DAY' },
+      transitTime: { '@type': 'QuantitativeValue', minValue: days[0], maxValue: days[days.length - 1], unitCode: 'DAY' } } } : {}) };
   const offerBase = { priceCurrency: 'PKR', availability: 'https://schema.org/' + stock, itemCondition: 'https://schema.org/NewCondition', url: WU.abs(canon), seller: { '@type': 'Organization', name: 'WisdomUp' },
+    shippingDetails: ship,
     hasMerchantReturnPolicy: { '@type': 'MerchantReturnPolicy', applicableCountry: 'PK', returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow', merchantReturnDays: 7 } };
   WU.seo({
     title: `${p.title} Price in Pakistan | WisdomUp`,

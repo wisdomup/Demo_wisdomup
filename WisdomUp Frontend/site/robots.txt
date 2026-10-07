@@ -8,5 +8,7 @@ Disallow: /*sort=
 Disallow: /*price=
 Disallow: /*conn=
 Disallow: /*feat=
+# Browser-drawn copies of pre-built pages (tools/build_pages.py) — same content, same canonical
+Disallow: /*__raw=
 
 Sitemap: https://wisdomup.pk/sitemap.xml
