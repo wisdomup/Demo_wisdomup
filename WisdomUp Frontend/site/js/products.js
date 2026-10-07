@@ -153,8 +153,7 @@
     const fill = t => String(t || '').replace(/\{n\}/g, scopeItems.length).replace(/\{min\}/g, prices.length ? D.rs(Math.min(...prices)) : '').replace(/\{max\}/g, prices.length ? D.rs(Math.max(...prices)) : '').replace(/\{year\}/g, WU.YEAR);
     const h1 = entry.h1 || (state.cat ? `${entry.name} Price in Pakistan` : `${entry.name} in Pakistan`);
     const path = state.cat ? url.cat(state.cat) : state.dept ? url.dept(state.dept) : pure ? url.filter(state.filter) : url.products;
-    $('mtitle').textContent = h1;
-    WU.revealWords($('mtitle'));
+    if ($('mtitle').textContent !== h1) { $('mtitle').textContent = h1; WU.revealWords($('mtitle')); } // only when it changes (never on a re-sort)
     $('mdesc-t').textContent = fill(entry.intro[0]);
     WU.seo({
       title: entry.title ? fill(entry.title) : state.cat ? `${entry.name} Price in Pakistan ${WU.YEAR} | WisdomUp` : `${entry.name} in Pakistan — Prices ${WU.YEAR} | WisdomUp`,
@@ -223,7 +222,8 @@
   /* ---------- Sort dropdown (popover with ✓ on the active option) ---------- */
   const sortBtn = $('msort-btn'), sortList = $('msort-list');
   function paintSortList() {
-    sortList.innerHTML = Object.entries(SORTS).map(([k, l], i) => `<li class="msort__opt" role="option" id="so-${k}" data-sort="${k}" aria-selected="${k === state.sort}" style="--i: ${i};"><span>${esc(l)}</span></li>`).join('');
+    if (!sortList.children.length) sortList.innerHTML = Object.entries(SORTS).map(([k, l], i) => `<li class="msort__opt" role="option" id="so-${k}" data-sort="${k}" aria-selected="false" style="--i: ${i};"><span>${esc(l)}</span></li>`).join('');
+    sortList.querySelectorAll('.msort__opt').forEach(o => o.setAttribute('aria-selected', String(o.dataset.sort === state.sort)));
   }
   let sortActive = 0;
   const sortOpts = () => [...sortList.querySelectorAll('.msort__opt')];
@@ -257,15 +257,36 @@
     sortList.focus({ preventScroll: true });
     markActive(Object.keys(SORTS).indexOf(state.sort));
   }
-  function closeSort(focusBtn) {
-    if (sortPanel.hidden) return;
+  function closeSort(focusBtn, after) {
+    if (sortPanel.hidden) { if (after) after(); return; }
     sortPanel.classList.remove('is-open');
     sortBtn.setAttribute('aria-expanded', 'false');
-    const done = () => { sortPanel.hidden = true; };
+    const done = () => { sortPanel.hidden = true; if (after) after(); };
     if (WU.reduced()) done(); else sortClosing = setTimeout(done, 560);
     if (focusBtn) sortBtn.focus({ preventScroll: true });
   }
-  function pickSort(k) { state.sort = k; syncUrl(); render(); closeSort(true); }
+  // Picking an option (2026-10-07, "it snaps and has a delay"): the cheap parts change at once — the underline moves, the
+  // button takes the new label and the panel's closed shape is re-measured to the NEW button, so the morph folds straight
+  // into it (it used to fold into the old, narrower button and then snap wider). The heavy part — re-sorting and repainting
+  // the grid — waits until the fold has finished, so nothing blocks the animation; the cards then glide in (staggerCards).
+  function pickSort(k) {
+    if (k === state.sort) return closeSort(true);
+    state.sort = k;
+    syncUrl();
+    paintSortList();
+    $('msort-label').textContent = $('msort-now').textContent = SORTS[k];
+    sortBtn.setAttribute('aria-label', 'Sort by: ' + SORTS[k]);
+    const r = sortBtn.getBoundingClientRect(), pw = sortPanel.offsetWidth, shift = parseFloat(sortPanel.style.getPropertyValue('--sb-r')) || 0;
+    sortPanel.style.setProperty('--sb-w', r.width + 'px');
+    sortPanel.style.setProperty('--sb-h', r.height + 'px');
+    sortPanel.style.setProperty('--sb-l', Math.max(0, pw - shift - r.width) + 'px');
+    $('mgrid').classList.add('is-sorting');
+    closeSort(true, () => {
+      render();
+      $('mgrid').classList.remove('is-sorting');
+      WU.staggerCards($('mgrid'));
+    });
+  }
   sortBtn.addEventListener('click', () => (sortOpen() ? closeSort() : openSort()));
   $('msort-x').addEventListener('click', () => closeSort(true));
   sortList.addEventListener('click', e => { const o = e.target.closest('[data-sort]'); if (o) pickSort(o.dataset.sort); });

@@ -1,4 +1,5 @@
-/* LOCKED product-card rail layout: 5.2 (≥1536) · 4.2 (1024–1535) · 3.2 (768–1023) · 2.2 (600–767) · 1.2 (<600). Do not override. */
+/* LOCKED product-card rail layout: 5.2 (≥1536) · 4.2 (1024–1535) · 3.2 (768–1023) · 2.2 (600–767) · 2.2 (<600 — phones show TWO columns
+   of product cards by default in both themes, rule of 2026-10-07; was 1.2). Do not override. */
 .wu-rail { --n: 4.2; --gaps: 4; --g: 20px; --pad: var(--gutter, 28px);
   display: grid !important; grid-auto-flow: column !important; grid-template-columns: none !important; grid-template-rows: none !important;
   grid-auto-columns: calc((100% + var(--pad) - var(--gaps) * var(--g)) / var(--n)) !important;
@@ -11,4 +12,4 @@
 @media (min-width: 1536px) { .wu-rail { --n: 5.2; --gaps: 5; } } /* big screens, e.g. a 16-inch MacBook (1728px) */
 @media (max-width: 1023px) { .wu-rail { --n: 3.2; --gaps: 3; } }
 @media (max-width: 767px) { .wu-rail { --n: 2.2; --gaps: 2; } }
-@media (max-width: 599px) { .wu-rail { --n: 1.2; --gaps: 1; --g: 12px; } }
+@media (max-width: 599px) { .wu-rail { --n: 2.2; --gaps: 2; --g: 10px; } } /* 10px = the All Products 2-per-row grid's gap */

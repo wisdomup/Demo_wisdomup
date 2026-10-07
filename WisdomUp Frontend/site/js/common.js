@@ -1116,16 +1116,22 @@
       list.focus({ preventScroll: true });
       markActive(Math.max(0, opts.findIndex(o => o.dataset.mode === themeMode())));
     }
-    function close(focusBtn) {
-      if (panel.hidden) return;
+    function close(focusBtn, after) {
+      if (panel.hidden) { if (after) after(); return; }
       panel.classList.remove('is-open');
       btn.setAttribute('aria-expanded', 'false');
       document.body.classList.remove('sf-menu-open');
-      const done = () => { panel.hidden = true; };
+      const done = () => { panel.hidden = true; if (after) after(); };
       if (reduced()) done(); else closing = setTimeout(done, 560);
       if (focusBtn) btn.focus({ preventScroll: true });
     }
-    const pick = m => { setTheme(m); mark(); close(true); };
+    // like the sort capsule: the underline moves at once, the panel folds back smoothly, and the theme (a whole-page restyle)
+    // switches once the fold has finished — never in the middle of the animation
+    const pick = m => {
+      if (m === themeMode()) return close(true);
+      opts.forEach(o => o.setAttribute('aria-selected', String(o.dataset.mode === m)));
+      close(true, () => { setTheme(m); mark(); });
+    };
     mark();
     btn.addEventListener('click', () => (isOpen() ? close() : open()));
     box.querySelector('.msort__x').addEventListener('click', () => close(true));

@@ -34,6 +34,7 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
 .search__pages a:hover { background: #1B1B1B; color: #fff; }
 .search__label { margin: 18px 4px 12px; font: 600 13px/1 var(--font); color: var(--muted); }
 .search__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; }
+@media (max-width: 599px) { .search__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 10px; } .ccard__media { height: 120px; padding: 10px; } .ccard__body { padding: 10px 10px 4px; } .ccard__foot { flex-wrap: wrap; padding: 8px 10px 12px; } } /* phones: two columns by default (rule of 2026-10-07) */
 .ccard__media { position: relative; height: 140px; padding: 14px; box-sizing: border-box; }
 .ccard__tag { position: absolute; left: 10px; top: 10px; right: auto; bottom: auto; padding: 4px 8px; border-radius: 999px; background: rgba(255,255,255,.9); font: 700 11px/1 var(--font); color: #1B1B1B; } /* right/bottom: auto — the design-system .ccard__tag pins right:0/bottom:0, which stretched this pill over the whole image */
 .ccard__tag::before { display: none; }
@@ -404,6 +405,11 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
 .msort--up .msort__now { right: calc(8px + var(--sb-r, 0px)); } /* so the label copy needs no room for it */
 .msort--up .msort__list { padding: 18px 22px 10px; }
 @media (max-width: 639px) { .msort--up .msort__list { padding: 12px 16px 4px; } }
+/* while a new sort order is on its way, the grid dims softly (opacity only — compositor) instead of freezing; the fresh cards
+   then glide in (WU.staggerCards) */
+.mgrid { transition: opacity 300ms cubic-bezier(.3,1,.3,1); }
+.mgrid.is-sorting { opacity: .45; }
+@media (prefers-reduced-motion: reduce) { .mgrid { transition: none; } }
 /* Products-per-row toggle */
 .mview { gap: 6px; }
 .mview__b { width: 40px; height: 40px; border: 0; border-radius: 999px; background: none; color: #8B8B8B; display: grid; place-items: center; cursor: pointer; transition: background-color 180ms ease, color 180ms ease; }
@@ -493,6 +499,16 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
   .mgrid--2 .wpc__foot .wpc__cta::after { inset: -7px; } /* keeps a ~44px tap area */
   .mgrid--2 .wpc__specs, .mgrid--2 .wpc__optlabel, .mgrid--2 .wpc__optchips { display: none; } /* ~170px cards */
   .mgrid--2 .wpc__opts { display: block; }
+}
+/* Phones (<600px), both themes — PRODUCT CARDS IN TWO COLUMNS BY DEFAULT (rule of 2026-10-07): rails show 2.2 cards (wu-rail.css),
+   so a rail card is ~156px wide — it gets the same compact card as the All Products 2-per-row grid above */
+@media (max-width: 599px) {
+  .wu-rail .wpc__row { flex-wrap: wrap; row-gap: 6px; }
+  .wu-rail .wpc__foot .wpc__cta { height: 32px; padding: 0 10px; gap: 5px; font-size: 12px; }
+  .wu-rail .wpc__foot .wpc__cta svg { width: 14px; height: 14px; }
+  .wu-rail .wpc__foot .wpc__cta::after { inset: -7px; } /* keeps a ~44px tap area */
+  .wu-rail .wpc__specs, .wu-rail .wpc__optlabel, .wu-rail .wpc__optchips { display: none; }
+  .wu-rail .wpc__opts { display: block; }
 }
 @media (prefers-reduced-motion: reduce) { .fdrawer, .fscrim { transition: none; } }
 
