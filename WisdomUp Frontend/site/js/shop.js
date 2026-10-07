@@ -31,6 +31,8 @@ window.WU_SHOP = {
     "returnDays": 7,
     "minPayout": 1000,
     "autoApprove": true,
+    "demoMode": true,
+    "demoNote": "demoMode true = while the shop's database is not connected (the demo site: /api/orders answers 503), the program runs in each visitor's own browser — sign-up, codes, the cart discount and the dashboard, with demo tools that simulate visits, orders, delivery and payouts. It is never used once the database answers. Set false for the live shop.",
     "tiers": [
       { "name": "Starter", "from": 0, "pct": 8 },
       { "name": "Pro", "from": 50000, "pct": 10 },

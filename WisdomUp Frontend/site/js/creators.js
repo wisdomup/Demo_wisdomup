@@ -159,7 +159,7 @@
         R.setMe({ code: d.creator.code, key: d.key, name: d.creator.name.split(' ')[0] });
         if ((R.get() || {}).code === d.creator.code) R.clear(); // never shop with your own code
         WU.px('Lead', { content_name: 'Creator sign-up' });
-        welcome(d.creator, d.key);
+        welcome(d.creator, d.key, !!d.demo);
       } catch (err) {
         if (err.field && form.elements[err.field]) { mark(err.field, err.message); form.elements[err.field].focus(); }
         else if (!err.status || err.status >= 500 || err.status === 404 || err.status === 405) {
@@ -173,14 +173,14 @@
     });
   }
 
-  function welcome(c, key) {
+  function welcome(c, key, demo) {
     const link = linkFor(c.code);
     const live = c.status === 'active';
     const done = $('cr-done');
     done.innerHTML = `
-      <span class="cr-done__badge">${live ? 'Your code is live' : 'Application received'}</span>
+      <span class="cr-done__badge">${demo ? 'Demo mode · saved in this browser' : live ? 'Your code is live' : 'Application received'}</span>
       <h2>Welcome, <b>${esc(c.name.split(' ')[0])}.</b></h2>
-      <p>${live ? `Share your link or code — your followers get ${CR.discountPct}% off and you earn from your first order.` : 'We’ll check your channel and switch your code on within two working days. Your dashboard is ready now.'}</p>
+      <p>${demo ? 'The shop’s database isn’t connected on this site yet, so this demo account lives in this browser only. Open your dashboard to simulate follower orders and watch your commission move.' : live ? `Share your link or code — your followers get ${CR.discountPct}% off and you earn from your first order.` : 'We’ll check your channel and switch your code on within two working days. Your dashboard is ready now.'}</p>
       <div class="cr-done__code"><span>Your code</span><b>${esc(c.code)}</b></div>
       <div class="crd-copyrow"><input class="crd-copyrow__in" id="cr-done-link" readonly value="${esc(pretty(link))}" aria-label="Your creator link"><button type="button" class="btn-outline" data-copy-text="${esc(link)}">Copy link</button></div>
       <div class="cr-done__key">
@@ -237,6 +237,7 @@
       $('crd-hi').textContent = `Hi, ${data.name.split(' ')[0]}`;
       const stLabel = { active: 'Active', paused: 'Paused', pending: 'Under review' }[data.status] || data.status;
       $('crd-tags').innerHTML = `<span class="crd-tag crd-tag--code">${R.TAG}${esc(data.code)}</span><span class="crd-tag crd-tag--${esc(data.status)}">${esc(stLabel)}</span><span class="crd-tag">${data.rate ? `Custom rate · ${data.rate}%` : `${esc(m.tier.name)} · ${m.tier.pct}%`}</span>`;
+      $('crd-demo').hidden = !data.demo;
       $('crd-status').hidden = data.status === 'active';
       $('crd-status').innerHTML = data.status === 'pending' ? '<b>Your code is under review.</b> We’ll switch it on within two working days — you can set up your links now.'
         : data.status === 'paused' ? `<b>Your code is paused</b>, so it gives no discount right now. <a href="${waLink(`Hello WisdomUp, my creator code ${data.code} is paused — can you help?`)}" target="_blank" rel="noopener">Message us on WhatsApp</a>.` : '';
@@ -361,6 +362,14 @@
       ];
       $('crd-caps').innerHTML = caps.map(t => `<div class="crd-cap"><p>${esc(t)}</p><button type="button" class="btn-outline" data-copy-text="${esc(t)}">Copy</button></div>`).join('');
     }
+
+    // Demo tools (demo mode only): simulated visits / orders / delivery / return window / payout, all in this browser
+    const SIM_MSG = { visit: 'Demo link visit added', order: 'Demo follower order added', deliver: 'Demo order marked delivered', skip: 'Return window skipped — commission approved', payout: 'Demo payout recorded', reset: 'Demo data cleared' };
+    $('crd-demo').addEventListener('click', async e => {
+      const b = e.target.closest('[data-sim]'); if (!b || !me) return;
+      try { const d = await R.api('sim', { code: me.code, key: me.key, what: b.dataset.sim }); data = d.creator; paint(); toast(SIM_MSG[b.dataset.sim], R.TAG); }
+      catch (err) { toast(err.message, R.TAG); }
+    });
 
     $('crd-main').addEventListener('click', e => {
       const c = e.target.closest('[data-copy]'); if (c) { copy($(c.dataset.copy).dataset.href); return; }

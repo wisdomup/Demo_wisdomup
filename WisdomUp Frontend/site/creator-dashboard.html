@@ -59,6 +59,18 @@
         <div class="crd-top__acts"><button type="button" class="btn-outline" id="crd-refresh">Refresh</button><button type="button" class="btn-outline" id="crd-out">Sign out</button></div>
       </header>
       <div class="crd-note" id="crd-status" hidden></div>
+      <section class="crd-card crd-demo" id="crd-demo" aria-labelledby="crd-demo-h" hidden>
+        <div class="crd-card__head"><h2 id="crd-demo-h"><span class="crd-demo__tag">Demo mode</span> See the money move</h2></div>
+        <p class="crd-fine">The shop’s database isn’t connected on this site yet, so your account lives in this browser only and nothing here is a real order. Use these to watch an order travel from a visit to a payout — then sign out and open your link to see the follower’s 5% in the cart.</p>
+        <div class="crd-demo__btns">
+          <button type="button" class="btn-outline" data-sim="visit">+ Link visit</button>
+          <button type="button" class="btn-outline" data-sim="order">+ Follower order</button>
+          <button type="button" class="btn-outline" data-sim="deliver">Mark next order delivered</button>
+          <button type="button" class="btn-outline" data-sim="skip">Skip the return window</button>
+          <button type="button" class="btn-outline" data-sim="payout">Pay out the balance</button>
+          <button type="button" class="btn-outline crd-demo__reset" data-sim="reset">Reset demo data</button>
+        </div>
+      </section>
 
       <section class="crd-card crd-link" aria-labelledby="crd-link-h">
         <h2 id="crd-link-h">Your link</h2>

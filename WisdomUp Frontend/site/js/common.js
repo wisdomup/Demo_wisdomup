@@ -235,10 +235,125 @@
   const refLoad = () => { const r = store.get(REF_KEY, null); return CR.on && r && r.code && Date.now() - r.at < (CR.linkDays || 30) * 864e5 ? r : null; };
   let ref = refLoad();
   async function crApi(action, body, opts = {}) {
-    const res = await fetch('/api/orders?cr=' + action, { method: opts.method || 'POST', headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) }, body: body ? JSON.stringify(body) : undefined });
-    const data = await res.json().catch(() => ({ ok: false }));
+    if (action === 'sim') return demoApi(action, body || {}); // demo tools never touch the server
+    let res, data;
+    try {
+      res = await fetch('/api/orders?cr=' + action, { method: opts.method || 'POST', headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) }, body: body ? JSON.stringify(body) : undefined });
+      data = await res.json().catch(() => ({ ok: false }));
+    } catch (e) { throw Object.assign(new Error('We could not reach the creator system. Check your connection and try again.'), { status: 0 }); }
+    // The program's database is not connected (503 "being set up"), or there is no API at all (a static copy): DEMO MODE
+    if (CR.demoMode && action !== 'admin' && (res.status === 503 || ([404, 405, 501].includes(res.status) && !data.error))) return demoApi(action, body || {});
     if (!res.ok || !data.ok) throw Object.assign(new Error(data.error || 'The creator system did not answer. Please try again.'), { status: res.status, field: data.field, data });
     return data;
+  }
+
+  /* ---------- DEMO MODE (2026-10-08, "now just use demo"): while the shop's database is not connected — the demo site — the creators
+     program runs in THIS browser (localStorage wu-cr-demo), with the server's rules mirrored here: sign-up (code + key), code checks
+     and link visits, the dashboard's numbers (tiers by monthly sales, approved returnDays after delivery, cancelled = void, balance =
+     approved − payouts) and payout details. Nothing leaves the device and nothing is a real order: the dashboard's demo tools
+     (action 'sim') add simulated visits / orders / deliveries / payouts so the money flow can be seen. Off with creators.demoMode =
+     false; never used once /api/orders answers (a connected database), so it cannot mix with real accounts. ---------- */
+  const DEMO_KEY = 'wu-cr-demo';
+  const RESERVED_CODES = ['WISDOMUP', 'WISDOM', 'ADMIN', 'TEST', 'SALE', 'FREE', 'DISCOUNT', 'OFFICIAL', 'SUPPORT', 'HELP', 'NULL', 'NONE', 'ORDER', 'SHOP'];
+  const crTiers = () => (CR.tiers || [{ name: 'Starter', from: 0, pct: 8 }]).slice().sort((x, y) => x.from - y.from);
+  const crTier = sales => crTiers().reduce((cur, t) => (sales >= t.from ? t : cur), crTiers()[0]);
+  const crNext = sales => crTiers().find(t => t.from > sales) || null;
+  const pkNow = (ms = Date.now()) => new Date(ms + 5 * 36e5).toISOString().slice(0, 19) + '+05:00'; // the server's PKT stamps
+  const pkDay = ms => pkNow(ms).slice(0, 10);
+  const demoPhone = v => { let d = String(v || '').replace(/\D/g, ''); if (d.startsWith('0092')) d = d.slice(4); else if (d.startsWith('92')) d = d.slice(2); if (d.startsWith('0')) d = d.slice(1); return /^3\d{9}$/.test(d) ? '0' + d : null; };
+  function demoStats(c, db) {
+    const now = Date.now(), rdays = CR.returnDays || 7, net = o => o.totals.subtotal - o.totals.discount;
+    const mine = db.orders.filter(o => o.code === c.code), monthSales = {}, top = {}, sums = { pending: 0, approved: 0, void: 0 };
+    mine.forEach(o => { if (o.status !== 'cancelled') monthSales[o.createdAt.slice(0, 7)] = (monthSales[o.createdAt.slice(0, 7)] || 0) + net(o); });
+    const rows = mine.slice().sort((x, y) => y.createdAt.localeCompare(x.createdAt)).map(o => {
+      const base = net(o), rate = c.rate || crTier(monthSales[o.createdAt.slice(0, 7)] || 0).pct;
+      let state = 'pending', amt = 0, until = null;
+      if (o.status === 'cancelled') state = 'void';
+      else {
+        amt = pctOf(base, rate);
+        const d = o.status === 'delivered' && o.history.slice().reverse().find(h => h.status === 'delivered');
+        if (d) { until = Date.parse(d.at) + rdays * 864e5; if (now >= until) state = 'approved'; }
+        o.items.forEach(l => { const t = top[l.id] || (top[l.id] = { id: l.id, title: l.title, qty: 0 }); t.qty += l.qty; });
+      }
+      sums[state] += amt;
+      return { at: o.createdAt, status: o.status, items: o.items, value: base, rate, commission: amt, state, until: until && state === 'pending' ? pkNow(until) : null };
+    });
+    const clicks = db.clicks[c.code] || {}, days = Array.from({ length: 30 }, (_, i) => pkDay(now - (29 - i) * 864e5));
+    const perDay = {};
+    mine.forEach(o => { if (o.status !== 'cancelled') perDay[o.createdAt.slice(0, 10)] = (perDay[o.createdAt.slice(0, 10)] || 0) + 1; });
+    const live = rows.filter(r => r.state !== 'void'), paid = (c.payouts || []).reduce((n, x) => n + x.amount, 0), m = pkNow().slice(0, 7), ms = monthSales[m] || 0, tier = crTier(ms);
+    return {
+      clicks: Object.values(clicks).reduce((n, v) => n + v, 0), clicks30: days.reduce((n, d) => n + (clicks[d] || 0), 0),
+      orders: live.length, sales: live.reduce((n, r) => n + r.value, 0), pending: sums.pending, approved: sums.approved, void: sums.void, paid, balance: sums.approved - paid,
+      month: { key: m, sales: ms, tier, next: crNext(ms), rate: c.rate || tier.pct },
+      series: days.map(d => ({ day: d, clicks: clicks[d] || 0, orders: perDay[d] || 0 })), rows: rows.slice(0, 60), top: Object.values(top).sort((x, y) => y.qty - x.qty).slice(0, 5),
+    };
+  }
+  function demoApi(action, body) {
+    const db = Object.assign({ creators: {}, clicks: {}, orders: [] }, store.get(DEMO_KEY, null) || {});
+    const save = () => store.set(DEMO_KEY, db);
+    const fail = (msg, status = 400, field = null) => { throw Object.assign(new Error(msg), { status, field, demo: true }); };
+    const pub = c => ({ code: c.code, name: c.name, handle: c.handle, platform: c.platform, audience: c.audience, status: c.status, joinedAt: c.joinedAt, rate: c.rate || null, payout: c.payout, payouts: c.payouts || [] });
+    const dash = c => ({ ...pub(c), discountPct: CR.discountPct || 0, demo: true, stats: demoStats(c, db) });
+    const auth = () => { const c = db.creators[codeNorm(body.code)]; if (!c || !body.key || c.key !== String(body.key).trim()) fail('That code and key don’t match. Check both, or message us on WhatsApp for a new key.', 403); return c; };
+    const free = code => code && !RESERVED_CODES.includes(code) && !db.creators[code];
+    const suggest = base => { base = (codeNorm(base) || 'WU').slice(0, 9); for (let i = 0; i < 20; i++) { const c = base + (10 + Math.floor(Math.random() * 90)); if (free(c)) return c; } return null; };
+    const t = (v, max) => String(v || '').replace(/\s+/g, ' ').trim().slice(0, max);
+    if (action === 'join') {
+      const name = t(body.name, 80), phone = demoPhone(body.phone), handle = t(body.handle, 200);
+      if (name.length < 2) fail('Please fill in this field.', 400, 'name');
+      if (!phone) fail('Enter a Pakistani mobile number, e.g. 0300 1234567.', 400, 'phone');
+      if (handle.length < 3) fail('Please fill in this field.', 400, 'handle');
+      if (!(CR.platforms || []).includes(body.platform)) fail('Choose where you post.', 400, 'platform');
+      if (!(CR.audiences || []).includes(body.audience)) fail('Choose your audience size.', 400, 'audience');
+      if (!body.agree) fail('Please accept the program terms.', 400, 'agree');
+      if (Object.values(db.creators).some(c => c.phone === phone)) fail('This WhatsApp number already has a creator account. Open your dashboard, or message us on WhatsApp to get a new key.', 409, 'phone');
+      let code = codeNorm(body.code);
+      if (body.code && !code) fail('Use 3–12 letters or numbers, e.g. SARA or ALI22.', 400, 'code');
+      if (code && RESERVED_CODES.includes(code)) fail('That code is reserved — please choose another.', 400, 'code');
+      if (code && !free(code)) { const tip = suggest(code); fail(`${code} is taken.` + (tip ? ` Try ${tip}.` : ''), 409, 'code'); }
+      if (!code) { const first = name.split(' ')[0].toUpperCase().replace(/[^A-Z]/g, '').slice(0, 9); code = first.length >= 3 && free(first) ? first : suggest(first || 'WU'); }
+      const key = Array.from({ length: 16 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789'[Math.floor(Math.random() * 56)]).join('');
+      const status = CR.autoApprove ? 'active' : 'pending';
+      const c = { code, name, phone, email: t(body.email, 120), handle, platform: body.platform, audience: body.audience, note: t(body.note, 300), status, joinedAt: pkNow(), key, rate: null,
+        payout: { method: (CR.payouts || []).includes(body.method) ? body.method : '', title: t(body.title, 80), number: t(body.number, 40) }, payouts: [] };
+      db.creators[code] = c; save();
+      return { ok: true, demo: true, key, creator: dash(c) };
+    }
+    if (action === 'avail') { const code = codeNorm(body.code); return code ? { ok: true, demo: true, code, available: free(code), suggestion: free(code) ? null : suggest(code) } : { ok: true, available: false }; }
+    if (action === 'code') {
+      const code = codeNorm(body.code), c = code && db.creators[code];
+      if (!c || c.status !== 'active') fail('This creator code is not active.', 404, 'ref');
+      if (body.click) { const day = pkDay(); (db.clicks[code] = db.clicks[code] || {})[day] = (db.clicks[code][day] || 0) + 1; save(); }
+      return { ok: true, demo: true, code, name: c.name.split(' ')[0], discountPct: CR.discountPct || 0 };
+    }
+    if (action === 'me') return { ok: true, demo: true, creator: dash(auth()) };
+    if (action === 'payout') {
+      const c = auth();
+      if (!(CR.payouts || []).includes(body.method)) fail('Choose how you want to be paid.', 400, 'method');
+      if (t(body.title, 80).length < 2) fail('Please fill in this field.', 400, 'title');
+      if (t(body.number, 40).length < 6) fail('Please fill in this field.', 400, 'number');
+      c.payout = { method: body.method, title: t(body.title, 80), number: t(body.number, 40) }; save();
+      return { ok: true, demo: true, creator: dash(c) };
+    }
+    if (action === 'sim') { // demo tools on the dashboard
+      const c = auth(), mine = db.orders.filter(o => o.code === c.code), day = pkDay();
+      const visit = () => { (db.clicks[c.code] = db.clicks[c.code] || {})[day] = (db.clicks[c.code][day] || 0) + 1; };
+      if (body.what === 'visit') visit();
+      if (body.what === 'order') {
+        const pool = D.products.filter(p => !p.soldOut && p.price >= 1000 && p.price <= 15000), p = pool[Math.floor(Math.random() * pool.length)];
+        const qty = Math.random() < .2 ? 2 : 1, subtotal = p.price * qty, at = pkNow();
+        visit();
+        db.orders.push({ number: 'DEMO-' + (db.orders.length + 1), code: c.code, createdAt: at, status: 'new', items: [{ id: p.id, title: p.title, qty }], totals: { subtotal, discount: pctOf(subtotal, CR.discountPct || 0) }, history: [{ status: 'new', at }] });
+      }
+      if (body.what === 'deliver') { const o = mine.filter(x => !['delivered', 'cancelled'].includes(x.status)).sort((x, y) => x.createdAt.localeCompare(y.createdAt))[0]; if (!o) fail('No open demo orders — simulate an order first.'); o.status = 'delivered'; o.history.push({ status: 'delivered', at: pkNow() }); }
+      if (body.what === 'skip') { const back = ((CR.returnDays || 7) + 1) * 864e5; let n = 0; mine.forEach(o => o.history.forEach(h => { if (h.status === 'delivered' && Date.now() - Date.parse(h.at) < back) { h.at = pkNow(Date.parse(h.at) - back); n++; } })); if (!n) fail('Nothing is waiting in the return window — mark an order delivered first.'); }
+      if (body.what === 'payout') { const bal = demoStats(c, db).balance; if (bal < 1) fail('Nothing approved to pay yet.'); (c.payouts = c.payouts || []).push({ amount: bal, at: pkNow(), method: (c.payout || {}).method || '', note: 'Demo payout' }); }
+      if (body.what === 'reset') { db.orders = db.orders.filter(o => o.code !== c.code); delete db.clicks[c.code]; c.payouts = []; }
+      save();
+      return { ok: true, demo: true, creator: dash(c) };
+    }
+    fail('Not available in demo mode.', 405);
   }
   const setRef = r => { ref = r; store.set(REF_KEY, r); saveCart(); }; // saveCart repaints every total
   const clearRef = () => { ref = null; try { localStorage.removeItem(REF_KEY); } catch (e) { /* storage unavailable */ } saveCart(); };
