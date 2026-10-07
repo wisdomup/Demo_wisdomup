@@ -756,6 +756,10 @@ a.news__card:hover { color: #fff; }
 /* Quick filters */
 .mnav__quick { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 10px 12px 2px; }
 .mnav__quick::-webkit-scrollbar { display: none; }
+/* The menu sheet's sideways rows (quick chips, department tiles) never drag the sheet's list (2026-10-07, "when I scroll the tabs it
+   goes downwards too"): a sideways swipe always drifts a little vertically, and the browser used to scroll the menu list down with it.
+   A gesture that starts on these rows only pans sideways and its overscroll does not chain. Page rows keep normal vertical scrolling. */
+.mnav__quick, .mnav__tiles { touch-action: pan-x; overscroll-behavior-x: contain; }
 .mnav__chip { flex: none; display: inline-flex; align-items: center; height: 30px; padding: 0 12px; border-radius: 999px; background: #F1F3F5; white-space: nowrap; font: 600 12px/1 var(--font); color: #1F2633; }
 .mnav__chip:active { background: #E3E6EA; }
 
