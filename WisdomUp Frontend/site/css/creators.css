@@ -255,8 +255,8 @@
 
 /* Demo mode (no database connected): the dashboard's demo tools */
 .crd-demo { background: #FFF6F3; box-shadow: inset 0 0 0 1.5px #F6C9BD; }
-.crd-demo h2 { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
-.crd-demo__tag { display: inline-flex; align-items: center; height: 26px; padding: 0 11px; border-radius: 999px; background: #D91E05; color: #fff; font: 700 11px/1 var(--font); letter-spacing: .1em; text-transform: uppercase; }
+.crd-demo .crd-card__head { justify-content: flex-start; align-items: center; gap: 10px; }
+.crd-demo__tag { display: inline-flex; align-items: center; flex: none; white-space: nowrap; height: 26px; padding: 0 11px; border-radius: 999px; background: #D91E05; color: #fff; font: 700 11px/1 var(--font); letter-spacing: .1em; text-transform: uppercase; }
 .crd-demo__btns { display: flex; flex-wrap: wrap; gap: 8px; }
 .crd-demo__btns .btn-outline { height: 36px; padding: 0 15px; font-size: 13px; background: #fff; }
 .crd-demo__reset { margin-left: auto; }
