@@ -132,6 +132,16 @@ button { font-family: inherit; }
 /* Banner foot — bugatti.store (2026-10-06): one bar on the copy's margins with a 1px hairline on top, a long thin arrow at each
    end and the ring bullets centred between them; the copy and the product photo centre in the space above it */
 .hero { --hero-x: clamp(22px, 5vw, 64px); --hero-foot: clamp(22px, 3.4vh, 40px); --hero-bar: calc(var(--hero-foot) + clamp(16px, 1.8vw, 24px) + 40px); --hero-top: 78px; }
+/* IMAGE-ONLY BANNERS (2026-10-07): the product image COVERS the whole banner, edge to edge — no copy, no button (the image links to
+   the product). Landscape banners centre the photo; portrait phone banners keep the product in view with the cards' crop (6% from
+   the left, where every catalogue packshot has its product). On a light image the foot bar turns ink (.hero.is-light). */
+.hero__full { position: absolute; inset: 0; display: block; -webkit-user-drag: none; -webkit-tap-highlight-color: transparent; }
+.hero__fimg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; display: block; -webkit-user-drag: none; }
+@media (max-aspect-ratio: 1/1) { .hero__fimg { object-position: 6% 50%; } } /* portrait screens: the banner is taller than wide */
+.hero__full:focus-visible { outline: 2px solid #fff; outline-offset: -6px; }
+.hero.is-light .hero__bar { border-top-color: rgba(11, 11, 11, .16); }
+.hero.is-light .hero__bar .hero__arrow, .hero.is-light .dot { color: #0B0B0B; }
+.hero.is-light .hero__full:focus-visible { outline-color: #0B0B0B; }
 .hero__bar { position: absolute; z-index: 3; left: var(--hero-x); right: var(--hero-x); bottom: var(--hero-foot); display: flex; align-items: center; padding-top: clamp(16px, 1.8vw, 24px); border-top: 1.5px solid rgba(255, 255, 255, .14); pointer-events: none; }
 .hero__bar > * { pointer-events: auto; }
 .hero .hero__bar .hero__arrow { position: static; flex: none; display: grid; width: 48px; height: 40px; margin: 0; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; color: #fff; opacity: .78; transition: opacity 500ms cubic-bezier(.3, 1, .3, 1); }

@@ -863,21 +863,15 @@
     const E = 'cubic-bezier(.16,1,.3,1)';
     let i = 0, hover = false, busy = null, timer = 0, wordTimer = 0, drag = null, dragged = false;
     const words = t => esc(t).split(/\s+/).filter(Boolean).map(w => `<span class="hw"><span class="hw__i">${w}</span></span>`).join(' ');
+    // IMAGE-ONLY BANNERS (2026-10-07, "keep the banner size, remove the text and buttons, full size image — both themes"): every slide
+    // is its product image filling the banner on the photo's own sampled backdrop (the whole packshot shows — nothing cropped), and
+    // the image links to the product. Size, glide/drag, zoom, autoplay and the foot bar (hairline, arrows, bullets) are unchanged;
+    // the bar turns ink on a light image (`.is-light`) so it stays readable.
+    const isLight = s => { const h = String((s.bg || [])[0] || '').replace('#', ''); if (h.length !== 6) return false; const v = h.match(/../g).map(x => parseInt(x, 16) / 255).map(x => x <= .03928 ? x / 12.92 : Math.pow((x + .055) / 1.055, 2.4)); return .2126 * v[0] + .7152 * v[1] + .0722 * v[2] > .18; };
     el.innerHTML = slides.map((s, k) => `
-      <div class="hero__slide${s.pack ? ' hero__slide--pack' : ''}${k === 0 ? ' is-on' : ''}" aria-roledescription="slide" aria-label="${k + 1} of ${n}"${k ? ' aria-hidden="true"' : ''}>
-        ${s.pack && s.src ? `<a class="hero__pack" href="${url.product(s.pid)}" tabindex="-1" aria-hidden="true" draggable="false" style="background: radial-gradient(110% 80% at 50% 45%, ${s.bg[0]}, ${s.bg[1]});"><img src="${s.src}" alt="" draggable="false"${k ? ' loading="lazy"' : ''}></a>`
-          : s.src ? `<img class="hero__img" src="${s.src}" alt="${esc(s.hint)}" draggable="false"${HERO_POS[s.slotId] ? ` style="object-position: ${HERO_POS[s.slotId]};"` : ''}${k ? ' loading="lazy"' : ''}>` : ''}
-        <div class="hero__scrim"></div>
+      <div class="hero__slide hero__slide--full${k === 0 ? ' is-on' : ''}" aria-roledescription="slide" aria-label="${k + 1} of ${n}"${k ? ' aria-hidden="true"' : ''}>
+        <a class="hero__full" href="${url.product(s.pid)}" aria-label="${esc(s.hint || s.name || '')}" draggable="false"${k ? ' tabindex="-1"' : ''} style="background: ${s.bg ? `radial-gradient(110% 80% at 50% 45%, ${s.bg[0]}, ${s.bg[1]})` : '#111'};"><img class="hero__fimg" src="${s.src}" alt="" draggable="false"${k ? ' loading="lazy"' : ''}></a>
       </div>`).join('') + `
-      <div class="hero__words">${slides.map((s, k) => `
-        <div class="hero__copy${s.pack ? ' hero__copy--pack' : ''}" aria-current="${k === 0}"${k ? ' aria-hidden="true"' : ''}>
-          <div class="eyebrow eyebrow--warm">${words(s.kicker)}</div>
-          <div class="hw hw--block"><div class="hero__name hw__i">${esc(s.name)}</div></div>
-          <div class="hero__line">${words(s.line)}</div>
-          ${s.sub ? `<div class="hero__sub">${words(s.sub)}</div>` : ''}
-          <div class="hero__cta hw__i hw__i--cta">${btnBuy(s.ctaLabel, url.product(s.pid))}</div>
-        </div>`).join('')}
-      </div>
       <div class="hero__bar">
         <button type="button" class="hero__arrow hero__arrow--prev" aria-label="Previous slide"><svg viewBox="0 0 37 24" aria-hidden="true"><path d="M10 5L3 12M3 12L10 19M3 12H33.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <div class="hero__dots"><div class="dots" role="tablist" aria-label="Slides" style="position: static;">
@@ -886,6 +880,8 @@
         <button type="button" class="hero__arrow hero__arrow--next" aria-label="Next slide"><svg viewBox="0 0 37 24" aria-hidden="true"><path d="M26.5 5L33.5 12M33.5 12L26.5 19M33.5 12H3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       </div>`;
     const slideEls = [...el.querySelectorAll('.hero__slide')], copies = [...el.querySelectorAll('.hero__copy')], dots = el.querySelectorAll('.dot');
+    const paintBar = k => el.classList.toggle('is-light', isLight(slides[k]));
+    paintBar(0);
     const units = c => [...c.querySelectorAll('.hw__i')];
     const setCur = (c, on) => {
       c.setAttribute('aria-current', on);
@@ -895,7 +891,7 @@
     copies.forEach((c, k) => setCur(c, k === 0));
     const stopAnims = c => c.querySelectorAll('.hw__i').forEach(x => x.getAnimations().forEach(a => a.cancel()));
     const wordsIn = c => {
-      if (reduced() || !c.animate) return;
+      if (!c || reduced() || !c.animate) return;
       c.querySelectorAll('.hw').forEach(w => w.classList.remove('is-open'));
       const u = units(c);
       u.forEach((x, k) => {
@@ -917,6 +913,7 @@
       return 500 + 30 * u.length;
     };
     const swapWords = (from, to) => {
+      if (!from || !to) return; // image-only banners have no copy
       clearTimeout(wordTimer);
       copies.forEach(c => { if (c !== from) { stopAnims(c); setCur(c, false); } });
       const done = () => { stopAnims(from); setCur(from, false); setCur(to, true); wordsIn(to); };
@@ -924,7 +921,7 @@
       if (wait) wordTimer = setTimeout(done, wait); else done();
     };
     const zoom = slide => {
-      const m = slide.querySelector('.hero__img, .hero__pack img');
+      const m = slide.querySelector('.hero__img, .hero__pack img, .hero__fimg');
       if (m && !reduced() && m.animate) m.animate([{ transform: 'scale(1.3)' }, { transform: 'scale(1)' }], { duration: 1300, easing: E });
     };
     // from/to positions in % of the hero width (a drag hands over where the finger left them)
@@ -946,7 +943,8 @@
       swapWords(copies[i], copies[next]);
       i = next;
       dots.forEach((d, k) => d.setAttribute('aria-selected', k === i));
-      slideEls.forEach((s, k) => { if (k === i) s.removeAttribute('aria-hidden'); else s.setAttribute('aria-hidden', 'true'); });
+      slideEls.forEach((s, k) => { if (k === i) s.removeAttribute('aria-hidden'); else s.setAttribute('aria-hidden', 'true'); const a = s.querySelector('.hero__full'); if (a) a.tabIndex = k === i ? 0 : -1; });
+      paintBar(i);
       if (reduced() || !to.animate) { from.classList.remove('is-on'); to.classList.add('is-on'); }
       else { busy = glide(from, to, dir, offset); zoom(to); }
       play();
