@@ -26,6 +26,7 @@
     bulk: 'bulk-order.html',
     corporate: 'corporate.html',
     creators: 'creators.html',
+    affiliate: 'affiliate.html',
     about: 'about.html',
     where: 'where-to-buy.html',
     blog: 'blog.html',
@@ -43,7 +44,7 @@
   const LINKS = {
     'All Items': url.products, Audio: url.dept('audio'), Charging: url.dept('charging'), 'Cables & Adapters': url.dept('cables'),
     'Car Accessories': url.dept('car'), Computer: url.dept('computer'), 'Personal Care': url.dept('care'),
-    'Bulk Order': url.bulk, 'Corporate Order': url.corporate, 'Content Creators Program': url.creators, 'Live Shopping': url.live,
+    'Bulk Order': url.bulk, 'Corporate Order': url.corporate, 'Content Creators Program': url.creators, 'Affiliate Program': url.affiliate, 'Live Shopping': url.live,
     'About Us': url.about, 'Where to Buy': url.where, Blog: url.blog,
     'Smart Help Center': url.help, 'Help Center': url.help, 'Order Tracker': url.track, 'Express Delivery': url.express,
     'Exchange & Refund Policy': url.returns, 'Warranty Policy': url.warranty, 'Shipping Policy': url.shipping, 'Download e-Manual': url.manuals,
@@ -1192,6 +1193,7 @@
       ['Bulk Orders', url.bulk, 'bulk wholesale distributor retailer reseller stockist'],
       ['Corporate Orders', url.corporate, 'corporate company gift gifts employee client branding logo'],
       ['Content Creators Program', url.creators, 'creator influencer youtube tiktok instagram affiliate commission'],
+      ['Affiliate Program', url.affiliate, 'affiliate partner referral earn commission join program'],
       ['WisdomUp Live', url.live, 'live show stream friday deals'],
       ['About WisdomUp', url.about, 'about company brand story countries'],
       ['Where to Buy', url.where, 'where buy store retailer shop near me international'],
@@ -1956,7 +1958,7 @@
   /* ---------- Motion: quiet scroll reveal (text rises 8px and un-blurs; blocks rise and fade; siblings stagger) ---------- */
   const RV_TEXT = 'h1, h2, h3, .sec-title, .eyebrow, .ihero__lede, .overview__head p, .seo__head p, .mdesc, .pbanner__copy, p, .prose li, blockquote'; // 2026-10-06: every paragraph and sub-heading too (bugatti.store)
   const RV_BLOCK = '.wpc, .tile, .post, .stat, .pd-stat, .ck__sec, .ord__card, .rv__sum, .rv__item, .faq__item, .seo__card, .duo__card, '
-    + '.promo-band, .loop, .series, .bulk, .pp, .trust__item, .step, .manual, .panel-list, .cta-band, .ck__sumcard, .mgrid__more, .empty, .ord__hero, .track__form, .iform, .bk-form';
+    + '.promo-band, .loop, .series, .bulk, .pp, .trust__item, .step, .afs__step, .afx, .afw__card, .afhp__row, .afj, .manual, .panel-list, .cta-band, .ck__sumcard, .mgrid__more, .empty, .ord__hero, .track__form, .iform, .bk-form';
   const RV_SKIP = '#site-nav, .mnav, .cartd, .fdrawer, .search, .ckc, .hero, .buybar, .toast, .wu-util, .quick, .visually-hidden, .seo__more, .footer-wrap, label';
   let revealer = null;
   // ---------- Motion engine (MOTION-REPORT.md, approved 2026-10-06): reveals, grid staggers, scroll-driven curtain/clip, liquid fills, magnets ----------

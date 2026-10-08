@@ -1,0 +1,235 @@
+/* ==========================================================================
+   WisdomUp AFFILIATE PAGE (2026-10-09) — affiliate.html: the layout of lovense.com/sextoys/affiliate (banner → 3 easy steps +
+   explainer → why your audience will love it → how we help → join) rebuilt in our design language. DAY styles; night lives in
+   night.css ("Affiliate page" block). Day colour rule: neutrals + ONE accent (brand red). Every stroke 1.5px; controls are
+   capsules; cards 16px, panels 24px+.
+   ========================================================================== */
+
+.af-h { margin: 0; font: 800 clamp(30px, 3.2vw, 48px)/1.05 var(--font); letter-spacing: -.01em; text-transform: uppercase; color: #111; text-align: center; text-wrap: balance; }
+.af-photo { display: block; overflow: hidden; border-radius: 14px; box-shadow: 0 18px 40px rgba(0,0,0,.28); }
+.af-photo img { display: block; width: 100%; height: 100%; }
+
+/* ---------- 1. Banner ---------- */
+.afb { position: relative; isolation: isolate; margin: 16px var(--gutter, 28px) 0; min-height: clamp(400px, 36vw, 540px); padding: clamp(40px, 6vw, 80px) clamp(20px, 4vw, 64px); border-radius: clamp(24px, 4vw, 40px); overflow: hidden; display: grid; place-items: center;
+  background: radial-gradient(60% 90% at 50% -10%, rgba(217,30,5,.42) 0%, rgba(217,30,5,0) 62%), linear-gradient(160deg, #2C2D30 0%, #0C0C0D 100%); }
+.afb__art { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.afb__ph { position: absolute; aspect-ratio: 4 / 5; }
+.afb__ph--1 { left: 3.5%; top: 11%; width: 14%; transform: rotate(-8deg); }
+.afb__ph--2 { left: 10%; bottom: -7%; width: 12%; transform: rotate(6deg); }
+.afb__ph--3 { right: 4%; top: 9%; width: 13.5%; transform: rotate(7deg); }
+.afb__ph--4 { right: 11%; bottom: -9%; width: 12%; transform: rotate(-5deg); }
+.afb__ph--5, .afb__ph--6 { display: none; }
+.afb__copy { max-width: min(780px, 62%); text-align: center; display: flex; flex-direction: column; align-items: center; }
+.afb h1 { margin: 0; font: 700 clamp(30px, 3.6vw, 52px)/1.1 var(--font); letter-spacing: -.02em; color: #fff; text-wrap: balance; }
+.afb h1 b { font-weight: 800; color: #FF6A4A; }
+.afb__p { margin: 18px 0 0; max-width: 58ch; font: 400 clamp(15px, 1.2vw, 17px)/1.55 var(--font); color: #D6D8DB; text-wrap: pretty; }
+.afb__go { margin-top: 28px; }
+.afb + .crumbs { margin-top: 16px; }
+@media (max-width: 1023px) {
+  .afb__copy { max-width: min(680px, 74%); }
+  .afb__ph--1 { left: -3%; top: 12%; width: 18%; }
+  .afb__ph--3 { right: -3%; top: 14%; width: 17%; }
+  .afb__ph--2 { left: 4%; bottom: -10%; width: 15%; }
+  .afb__ph--4 { right: 4%; bottom: -12%; width: 15%; }
+}
+@media (max-width: 767px) {
+  .afb { display: flex; flex-direction: column; align-items: center; min-height: 0; padding: 28px 20px 32px; }
+  .afb__art { position: relative; inset: auto; z-index: 0; width: 100%; height: 132px; margin-bottom: 22px; display: flex; justify-content: center; align-items: center; }
+  .afb__ph { position: relative; left: auto; right: auto; top: auto; bottom: auto; width: 92px; flex: none; margin: 0 -10px; }
+  .afb__ph--1 { transform: rotate(-9deg) translateY(8px); }
+  .afb__ph--2 { transform: translateY(-4px); z-index: 1; width: 104px; }
+  .afb__ph--3 { transform: rotate(9deg) translateY(8px); }
+  .afb__ph--4 { display: none; }
+  .afb__copy { max-width: 100%; }
+  .afb__go { margin-top: 24px; }
+}
+
+/* ---------- 2. Get paid in 3 easy steps ---------- */
+.afs { margin: var(--sec) var(--gutter, 28px) 0; padding: clamp(40px, 5vw, 72px) clamp(16px, 4vw, 56px); border-radius: clamp(24px, 4vw, 40px); background: #F5F6F8; }
+.afs__steps { position: relative; list-style: none; max-width: 1040px; margin: clamp(28px, 3.4vw, 48px) auto 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.afs__steps::before { content: ''; position: absolute; top: 56px; left: 16.7%; right: 16.7%; height: 1.5px; background: #D2D2D2; }
+.afs__step { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+.afs__ic { display: grid; place-items: center; width: 112px; height: 112px; margin-bottom: 14px; border-radius: 50%; background: #fff; box-shadow: inset 0 0 0 1.5px #E3E4E6, 0 10px 30px rgba(0,0,0,.05); }
+.afs__ic svg { width: 48px; height: 48px; fill: none; stroke: #111; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.afs__ic .r { stroke: #D91E05; }
+.afs__step h3 { margin: 0; font: 700 20px/1.2 var(--font); color: #111; }
+.afs__step p { margin: 0; font: 400 15px/1.45 var(--font); color: #4A4D53; }
+@media (max-width: 639px) {
+  .afs__steps { gap: 8px; }
+  .afs__steps::before { top: 36px; }
+  .afs__ic { width: 72px; height: 72px; margin-bottom: 8px; }
+  .afs__ic svg { width: 32px; height: 32px; }
+  .afs__step h3 { font-size: 17px; }
+  .afs__step p { font-size: 13px; }
+}
+
+/* The walk-through of one order — in the place of lovense's video: steps on the left (the red bar under the current one is the
+   clock), the scene on the right; autoplays, pauses on hover / off screen / hidden tab, off for reduced motion */
+.afx { --afx-dur: 4.6s; position: relative; max-width: 1180px; margin: clamp(32px, 4vw, 56px) auto 0; display: grid; grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr); min-height: clamp(440px, 40vw, 560px); border-radius: 24px; overflow: hidden; color: #fff;
+  background: radial-gradient(60% 80% at 88% 8%, rgba(217,30,5,.34) 0%, rgba(217,30,5,0) 62%), linear-gradient(160deg, #2C2D30 0%, #0C0C0D 100%); }
+.afx__side { display: flex; flex-direction: column; padding: clamp(24px, 3.4vw, 44px); }
+.afx__kicker { font: 600 12px/1 var(--font); letter-spacing: .18em; text-transform: uppercase; color: #FF6A4A; }
+.afx__h { margin: 12px 0 22px; font: 700 clamp(22px, 2.2vw, 30px)/1.15 var(--font); letter-spacing: -.01em; color: #fff; text-wrap: balance; }
+.afx__list { list-style: none; margin: 0 0 18px; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.afx__step { display: grid; grid-template-columns: 28px minmax(0, 1fr); column-gap: 14px; row-gap: 3px; width: 100%; padding: 12px 0; border: 0; background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.afx__n { grid-row: 1 / span 3; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.28); font: 700 13px/1 var(--font); color: rgba(255,255,255,.7); transition: background-color 500ms cubic-bezier(.3,1,.3,1), color 500ms cubic-bezier(.3,1,.3,1), box-shadow 500ms cubic-bezier(.3,1,.3,1); }
+.afx__t { font: 700 16px/1.3 var(--font); color: rgba(255,255,255,.62); transition: color 500ms cubic-bezier(.3,1,.3,1); }
+.afx__s { font: 400 14px/1.45 var(--font); color: rgba(255,255,255,.5); transition: color 500ms cubic-bezier(.3,1,.3,1); }
+.afx__step[aria-current] .afx__n { background: #fff; color: #0B0B0B; box-shadow: none; }
+.afx__step[aria-current] .afx__t { color: #fff; }
+.afx__step[aria-current] .afx__s { color: rgba(255,255,255,.8); }
+.afx__step:focus-visible { outline: 2px solid #fff; outline-offset: 2px; border-radius: 12px; }
+@media (hover: hover) and (pointer: fine) { .afx__step:not([aria-current]):hover .afx__t { color: #fff; } }
+.afx__bar { grid-column: 2; display: block; height: 3px; margin-top: 8px; border-radius: 999px; background: rgba(255,255,255,.14); overflow: hidden; opacity: 0; transition: opacity 300ms ease; }
+.afx__bar i { display: block; height: 100%; background: #D91E05; transform-origin: 0 50%; transform: scaleX(0); }
+.afx__step[aria-current] .afx__bar { opacity: 1; }
+.afx__step[aria-current] .afx__bar i { animation: afx-run var(--afx-dur) linear forwards; }
+.afx.is-paused .afx__bar i { animation-play-state: paused; }
+@keyframes afx-run { to { transform: scaleX(1); } }
+.afx__play { display: grid; place-items: center; width: 34px; height: 34px; margin-top: auto; padding: 0; border: 0; border-radius: 50%; background: rgba(255,255,255,.1); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.22); color: #fff; cursor: pointer; }
+.afx__play svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.afx__play .afx__i-play { fill: currentColor; stroke: none; display: none; }
+.afx.is-stopped .afx__i-pause { display: none; }
+.afx.is-stopped .afx__i-play { display: block; }
+.afx__play:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+@media (hover: hover) and (pointer: fine) { .afx__play:hover { background: rgba(255,255,255,.18); } }
+
+.afx__stage { position: relative; min-height: 380px; }
+.afx__sc { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: clamp(20px, 3vw, 44px); pointer-events: none; }
+.afx__sc > *, .afx__bill > * { opacity: 0; transform: translateY(24px); transition: opacity 400ms cubic-bezier(.3,1,.3,1), transform 1000ms cubic-bezier(.16,1,.3,1); }
+.afx__sc.is-on > *, .afx__sc.is-on .afx__bill > * { opacity: 1; transform: none; transition-delay: calc(160ms + var(--i, 0) * 100ms); }
+.afx__sc.is-on .afx__bill > * { transition-delay: calc(260ms + var(--i, 0) * 110ms); } /* the bill rises, then its rows */
+/* scene 1: the link opens the product */
+.afx__url { display: flex; align-items: center; gap: 8px; max-width: min(100%, 440px); height: 40px; padding: 0 16px; border-radius: 999px; background: rgba(255,255,255,.08); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.16); font: 500 13px/1 var(--font); color: rgba(255,255,255,.72); }
+.afx__url svg { flex: none; width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+.afx__url > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.afx__url b { color: #fff; font-weight: 700; }
+.afx__card { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 16px; align-items: center; width: min(100%, 440px); padding: 14px; border-radius: 16px; background: #fff; color: #111; box-shadow: 0 24px 60px rgba(0,0,0,.45); }
+.afx__ph { width: 120px; height: 120px; border-radius: 12px; box-shadow: none; }
+.afx__ct { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; min-width: 0; }
+.afx__name { font: 700 15px/1.3 var(--font); color: #111; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.afx__price { font: 800 20px/1 var(--font); color: #111; }
+.afx__tag { display: inline-flex; align-items: center; height: 26px; padding: 0 11px; border-radius: 999px; background: #FFEDE7; color: #B81A04; font: 700 12px/1 var(--font); }
+/* scene 2: the discount at checkout */
+.afx__bill { display: flex; flex-direction: column; width: min(100%, 420px); padding: 10px 22px 22px; border-radius: 16px; background: #fff; color: #111; box-shadow: 0 24px 60px rgba(0,0,0,.45); }
+.afx__row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 13px 0; box-shadow: inset 0 -1.5px 0 #EEEFF1; font: 500 15px/1.3 var(--font); color: #3D3F44; }
+.afx__row--off > span:last-child { color: #D91E05; font-weight: 700; }
+.afx__row--total { box-shadow: none; color: #111; font-weight: 700; }
+.afx__row--total b { font: 800 26px/1 var(--font); letter-spacing: -.02em; }
+.afx__code { display: inline-flex; align-items: center; height: 22px; padding: 0 9px; margin-right: 4px; border-radius: 999px; background: #111; color: #fff; font: 700 11px/1 var(--font); letter-spacing: .08em; }
+.afx__cod { align-self: flex-start; display: inline-flex; align-items: center; height: 30px; padding: 0 13px; border-radius: 999px; box-shadow: inset 0 0 0 1.5px #111; font: 600 13px/1 var(--font); color: #111; }
+/* scene 3: delivered */
+.afx__track { position: relative; display: flex; justify-content: space-between; width: min(100%, 420px); }
+.afx__track::before, .afx__track::after { content: ''; position: absolute; top: 18px; left: 34px; right: 34px; height: 1.5px; background: rgba(255,255,255,.2); }
+.afx__track::after { background: #D91E05; transform-origin: 0 50%; transform: scaleX(0); transition: transform 1200ms cubic-bezier(.16,1,.3,1) 300ms; }
+.afx__sc.is-on .afx__track::after { transform: scaleX(1); }
+.afx__node { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 10px; width: 68px; font: 600 13px/1 var(--font); color: #fff; }
+.afx__node i { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: #2A2B2E; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.25); transition: background-color 500ms cubic-bezier(.3,1,.3,1), box-shadow 500ms cubic-bezier(.3,1,.3,1); }
+.afx__node svg { width: 18px; height: 18px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; opacity: .35; transition: opacity 500ms ease; }
+.afx__sc.is-on .afx__node i { background: #D91E05; box-shadow: none; transition-delay: calc(300ms + var(--k) * 450ms); }
+.afx__sc.is-on .afx__node svg { opacity: 1; transition-delay: calc(300ms + var(--k) * 450ms); }
+.afx__parcel { display: flex; align-items: center; gap: 14px; width: min(100%, 420px); margin-top: 18px; padding: 12px 18px 12px 12px; border-radius: 16px; background: #fff; color: #111; box-shadow: 0 24px 60px rgba(0,0,0,.45); }
+.afx__ph--s { flex: none; width: 64px; height: 64px; border-radius: 10px; }
+.afx__parcel > span:last-child { display: flex; flex-direction: column; gap: 4px; font: 400 14px/1.3 var(--font); color: #4A4D53; }
+.afx__parcel b { font: 700 16px/1.2 var(--font); color: #111; }
+/* scene 4: you earn */
+.afx__label { font: 600 12px/1 var(--font); letter-spacing: .18em; text-transform: uppercase; color: rgba(255,255,255,.72); }
+.afx__big { font: 800 clamp(56px, 7vw, 104px)/1 var(--font); letter-spacing: -.04em; color: #fff; }
+.afx__math { font: 500 15px/1.4 var(--font); color: rgba(255,255,255,.78); text-align: center; }
+.afx__chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 6px; }
+.afx__chips span { display: inline-flex; align-items: center; height: 32px; padding: 0 13px; border-radius: 999px; background: rgba(255,255,255,.08); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.18); font: 600 12px/1 var(--font); color: #fff; }
+@media (max-width: 767px) {
+  .afx { grid-template-columns: minmax(0, 1fr); min-height: 0; }
+  .afx__stage { order: -1; min-height: 340px; }
+  .afx__side { padding-top: 4px; }
+  .afx__card { grid-template-columns: 92px minmax(0, 1fr); gap: 12px; padding: 12px; }
+  .afx__ph { width: 92px; height: 92px; }
+  .afx__row--total b { font-size: 22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .afx__bar i { animation: none !important; transform: scaleX(1); }
+  .afx__play { display: none; }
+}
+
+/* ---------- 3. Why your audience will love WisdomUp ---------- */
+.afw { margin: var(--sec) var(--gutter, 28px) 0; }
+.afw__grid { max-width: 1080px; margin: clamp(28px, 3.4vw, 48px) auto 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(24px, 4vw, 56px); }
+.afw__card { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+.afw__img { position: relative; width: 100%; aspect-ratio: 4 / 3; margin-bottom: 14px; border-radius: 24px; background: #F5F6F8; overflow: hidden; }
+.afw__card h3 { margin: 0; font: 700 clamp(20px, 1.8vw, 24px)/1.25 var(--font); color: #111; text-wrap: balance; }
+.afw__card p { margin: 0; max-width: 46ch; font: 400 16px/1.55 var(--font); color: #4A4D53; text-wrap: pretty; }
+.afw__ph { position: absolute; aspect-ratio: 4 / 5; box-shadow: 0 18px 40px rgba(0,0,0,.14); }
+.afw__ph--1 { left: 10%; top: 24%; width: 32%; transform: rotate(-6deg); }
+.afw__ph--2 { left: 32%; top: 17%; width: 36%; z-index: 1; }
+.afw__ph--3 { right: 10%; top: 24%; width: 32%; transform: rotate(6deg); }
+.afw__img--trust { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 20px; }
+.afw__pill { display: inline-flex; align-items: center; gap: 10px; height: 44px; padding: 0 20px 0 14px; border-radius: 999px; background: #fff; box-shadow: inset 0 0 0 1.5px #E3E4E6, 0 8px 20px rgba(0,0,0,.05); font: 600 15px/1 var(--font); color: #111; white-space: nowrap; }
+.afw__pill:nth-child(odd) { transform: translateX(-18px); }
+.afw__pill:nth-child(even) { transform: translateX(18px); }
+.afw__pill svg { flex: none; width: 22px; height: 22px; fill: none; stroke: #111; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.afw__pill .r { stroke: #D91E05; }
+@media (max-width: 767px) {
+  .afw__grid { grid-template-columns: minmax(0, 1fr); gap: 40px; }
+  .afw__pill { height: 40px; font-size: 14px; }
+  .afw__pill:nth-child(odd) { transform: translateX(-10px); }
+  .afw__pill:nth-child(even) { transform: translateX(10px); }
+}
+
+/* ---------- 4. How WisdomUp can help you: copy left, picture right ---------- */
+.afhp { margin: var(--sec) var(--gutter, 28px) 0; }
+.afhp__row { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 440px); gap: clamp(24px, 5vw, 72px); align-items: center; padding: clamp(28px, 3.4vw, 44px) 0; box-shadow: inset 0 -1.5px 0 #E3E4E6; }
+.afhp__row:first-of-type { margin-top: clamp(12px, 2vw, 24px); }
+.afhp__row:last-child { box-shadow: none; }
+.afhp__n { font: 700 13px/1 var(--font); letter-spacing: .16em; color: #D91E05; }
+.afhp__copy h3 { margin: 10px 0 12px; font: 700 clamp(22px, 2.2vw, 30px)/1.2 var(--font); letter-spacing: -.01em; color: #111; text-wrap: balance; }
+.afhp__copy p { margin: 0; max-width: 56ch; font: 400 16px/1.6 var(--font); color: #4A4D53; text-wrap: pretty; }
+.afhp__art { display: grid; place-items: center; min-height: 260px; padding: clamp(20px, 2.6vw, 32px); border-radius: 24px; background: #F5F6F8; }
+@media (max-width: 767px) {
+  .afhp__row { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .afhp__art { min-height: 0; }
+}
+/* small drawings of the dashboard's tools (decorative — aria-hidden in the page) */
+.afm { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 360px; padding: 20px; border-radius: 16px; background: #fff; box-shadow: inset 0 0 0 1.5px #E3E4E6, 0 12px 30px rgba(0,0,0,.06); }
+.afm__label { font: 600 11px/1 var(--font); letter-spacing: .16em; text-transform: uppercase; color: #6B6F76; }
+.afm__code { font: 800 30px/1 var(--font); letter-spacing: .06em; color: #111; }
+.afm__link { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border-radius: 999px; background: #F5F6F8; font: 500 13px/1 var(--font); color: #3D3F44; min-width: 0; }
+.afm__link > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.afm svg { flex: none; width: 16px; height: 16px; fill: none; stroke: #111; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.afm__btns { display: flex; gap: 8px; }
+.afm__btn { display: inline-flex; align-items: center; height: 32px; padding: 0 14px; border-radius: 999px; box-shadow: inset 0 0 0 1.5px #111; font: 600 12px/1 var(--font); color: #111; white-space: nowrap; }
+.afm__btn--ink { background: #111; color: #fff; box-shadow: none; }
+.afm__search { display: flex; align-items: center; gap: 8px; height: 38px; padding: 0 14px; border-radius: 999px; box-shadow: inset 0 0 0 1.5px #D2D2D2; font: 500 14px/1 var(--font); color: #111; }
+.afm__rows { display: flex; flex-direction: column; }
+.afm__item { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 0; box-shadow: inset 0 -1.5px 0 #EEEFF1; }
+.afm__item:last-child { box-shadow: none; }
+.afm__ph { width: 44px; height: 44px; border-radius: 10px; box-shadow: none; }
+.afm__it { display: flex; flex-direction: column; gap: 3px; min-width: 0; font: 600 13px/1.25 var(--font); color: #111; }
+.afm__it > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.afm__it b { font-weight: 700; color: #3D3F44; }
+.afm__item .afm__btn { height: 28px; padding: 0 11px; font-size: 11px; }
+.afm__cap { padding: 12px 14px; border-radius: 14px 14px 14px 4px; background: #F5F6F8; font: 400 13px/1.45 var(--font); color: #3D3F44; }
+.afm__chart { display: grid; grid-template-columns: 50px minmax(0, 1fr); gap: 10px; align-items: end; }
+.afm__lab { font: 600 11px/1 var(--font); color: #6B6F76; padding-bottom: 2px; }
+.afm__bars { display: flex; align-items: flex-end; gap: 2px; height: 46px; box-shadow: inset 0 -1.5px 0 #E3E4E6; }
+.afm__bars i { flex: 1; height: var(--h); border-radius: 2px 2px 0 0; background: #111; }
+.afm__bars--red i { background: #D91E05; }
+.afm__tier { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.afm__tierrow { display: flex; justify-content: space-between; font: 600 12px/1 var(--font); color: #6B6F76; }
+.afm__tierrow b { color: #111; }
+.afm__track { height: 6px; border-radius: 999px; background: #E3E4E6; overflow: hidden; }
+.afm__track i { display: block; width: 62%; height: 100%; border-radius: 999px; background: #D91E05; }
+
+/* ---------- 5. Join ---------- */
+.afj { margin: var(--sec) var(--gutter, 28px) 0; padding: clamp(40px, 5vw, 72px) 20px; border-radius: clamp(24px, 4vw, 40px); background: #F5F6F8; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
+.afj__h { margin: 0; font: 800 clamp(28px, 3vw, 44px)/1.05 var(--font); letter-spacing: -.01em; text-transform: uppercase; color: #111; text-wrap: balance; }
+.afj p { margin: 0; font: 400 16px/1.5 var(--font); color: #4A4D53; }
+.page--aff .afj__go { margin-top: 10px; min-width: min(100%, 300px); justify-content: center; }
+.afj__more { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 12px; margin-top: 8px; font: 500 14px/1.4 var(--font); color: #6B6F76; }
+.afj__more a { color: #111; }
+
+@media (max-width: 639px) {
+  .af-h { font-size: 26px; }
+  .afj__h { font-size: 26px; }
+  .afj__more { flex-direction: column; gap: 8px; }
+  .afj__more > span { display: none; }
+}

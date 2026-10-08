@@ -45,7 +45,7 @@ window.WU_STORE = (function () {
     ],
     footer: [
       { title: 'Products', links: ['All Items', 'Audio', 'Charging', 'Cables & Adapters', 'Car Accessories', 'Computer', 'Personal Care'] },
-      { title: 'Explore', links: ['Bulk Order', 'Corporate Order', 'Content Creators Program', 'Live Shopping', 'About Us', 'Where to Buy', 'Blog'] },
+      { title: 'Explore', links: ['Bulk Order', 'Corporate Order', 'Content Creators Program', 'Affiliate Program', 'Live Shopping', 'About Us', 'Where to Buy', 'Blog'] },
       { title: 'Support', links: ['Smart Help Center', 'Order Tracker', 'Exchange & Refund Policy', 'Warranty Policy', 'Shipping Policy', 'Download e-Manual'] },
     ],
     contact: { phone: '+92 327 9800153', email: 'support@wisdomup.pk', hours: 'Mon–Sun, 10 AM – 6 PM' },
