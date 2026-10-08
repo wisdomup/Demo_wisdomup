@@ -190,22 +190,13 @@
   /* ---------- Live: countdown to Friday 8 PM PKT + reminder ---------- */
   const cd = document.querySelector('[data-countdown]');
   if (cd) {
-    const pad = n => String(n).padStart(2, '0');
-    const nextShow = () => { const n = new Date(), t = new Date(n); t.setHours(20, 0, 0, 0); let a = (5 - n.getDay() + 7) % 7; if (a === 0 && n >= t) a = 7; t.setDate(t.getDate() + a); return t; };
-    const tick = () => {
-      const ms = nextShow() - new Date();
-      cd.innerHTML = [[pad(Math.floor(ms / 864e5)), 'Days'], [pad(Math.floor(ms / 36e5) % 24), 'Hrs'], [pad(Math.floor(ms / 6e4) % 60), 'Min'], [pad(Math.floor(ms / 1e3) % 60), 'Sec']]
-        .map(([v, l]) => `<div><b>${v}</b><span>${l}</span></div>`).join('');
-    };
+    // Friday 8 PM Pakistan time whatever the visitor's clock zone (WU.live); the date is shown as it falls in Pakistan
+    const tick = () => { cd.innerHTML = WU.live.parts().map(([v, l]) => `<div><b>${v}</b><span>${l}</span></div>`).join(''); };
     tick(); setInterval(tick, 1000);
     const nd = $('live-next');
-    if (nd) nd.textContent = nextShow().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) + ' · 8 PM PKT';
+    if (nd) nd.textContent = new Date(WU.live.next()).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'Asia/Karachi' }) + ' · 8 PM PKT';
   }
-  document.querySelectorAll('[data-remind]').forEach(b => b.addEventListener('click', () => {
-    b.textContent = 'Reminder set';
-    b.setAttribute('aria-pressed', 'true');
-    toast('We’ll remind you before Friday’s show');
-  }));
+  document.querySelectorAll('[data-remind]').forEach(b => b.addEventListener('click', WU.live.remind)); // a calendar event with an alert
 
   /* ---------- Blog index + article ---------- */
   const POSTS = window.WU_POSTS || [];

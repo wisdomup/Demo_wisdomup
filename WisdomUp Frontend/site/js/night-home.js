@@ -34,19 +34,9 @@
 
   /* ---------- Live card (redesigned 2026-10-07, "this part looks ugly … make it beautiful"): a stage-lit black panel — badge +
      schedule, the title and the Live page's own line, a countdown to the next show (Friday 8 PM PKT, worked out in Pakistan
-     time whatever the visitor's clock says) and a sound-wave strip that moves (still for reduced motion). Facts from live.html. ---------- */
-  const PKT = 5 * 36e5;
-  const nextShow = () => {
-    const now = Date.now(), p = new Date(now + PKT); // p's UTC fields = the time in Pakistan
-    let t = Date.UTC(p.getUTCFullYear(), p.getUTCMonth(), p.getUTCDate(), 20) - PKT + ((5 - p.getUTCDay() + 7) % 7) * 864e5;
-    if (t <= now) t += 7 * 864e5;
-    return t - now;
-  };
-  const liveCells = () => {
-    const ms = nextShow(), pad = n => String(n).padStart(2, '0');
-    return [[Math.floor(ms / 864e5), 'Days'], [Math.floor(ms / 36e5) % 24, 'Hours'], [Math.floor(ms / 6e4) % 60, 'Min'], [Math.floor(ms / 1e3) % 60, 'Sec']]
-      .map(([v, l]) => `<span class="nh-live__cell"><b>${pad(v)}</b><small>${l}</small></span>`).join('');
-  };
+     time whatever the visitor's clock says — WU.live, shared with the day home and the Live page) and a sound-wave strip that
+     moves (still for reduced motion). Facts from live.html. ---------- */
+  const liveCells = () => WU.live.parts(true).map(([v, l]) => `<span class="nh-live__cell"><b>${v}</b><small>${l}</small></span>`).join('');
   // 56 bars under a soft arch; each one breathes at its own pace (fixed numbers, so every visit looks the same)
   const EQ = Array.from({ length: 56 }, (_, i) => {
     const h = Math.round(22 + 70 * Math.sin(Math.PI * (i + .5) / 56) * (.55 + .45 * Math.abs(Math.sin(i * 1.7))));

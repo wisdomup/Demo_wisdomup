@@ -153,6 +153,34 @@ SEO_TAG = re.compile(
     r'<title>.*?</title>|<meta (?:name|property)="(?:description|robots|og:[^"]+|twitter:[^"]+|product:[^"]+)"[^>]*>'
     r'|<link rel="canonical"[^>]*>|<script type="application/ld\+json"[^>]*>.*?</script>', re.S)
 
+# Looping carousels draw 3 copies of their slides so they can glide forever; the 2 hidden copies (aria-hidden) are left out of
+# the snapshot (2026-10-08, after a review counted the home slides "3 times"): crawlers then read each slide once, the page is
+# lighter, and the page scripts draw the copies again on load (they render these tracks with innerHTML).
+CLONE_CLASSES = ('loop__slide', 'news__card', 'promo-band__item', 'feat__slide', 'bban__card')
+CLONE_OPEN = re.compile(r'<(article|div|a)\b[^>]*\bclass="(?:%s)\b[^"]*"[^>]*\baria-hidden="true"[^>]*>' % '|'.join(CLONE_CLASSES))
+
+
+def strip_clones(html):
+    out, pos = [], 0
+    while True:
+        m = CLONE_OPEN.search(html, pos)
+        if not m:
+            break
+        tag, depth, i = m.group(1), 1, m.end()
+        tok = re.compile(r'<(/?)%s\b[^>]*>' % tag)
+        while depth:
+            t = tok.search(html, i)
+            if not t:  # unbalanced markup: keep everything as it is
+                return html
+            depth += -1 if t.group(1) else (0 if t.group(0).endswith('/>') else 1)
+            i = t.end()
+        out.append(html[pos:m.start()])
+        pos = i
+    out.append(html[pos:])
+    # the tracks' saved scroll position assumed 3 copies: drop it, so the one copy left shows from its first slide until the
+    # scripts take over
+    return re.sub(r'(<div class="[a-z-]+__track"[^>]*?) style="[^"]*transform[^"]*"', r'\1', ''.join(out))
+
 
 def build_one(t, tmp):
     page, query, out_rel = t
@@ -190,6 +218,7 @@ def build_one(t, tmp):
     # the footer's bottom margin is measured on load (fitGap) and differs by a pixel or two between runs — the scripts set it
     # again anyway, so leave it out and a rebuild without real changes leaves the files untouched
     body = re.sub(r'(<div class="footer-wrap[^"]*" id="footer") style="[^"]*"', r'\1', body)
+    body = strip_clones(body)
     body = re.sub(r'\n{3,}', '\n\n', body)
     out = re.sub(r'(<body[^>]*>).*(</body>)', lambda m: m.group(1) + body + m.group(2), out, count=1, flags=re.S)
     out = out.replace('<!-- pre-rendered', '<!-- (old) pre-rendered')

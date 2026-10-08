@@ -215,25 +215,13 @@
     return `<a class="mic" href="${url.product(id)}"><span class="mic__code">${esc(code(p))}</span><span class="mic__meta">${esc(p.meta)}</span><span class="mic__price">${esc(p.priceText)}</span></a>`;
   }).join('');
 
-  const pad = n => String(n).padStart(2, '0');
-  function nextShowMs() {
-    const d = new Date(), t = new Date(d);
-    t.setHours(20, 0, 0, 0);
-    let addDays = (5 - d.getDay() + 7) % 7;
-    if (addDays === 0 && d >= t) addDays = 7;
-    t.setDate(t.getDate() + addDays);
-    return t - d;
-  }
+  // Countdown to Friday 8 PM Pakistan time (WU.live — the same routine everywhere) and a real calendar reminder
   function tick() {
-    const ms = nextShowMs();
-    $('countdown').innerHTML = [
-      [pad(Math.floor(ms / 864e5)), 'Days'], [pad(Math.floor(ms / 36e5) % 24), 'Hrs'],
-      [pad(Math.floor(ms / 6e4) % 60), 'Min'], [pad(Math.floor(ms / 1e3) % 60), 'Sec'],
-    ].map(([v, l]) => `<div class="countdown__cell"><span class="countdown__v">${v}</span><span class="countdown__l">${l}</span></div>`).join('');
+    $('countdown').innerHTML = WU.live.parts().map(([v, l]) => `<div class="countdown__cell"><span class="countdown__v">${v}</span><span class="countdown__l">${l}</span></div>`).join('');
   }
   tick();
   setInterval(tick, 1000);
-  $('remind').addEventListener('click', e => { e.currentTarget.textContent = 'Reminder set'; });
+  $('remind').addEventListener('click', WU.live.remind);
 
   /* ---------- Promo carousel ---------- */
   (function promos() {

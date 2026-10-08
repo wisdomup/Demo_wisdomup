@@ -2278,6 +2278,48 @@
     }, { passive: true });
   }
 
+  /* ---------- WisdomUp Live (fixed 2026-10-08 after an outside review): the next show is Friday 8 PM in PAKISTAN TIME (UTC+5, no
+     daylight saving) whatever the visitor's clock zone — the day home and the Live page used the visitor's own clock, so abroad the
+     countdown was hours off. ONE routine for every countdown; labels follow the number (1 Day, 2 Days). "Remind me" is a REAL
+     reminder: a calendar event for the show (repeats every Friday, alert 30 minutes before) kept by the visitor's own calendar. */
+  const PKT_MS = 5 * 36e5;
+  function nextLive(now = Date.now()) {
+    const p = new Date(now + PKT_MS);
+    let t = Date.UTC(p.getUTCFullYear(), p.getUTCMonth(), p.getUTCDate(), 20) - PKT_MS + ((5 - p.getUTCDay() + 7) % 7) * 864e5;
+    if (t <= now) t += 7 * 864e5;
+    return t;
+  }
+  function liveParts(long) {
+    const ms = Math.max(0, nextLive() - Date.now());
+    const v = [Math.floor(ms / 864e5), Math.floor(ms / 36e5) % 24, Math.floor(ms / 6e4) % 60, Math.floor(ms / 1e3) % 60];
+    const L = [['Day', 'Days'], long ? ['Hour', 'Hours'] : ['Hr', 'Hrs'], ['Min', 'Min'], ['Sec', 'Sec']];
+    return v.map((n, i) => [String(n).padStart(2, '0'), L[i][n === 1 ? 0 : 1]]);
+  }
+  function liveReminder() {
+    const t = nextLive(), f = d => new Date(d).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+    const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//WisdomUp//Live//EN', 'CALSCALE:GREGORIAN', 'BEGIN:VEVENT',
+      `UID:wisdomup-live@wisdomup.pk`, `DTSTAMP:${f(Date.now())}`, `DTSTART:${f(t)}`, `DTEND:${f(t + 36e5)}`, 'RRULE:FREQ=WEEKLY;BYDAY=FR',
+      'SUMMARY:WisdomUp Live', `DESCRIPTION:Live shopping with live-only prices. Watch: ${abs('live.html')}`, `URL:${abs('live.html')}`,
+      'BEGIN:VALARM', 'TRIGGER:-PT30M', 'ACTION:DISPLAY', 'DESCRIPTION:WisdomUp Live starts in 30 minutes', 'END:VALARM', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' }));
+    a.download = 'wisdomup-live.ics';
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    toast('Open the calendar file to add Friday’s show — it reminds you 30 minutes before');
+  }
+  // Prices quoted in page copy follow the catalogue and the sale (2026-10-08: the home page's About text still quoted pre-sale
+  // prices — Rs.6,840 for the TS-11ANC next to Rs.5,850 everywhere else). data-price="id" → that product's price;
+  // data-from="type" → the lowest price in that type; data-from="id,id" → the lowest of those products.
+  function fillPrices(root = document) {
+    root.querySelectorAll('[data-price]').forEach(el => { const p = D.byId(el.dataset.price); if (p) el.textContent = p.priceText; });
+    root.querySelectorAll('[data-from]').forEach(el => {
+      const k = el.dataset.from.split(',').map(x => x.trim());
+      const ps = k.length > 1 || D.byId(k[0]) ? k.map(id => D.byId(id)).filter(Boolean) : D.products.filter(p => p.type === k[0] && !p.soldOut);
+      if (ps.length) el.textContent = D.rs(Math.min(...ps.map(p => p.price)));
+    });
+  }
+
   function initChrome({ active = null } = {}) {
     activeCat = active;
     renderUtility();
@@ -2293,6 +2335,7 @@
     captureRef();
     consentUI = mountConsent();
     tasteInit();
+    fillPrices();
     initMotion();
     mountToTop();
     runEdges();
@@ -2936,7 +2979,8 @@
     openSearch: () => search && search.open(),
     toggleTheme, setTheme, themeMode, isNight, slide, staggerCards, revealWords, sheetDrag, quickAdd, budget: BUDGET, STAR_OUTLINE,
     consent: { open: n => consentUI && consentUI.open(n), get: consentGet },
-    taste: { get: tasteGet, suggest, clear: tasteClear, on: personalOK }, // the on-device interest model (personalised suggestions)
+    taste: { get: tasteGet, suggest, clear: tasteClear, on: personalOK },
+    live: { next: nextLive, parts: liveParts, remind: liveReminder }, fillPrices, // the on-device interest model (personalised suggestions)
     search: { run: q => runSearch(q) }, // the search engine (tools/search_eval.js scores it against tools/search_eval.json)
     ref: { get: () => ref, apply: applyRef, clear: clearRef, api: crApi, norm: codeNorm, pctOf, TAG: TAG_SVG, me: () => store.get(ME_KEY, null), setMe: v => { if (v) store.set(ME_KEY, v); else try { localStorage.removeItem(ME_KEY); } catch (e) { /* storage unavailable */ } } },
     seo, abs, clip, ldCrumbs, ldFaq, px, pxItem, YEAR, SITE,
