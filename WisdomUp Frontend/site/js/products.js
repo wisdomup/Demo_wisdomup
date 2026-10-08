@@ -216,7 +216,7 @@
   window.addEventListener('scroll', spy, { passive: true });
   window.addEventListener('wu-nav', e => $('mbar').classList.toggle('is-up', e.detail.hidden));
   window.addEventListener('hashchange', () => {
-    if (catFromHash()) { state.cat = catFromHash(); state.dept = null; syncUrl(); render(); scrollToEl($('mbar'), 0); }
+    if (catFromHash()) { state.cat = catFromHash(); state.dept = null; syncUrl(); freshGrid(true); }
   });
 
   /* ---------- Sort dropdown (popover with ✓ on the active option) ---------- */
@@ -281,11 +281,20 @@
     sortPanel.style.setProperty('--sb-h', r.height + 'px');
     sortPanel.style.setProperty('--sb-l', Math.max(0, pw - shift - r.width) + 'px');
     $('mgrid').classList.add('is-sorting');
-    closeSort(true, () => {
-      render();
-      $('mgrid').classList.remove('is-sorting');
-      WU.staggerCards($('mgrid'));
-    });
+    closeSort(true, freshGrid);
+  }
+  // ONE card animation for every new view of the grid (2026-10-08, "add the cards animation which we already have on the mobile
+  // view when applying the filters also the sorting"): the grid dims while the panel folds/closes, then the new cards are painted
+  // and rise in one after another (WU.staggerCards — 30px / 300ms / 50ms apart on phones, 50px / 500ms / 100ms wider), counted
+  // from the top of the grid so the cards that will be on screen glide in even while the page scrolls back to the bar.
+  function freshGrid(scrollTo) {
+    render();
+    const g = $('mgrid'), c = g.children[0];
+    const cols = getComputedStyle(g).gridTemplateColumns.split(' ').filter(Boolean).length || 1;
+    const rows = c ? Math.ceil(innerHeight / Math.max(160, c.offsetHeight)) + 1 : 3;
+    if (scrollTo) scrollToEl($('mbar'), 0);
+    g.classList.remove('is-sorting');
+    WU.staggerCards(g, { first: cols * rows });
   }
   sortBtn.addEventListener('click', () => (sortOpen() ? closeSort() : openSort()));
   $('msort-x').addEventListener('click', () => closeSort(true));
@@ -401,8 +410,9 @@
   $('apply-filters').addEventListener('click', () => {
     Object.assign(state, copyState(draft));
     history.replaceState(null, '', location.pathname + location.search);
-    syncUrl(); render();
-    closeDrawer(() => { scrollToEl($('mbar'), 0); openBtn.focus({ preventScroll: true }); });
+    syncUrl();
+    $('mgrid').classList.add('is-sorting'); // the grid dims behind the closing panel; the new cards glide in once it has gone
+    closeDrawer(() => { freshGrid(true); openBtn.focus({ preventScroll: true }); });
   });
   // Keyboard: Escape closes, Tab stays inside the panel
   drawer.addEventListener('keydown', e => {

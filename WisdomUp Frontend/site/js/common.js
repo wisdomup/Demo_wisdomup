@@ -1821,7 +1821,9 @@
   }
 
   // Grid items enter 50px lower and fade in, 500ms ease, 100ms apart (phones 30px / 300ms / 50ms) — used when a tab swaps its cards
-  function staggerCards(container) {
+  // first = animate the first n cards wherever they are (2026-10-08: used when the page is about to scroll to the grid, so the
+  // cards that will be on screen still glide in); otherwise only the cards on screen now
+  function staggerCards(container, { first } = {}) {
     if (!container) return;
     const items = [...container.children];
     items.forEach(el => el.classList.add('is-in'));
@@ -1829,9 +1831,9 @@
     const H = innerHeight, W = innerWidth;
     const d = phone() ? 30 : 50, t = phone() ? 300 : 500, gap = phone() ? 50 : 100;
     let k = 0;
-    items.forEach(el => {
+    items.forEach((el, i) => {
       const b = el.getBoundingClientRect();
-      if (b.top > H || b.bottom < 0 || b.left > W || b.right < 0) return;
+      if (first != null ? i >= first : (b.top > H || b.bottom < 0 || b.left > W || b.right < 0)) return;
       el.animate([{ opacity: 0, transform: `translateY(${d}px)` }, { opacity: 1, transform: 'none' }], { duration: t, delay: k++ * gap, easing: 'ease', fill: 'backwards' });
     });
   }
