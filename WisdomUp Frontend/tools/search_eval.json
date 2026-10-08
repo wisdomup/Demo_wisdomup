@@ -1,0 +1,932 @@
+{
+ "note": "Search relevance test set (2026-10-08). Each query lists the product types a good answer belongs to (any of), optionally a connector the top result must have. Score it with tools/search_eval.js (paste into the console on any page served by site/serve.py). Metrics: P@1 = the first result is a right type; P@4 = share of the first four that are; zero = queries with no product results. Groups: direct (plain product words), need (a need or use, not a product name), roman (Roman Urdu / Urdu-English mix), typo (spelling far off). The 'holdout' group (50 queries) was written AFTER the engine was tuned on the other four groups, to check it generalises: first run 95.7% P@1 / 89.4% P@4; two misses fixed with general rules ('X with Y' describes X, 'X to bluetooth' = a converter), so it now works as a regression set. Add new real queries from shoppers as you collect them.",
+ "queries": [
+  {
+   "q": "earbuds",
+   "expect": [
+    "earbuds"
+   ],
+   "group": "direct"
+  },
+  {
+   "q": "airpods",
+   "expect": [
+    "earbuds"
+   ],
+   "group": "direct"
+  },
+  {
+   "q": "neckband",
+   "expect": [
+    "neckbands"
+   ],
+   "group": "direct"
+  },
+  {
+   "q": "wired earphones",
+   "expect": [
+    "handsfree"
+   ],
+   "group": "direct"
+  },
+  {
+   "q": "type c handsfree",
+   "expect": [
+    "handsfree"
+   ],
+   "conn": "USB-C",
+   "group": "direct"
+  },
+  {
+   "q": "handsfree for iphone",
+   "expect": [
+    "handsfree"
+   ],
+   "conn": "Lightning",
+   "group": "direct"
+  },
+  {
+   "q": "power bank 20000mah",
+   "expect": [
+    "power-banks"
+   ],
+   "group": "direct"
+  },
+  {
+   "q": "10000 mah magnetic power bank",
+   "expect": [
+    "power-banks"
+   ],
+   "group": "direct"
+  },
+  {
+   "q": "wireless charger",
+   "expect": [
+    "wireless-chargers"
+   ],
+   "group": "direct"
+  },
+  {
+   "q": "fm transmitter",
+   "expect": [
+    "car-bluetooth"
+   ],
+   "group": "direct"
+  },
+  {
+   "q": "aux cable",
+   "expect": [
+    "audio-cables"
+   ],
+   "group": "direct"
+  },
+  {
+   "q": "hdmi cable for tv",
+   "expect": [
+    "hdmi"
+   ],
+   "group": "direct"
+  },
+  {
+   "q": "otg adapter",
+   "expect": [
+    "adapters"
+   ],
+   "group": "direct"
+  },
+  {
+   "q": "64gb usb",
+   "expect": [
+    "usb-drives"
+   ],
+   "group": "direct"
+  },
+  {
+   "q": "memory card 32gb",
+   "expect": [
+    "memory-cards"
+   ],
+   "group": "direct"
+  },
+  {
+   "q": "sd card reader",
+   "expect": [
+    "card-readers"
+   ],
+   "group": "direct"
+  },
+  {
+   "q": "selfie stick",
+   "expect": [
+    "selfie-sticks"
+   ],
+   "group": "direct"
+  },
+  {
+   "q": "laptop stand",
+   "expect": [
+    "stands"
+   ],
+   "group": "direct"
+  },
+  {
+   "q": "mouse pad",
+   "expect": [
+    "mouse-pads"
+   ],
+   "group": "direct"
+  },
+  {
+   "q": "gaming keyboard",
+   "expect": [
+    "keyboards"
+   ],
+   "group": "direct"
+  },
+  {
+   "q": "beard trimmer",
+   "expect": [
+    "clippers",
+    "shavers"
+   ],
+   "group": "direct"
+  },
+  {
+   "q": "shaver for men",
+   "expect": [
+    "shavers"
+   ],
+   "group": "direct"
+  },
+  {
+   "q": "bike mobile holder",
+   "expect": [
+    "bike-mounts"
+   ],
+   "group": "direct"
+  },
+  {
+   "q": "car mobile holder",
+   "expect": [
+    "car-holders"
+   ],
+   "group": "direct"
+  },
+  {
+   "q": "extension board",
+   "expect": [
+    "power-strips"
+   ],
+   "group": "direct"
+  },
+  {
+   "q": "type c to lightning cable",
+   "expect": [
+    "charging-cables"
+   ],
+   "group": "direct"
+  },
+  {
+   "q": "ts11",
+   "expect": [
+    "earbuds"
+   ],
+   "group": "direct"
+  },
+  {
+   "q": "cdb 18",
+   "expect": [
+    "power-banks"
+   ],
+   "group": "direct"
+  },
+  {
+   "q": "something to play music in my car",
+   "expect": [
+    "car-bluetooth",
+    "bt-receivers"
+   ],
+   "group": "need"
+  },
+  {
+   "q": "charger for iphone 15",
+   "expect": [
+    "wall-chargers"
+   ],
+   "group": "need"
+  },
+  {
+   "q": "fast charger for samsung",
+   "expect": [
+    "wall-chargers"
+   ],
+   "group": "need"
+  },
+  {
+   "q": "laptop charger",
+   "expect": [
+    "wall-chargers"
+   ],
+   "group": "need"
+  },
+  {
+   "q": "earphones for gym",
+   "expect": [
+    "neckbands",
+    "earbuds"
+   ],
+   "group": "need"
+  },
+  {
+   "q": "headphones for running",
+   "expect": [
+    "neckbands",
+    "earbuds"
+   ],
+   "group": "need"
+  },
+  {
+   "q": "noise cancelling earbuds",
+   "expect": [
+    "earbuds"
+   ],
+   "group": "need"
+  },
+  {
+   "q": "headset for zoom calls",
+   "expect": [
+    "headphones",
+    "handsfree"
+   ],
+   "group": "need"
+  },
+  {
+   "q": "mic for youtube videos",
+   "expect": [
+    "microphones"
+   ],
+   "group": "need"
+  },
+  {
+   "q": "something for podcast recording",
+   "expect": [
+    "microphones"
+   ],
+   "group": "need"
+  },
+  {
+   "q": "loud speaker for party",
+   "expect": [
+    "speakers"
+   ],
+   "group": "need"
+  },
+  {
+   "q": "waterproof speaker",
+   "expect": [
+    "speakers"
+   ],
+   "group": "need"
+  },
+  {
+   "q": "earbuds with long battery",
+   "expect": [
+    "earbuds"
+   ],
+   "group": "need"
+  },
+  {
+   "q": "make my old speaker bluetooth",
+   "expect": [
+    "bt-receivers",
+    "car-bluetooth"
+   ],
+   "group": "need"
+  },
+  {
+   "q": "charge phone in car",
+   "expect": [
+    "car-chargers",
+    "car-bluetooth"
+   ],
+   "group": "need"
+  },
+  {
+   "q": "phone mount for motorcycle",
+   "expect": [
+    "bike-mounts"
+   ],
+   "group": "need"
+  },
+  {
+   "q": "backup for my photos",
+   "expect": [
+    "usb-drives",
+    "memory-cards"
+   ],
+   "group": "need"
+  },
+  {
+   "q": "connect laptop to tv",
+   "expect": [
+    "hdmi"
+   ],
+   "group": "need"
+  },
+  {
+   "q": "work from home setup",
+   "expect": [
+    "stands",
+    "keyboards",
+    "mice",
+    "headphones"
+   ],
+   "group": "need"
+  },
+  {
+   "q": "gift for my brother",
+   "expect": [
+    "earbuds",
+    "headphones",
+    "speakers",
+    "power-banks",
+    "neckbands",
+    "shavers",
+    "clippers"
+   ],
+   "group": "need"
+  },
+  {
+   "q": "travel adapter",
+   "expect": [
+    "power-strips",
+    "wall-chargers"
+   ],
+   "group": "need"
+  },
+  {
+   "q": "cheap bluetooth earphones",
+   "expect": [
+    "earbuds",
+    "neckbands",
+    "handsfree"
+   ],
+   "group": "need"
+  },
+  {
+   "q": "car mein gaane sunne ke liye",
+   "expect": [
+    "car-bluetooth",
+    "bt-receivers"
+   ],
+   "group": "roman"
+  },
+  {
+   "q": "gari ka charger",
+   "expect": [
+    "car-chargers"
+   ],
+   "group": "roman"
+  },
+  {
+   "q": "mobile ka tez charger",
+   "expect": [
+    "wall-chargers"
+   ],
+   "group": "roman"
+  },
+  {
+   "q": "sasta handsfree",
+   "expect": [
+    "handsfree"
+   ],
+   "group": "roman"
+  },
+  {
+   "q": "zyada awaz wala speaker",
+   "expect": [
+    "speakers"
+   ],
+   "group": "roman"
+  },
+  {
+   "q": "daarhi ki machine",
+   "expect": [
+    "clippers",
+    "shavers"
+   ],
+   "group": "roman"
+  },
+  {
+   "q": "baal katne wali machine",
+   "expect": [
+    "clippers"
+   ],
+   "group": "roman"
+  },
+  {
+   "q": "tiktok video ke liye mic",
+   "expect": [
+    "microphones"
+   ],
+   "group": "roman"
+  },
+  {
+   "q": "kaan wale headphone",
+   "expect": [
+    "headphones",
+    "earbuds"
+   ],
+   "group": "roman"
+  },
+  {
+   "q": "lambi battery wale earbuds",
+   "expect": [
+    "earbuds"
+   ],
+   "group": "roman"
+  },
+  {
+   "q": "bachon ke liye tohfa",
+   "expect": [
+    "earbuds",
+    "headphones",
+    "speakers",
+    "selfie-sticks"
+   ],
+   "group": "roman"
+  },
+  {
+   "q": "mobile stand mez ke liye",
+   "expect": [
+    "stands"
+   ],
+   "group": "roman"
+  },
+  {
+   "q": "erbuds",
+   "expect": [
+    "earbuds"
+   ],
+   "group": "typo"
+  },
+  {
+   "q": "hedphones",
+   "expect": [
+    "headphones"
+   ],
+   "group": "typo"
+  },
+  {
+   "q": "spekar",
+   "expect": [
+    "speakers"
+   ],
+   "group": "typo"
+  },
+  {
+   "q": "powr bank",
+   "expect": [
+    "power-banks"
+   ],
+   "group": "typo"
+  },
+  {
+   "q": "chrger",
+   "expect": [
+    "wall-chargers",
+    "car-chargers"
+   ],
+   "group": "typo"
+  },
+  {
+   "q": "bluetoth speaker",
+   "expect": [
+    "speakers"
+   ],
+   "group": "typo"
+  },
+  {
+   "q": "wirless mouse",
+   "expect": [
+    "mice"
+   ],
+   "group": "typo"
+  },
+  {
+   "q": "trimer",
+   "expect": [
+    "clippers",
+    "shavers"
+   ],
+   "group": "typo"
+  },
+  {
+   "q": "mic for vloging",
+   "expect": [
+    "microphones"
+   ],
+   "group": "typo"
+  },
+  {
+   "q": "nekband",
+   "expect": [
+    "neckbands"
+   ],
+   "group": "typo"
+  },
+  {
+   "q": "hands free",
+   "expect": [
+    "handsfree"
+   ],
+   "group": "typo"
+  },
+  {
+   "q": "ear phones",
+   "expect": [
+    "handsfree",
+    "earbuds"
+   ],
+   "group": "typo"
+  },
+  {
+   "q": "heaphone",
+   "expect": [
+    "headphones"
+   ],
+   "group": "typo"
+  },
+  {
+   "q": "seflie stik",
+   "expect": [
+    "selfie-sticks"
+   ],
+   "group": "typo"
+  },
+  {
+   "q": "bluetooth headphones",
+   "expect": [
+    "headphones"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "wireless earbuds for android",
+   "expect": [
+    "earbuds"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "iphone charger",
+   "expect": [
+    "wall-chargers"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "20w charger",
+   "expect": [
+    "wall-chargers"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "car phone charger fast",
+   "expect": [
+    "car-chargers"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "magnetic car mount",
+   "expect": [
+    "car-holders",
+    "wireless-chargers"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "portable speaker",
+   "expect": [
+    "speakers"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "speaker with lights",
+   "expect": [
+    "speakers"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "headphones under 3000",
+   "expect": [
+    "headphones"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "power bank for iphone",
+   "expect": [
+    "power-banks"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "slim power bank",
+   "expect": [
+    "power-banks"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "usb c cable 2m",
+   "expect": [
+    "charging-cables"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "lightning cable",
+   "expect": [
+    "charging-cables"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "hair clipper",
+   "expect": [
+    "clippers"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "electric shaver",
+   "expect": [
+    "shavers"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "keyboard and mouse",
+   "expect": [
+    "keyboards"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "wireless mouse for laptop",
+   "expect": [
+    "mice"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "phone stand",
+   "expect": [
+    "stands"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "mic for live streaming",
+   "expect": [
+    "microphones"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "wireless mic",
+   "expect": [
+    "microphones"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "earphones with mic for calls",
+   "expect": [
+    "handsfree",
+    "earbuds",
+    "headphones"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "jogging earphones",
+   "expect": [
+    "neckbands",
+    "earbuds"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "speaker for home",
+   "expect": [
+    "speakers"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "dj speaker",
+   "expect": [
+    "speakers"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "aux to bluetooth",
+   "expect": [
+    "bt-receivers",
+    "car-bluetooth"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "bluetooth for car",
+   "expect": [
+    "car-bluetooth",
+    "bt-receivers"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "pen drive",
+   "expect": [
+    "usb-drives"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "micro sd card",
+   "expect": [
+    "memory-cards"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "hdmi",
+   "expect": [
+    "hdmi"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "otg connector",
+   "expect": [
+    "adapters"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "gaane sunne wale earphones",
+   "expect": [
+    "earbuds",
+    "handsfree",
+    "neckbands",
+    "headphones"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "speaker chahiye",
+   "expect": [
+    "speakers"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "sasta power bank",
+   "expect": [
+    "power-banks"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "achi awaz wale headphones",
+   "expect": [
+    "headphones"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "bike ke liye mobile holder",
+   "expect": [
+    "bike-mounts"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "gaari mein mobile charge karne ke liye",
+   "expect": [
+    "car-chargers"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "shaving machine",
+   "expect": [
+    "shavers",
+    "clippers"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "eurbuds",
+   "expect": [
+    "earbuds"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "headfones",
+   "expect": [
+    "headphones"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "powerbnak",
+   "expect": [
+    "power-banks"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "chargeer",
+   "expect": [
+    "wall-chargers",
+    "car-chargers"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "mircophone",
+   "expect": [
+    "microphones"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "keybord",
+   "expect": [
+    "keyboards"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "spaeker",
+   "expect": [
+    "speakers"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "neckbend",
+   "expect": [
+    "neckbands"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "earbud wirless",
+   "expect": [
+    "earbuds"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "clipers",
+   "expect": [
+    "clippers"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "mic wale earphones",
+   "expect": [
+    "handsfree",
+    "earbuds",
+    "headphones",
+    "neckbands"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "speaker with mic",
+   "expect": [
+    "speakers"
+   ],
+   "group": "holdout"
+  },
+  {
+   "q": "power bank with cable",
+   "expect": [
+    "power-banks"
+   ],
+   "group": "holdout"
+  }
+ ]
+}

@@ -816,119 +816,352 @@
       else { input.placeholder = full; stopHint(); }
     }, 45);
   }
-  /* ---------- SEARCH ENGINE (rebuilt 2026-10-08, "improve the search engine"). Light and fully in the browser:
-     · forgiving text: case, dashes and spaces don't matter for model codes ("ts11", "TS 11", "cdb-18"), "type c"/"usb c" → usb-c,
-       plurals fall back to the singular;
-     · shoppers' words → our words (SYN: airpods/tws → earbuds, adapter/plug → charger, lav/mic → microphone, wire → cable …);
-     · spelling slips: a word found nowhere in the catalogue is matched to the closest catalogue word (1 edit for 4–6 letters,
-       2 from 7) and the page says "Showing results for …";
-     · price intent: "under 3000", "below 2k", "upto Rs.5,000" filters by price;
-     · scoring per word: model code 14 (exact) / 10 (start) › name 6 (word start) / 4 › category 5 › department 2 › specs 1;
-       a synonym or correction counts 80%. Every word must match; if nothing does, the closest products (most words) are shown;
-     · ties: the visitor's own interests (tasteAffinity, only with consent), then best sellers / new. ---------- */
+  /* ---------- SEARCH ENGINE v2 (2026-10-08, "go beyond the text errors and still serve the users with best matches").
+     Built from e-commerce search research (query understanding = category + attribute + number extraction; null-query recovery by
+     dropping the least important word; phonetic normalisation for Roman Urdu, whose spellings vary by person; the shopper's own
+     recent behaviour for vague queries) and SCORED on tools/search_eval.json with tools/search_eval.js. All in the browser, instant,
+     no model download (a small embedding model would be ~23 MB plus a runtime — too heavy for this shop on mobile data).
+     1 NORMALISE: phrases joined ("type c" → usb-c, "power bank", "memory card", "extension board" …), English + Roman Urdu filler
+       dropped (for, my, something, ka, ke liye, wala …), Roman Urdu read by sound (gaari/gari/gadi → car, awaz → loud, daarhi → beard).
+     2 UNDERSTAND: price limits / ranges and cheap / premium; numbers with units (mAh, W, GB, m); devices (iPhone 15+ → USB-C, older
+       iPhone → Lightning, Android brands → USB-C); attributes (noise cancelling, water, fast, magnetic, wireless, wired, lights,
+       loud, long battery, small); NEEDS → weighted categories (LEXICON: car + music → Car Bluetooth & FM, gym → neckbands, tv → HDMI).
+     3 MATCH: product words (earbuds, charger, cable, mic …) are REQUIRED but met by their CATEGORY or the text; context words (car,
+       gym, gift, laptop …) only steer; other words must appear in the text; an unknown word is corrected (edit distance, then
+       letter trigrams, then a shared stem) or set aside.
+     4 RANK: text match × word rarity + category fit + attributes + numbers + price wish + on-device learning (interests, and which
+       product this device opened for the same search — only with the "Personalised suggestions" consent) + best seller / new.
+     5 RECOVER: nothing matches every required word → drop the least important one ("No exact match for …"), then show the understood
+       categories, so a search never ends empty while the shop has something relevant. ---------- */
   const sNorm = v => String(v || '').toLowerCase().replace(/[^a-z0-9.+\- ]+/g, ' ').replace(/\s+/g, ' ').trim();
   const sCompact = v => String(v || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
-  const SYN = {
-    airpods: ['earbuds', 'true wireless'], airpod: ['earbuds'], earpods: ['earbuds', 'handsfree'], tws: ['earbuds', 'true wireless'], buds: ['earbuds'], earbud: ['earbuds'], ear: ['earbuds', 'earphones'],
-    earphone: ['earphones', 'handsfree'], earphones: ['handsfree'], 'hands-free': ['handsfree'], handfree: ['handsfree'], headset: ['headphones', 'handsfree'], headphone: ['headphones'], wired: ['handsfree', 'wired'],
-    powerbank: ['power bank'], 'power-bank': ['power bank'], battery: ['power bank', 'battery'],
-    adapter: ['charger', 'adapter'], adaptor: ['charger', 'adapter'], plug: ['charger', 'plug'], brick: ['charger'], charging: ['charger', 'charging'],
-    wire: ['cable'], cord: ['cable'], lead: ['cable'], data: ['cable'],
-    'usb-c': ['type-c'], 'type-c': ['usb-c'], typec: ['usb-c', 'type-c'], usbc: ['usb-c', 'type-c'], iphone: ['lightning', 'iphone'], apple: ['lightning'], android: ['usb-c', 'micro'],
-    mic: ['microphone'], mike: ['microphone'], lav: ['microphone', 'clip-on'], lavalier: ['microphone', 'clip-on'], podcast: ['microphone'],
-    trimmer: ['clipper', 'trimmer'], razor: ['shaver'], beard: ['clipper', 'shaver', 'trimmer'], haircut: ['clipper'],
-    soundbar: ['speaker'], loudspeaker: ['speaker'], party: ['party speaker'],
-    mouse: ['mouse', 'mice'], mice: ['mice', 'mouse'], holder: ['holder', 'mount', 'stand'], mount: ['mount', 'holder'], stand: ['stand', 'holder'], tripod: ['selfie', 'stand'],
-    anc: ['noise-cancelling', 'noise cancelling', 'anc'], gaming: ['gaming', 'rgb'], flash: ['usb flash', 'drive'], usb: ['usb'], sd: ['memory card', 'card reader'], aux: ['aux', '3.5mm'],
+  const reEsc = v => v.replace(/[.*+?^${}()|[\]\\-]/g, '\\$&');
+  // Phrases first (so "type c", "power bank", "extension board" are read as one thing)
+  const PHRASES = [
+    [/\b(?:type|usb)[\s-]?c\b/g, 'usb-c'], [/\bmicro[\s-]?usb\b|\bv8\b/g, 'microusb'], [/\b3\.5\s?mm\b|\bjack\b/g, '35mm'],
+    [/\bpower[\s-]?banks?\b/g, 'powerbank'], [/\bhands?[\s-]?free\b/g, 'handsfree'], [/\bear[\s-]?phones?\b/g, 'earphones'],
+    [/\bear[\s-]?buds?\b/g, 'earbuds'], [/\bhead[\s-]?phones?\b/g, 'headphones'], [/\bneck[\s-]?bands?\b/g, 'neckband'],
+    [/\b(?:sd[\s-]?|memory[\s-]?|tf[\s-]?)?card[\s-]?readers?\b/g, 'cardreader'], [/\b(?:memory|sd|tf)[\s-]?cards?\b|\bmicro[\s-]?sd\b/g, 'memorycard'],
+    [/\b(?:wireless|magnetic|qi)[\s-]?chargers?\b|\bcharging[\s-]?pads?\b/g, 'wirelesscharger'],
+    [/\b(?:usb[\s-]?)?(?:flash|pen)[\s-]?drives?\b|\busb[\s-]?drives?\b/g, 'flashdrive'], [/\bmouse[\s-]?pads?\b/g, 'mousepad'],
+    [/\bselfie[\s-]?sticks?\b/g, 'selfiestick'], [/\b(?:power[\s-]?strips?|extension(?:[\s-]?(?:board|lead|cord|socket))?|multi[\s-]?plugs?|switch[\s-]?boards?)\b/g, 'powerstrip'],
+    [/\bfm[\s-]?transmitters?\b/g, 'fmtransmitter'], [/\bnoise[\s-]?cancell?(?:ing|ation|er)?\b/g, 'anc'], [/\bwater[\s-]?(?:proof|resistant)\b/g, 'waterproof'],
+    [/\b(?:kam|low)\s+(?:qeemat|qimat|keemat|price)\b/g, 'cheap'], [/\bbattery\s+(?:timing|backup|life)\b/g, 'battery long'],
+    [/\bfree[\s-]?fire\b/g, 'freefire'], [/\bwork\s+from\s+home\b/g, 'wfh'], [/\bmag[\s-]?safe\b/g, 'magsafe'], [/\bwall[\s-]?chargers?\b/g, 'charger'],
+  ];
+  // Words with no meaning for search — English and Roman Urdu
+  const FILL = new Set(('a an the for with and or of to in on at by from into my me i we you your our is are be it its this that these those some something anything '
+    + 'thing things stuff need needs want wants wanted looking look find get buy buying price prices rate pakistan pk online wisdomup please best good nice new '
+    + 'original quality item items product products one ones use using used can could would should will which what also just only very really like make makes '
+    + 'phone phones mobile mobiles fone cell smartphone device connect connection setup set kit '
+    + 'ka ki ke kay ko k ky se say me mein main mai mera meri mere mujhe hamein chahiye chahye chaiye chahie liye lye liay keliye kliye wala wali wale walay '
+    + 'waly walon hai hain hy ho aur ya bhi koi kuch acha achi achha achhi accha sab kaun kon konsa konsi kis kya kia jo jis ek aik le lena dena chalane '
+    + 'chalana karne karna kar bohat bahut buhat bht wali banane banana banaye').split(' '));
+  // LEXICON — 'p' product words (required; met by these categories or by the text), 'c' context words (steer only).
+  // Weights say how strongly a word points at a category; context words add up, so car + music lands on Car Bluetooth & FM.
+  const LEXICON = [
+    ['p', 'earbuds earbud airpods airpod tws buds earpods erbuds', { earbuds: 1, neckbands: 0.3 }],
+    ['p', 'earphones earphone', { handsfree: 0.9, earbuds: 0.75, neckbands: 0.65 }],
+    ['p', 'handsfree handfree handsfre', { handsfree: 1 }],
+    ['p', 'headset headsets', { headphones: 0.85, handsfree: 0.7 }],
+    ['p', 'headphones headphone hedphones hedphone heaphone', { headphones: 1, earbuds: 0.3 }],
+    ['p', 'neckband neckbands nekband', { neckbands: 1 }],
+    ['p', 'speaker speakers soundbar loudspeaker spekar speeker', { speakers: 1, 'bt-receivers': 0.15 }],
+    ['p', 'wirelesscharger', { 'wireless-chargers': 1 }],
+    ['p', 'charger chargers charjer chargr chrger', { 'wall-chargers': 1, 'car-chargers': 0.6, 'wireless-chargers': 0.5, 'car-bluetooth': 0.3 }],
+    ['p', 'adapter adapters adaptor', { adapters: 0.8, 'wall-chargers': 0.7, 'power-strips': 0.6 }],
+    ['p', 'cable cables wire wires cord lead', { 'charging-cables': 1, 'audio-cables': 0.6, hdmi: 0.5 }],
+    ['p', 'powerbank powerbanks', { 'power-banks': 1 }],
+    ['p', 'mic mike mics microphone microphones lavalier lav', { microphones: 1 }],
+    ['p', 'mouse mice', { mice: 1, keyboards: 0.5, 'mouse-pads': 0.35 }],
+    ['p', 'mousepad', { 'mouse-pads': 1 }],
+    ['p', 'keyboard keyboards', { keyboards: 1 }],
+    ['p', 'trimmer trimmers trimer clipper clippers', { clippers: 1, shavers: 0.6 }],
+    ['p', 'shaver shavers razor', { shavers: 1, clippers: 0.5 }],
+    ['p', 'machine machines', { clippers: 0.7, shavers: 0.6 }],
+    ['p', 'memorycard', { 'memory-cards': 1, 'card-readers': 0.4 }],
+    ['p', 'cardreader', { 'card-readers': 1 }],
+    ['p', 'flashdrive', { 'usb-drives': 1 }],
+    ['p', 'hdmi', { hdmi: 1 }],
+    ['p', 'aux', { 'audio-cables': 1, 'bt-receivers': 0.35 }],
+    ['p', 'otg', { adapters: 1 }],
+    ['p', 'fmtransmitter fm transmitter', { 'car-bluetooth': 1 }],
+    ['p', 'receiver receivers', { 'bt-receivers': 1, 'car-bluetooth': 0.6 }],
+    ['p', 'selfiestick selfie', { 'selfie-sticks': 1 }],
+    ['p', 'tripod', { 'selfie-sticks': 0.8, stands: 0.6 }],
+    ['p', 'stand stands', { stands: 1, 'car-holders': 0.35 }],
+    ['p', 'holder holders', { 'car-holders': 1, 'bike-mounts': 0.75, stands: 0.5 }],
+    ['p', 'mount mounts', { 'bike-mounts': 0.9, 'car-holders': 0.85 }],
+    ['p', 'powerstrip socket sockets', { 'power-strips': 1 }],
+    ['c', 'car cars gari gaari gadi gaadi gaddi', { 'car-bluetooth': 0.7, 'car-chargers': 0.7, 'car-holders': 0.7, 'wireless-chargers': 0.25 }],
+    ['c', 'bike bikes motorbike motorcycle motor scooty cycle bicycle', { 'bike-mounts': 1.2 }],
+    ['c', 'music song songs gaana gana gaane gane gaanay play playing listen listening sunne sunna sunnay sunny audio', { speakers: 0.6, headphones: 0.45, earbuds: 0.45, neckbands: 0.35, 'car-bluetooth': 0.4, 'bt-receivers': 0.4 }],
+    ['c', 'loud awaz awaaz aawaz avaz sound bass party shaadi shadi wedding mehfil dj', { speakers: 1 }, ['loud']],
+    ['c', 'gym workout exercise running run runner jogging jog sports sport walking', { neckbands: 1, earbuds: 0.75 }, ['water']],
+    ['c', 'call calls calling zoom meeting meetings office class classes teams', { headphones: 0.6, handsfree: 0.6, earbuds: 0.5, microphones: 0.3 }],
+    ['c', 'gaming game games gamer pubg freefire', { keyboards: 0.6, mice: 0.6, headphones: 0.6, 'mouse-pads': 0.4 }, ['lights']],
+    ['c', 'video videos vlog vlogs vlogging vloging vlogger youtube youtuber tiktok tiktoker reels reel recording record podcast podcasting streaming stream creator', { microphones: 1, 'selfie-sticks': 0.5, stands: 0.35 }],
+    ['c', 'photo photos pictures pics tasveer tasweer data backup storage files', { 'memory-cards': 0.8, 'usb-drives': 0.8, 'card-readers': 0.4 }],
+    ['c', 'tv led lcd projector monitor screen', { hdmi: 1.1 }],
+    ['c', 'laptop laptops computer pc macbook desktop', { stands: 0.45, keyboards: 0.4, mice: 0.4, hdmi: 0.4, 'wall-chargers': 0.3, 'bt-receivers': 0.2 }],
+    ['c', 'desk table mez maiz meez study', { stands: 1 }],
+    ['c', 'home ghar work wfh', { stands: 0.5, keyboards: 0.5, mice: 0.5, headphones: 0.4, 'mouse-pads': 0.3, 'power-strips': 0.3 }],
+    ['c', 'travel travelling traveling safar trip journey', { 'power-banks': 0.7, 'power-strips': 0.6, 'wall-chargers': 0.4 }],
+    ['c', 'gift gifts tohfa tohfay tohfe present', { earbuds: 0.5, headphones: 0.5, speakers: 0.5, 'power-banks': 0.4, neckbands: 0.3, shavers: 0.3, clippers: 0.3, 'selfie-sticks': 0.2 }],
+    ['c', 'kids kid child children bachon bachay bache bachy bacha', { headphones: 0.5, earbuds: 0.4, speakers: 0.4, 'selfie-sticks': 0.3 }],
+    ['c', 'men man mard brother bhai dad father abbu abu husband', { shavers: 0.4, clippers: 0.4, earbuds: 0.2, 'power-banks': 0.2 }],
+    ['c', 'beard daarhi darhi dadhi daari dari moustache moonch', { clippers: 1, shavers: 0.8 }],
+    ['c', 'hair baal bal baalon haircut', { clippers: 1.1 }],
+    ['c', 'cut cutting katne kaatne katna trim trimming', { clippers: 0.6, shavers: 0.4 }],
+    ['c', 'shave shaving', { shavers: 1 }],
+    ['c', 'ear ears kaan kan', { earbuds: 0.45, headphones: 0.45, handsfree: 0.35, neckbands: 0.35 }],
+    ['c', 'old purana purani legacy', { 'bt-receivers': 0.8, 'car-bluetooth': 0.5 }],
+    ['c', 'magsafe', { 'wireless-chargers': 0.6, 'power-banks': 0.6 }, ['magnetic']],
+    ['c', 'charge charging recharge', { 'wall-chargers': 0.6, 'car-chargers': 0.6, 'power-banks': 0.5, 'wireless-chargers': 0.4, 'charging-cables': 0.4 }],
+    ['c', 'battery betri batri', { 'power-banks': 0.5 }, ['battery']],
+  ];
+  // INTENT RULES — word combinations that mean one thing (checked on the normalised query): extra category weight, extra
+  // attributes, and 'soften' = the product words stop being required (the shopper named the wrong thing for what they need)
+  const INTENTS = [
+    [/\b(?:old|purana|purani|make|convert|turn|add)\b.*\b(?:bluetooth|wireless)\b|\b(?:bluetooth|wireless)\b.*\b(?:old|purana|purani)\b|\b(?:aux|wired|stereo|speaker|35mm)\s+(?:to|into|se)\s+(?:bluetooth|wireless)\b/, { 'bt-receivers': 1.6, 'car-bluetooth': 0.8 }, [], true],
+    [/\bcar\b.*\b(?:music|songs?|gaane|gana|gaana|gane|play|audio|aux|stereo|sunne|fm)\b|\b(?:music|songs?|gaane|gana|gaana|gane|play|audio|stereo|sunne)\b.*\bcar\b/, { 'car-bluetooth': 1.2, 'bt-receivers': 0.6 }],
+    [/\bcar\b.*\b(?:charger|chargers|charge|charging)\b|\b(?:charger|chargers|charge|charging)\b.*\bcar\b/, { 'car-chargers': 1.4 }],
+    [/\b(?:gym|workout|exercise|running|run|jogging|sports?)\b.*\b(?:headphones?|earphones?|handsfree)\b|\b(?:headphones?|earphones?|handsfree)\b.*\b(?:gym|workout|exercise|running|run|jogging|sports?)\b/, { neckbands: 1.2, earbuds: 1 }, ['water'], true],
+    [/\b(?:laptop|macbook|computer|pc)\b.*\b(?:tv|led|lcd|projector|monitor|screen)\b|\b(?:tv|led|lcd|projector|monitor|screen)\b.*\b(?:laptop|macbook|computer|pc)\b/, { hdmi: 1.5 }],
+    [/\b(?:laptop|macbook)\b.*\bcharger\b|\bcharger\b.*\b(?:laptop|macbook)\b/, { 'wall-chargers': 0.8 }, ['power']],
+  ];
+  // ATTRIBUTES a shopper may ask for, and how a product shows it
+  const ATTR_WORDS = {
+    anc: 'anc quiet shor', water: 'waterproof water ipx sweat sweatproof rain pani swimming', fast: 'fast tez quick rapid qc pd turbo',
+    magnetic: 'magnetic magsafe magnet', wireless: 'wireless bluetooth bluetoth bluetooh cordless bt', wired: 'wired', lights: 'rgb light lights glow',
+    battery: 'long lambi lamba timing hours', small: 'small mini chota chhota choti chhoti compact portable pocket tiny', more: 'zyada ziada zada more extra',
+    cheap: 'cheap sasta sasti saste sastay budget affordable lowest', premium: 'premium mehnga mehngi mehenga expensive luxury',
   };
-  const STOP = new Set(['for', 'with', 'the', 'and', 'a', 'an', 'in', 'of', 'to', 'buy', 'price', 'prices', 'pakistan', 'pk', 'online', 'wisdomup', 'best', 'new', 'cheap', 'good', 'original']);
+  const CONN_WORDS = { 'usb-c': 'USB-C', lightning: 'Lightning', microusb: 'Micro-USB', '35mm': '3.5mm' };
+  const ATTR_LABEL = { anc: 'noise cancelling', water: 'water resistant', fast: 'fast charging', magnetic: 'magnetic', wireless: 'wireless', wired: 'wired', lights: 'lights / RGB', loud: 'loud', power: 'high wattage', battery: 'long battery', small: 'compact' };
+  const phon = w => w.replace(/(.)\1+/g, '$1').replace(/ee|ii/g, 'i').replace(/oo|uu/g, 'u').replace(/([bcdgjkptsz])h/g, '$1').replace(/[aeiouy]+$/, '');
   let sIndex = null;
   function searchIndex() {
     if (sIndex) return sIndex;
-    const vocab = new Map(), codes = [];
+    const vocab = new Map(), codes = [], lex = new Map(), lexPhon = new Map(), attrOf = new Map();
+    LEXICON.forEach(([kind, words, types, attrs]) => words.split(' ').forEach(w => { const e = { kind, types, attrs: attrs || [], word: words.split(' ')[0] }; lex.set(w, e); if (w.length >= 3) lexPhon.set(phon(w), e); }));
+    Object.entries(ATTR_WORDS).forEach(([a, words]) => words.split(' ').forEach(w => attrOf.set(w, a)));
+    const num = (re, t) => { let m, best = 0; re.lastIndex = 0; while ((m = re.exec(t))) best = Math.max(best, parseFloat(m[1].replace(/,/g, ''))); return best; };
     const docs = D.products.map(p => {
       const ids = [p.code, ...(p.skus || [])].map(sCompact);
       codes.push(...ids);
+      const specs = (p.specs || []).map(x => [].concat(x).join(' ')).join(' ');
       const f = {
         codes: ids, title: sNorm(p.title), cat: sNorm(`${p.cat} ${typeLabel(p.type)} ${p.type.replace(/-/g, ' ')}`),
         dept: sNorm(DEPTS.filter(d => d.types.includes(p.type)).map(d => d.label).join(' ')),
-        rest: sNorm([p.meta, (p.connectors || []).join(' '), (p.highlights || []).join(' '), (p.specs || []).map(x => [].concat(x).join(' ')).join(' ')].join(' ')),
+        rest: sNorm([p.meta, (p.connectors || []).join(' '), (p.highlights || []).join(' '), specs].join(' ')),
       };
       f.all = ` ${f.title} ${f.cat} ${f.dept} ${f.rest} `;
       new Set(f.all.split(' ')).forEach(w => { if (w.length >= 3 && /[a-z]/.test(w)) vocab.set(w, (vocab.get(w) || 0) + 1); });
-      return { p, f };
+      const raw = `${p.title} ${p.meta} ${specs} ${(p.highlights || []).join(' ')}`;
+      const feats = new Set(p.features || []);
+      const n = {
+        mah: num(/(\d[\d,]*)\s*mah/gi, raw), watts: num(/(\d+(?:\.\d+)?)\s*w\b/gi, raw), meters: num(/(\d+(?:\.\d+)?)\s*m\b/gi, raw),
+        hours: num(/(\d+)\s*(?:hours|hrs|h)\b/gi, raw), gb: (raw.match(/(\d+)\s*gb/gi) || []).map(x => parseInt(x, 10)),
+      };
+      const has = {
+        anc: feats.has('anc') || /noise[\s-]?cancel|\banc\b/i.test(raw), water: feats.has('water') || /water|ipx/i.test(raw), fast: feats.has('fast') || /fast|qc ?3|pd\b/i.test(raw),
+        magnetic: feats.has('magnetic') || /magnetic|magsafe/i.test(raw), wireless: feats.has('wireless') || /wireless|bluetooth|\bbt\b|tws/i.test(raw), lights: feats.has('lights') || /rgb|light/i.test(raw),
+        wired: /handsfree|wired|3\.5mm|aux/i.test(`${p.type} ${raw}`) && !/wireless|bluetooth/i.test(p.title), small: /mini|compact|portable|pocket|foldable/i.test(raw),
+      };
+      return { p, f, n, has, conns: p.connectors || [] };
     });
-    Object.values(SYN).flat().forEach(w => w.split(' ').forEach(x => vocab.set(x, vocab.get(x) || 1)));
-    return (sIndex = { docs, vocab: [...vocab.keys()], freq: vocab, codes: codes.join(' ') });
+    Object.values(LEXICON).forEach(([, words]) => words.split(' ').forEach(w => { if (w.length >= 3) vocab.set(w, vocab.get(w) || 1); }));
+    return (sIndex = { docs, vocab: [...vocab.keys()], freq: vocab, codes: codes.join(' '), lex, lexPhon, attrOf });
   }
-  function editDistance(a, b, max) { // Levenshtein, giving up once it passes max
+  function editDistance(a, b, max) { // Damerau-Levenshtein (a swapped pair of letters is one slip), giving up once it passes max
     if (Math.abs(a.length - b.length) > max) return max + 1;
-    let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
+    let pp = null, prev = Array.from({ length: b.length + 1 }, (_, i) => i);
     for (let i = 1; i <= a.length; i++) {
       const cur = [i]; let best = i;
-      for (let j = 1; j <= b.length; j++) { cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); best = Math.min(best, cur[j]); }
+      for (let j = 1; j <= b.length; j++) {
+        cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+        if (pp && i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) cur[j] = Math.min(cur[j], pp[j - 2] + 1);
+        best = Math.min(best, cur[j]);
+      }
       if (best > max) return max + 1;
-      prev = cur;
+      pp = prev; prev = cur;
     }
     return prev[b.length];
   }
-  function expandWord(w, idx) {
-    const alts = new Set([w]);
-    (SYN[w] || []).forEach(a => alts.add(a));
-    if (w.length > 3 && w.endsWith('s')) { alts.add(w.slice(0, -1)); (SYN[w.slice(0, -1)] || []).forEach(a => alts.add(a)); }
-    let fixed = null;
-    const known = [...alts].some(a => idx.vocab.some(v => v.includes(a))) || (sCompact(w).length >= 2 && idx.codes.includes(sCompact(w)));
-    if (!known && w.length >= 4 && /^[a-z]+$/.test(w)) {
-      const max = w.length >= 7 ? 2 : 1;
-      let best = max + 1;
-      idx.vocab.forEach(v => { const d = editDistance(w, v, max); if (d < best || (d === best && fixed && idx.freq.get(v) > idx.freq.get(fixed))) { best = d; fixed = v; } });
-      if (fixed && best <= max) { alts.add(fixed); (SYN[fixed] || []).forEach(a => alts.add(a)); } else fixed = null;
-    }
-    return { w, alts: [...alts], fixed };
+  const grams = w => { const s = ` ${w} `, g = new Set(); for (let i = 0; i < s.length - 2; i++) g.add(s.slice(i, i + 3)); return g; };
+  const trigramSim = (a, b) => { const A = grams(a), B = grams(b); let n = 0; A.forEach(x => { if (B.has(x)) n++; }); return n / (A.size + B.size - n); };
+  // A word nothing knows: the closest known word (lexicon first, then catalogue words) by edits, then by letter trigrams
+  function correctWord(w, idx) {
+    if (w.length < 4 || !/^[a-z]+$/.test(w)) return null;
+    const max = w.length >= 7 ? 2 : 1;
+    let best = null, bd = max + 1;
+    const consider = (v, bonus) => { const d = editDistance(w, v, max); if (d < bd || (d === bd && best && (idx.freq.get(v) || 0) + bonus > (idx.freq.get(best) || 0))) { bd = d; best = v; } };
+    idx.lex.forEach((_, v) => consider(v, 50));
+    idx.vocab.forEach(v => consider(v, 0));
+    if (best && bd <= max) return best;
+    let ts = 0; best = null;
+    [...idx.lex.keys(), ...idx.vocab].forEach(v => { if (Math.abs(v.length - w.length) > 3) return; const s = trigramSim(w, v); if (s > ts) { ts = s; best = v; } });
+    if (best && ts >= 0.45) return best;
+    const stem = w.replace(/(ing|ers|er|es|s)$/, '');
+    const hit = [...idx.lex.keys()].find(v => v.length >= 4 && (stem.startsWith(v) || v.startsWith(stem)));
+    return hit || null;
   }
-  const reEsc = v => v.replace(/[.*+?^${}()|[\]\\-]/g, '\\$&');
-  function wordScore(d, e) {
-    const c = sCompact(e.w);
+  // 2 UNDERSTAND
+  function understand(raw) {
+    const idx = searchIndex();
+    let q = ` ${sNorm(raw)} `;
+    const u = { maxPrice: null, minPrice: null, mah: 0, watts: 0, gb: 0, meters: 0, conns: {}, device: '', attrs: new Set(), types: {}, required: [], soft: [], fixes: [], ignored: [], codeWords: [] };
+    q = q.replace(/\biphone\s*(\d{1,2})\b(?:\s*(?:pro|max|plus|mini))*/g, (_, n) => { const c = +n >= 15 ? 'USB-C' : 'Lightning'; u.conns[c] = 1; u.device = `iPhone ${n} (${c})`; return ' iphone '; });
+    q = q.replace(/(\d+(?:[.,]\d+)?)\s*(k)?\s*mah\b/g, (_, n, k) => { u.mah = parseFloat(n.replace(/,/g, '')) * (k ? 1000 : 1); return ' '; });
+    q = q.replace(/\b(\d+(?:\.\d+)?)\s*(?:w|watt|watts)\b/g, (_, n) => { u.watts = +n; return ' '; });
+    q = q.replace(/\b(\d+)\s*(?:gb|tb)\b/g, (_, n) => { u.gb = +n; return ' '; });
+    q = q.replace(/\b(\d+(?:\.\d+)?)\s*(?:m|meter|metre|meters|metres)\b/g, (_, n) => { u.meters = +n; return ' '; });
+    q = q.replace(/\b(?:between|from)?\s*(?:rs\.?\s*)?(\d[\d,]*)\s*(k)?\s*(?:-|to|and|se)\s*(?:rs\.?\s*)?(\d[\d,]*)\s*(k)?\s*(?:tak|ke beech|tk)?\b/, (m, a, ka, b, kb) => {
+      const lo = parseFloat(a.replace(/,/g, '')) * (ka ? 1000 : 1), hi = parseFloat(b.replace(/,/g, '')) * (kb ? 1000 : 1);
+      if (hi > lo && lo >= 100) { u.minPrice = lo; u.maxPrice = hi; return ' '; } return m;
+    });
+    q = q.replace(/\b(?:under|below|less than|upto|up to|max|within|tak|se kam|andar)\s*(?:rs\.?\s*)?(\d[\d,.]*)\s*(k)?\b/, (_, n, k) => { u.maxPrice = parseFloat(n.replace(/,/g, '')) * (k ? 1000 : 1); return ' '; });
+    q = q.replace(/\b(?:rs\.?\s*)?(\d[\d,.]*)\s*(k)?\s*(?:tak|se kam|ke andar|or less|max)\b/, (_, n, k) => { u.maxPrice = parseFloat(n.replace(/,/g, '')) * (k ? 1000 : 1); return ' '; });
+    PHRASES.forEach(([re, to]) => { q = q.replace(re, ` ${to} `); });
+    let words = q.split(/\s+/).filter(Boolean);
+    for (let i = 0; i < words.length - 1; i++) { const j = words[i] + words[i + 1]; if (/^[a-z]{2,5}$/.test(words[i]) && /^\d+[a-z]*$/.test(words[i + 1]) && idx.codes.split(' ').some(c => c.startsWith(j))) { words.splice(i, 2, j); } }
+    const describes = new Set(); // positions of words that only describe ("earphones with mic", "mic wale earphones")
+    words.forEach((w, i) => {
+      if (w === 'with' || w === 'plus' || w === 'including') for (let j = i + 1; j < words.length && !['for', 'and', 'under', 'in'].includes(words[j]); j++) describes.add(j);
+      if (/^(?:wala|wali|wale|walay|waly|walon)$/.test(w) && i > 0 && i < words.length - 1) describes.add(i - 1);
+    });
+    let soften = false;
+    const qq = ` ${words.join(' ')} `;
+    INTENTS.forEach(([re, types, attrs, soft]) => { if (re.test(qq)) { Object.entries(types).forEach(([t, w]) => { u.types[t] = (u.types[t] || 0) + w; }); (attrs || []).forEach(a => u.attrs.add(a)); if (soft) soften = true; u.intent = true; } });
+    if (words.includes('usb') && u.gb) words = words.map(w => (w === 'usb' ? 'flashdrive' : w));
+    if (words.includes('powerbank') || words.includes('power')) words.forEach(w => { if (/^\d{4,6}$/.test(w) && +w >= 2000) u.mah = +w; });
+    const addTypes = (types, k) => Object.entries(types).forEach(([t, w]) => { u.types[t] = (u.types[t] || 0) + w * k; });
+    for (const [pos, w0] of words.entries()) {
+      let w = w0;
+      if (FILL.has(w) || (/^\d+$/.test(w) && (u.mah || +w < 100))) continue;
+      if (CONN_WORDS[w]) { u.conns[CONN_WORDS[w]] = 1; continue; }
+      if (/^(iphone|apple|ios)$/.test(w)) { if (!u.device) { u.conns.Lightning = 0.6; u.device = 'iPhone'; } continue; }
+      if (/^(samsung|android|oppo|vivo|infinix|tecno|redmi|xiaomi|realme|huawei|oneplus|pixel|nokia|honor)$/.test(w)) { u.conns['USB-C'] = 0.8; u.device = u.device || w[0].toUpperCase() + w.slice(1); continue; }
+      let e = idx.lex.get(w) || (w.length >= 4 && idx.lexPhon.get(phon(w)));
+      let a = idx.attrOf.get(w);
+      const isCode = /\d/.test(w) && /[a-z]/.test(w) || (/^\d+$/.test(w) && idx.codes.includes(w));
+      const known = !e && !a && (isCode || idx.vocab.some(v => v.includes(w)));
+      if (!e && !a && !known) {
+        const fix = correctWord(w, idx);
+        if (fix) { u.fixes.push([w0, fix]); w = fix; e = idx.lex.get(w); a = idx.attrOf.get(w); }
+        else { u.ignored.push(w0); continue; }
+      }
+      if (a) { u.attrs.add(a); continue; }
+      if (e) {
+        e.attrs.forEach(x => u.attrs.add(x));
+        if (e.kind === 'p' && !soften && !describes.has(pos)) { u.required.push({ w, kind: 'p', types: e.types }); addTypes(e.types, 1); }
+        else if (e.kind === 'p') { u.soft.push(w); addTypes(e.types, 0.5); }
+        else { u.soft.push(w); addTypes(e.types, 1); }
+        continue;
+      }
+      u.required.push({ w, kind: isCode ? 'code' : 'text' });
+    }
+    if (u.attrs.has('more')) { if (u.attrs.has('loud') || u.types.speakers) u.attrs.add('loud'); else u.attrs.add('battery'); u.attrs.delete('more'); }
+    return u;
+  }
+  function textScore(d, w) {
+    const c = sCompact(w);
     let sc = 0;
     if (c.length >= 2 && /\d/.test(c)) { if (d.f.codes.includes(c)) sc = 14; else if (d.f.codes.some(x => x.startsWith(c))) sc = 10; }
-    for (const a of e.alts) {
-      const k = a === e.w ? 1 : 0.8;
-      let v = 0;
-      if (new RegExp('(^| )' + reEsc(a)).test(d.f.title)) v = 6; else if (d.f.title.includes(a)) v = 4;
-      if (d.f.cat.includes(a)) v = Math.max(v, 7);
-      if (!v && d.f.dept.includes(a)) v = 2;
-      if (!v && d.f.all.includes(a)) v = 1;
-      sc = Math.max(sc, v * k);
-    }
-    return sc;
+    let v = 0;
+    if (new RegExp('(^| )' + reEsc(w)).test(d.f.title)) v = 6; else if (d.f.title.includes(w)) v = 4;
+    if (d.f.cat.includes(w)) v = Math.max(v, 7);
+    if (!v && d.f.dept.includes(w)) v = 2;
+    if (!v && d.f.all.includes(w)) v = 1;
+    return Math.max(sc, v);
   }
+  // 3–5 MATCH, RANK, RECOVER
   function runSearch(raw) {
-    const idx = searchIndex();
-    let q = sNorm(raw).replace(/\b(type|usb)[\s-]?c\b/g, 'usb-c').replace(/\bpower[\s-]?banks?\b/g, 'powerbank').replace(/\bhands?[\s-]?free\b/g, 'handsfree');
-    let maxPrice = null;
-    q = q.replace(/\b(?:under|below|less than|upto|up to|max|within)\s*(?:rs\.?\s*)?(\d[\d,.]*)\s*(k)?\b/, (_, n, k) => { maxPrice = parseFloat(n.replace(/,/g, '')) * (k ? 1000 : 1); return ' '; }).replace(/\s+/g, ' ').trim();
-    const ents = q.split(' ').filter(w => w && !STOP.has(w)).map(w => expandWord(w, idx));
-    const pool = idx.docs.filter(d => maxPrice == null || d.p.price <= maxPrice); // only for a bare "under 2000"
-    const aff = tasteAffinity();
-    const tie = p => 1.5 * (aff[p.type] || 0) + (p.tabs.includes('best') ? 0.4 : 0) + (p.tabs.includes('new') ? 0.2 : 0) - (p.soldOut ? 3 : 0);
-    if (!ents.length) return { hits: maxPrice != null ? pool.map(d => d.p).sort((a, b) => tie(b) - tie(a) || b.price - a.price) : [], fixes: [], loose: false, maxPrice };
-    const rows = idx.docs.map(d => ({ p: d.p, per: ents.map(e => wordScore(d, e)) }));
-    // a word that matches few products says more than one that matches half the shop ("mouse" vs "wireless")
-    const idf = ents.map((e, i) => Math.log(1 + rows.length / Math.max(1, rows.filter(r => r.per[i] > 0).length)));
-    rows.forEach(r => { r.matched = r.per.filter(v => v > 0).length; r.s = r.per.reduce((n, v, i) => n + v * idf[i], 0); r.strong = r.per.every(v => v >= 2); });
-    const rank = (a, b) => (b.matched * 1000 + b.s + tie(b.p)) - (a.matched * 1000 + a.s + tie(a.p));
-    const inBudget = r => maxPrice == null || r.p.price <= maxPrice;
-    let hits = rows.filter(r => r.matched === ents.length && inBudget(r)), loose = false, overBudget = false;
-    // a price limit that only weak matches meet (a word buried in the specs) while real matches exist above it: say so, cheapest first
-    if (maxPrice != null && !hits.some(r => r.strong)) {
-      const real = rows.filter(r => r.matched === ents.length && r.strong);
-      if (real.length) { hits = real.sort((a, b) => a.p.price - b.p.price); overBudget = true; }
+    const idx = searchIndex(), u = understand(raw), docs = idx.docs;
+    const aff = tasteAffinity(), clicks = tasteQueryClicks(u);
+    const req = u.required, soft = Object.keys(u.types).length;
+    const prodTypes = req.filter(r => r.kind === 'p').map(r => Object.keys(r.types).filter(t => r.types[t] >= 0.5)).flat();
+    const vague = req.length === 1 && req[0].kind === 'p' && new Set(prodTypes).size > 1; // "charger": the shopper's own interests decide more
+    const sat = (d, r) => {
+      if (r.kind === 'p') { const tw = r.types[d.p.type] || 0; const tx = textScore(d, r.w); return Math.max(tw >= 0.3 ? tw * 9 : 0, tx >= 4 ? tx : 0); }
+      return textScore(d, r.w);
+    };
+    const rows = docs.map(d => ({ d, per: req.map(r => sat(d, r)) }));
+    const idf = req.map((r, i) => (r.kind === 'p' ? 1 : Math.log(1 + docs.length / Math.max(1, rows.filter(x => x.per[i] > 0).length))));
+    const attrScore = d => {
+      let s = 0;
+      u.attrs.forEach(a => {
+        if (a === 'loud' || a === 'power') s += d.n.watts ? Math.min(6, Math.log2(1 + d.n.watts)) : 0;
+        else if (a === 'wireless' && d.has.wired) s -= 4;
+        else if (a === 'battery') s += d.n.hours ? Math.min(6, Math.log2(1 + d.n.hours)) : d.n.mah ? 3 : 0;
+        else if (a === 'cheap' || a === 'premium') s += 0;
+        else if (d.has[a]) s += 4;
+      });
+      Object.entries(u.conns).forEach(([c, w]) => { if (d.conns.includes(c)) s += 6 * w; else if (d.conns.length && ['handsfree', 'charging-cables', 'wall-chargers', 'adapters', 'car-chargers'].includes(d.p.type)) s -= 3 * w; });
+      if (u.mah) s += d.n.mah ? (d.n.mah >= u.mah ? 5 : -3) : 0;
+      if (u.watts) s += d.n.watts ? (d.n.watts >= u.watts ? 4 : -2) : 0;
+      if (u.gb) s += d.n.gb.length ? (u.gb >= Math.min(...d.n.gb) && u.gb <= Math.max(...d.n.gb) ? 4 : -2) : 0;
+      if (u.meters) s += d.n.meters ? Math.max(-2, 3 - Math.abs(d.n.meters - u.meters) * 2) : 0;
+      if (u.attrs.has('cheap')) s -= 1.5 * Math.log(d.p.price);
+      if (u.attrs.has('premium')) s += 1.5 * Math.log(d.p.price);
+      return s;
+    };
+    const inBudget = d => (u.maxPrice == null || d.p.price <= u.maxPrice) && (u.minPrice == null || d.p.price >= u.minPrice);
+    const score = (x, used) => used.reduce((n, i) => n + x.per[i] * idf[i], 0) + 9 * (u.types[x.d.p.type] || 0) + attrScore(x.d)
+      + (vague ? 3 : 1.5) * (aff[x.d.p.type] || 0) + Math.min(8, 4 * (clicks[x.d.p.id] || 0))
+      + (x.d.p.tabs.includes('best') ? 0.4 : 0) + (x.d.p.tabs.includes('new') ? 0.2 : 0) - (x.d.p.soldOut ? 3 : 0);
+    // required words, the least important first in line to be dropped (text words before product words and codes)
+    const imp = i => (req[i].kind === 'text' ? idf[i] : 10 + idf[i]);
+    let keep = req.map((_, i) => i), dropped = [], hits = [], overBudget = false;
+    const topW = Math.max(0, ...Object.values(u.types));
+    const near = x => (u.types[x.d.p.type] || 0) >= topW * 0.5 && topW > 0;
+    const pick = () => rows.filter(x => keep.every(i => x.per[i] > 0) && (keep.length || near(x) || (!topW && attrScore(x.d) > 0)));
+    for (;;) {
+      hits = pick().filter(x => inBudget(x.d));
+      if (hits.length || !keep.length) break;
+      if (u.maxPrice != null && pick().length) break; // matches exist, just not in the budget
+      const worst = keep.slice().sort((a, b) => imp(a) - imp(b))[0];
+      keep = keep.filter(i => i !== worst); dropped.push(req[worst].w);
     }
-    if (!overBudget) {
-      if (!hits.length && ents.length > 1) { hits = rows.filter(r => r.matched > 0 && inBudget(r)); loose = hits.length > 0; }
-      hits.sort(rank);
-    }
-    return { hits: hits.map(x => x.p), fixes: ents.filter(e => e.fixed).map(e => [e.w, e.fixed]), loose, overBudget, maxPrice };
+    if (!hits.length && u.maxPrice != null) { hits = pick(); overBudget = hits.length > 0; }
+    if (!hits.length && soft) hits = rows.filter(x => near(x) && inBudget(x.d));
+    if (!hits.length && !req.length && !soft && (u.maxPrice != null || u.minPrice != null)) hits = rows.filter(x => inBudget(x.d));
+    hits.forEach(x => { x.s = score(x, keep); });
+    hits.sort(overBudget ? (a, b) => a.d.p.price - b.d.p.price : (a, b) => b.s - a.s);
+    // what the engine understood, in plain words (shown under the search box when it did more than match text)
+    const topTypes = Object.entries(u.types).sort((a, b) => b[1] - a[1]).filter(([, w], i, all) => w >= all[0][1] * 0.6).slice(0, 2).map(([t]) => typeLabel(t));
+    const understood = [];
+    if ((u.soft.length || u.intent) && topTypes.length) understood.push(topTypes.join(' / '));
+    if (u.device) understood.push(`for ${u.device}`);
+    Object.keys(u.conns).forEach(c => { if (!u.device || !u.device.includes(c)) understood.push(c); });
+    u.attrs.forEach(a => { if (ATTR_LABEL[a]) understood.push(ATTR_LABEL[a]); });
+    if (u.attrs.has('cheap')) understood.push('lowest prices first');
+    if (u.attrs.has('premium')) understood.push('premium first');
+    if (u.mah) understood.push(`${u.mah.toLocaleString('en-PK')}mAh+`);
+    if (u.watts) understood.push(`${u.watts}W+`);
+    if (u.gb) understood.push(`${u.gb}GB`);
+    if (u.meters) understood.push(`${u.meters}m`);
+    if (u.minPrice != null) understood.push(`Rs.${u.minPrice.toLocaleString('en-PK')}–${u.maxPrice.toLocaleString('en-PK')}`);
+    return { hits: hits.map(x => x.d.p), fixes: u.fixes, dropped, loose: dropped.length > 0 && !overBudget, overBudget, maxPrice: u.maxPrice, understood, key: queryKey(u) };
+  }
+  // On-device learning from this shopper's own searches (consent only): which product they opened after the same search
+  const queryKey = u => [...u.required.map(r => r.w), ...u.soft].sort().join(' ');
+  function tasteQueryClicks(u) {
+    if (!personalOK()) return {};
+    const k = queryKey(u), m = (tasteGet().q || {})[k];
+    if (!m) return {};
+    const now = Date.now();
+    return Object.fromEntries(Object.entries(m).map(([pid, e]) => [pid, decayed(e, now)]));
+  }
+  function tasteQueryClick(key, pid) {
+    if (!key || !pid || !personalOK()) return;
+    const t = tasteGet(), now = Date.now();
+    t.q = t.q || {};
+    const m = t.q[key] = t.q[key] || {};
+    m[pid] = [decayed(m[pid], now) + 1, now];
+    const keys = Object.keys(t.q); if (keys.length > 40) delete t.q[keys[0]];
+    store.set(TASTE_KEY, t);
   }
 
   function mountSearch() {
@@ -965,7 +1198,7 @@
       ['Blog', url.blog, 'blog guide tips how to article'],
     ];
     const BG = D.media;
-    let lastHits = [];
+    let lastHits = [], lastKey = '';
     const card = (p, i) => `
         <a class="ccard" href="${url.product(p.id)}" data-pid="${p.id}">
           <div class="ccard__media" style="background: ${p.thumb ? photoBg(p) : BG[i % BG.length]};">${p.thumb ? `<img src="${p.thumb}" alt="${esc(p.title)}" loading="lazy" style="width: 100%; height: 100%; ${photoFit(p)}">` : art(p.art, { alt: p.title, style: 'width: 100%; height: 100%;' })}${p.ribbon || p.cat ? `<div class="ccard__tag"><span>${esc(p.ribbon || p.cat)}</span></div>` : ''}</div>
@@ -992,20 +1225,21 @@
       }
       recentEl.hidden = true;
       const r = runSearch(raw), res = r.hits.slice(0, 8);
-      lastHits = r.hits;
+      lastHits = r.hits; lastKey = r.key;
       // category suggestions: the types the results fall in, most results first
       const counts = {}; r.hits.forEach(p => { counts[p.type] = (counts[p.type] || 0) + 1; });
-      const cats = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 4);
+      const cats = Object.entries(counts).slice(0, 4); // insertion order = rank order: the best match's category comes first
       catsEl.hidden = r.loose || r.overBudget || !cats.length;
       const band = !r.maxPrice ? '' : r.maxPrice <= 1000 ? 'u1' : r.maxPrice <= 2000 ? 'u2' : r.maxPrice <= 5000 ? 'u5' : ''; // the listing's budget bands
       catsEl.innerHTML = cats.map(([t, n]) => `<a href="${catHref(t)}${band && CATS.includes(t) ? '&price=' + band : ''}">${esc(typeLabel(t))} <small>${n}</small> ›</a>`).join('');
       const fix = r.fixes.length ? `Showing results for “${esc(r.fixes.reduce((t, [a, b]) => t.replace(new RegExp('\\b' + reEsc(a) + '\\b', 'i'), b), raw))}”` : '';
+      const said = r.understood.length ? `Understood: ${r.understood.map(esc).join(' · ')}` : '';
       const price = r.maxPrice ? ` under ${esc(D.rs(r.maxPrice))}` : '';
       label.textContent = !r.hits.length ? (pages.length ? 'No products — see the page above' : 'No matches — try “earbuds”, “charger” or “cable”')
         : r.overBudget ? `Nothing under ${D.rs(r.maxPrice)} — lowest prices first`
-        : r.loose ? `No exact match — closest ${res.length === 1 ? 'product' : 'products'}`
+        : r.loose ? `No exact match for “${r.dropped.join(' ')}” — closest ${res.length === 1 ? 'product' : 'products'}`
         : (r.hits.length > res.length ? `Top ${res.length} of ${r.hits.length} results` : r.hits.length + ' result' + (r.hits.length > 1 ? 's' : '')) + price;
-      if (fix) { why.hidden = false; why.innerHTML = fix; }
+      if (fix || said) { why.hidden = false; why.innerHTML = [fix, said].filter(Boolean).join(' · '); }
       grid.innerHTML = res.map(card).join('');
     };
     host.classList.add('is-anim');
@@ -1015,7 +1249,7 @@
     const open = () => { clearTimeout(closing); host.hidden = false; document.documentElement.style.overflow = 'hidden'; paint(); requestAnimationFrame(() => host.classList.add('is-open')); setTimeout(() => input.focus(), 30); typeHint(input); };
     const close = () => { commit(); host.classList.remove('is-open'); document.documentElement.style.overflow = ''; stopHint(); const done = () => { host.hidden = true; }; if (reduced()) done(); else closing = setTimeout(done, 850); };
     input.addEventListener('input', () => { paint(); clearTimeout(commitT); commitT = setTimeout(commit, 1500); });
-    input.addEventListener('keydown', e => { if (e.key === 'Enter') { commit(); const a = grid.querySelector('a') || pagesEl.querySelector('a'); if (a) { const p = D.byId(a.dataset.pid); if (p) tasteAdd(p, 2, 1); location.href = a.href; } } });
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') { commit(); const a = grid.querySelector('a') || pagesEl.querySelector('a'); if (a) { const p = D.byId(a.dataset.pid); if (p) { tasteAdd(p, 2, 1); tasteQueryClick(lastKey, p.id); } location.href = a.href; } } });
     host.addEventListener('click', e => {
       if (e.target === host || e.target.closest('.search__close')) { close(); return; }
       const term = e.target.closest('[data-term]');
@@ -1023,7 +1257,7 @@
       const clr = e.target.closest('[data-clear]');
       if (clr) { tasteClear(clr.dataset.clear === 'terms' ? 'terms' : undefined); paint(); toast(clr.dataset.clear === 'terms' ? 'Recent searches cleared' : 'Your browsing history for suggestions is cleared'); return; }
       const hit = e.target.closest('.ccard[data-pid]');
-      if (hit) { commit(); tasteAdd(D.byId(hit.dataset.pid), 2, 1); }
+      if (hit) { commit(); tasteAdd(D.byId(hit.dataset.pid), 2, 1); tasteQueryClick(lastKey, hit.dataset.pid); }
     });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && !host.hidden) close(); });
     sheetDrag(host.querySelector('.search'), close, { scroller: () => host.querySelector('.search'), head: '.search__field' });
@@ -2703,6 +2937,7 @@
     toggleTheme, setTheme, themeMode, isNight, slide, staggerCards, revealWords, sheetDrag, quickAdd, budget: BUDGET, STAR_OUTLINE,
     consent: { open: n => consentUI && consentUI.open(n), get: consentGet },
     taste: { get: tasteGet, suggest, clear: tasteClear, on: personalOK }, // the on-device interest model (personalised suggestions)
+    search: { run: q => runSearch(q) }, // the search engine (tools/search_eval.js scores it against tools/search_eval.json)
     ref: { get: () => ref, apply: applyRef, clear: clearRef, api: crApi, norm: codeNorm, pctOf, TAG: TAG_SVG, me: () => store.get(ME_KEY, null), setMe: v => { if (v) store.set(ME_KEY, v); else try { localStorage.removeItem(ME_KEY); } catch (e) { /* storage unavailable */ } } },
     seo, abs, clip, ldCrumbs, ldFaq, px, pxItem, YEAR, SITE,
   };
