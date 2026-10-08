@@ -7,7 +7,7 @@ window.WU_SHOP = {
   "currency": "PKR",
   "siteUrl": "https://wisdomup.pk/",
   "facebookPixelId": "",
-  "freeDeliveryFrom": 20000,
+  "freeDeliveryFrom": 10000,
   "delivery": {
     "standard": { "label": "Standard delivery", "eta": "3–5 working days", "fee": 250, "freeOver": true },
     "express": { "label": "Express delivery", "eta": "1–2 working days", "fee": 450, "freeOver": false }

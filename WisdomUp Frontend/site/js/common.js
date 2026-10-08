@@ -105,7 +105,7 @@
   // Shop-by-budget bands (changed 2026-10-06): NON-overlapping — u1 = Rs.1–1,000, u2 = Rs.1,001–2,000, u5 = Rs.2,001–5,000.
   // The site keeps the "Under Rs.…" labels; the listing (?price=u1/u2/u5), the day rail tabs and the night segment all read these.
   const BUDGET = { u1: p => p.price >= 1 && p.price <= 1000, u2: p => p.price > 1000 && p.price <= 2000, u5: p => p.price > 2000 && p.price <= 5000 };
-  const SHOP = window.WU_SHOP || { freeDeliveryFrom: 20000, maxQty: 10, giftWrap: 490, delivery: { standard: { fee: 250, freeOver: true } } };
+  const SHOP = window.WU_SHOP || { freeDeliveryFrom: 10000, maxQty: 10, giftWrap: 490, delivery: { standard: { fee: 250, freeOver: true } } };
   // Copy that quotes the free-delivery threshold ({FREE_FROM} in wu-data.js) always follows shop.js
   const FREE_FROM = D.rs(SHOP.freeDeliveryFrom);
   const fillFree = t => typeof t === 'string' ? t.replace(/\{FREE_FROM\}/g, FREE_FROM) : t;
