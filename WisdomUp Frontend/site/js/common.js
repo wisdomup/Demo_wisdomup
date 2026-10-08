@@ -156,8 +156,94 @@
   // Cookie choices (2026-10-06): the Pixel is the site's only non-essential item, so it loads ONLY after the visitor allows
   // marketing cookies in the cookie popup (localStorage wu-consent = { v: 1, marketing, at }).
   const CONSENT_KEY = 'wu-consent';
-  const consentGet = () => { try { const c = JSON.parse(localStorage.getItem(CONSENT_KEY)); return c && c.v === 1 ? c : null; } catch (e) { return null; } };
+  // v2 (2026-10-08) added "personal" (personalised suggestions); a v1 choice is asked again, because it never covered that purpose
+  const consentGet = () => { try { const c = JSON.parse(localStorage.getItem(CONSENT_KEY)); return c && c.v === 2 ? c : null; } catch (e) { return null; } };
   const marketingOK = () => !!(consentGet() || {}).marketing;
+  const personalOK = () => !!(consentGet() || {}).personal;
+
+  /* ---------- PERSONALISED SUGGESTIONS — a very light, on-device interest model (2026-10-08: "observe the user behaviour … how long
+     the user is staying and what he is looking for … do a very lite version"). Runs ONLY with the visitor's "Personalised suggestions"
+     consent, lives in this browser (localStorage wu-taste) and is never sent anywhere; switching the consent off deletes it.
+     Signals → points: product opened +1 (its type +.5) and time on it (visible seconds ÷ 30, at most +6 a visit); a category page +1
+     and up to +2 for time (÷ 60); a search: the term is kept (8 newest) and the types of its top results get +.6 → +.2 by rank; a
+     search result clicked +2 (type +1); add to cart +4 (type +2); wishlist +3 (type +1.5). Every score HALVES every 10 days, so
+     today's browsing outweighs last month's. A preferred price = the weighted average of log(price) of what was looked at.
+     suggest() ranks the catalogue: 3 × type interest + .8 × department interest + 1.2 × product interest + .8 × price fit (+ small
+     best/new nudges, − already in the cart), at most 2 per type so the list stays varied. ---------- */
+  const TASTE_KEY = 'wu-taste', TASTE_HALF = 10 * 864e5;
+  const tasteGet = () => { const t = store.get(TASTE_KEY, null); return t && t.v === 1 ? t : { v: 1, types: {}, items: {}, terms: [], price: [0, 0] }; };
+  const decayed = (e, now) => (e ? e[0] * Math.pow(0.5, (now - e[1]) / TASTE_HALF) : 0);
+  function tasteBump(t, map, k, w, now) { if (k && w) map[k] = [decayed(map[k], now) + w, now]; }
+  function tasteAdd(p, itemW, typeW) {
+    if (!p || !personalOK()) return;
+    const t = tasteGet(), now = Date.now();
+    tasteBump(t, t.items, p.id, itemW, now); tasteBump(t, t.types, p.type, typeW, now);
+    const w = itemW + typeW;
+    if (w > 0 && p.price > 0) t.price = [t.price[0] * 0.98 + w * Math.log(p.price), t.price[1] * 0.98 + w];
+    const ids = Object.keys(t.items); // keep the 80 strongest products
+    if (ids.length > 80) ids.sort((a, b) => decayed(t.items[a], now) - decayed(t.items[b], now)).slice(0, ids.length - 80).forEach(k => delete t.items[k]);
+    store.set(TASTE_KEY, t);
+  }
+  function tasteType(type, w) { if (!type || !personalOK()) return; const t = tasteGet(); tasteBump(t, t.types, type, w, Date.now()); store.set(TASTE_KEY, t); }
+  function tasteSearch(q, hits) {
+    if (!personalOK()) return;
+    const t = tasteGet(), now = Date.now(), term = String(q).trim().slice(0, 40);
+    t.terms = [term].concat((t.terms || []).filter(x => x.toLowerCase() !== term.toLowerCase())).slice(0, 8);
+    [...new Set(hits.slice(0, 8).map(p => p.type))].slice(0, 4).forEach((ty, i) => tasteBump(t, t.types, ty, [0.6, 0.45, 0.3, 0.2][i], now));
+    store.set(TASTE_KEY, t);
+  }
+  function tasteClear(part) {
+    if (part === 'terms') { const t = tasteGet(); t.terms = []; store.set(TASTE_KEY, t); return; }
+    try { localStorage.removeItem(TASTE_KEY); } catch (e) { /* storage unavailable */ }
+  }
+  const tasteAffinity = () => { // type → 0..1 (empty without consent or history)
+    if (!personalOK()) return {};
+    const t = tasteGet(), now = Date.now(), e = Object.entries(t.types).map(([k, v]) => [k, decayed(v, now)]).filter(x => x[1] > 0.3);
+    const max = Math.max(0, ...e.map(x => x[1]));
+    return max ? Object.fromEntries(e.map(([k, v]) => [k, v / max])) : {};
+  };
+  // Time on a page while it is visible: onTime(seconds) runs whenever the tab is hidden or the page is left
+  function watchTime(onTime) {
+    let since = document.visibilityState === 'visible' ? Date.now() : 0;
+    const stop = () => { if (since) { const s = (Date.now() - since) / 1000; since = 0; if (s > 2) onTime(Math.min(s, 600)); } };
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') stop(); else if (!since) since = Date.now(); });
+    window.addEventListener('pagehide', stop);
+  }
+  function tasteInit() {
+    if (!personalOK()) return;
+    const q = new URLSearchParams(location.search), page = location.pathname.split('/').pop() || 'index.html';
+    if (page === 'product.html') {
+      const id = q.get('id'), p = D.byId(id) || D.products.find(x => (x.skus || []).includes(id));
+      if (!p) return;
+      tasteAdd(p, 1, 0.5);
+      let given = 0;
+      watchTime(sec => { const d = Math.min(6 - given, sec / 30); if (d > 0.05) { given += d; tasteAdd(p, d, d / 2); } });
+    } else if (page === 'products.html' && q.get('cat')) {
+      const ty = q.get('cat');
+      tasteType(ty, 1);
+      let given = 0;
+      watchTime(sec => { const d = Math.min(2 - given, sec / 60); if (d > 0.05) { given += d; tasteType(ty, d); } });
+    }
+  }
+  function suggest(n = 8) {
+    const aff = tasteAffinity(), types = Object.keys(aff).sort((a, b) => aff[b] - aff[a]);
+    if (!types.length) return null;
+    const t = tasteGet(), now = Date.now();
+    const iAff = Object.fromEntries(Object.entries(t.items).map(([k, v]) => [k, decayed(v, now)]));
+    const iMax = Math.max(1, ...Object.values(iAff));
+    const dAff = d => Math.min(1, d.types.reduce((m, ty) => m + (aff[ty] || 0), 0));
+    const deptOf = {}; DEPTS.forEach(d => d.types.forEach(ty => { deptOf[ty] = d; }));
+    const mu = t.price[1] ? t.price[0] / t.price[1] : null;
+    const inCart = new Set(cart.map(l => skuIndex[l.sku] && skuIndex[l.sku].p.id));
+    const score = p => 3 * (aff[p.type] || 0) + 0.8 * (deptOf[p.type] ? dAff(deptOf[p.type]) : 0) + 1.2 * ((iAff[p.id] || 0) / iMax)
+      + (mu ? 0.8 * Math.exp(-((Math.log(p.price) - mu) ** 2) / (2 * 0.55 * 0.55)) : 0)
+      + (p.tabs.includes('best') ? 0.3 : 0) + (p.tabs.includes('new') ? 0.2 : 0) - (inCart.has(p.id) ? 4 : 0);
+    const ranked = D.products.filter(p => !p.soldOut).map(p => [p, score(p)]).sort((a, b) => b[1] - a[1]);
+    const perType = {}, out = [];
+    for (const [p] of ranked) { if ((perType[p.type] || 0) >= 2) continue; perType[p.type] = (perType[p.type] || 0) + 1; out.push(p); if (out.length === n) break; }
+    const names = types.slice(0, 2).map(ty => typeLabel(ty));
+    return { items: out, reason: `Based on what you’ve been looking at — ${names.join(' and ')}` };
+  }
   function loadPixel() {
     if (!PIXEL_ID || !marketingOK()) return;
     if (window.fbq) { window.fbq('consent', 'grant'); return; }
@@ -206,6 +292,7 @@
     else cart.push({ sku, qty: Math.min(SHOP.maxQty, n) });
     saveCart();
     px('AddToCart', pxItem(p, sku, n));
+    tasteAdd(p, 4, 2);
     const attrs = Object.values(skuIndex[sku].v.attrs || {});
     toast(`${n > 1 ? n + ' × ' : ''}${p.code}${attrs.length ? ' (' + attrs.join(', ') + ')' : ''} added to cart`);
     if (opts.open && cartUI) cartUI.open();
@@ -440,7 +527,7 @@
     const on = !wished(id);
     wish = on ? wish.concat(id) : wish.filter(x => x !== id);
     store.set('wu-wish', wish);
-    if (on) px('AddToWishlist', pxItem(p, defaultSku(p)));
+    if (on) { px('AddToWishlist', pxItem(p, defaultSku(p))); tasteAdd(p, 3, 1.5); }
     paintWish();
     toast(on ? 'Saved to your wishlist' : 'Removed from your wishlist', heartSvg(18, on));
     window.dispatchEvent(new CustomEvent('wu-wish', { detail: { id, on } }));
@@ -729,6 +816,121 @@
       else { input.placeholder = full; stopHint(); }
     }, 45);
   }
+  /* ---------- SEARCH ENGINE (rebuilt 2026-10-08, "improve the search engine"). Light and fully in the browser:
+     · forgiving text: case, dashes and spaces don't matter for model codes ("ts11", "TS 11", "cdb-18"), "type c"/"usb c" → usb-c,
+       plurals fall back to the singular;
+     · shoppers' words → our words (SYN: airpods/tws → earbuds, adapter/plug → charger, lav/mic → microphone, wire → cable …);
+     · spelling slips: a word found nowhere in the catalogue is matched to the closest catalogue word (1 edit for 4–6 letters,
+       2 from 7) and the page says "Showing results for …";
+     · price intent: "under 3000", "below 2k", "upto Rs.5,000" filters by price;
+     · scoring per word: model code 14 (exact) / 10 (start) › name 6 (word start) / 4 › category 5 › department 2 › specs 1;
+       a synonym or correction counts 80%. Every word must match; if nothing does, the closest products (most words) are shown;
+     · ties: the visitor's own interests (tasteAffinity, only with consent), then best sellers / new. ---------- */
+  const sNorm = v => String(v || '').toLowerCase().replace(/[^a-z0-9.+\- ]+/g, ' ').replace(/\s+/g, ' ').trim();
+  const sCompact = v => String(v || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+  const SYN = {
+    airpods: ['earbuds', 'true wireless'], airpod: ['earbuds'], earpods: ['earbuds', 'handsfree'], tws: ['earbuds', 'true wireless'], buds: ['earbuds'], earbud: ['earbuds'], ear: ['earbuds', 'earphones'],
+    earphone: ['earphones', 'handsfree'], earphones: ['handsfree'], 'hands-free': ['handsfree'], handfree: ['handsfree'], headset: ['headphones', 'handsfree'], headphone: ['headphones'], wired: ['handsfree', 'wired'],
+    powerbank: ['power bank'], 'power-bank': ['power bank'], battery: ['power bank', 'battery'],
+    adapter: ['charger', 'adapter'], adaptor: ['charger', 'adapter'], plug: ['charger', 'plug'], brick: ['charger'], charging: ['charger', 'charging'],
+    wire: ['cable'], cord: ['cable'], lead: ['cable'], data: ['cable'],
+    'usb-c': ['type-c'], 'type-c': ['usb-c'], typec: ['usb-c', 'type-c'], usbc: ['usb-c', 'type-c'], iphone: ['lightning', 'iphone'], apple: ['lightning'], android: ['usb-c', 'micro'],
+    mic: ['microphone'], mike: ['microphone'], lav: ['microphone', 'clip-on'], lavalier: ['microphone', 'clip-on'], podcast: ['microphone'],
+    trimmer: ['clipper', 'trimmer'], razor: ['shaver'], beard: ['clipper', 'shaver', 'trimmer'], haircut: ['clipper'],
+    soundbar: ['speaker'], loudspeaker: ['speaker'], party: ['party speaker'],
+    mouse: ['mouse', 'mice'], mice: ['mice', 'mouse'], holder: ['holder', 'mount', 'stand'], mount: ['mount', 'holder'], stand: ['stand', 'holder'], tripod: ['selfie', 'stand'],
+    anc: ['noise-cancelling', 'noise cancelling', 'anc'], gaming: ['gaming', 'rgb'], flash: ['usb flash', 'drive'], usb: ['usb'], sd: ['memory card', 'card reader'], aux: ['aux', '3.5mm'],
+  };
+  const STOP = new Set(['for', 'with', 'the', 'and', 'a', 'an', 'in', 'of', 'to', 'buy', 'price', 'prices', 'pakistan', 'pk', 'online', 'wisdomup', 'best', 'new', 'cheap', 'good', 'original']);
+  let sIndex = null;
+  function searchIndex() {
+    if (sIndex) return sIndex;
+    const vocab = new Map(), codes = [];
+    const docs = D.products.map(p => {
+      const ids = [p.code, ...(p.skus || [])].map(sCompact);
+      codes.push(...ids);
+      const f = {
+        codes: ids, title: sNorm(p.title), cat: sNorm(`${p.cat} ${typeLabel(p.type)} ${p.type.replace(/-/g, ' ')}`),
+        dept: sNorm(DEPTS.filter(d => d.types.includes(p.type)).map(d => d.label).join(' ')),
+        rest: sNorm([p.meta, (p.connectors || []).join(' '), (p.highlights || []).join(' '), (p.specs || []).map(x => [].concat(x).join(' ')).join(' ')].join(' ')),
+      };
+      f.all = ` ${f.title} ${f.cat} ${f.dept} ${f.rest} `;
+      new Set(f.all.split(' ')).forEach(w => { if (w.length >= 3 && /[a-z]/.test(w)) vocab.set(w, (vocab.get(w) || 0) + 1); });
+      return { p, f };
+    });
+    Object.values(SYN).flat().forEach(w => w.split(' ').forEach(x => vocab.set(x, vocab.get(x) || 1)));
+    return (sIndex = { docs, vocab: [...vocab.keys()], freq: vocab, codes: codes.join(' ') });
+  }
+  function editDistance(a, b, max) { // Levenshtein, giving up once it passes max
+    if (Math.abs(a.length - b.length) > max) return max + 1;
+    let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
+    for (let i = 1; i <= a.length; i++) {
+      const cur = [i]; let best = i;
+      for (let j = 1; j <= b.length; j++) { cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); best = Math.min(best, cur[j]); }
+      if (best > max) return max + 1;
+      prev = cur;
+    }
+    return prev[b.length];
+  }
+  function expandWord(w, idx) {
+    const alts = new Set([w]);
+    (SYN[w] || []).forEach(a => alts.add(a));
+    if (w.length > 3 && w.endsWith('s')) { alts.add(w.slice(0, -1)); (SYN[w.slice(0, -1)] || []).forEach(a => alts.add(a)); }
+    let fixed = null;
+    const known = [...alts].some(a => idx.vocab.some(v => v.includes(a))) || (sCompact(w).length >= 2 && idx.codes.includes(sCompact(w)));
+    if (!known && w.length >= 4 && /^[a-z]+$/.test(w)) {
+      const max = w.length >= 7 ? 2 : 1;
+      let best = max + 1;
+      idx.vocab.forEach(v => { const d = editDistance(w, v, max); if (d < best || (d === best && fixed && idx.freq.get(v) > idx.freq.get(fixed))) { best = d; fixed = v; } });
+      if (fixed && best <= max) { alts.add(fixed); (SYN[fixed] || []).forEach(a => alts.add(a)); } else fixed = null;
+    }
+    return { w, alts: [...alts], fixed };
+  }
+  const reEsc = v => v.replace(/[.*+?^${}()|[\]\\-]/g, '\\$&');
+  function wordScore(d, e) {
+    const c = sCompact(e.w);
+    let sc = 0;
+    if (c.length >= 2 && /\d/.test(c)) { if (d.f.codes.includes(c)) sc = 14; else if (d.f.codes.some(x => x.startsWith(c))) sc = 10; }
+    for (const a of e.alts) {
+      const k = a === e.w ? 1 : 0.8;
+      let v = 0;
+      if (new RegExp('(^| )' + reEsc(a)).test(d.f.title)) v = 6; else if (d.f.title.includes(a)) v = 4;
+      if (d.f.cat.includes(a)) v = Math.max(v, 7);
+      if (!v && d.f.dept.includes(a)) v = 2;
+      if (!v && d.f.all.includes(a)) v = 1;
+      sc = Math.max(sc, v * k);
+    }
+    return sc;
+  }
+  function runSearch(raw) {
+    const idx = searchIndex();
+    let q = sNorm(raw).replace(/\b(type|usb)[\s-]?c\b/g, 'usb-c').replace(/\bpower[\s-]?banks?\b/g, 'powerbank').replace(/\bhands?[\s-]?free\b/g, 'handsfree');
+    let maxPrice = null;
+    q = q.replace(/\b(?:under|below|less than|upto|up to|max|within)\s*(?:rs\.?\s*)?(\d[\d,.]*)\s*(k)?\b/, (_, n, k) => { maxPrice = parseFloat(n.replace(/,/g, '')) * (k ? 1000 : 1); return ' '; }).replace(/\s+/g, ' ').trim();
+    const ents = q.split(' ').filter(w => w && !STOP.has(w)).map(w => expandWord(w, idx));
+    const pool = idx.docs.filter(d => maxPrice == null || d.p.price <= maxPrice); // only for a bare "under 2000"
+    const aff = tasteAffinity();
+    const tie = p => 1.5 * (aff[p.type] || 0) + (p.tabs.includes('best') ? 0.4 : 0) + (p.tabs.includes('new') ? 0.2 : 0) - (p.soldOut ? 3 : 0);
+    if (!ents.length) return { hits: maxPrice != null ? pool.map(d => d.p).sort((a, b) => tie(b) - tie(a) || b.price - a.price) : [], fixes: [], loose: false, maxPrice };
+    const rows = idx.docs.map(d => ({ p: d.p, per: ents.map(e => wordScore(d, e)) }));
+    // a word that matches few products says more than one that matches half the shop ("mouse" vs "wireless")
+    const idf = ents.map((e, i) => Math.log(1 + rows.length / Math.max(1, rows.filter(r => r.per[i] > 0).length)));
+    rows.forEach(r => { r.matched = r.per.filter(v => v > 0).length; r.s = r.per.reduce((n, v, i) => n + v * idf[i], 0); r.strong = r.per.every(v => v >= 2); });
+    const rank = (a, b) => (b.matched * 1000 + b.s + tie(b.p)) - (a.matched * 1000 + a.s + tie(a.p));
+    const inBudget = r => maxPrice == null || r.p.price <= maxPrice;
+    let hits = rows.filter(r => r.matched === ents.length && inBudget(r)), loose = false, overBudget = false;
+    // a price limit that only weak matches meet (a word buried in the specs) while real matches exist above it: say so, cheapest first
+    if (maxPrice != null && !hits.some(r => r.strong)) {
+      const real = rows.filter(r => r.matched === ents.length && r.strong);
+      if (real.length) { hits = real.sort((a, b) => a.p.price - b.p.price); overBudget = true; }
+    }
+    if (!overBudget) {
+      if (!hits.length && ents.length > 1) { hits = rows.filter(r => r.matched > 0 && inBudget(r)); loose = hits.length > 0; }
+      hits.sort(rank);
+    }
+    return { hits: hits.map(x => x.p), fixes: ents.filter(e => e.fixed).map(e => [e.w, e.fixed]), loose, overBudget, maxPrice };
+  }
+
   function mountSearch() {
     const host = document.createElement('div');
     host.className = 'scrim';
@@ -736,12 +938,15 @@
     host.innerHTML = `
       <div class="search" role="dialog" aria-modal="true" aria-label="Search products">
         <label class="search__field">${icon('search', 22)}<input type="search" placeholder="Search earbuds, speakers, chargers…" aria-label="Search products"><button type="button" class="search__close" aria-label="Close search">×</button></label>
-        <div class="search__pages" hidden></div>
-        <div class="search__label"><b></b></div>
+        <div class="search__recent" hidden><div class="search__sec"><span>Recent searches</span><button type="button" class="search__clear" data-clear="terms">Clear</button></div><div class="search__pages search__terms"></div></div>
+        <div class="search__pages search__cats" hidden></div>
+        <div class="search__pages" data-help hidden></div>
+        <div class="search__head"><div class="search__label"><b></b></div><p class="search__why" hidden></p></div>
         <div class="search__grid"></div>
       </div>`;
     document.body.appendChild(host);
-    const input = host.querySelector('input'), grid = host.querySelector('.search__grid'), label = host.querySelector('.search__label b'), pagesEl = host.querySelector('.search__pages');
+    const input = host.querySelector('input'), grid = host.querySelector('.search__grid'), label = host.querySelector('.search__label b'), why = host.querySelector('.search__why');
+    const pagesEl = host.querySelector('[data-help]'), catsEl = host.querySelector('.search__cats'), recentEl = host.querySelector('.search__recent');
     // Help and company pages are searchable too ("warranty", "return", "track", "bulk"…)
     const PAGES = [
       ['Wishlist', url.wishlist, 'wishlist saved favourites favorites hearts liked save for later'],
@@ -760,34 +965,66 @@
       ['Blog', url.blog, 'blog guide tips how to article'],
     ];
     const BG = D.media;
-    const paint = () => {
-      const q = input.value.trim().toLowerCase();
-      const pages = q.length > 1 ? PAGES.filter(([t, , k]) => (t + ' ' + k).toLowerCase().split(/\s+/).some(w => w.startsWith(q) || q.split(/\s+/).some(x => x.length > 2 && w.startsWith(x)))).slice(0, 4) : [];
-      pagesEl.hidden = !pages.length;
-      pagesEl.innerHTML = pages.map(([t, h]) => `<a href="${h}">${esc(t)} ›</a>`).join('');
-      const words = q.split(/\s+/).filter(Boolean);
-      const hay = p => p._s || (p._s = [p.title, p.meta, p.cat, (p.skus || []).join(' '), (p.connectors || []).join(' '), DEPTS.filter(d => d.types.includes(p.type)).map(d => d.label).join(' '), (p.highlights || []).join(' ')].join(' ').toLowerCase());
-      // Rank: words in the product name and category count most, then specs/highlights
-      const score = p => words.reduce((n, w) => n + (p.title.toLowerCase().includes(w) ? 3 : 0) + (p.cat.toLowerCase().includes(w) ? 4 : 0), 0);
-      const hits = q ? D.products.filter(p => words.every(w => hay(p).includes(w))).sort((a, b) => score(b) - score(a)) : D.products.filter(p => p.tabs.includes('best') || p.tabs.includes('new'));
-      const res = hits.slice(0, 8);
-      label.textContent = q ? (hits.length ? (hits.length > res.length ? `Top ${res.length} of ${hits.length} results` : hits.length + ' result' + (hits.length > 1 ? 's' : '')) : 'No matches — try “earbuds”, “charger” or “cable”') : 'Popular right now';
-      grid.innerHTML = res.map((p, i) => `
-        <a class="ccard" href="${url.product(p.id)}">
+    let lastHits = [];
+    const card = (p, i) => `
+        <a class="ccard" href="${url.product(p.id)}" data-pid="${p.id}">
           <div class="ccard__media" style="background: ${p.thumb ? photoBg(p) : BG[i % BG.length]};">${p.thumb ? `<img src="${p.thumb}" alt="${esc(p.title)}" loading="lazy" style="width: 100%; height: 100%; ${photoFit(p)}">` : art(p.art, { alt: p.title, style: 'width: 100%; height: 100%;' })}${p.ribbon || p.cat ? `<div class="ccard__tag"><span>${esc(p.ribbon || p.cat)}</span></div>` : ''}</div>
           <div class="ccard__body"><div class="ccard__title">${esc(code(p))}</div><p class="ccard__meta">${esc(p.meta)}</p></div>
           <div class="ccard__foot"><span class="ccard__price">${esc(p.priceText)}</span>${p.wasText ? `<s class="ccard__was">${esc(p.wasText)}</s>` : ''}</div>
-        </a>`).join('');
+        </a>`;
+    const paint = () => {
+      const raw = input.value.trim(), q = raw.toLowerCase();
+      const pages = q.length > 1 ? PAGES.filter(([t, , k]) => (t + ' ' + k).toLowerCase().split(/\s+/).some(w => w.startsWith(q) || q.split(/\s+/).some(x => x.length > 2 && w.startsWith(x)))).slice(0, 4) : [];
+      pagesEl.hidden = !pages.length;
+      pagesEl.innerHTML = pages.map(([t, h]) => `<a href="${h}">${esc(t)} ›</a>`).join('');
+      why.hidden = true;
+      if (!q) { // empty: recent searches + picked for you (with consent and history) or popular right now
+        const terms = personalOK() ? (tasteGet().terms || []) : [];
+        recentEl.hidden = !terms.length;
+        recentEl.querySelector('.search__terms').innerHTML = terms.map(t => `<button type="button" data-term="${esc(t)}">${esc(t)}</button>`).join('');
+        catsEl.hidden = true;
+        const picks = suggest(8);
+        lastHits = picks ? picks.items : D.products.filter(p => p.tabs.includes('best') || p.tabs.includes('new')).slice(0, 8);
+        label.textContent = picks ? 'Picked for you' : 'Popular right now';
+        if (picks) { why.hidden = false; why.innerHTML = `${esc(picks.reason)} · <button type="button" class="search__clear" data-clear="all">Clear history</button>`; }
+        grid.innerHTML = lastHits.map(card).join('');
+        return;
+      }
+      recentEl.hidden = true;
+      const r = runSearch(raw), res = r.hits.slice(0, 8);
+      lastHits = r.hits;
+      // category suggestions: the types the results fall in, most results first
+      const counts = {}; r.hits.forEach(p => { counts[p.type] = (counts[p.type] || 0) + 1; });
+      const cats = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 4);
+      catsEl.hidden = r.loose || r.overBudget || !cats.length;
+      const band = !r.maxPrice ? '' : r.maxPrice <= 1000 ? 'u1' : r.maxPrice <= 2000 ? 'u2' : r.maxPrice <= 5000 ? 'u5' : ''; // the listing's budget bands
+      catsEl.innerHTML = cats.map(([t, n]) => `<a href="${catHref(t)}${band && CATS.includes(t) ? '&price=' + band : ''}">${esc(typeLabel(t))} <small>${n}</small> ›</a>`).join('');
+      const fix = r.fixes.length ? `Showing results for “${esc(r.fixes.reduce((t, [a, b]) => t.replace(new RegExp('\\b' + reEsc(a) + '\\b', 'i'), b), raw))}”` : '';
+      const price = r.maxPrice ? ` under ${esc(D.rs(r.maxPrice))}` : '';
+      label.textContent = !r.hits.length ? (pages.length ? 'No products — see the page above' : 'No matches — try “earbuds”, “charger” or “cable”')
+        : r.overBudget ? `Nothing under ${D.rs(r.maxPrice)} — lowest prices first`
+        : r.loose ? `No exact match — closest ${res.length === 1 ? 'product' : 'products'}`
+        : (r.hits.length > res.length ? `Top ${res.length} of ${r.hits.length} results` : r.hits.length + ' result' + (r.hits.length > 1 ? 's' : '')) + price;
+      if (fix) { why.hidden = false; why.innerHTML = fix; }
+      grid.innerHTML = res.map(card).join('');
     };
     host.classList.add('is-anim');
-    let closing = 0;
+    let closing = 0, commitT = 0, committed = '';
+    // a search "counts" (pixel + interests) once the visitor pauses on it, presses Enter or opens a result
+    const commit = () => { const q = input.value.trim(); if (q.length < 2 || q.toLowerCase() === committed) return; committed = q.toLowerCase(); px('Search', { search_string: q }); if (lastHits.length) tasteSearch(q, lastHits); };
     const open = () => { clearTimeout(closing); host.hidden = false; document.documentElement.style.overflow = 'hidden'; paint(); requestAnimationFrame(() => host.classList.add('is-open')); setTimeout(() => input.focus(), 30); typeHint(input); };
-    const close = () => { host.classList.remove('is-open'); document.documentElement.style.overflow = ''; stopHint(); const done = () => { host.hidden = true; }; if (reduced()) done(); else closing = setTimeout(done, 850); };
-    input.addEventListener('input', paint);
-    let sentQ = ''; // tell the pixel what was searched, once per finished query
-    input.addEventListener('change', () => { const q = input.value.trim(); if (q.length > 1 && q !== sentQ) { sentQ = q; px('Search', { search_string: q }); } });
-    input.addEventListener('keydown', e => { if (e.key === 'Enter') { const a = grid.querySelector('a') || pagesEl.querySelector('a'); if (a) location.href = a.href; } });
-    host.addEventListener('click', e => { if (e.target === host || e.target.closest('.search__close')) close(); });
+    const close = () => { commit(); host.classList.remove('is-open'); document.documentElement.style.overflow = ''; stopHint(); const done = () => { host.hidden = true; }; if (reduced()) done(); else closing = setTimeout(done, 850); };
+    input.addEventListener('input', () => { paint(); clearTimeout(commitT); commitT = setTimeout(commit, 1500); });
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') { commit(); const a = grid.querySelector('a') || pagesEl.querySelector('a'); if (a) { const p = D.byId(a.dataset.pid); if (p) tasteAdd(p, 2, 1); location.href = a.href; } } });
+    host.addEventListener('click', e => {
+      if (e.target === host || e.target.closest('.search__close')) { close(); return; }
+      const term = e.target.closest('[data-term]');
+      if (term) { input.value = term.dataset.term; paint(); input.focus(); return; }
+      const clr = e.target.closest('[data-clear]');
+      if (clr) { tasteClear(clr.dataset.clear === 'terms' ? 'terms' : undefined); paint(); toast(clr.dataset.clear === 'terms' ? 'Recent searches cleared' : 'Your browsing history for suggestions is cleared'); return; }
+      const hit = e.target.closest('.ccard[data-pid]');
+      if (hit) { commit(); tasteAdd(D.byId(hit.dataset.pid), 2, 1); }
+    });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && !host.hidden) close(); });
     sheetDrag(host.querySelector('.search'), close, { scroller: () => host.querySelector('.search'), head: '.search__field' });
     return { open, close };
@@ -1819,6 +2056,7 @@
     qaddUI = mountQuickAdd();
     captureRef();
     consentUI = mountConsent();
+    tasteInit();
     initMotion();
     mountToTop();
     runEdges();
@@ -2146,6 +2384,7 @@
     const LOGO = '<div class="ckc__logo"><img src="img/wu-logo.png" alt="WisdomUp"><img src="img/wu-logo-white.png" alt="" aria-hidden="true"></div>';
     const CATS = [
       { id: 'essential', name: 'Essential', always: true, desc: 'Your cart, wishlist, orders placed from this device, reviews you wrote, saved checkout details, display choices (day or night, grid view) and the creator code from a creator’s link (so its discount reaches checkout; kept 30 days, removable in the cart). A creator’s link also adds one to that creator’s visit count — no personal details are sent. Kept in this browser only and never shared with advertisers. The shop cannot work without it, so it is always on.' },
+      { id: 'personal', name: 'Personalised suggestions', desc: 'Remembers, on this device only, which products and categories you open and how long you look at them, what you search for and what you add to your cart or wishlist — so search can suggest products for you (“Picked for you”) and keep your recent searches. It is never sent to us, to advertisers or anyone else, and switching it off deletes it.' },
       { id: 'marketing', name: 'Marketing', desc: 'Meta Pixel (Facebook and Instagram). It records page views, searches, add-to-cart and purchases — the product, price and quantity, never your name, phone number or address — so we can measure our ads and show them to people who have visited the shop. It sets Meta cookies in this browser.' },
     ];
     const el = document.createElement('div');
@@ -2159,9 +2398,9 @@
             <h2 class="ckc__h" id="ckc-h1">Your cookie choices on this site</h2>
             <div class="ckc__text">
               <p>WisdomUp keeps your cart, wishlist, recently viewed products, orders, saved checkout details, your order note and any creator code you arrived with in this browser. That storage is <b>essential</b> — the shop needs it to work — so it can’t be switched off.</p>
-              <p>With your permission we also use <b>marketing cookies</b> from Meta to:</p>
-              <ul><li>Measure which Facebook and Instagram ads bring visits and orders.</li><li>Show our ads to people who have visited the shop.</li></ul>
-              <p>Select ‘Accept all’ to allow marketing cookies, or ‘Essential only’ to keep them off. To decide category by category, select ‘Manage settings’. You can change your choice at any time from ‘Cookie preferences’ at the foot of every page.</p>
+              <p>With your permission we also:</p>
+              <ul><li>Remember what you browse and search <b>on this device only</b>, to suggest products for you in search.</li><li>Use <b>marketing cookies</b> from Meta to measure which Facebook and Instagram ads bring visits and orders, and to show our ads to people who have visited the shop.</li></ul>
+              <p>Select ‘Accept all’ to allow both, or ‘Essential only’ to keep them off. To decide category by category, select ‘Manage settings’. You can change your choice at any time from ‘Cookie preferences’ at the foot of every page.</p>
             </div>
           </div>
           <div class="ckc__acts">
@@ -2174,7 +2413,7 @@
           <div class="ckc__scroll">
             ${LOGO}
             <h2 class="ckc__h ckc__h--left" id="ckc-h2">Manage your choices</h2>
-            <div class="ckc__text"><p>Switch marketing cookies on or off below, then select ‘Save choices’. Essential storage stays on because the cart, wishlist and checkout depend on it. Open a category to see exactly what it does.</p></div>
+            <div class="ckc__text"><p>Switch personalised suggestions and marketing cookies on or off below, then select ‘Save choices’. Essential storage stays on because the cart, wishlist and checkout depend on it. Open a category to see exactly what it does.</p></div>
             <div class="ckc__quick">
               <button type="button" class="ckc__btn ckc__btn--red" data-ck="essential">Essential only</button>
               <button type="button" class="ckc__btn ckc__btn--red" data-ck="all">Accept all</button>
@@ -2184,7 +2423,7 @@
                 <div class="ckc__row">
                   <span class="ckc__name" id="ckc-n-${c.id}">${c.name}</span>
                   ${c.always ? '<span class="ckc__always">Always on</span>' : `<button type="button" class="ckc__switch" role="switch" aria-checked="false" aria-labelledby="ckc-n-${c.id}" data-cat="${c.id}"><i></i></button>`}
-                  <button type="button" class="ckc__more" aria-expanded="false" aria-controls="ckc-d-${c.id}" aria-label="About ${c.name.toLowerCase()} cookies">${icon('chev-r', 18)}</button>
+                  <button type="button" class="ckc__more" aria-expanded="false" aria-controls="ckc-d-${c.id}" aria-label="About ${c.name.toLowerCase()}${c.id === 'personal' ? '' : ' cookies'}">${icon('chev-r', 18)}</button>
                 </div>
                 <div class="ckc__desc" id="ckc-d-${c.id}" hidden><p>${c.desc}</p></div>
               </li>`).join('')}
@@ -2197,10 +2436,11 @@
         </div>
       </section>`;
     document.body.append(el);
-    const box = el.querySelector('.ckc__box'), sw = el.querySelector('.ckc__switch');
+    const box = el.querySelector('.ckc__box'), sws = [...el.querySelectorAll('.ckc__switch')];
+    const swOn = cat => { const x = sws.find(b => b.dataset.cat === cat); return !!x && x.getAttribute('aria-checked') === 'true'; };
     const layers = { notice: el.querySelector('[data-layer="notice"]'), manage: el.querySelector('[data-layer="manage"]') };
     let layer = 'notice', hideT = 0, opener = null, anims = [];
-    const setSwitch = on => sw.setAttribute('aria-checked', on);
+    const setSwitches = () => sws.forEach(b => b.setAttribute('aria-checked', b.dataset.cat === 'personal' ? personalOK() : marketingOK()));
     // the blocks of a layer rise in one after another (the menu's glide curve, 100ms apart)
     const glide = (root, from = 'translate3d(0, 16px, 0)') => {
       anims.forEach(a => a.cancel()); anims = [];
@@ -2223,7 +2463,7 @@
     function open(name = 'notice') {
       clearTimeout(hideT);
       opener = document.activeElement;
-      setSwitch(marketingOK());
+      setSwitches();
       layers.notice.hidden = name !== 'notice'; layers.manage.hidden = name !== 'manage'; layer = name;
       box.setAttribute('aria-labelledby', name === 'notice' ? 'ckc-h1' : 'ckc-h2');
       el.querySelectorAll('.ckc__more').forEach(b => { b.setAttribute('aria-expanded', 'false'); $(b.getAttribute('aria-controls')).hidden = true; });
@@ -2238,24 +2478,27 @@
       const done = () => { el.hidden = true; if (opener && opener.isConnected && opener !== document.body) opener.focus({ preventScroll: true }); };
       if (reduced()) done(); else hideT = setTimeout(done, 850);
     }
-    const save = marketing => {
+    const save = (marketing, personal) => {
       const was = marketingOK();
-      try { localStorage.setItem(CONSENT_KEY, JSON.stringify({ v: 1, marketing: !!marketing, at: new Date().toISOString() })); } catch (e) {}
+      try { localStorage.setItem(CONSENT_KEY, JSON.stringify({ v: 2, marketing: !!marketing, personal: !!personal, at: new Date().toISOString() })); } catch (e) {}
       if (marketing) loadPixel();
       else if (was && window.fbq) window.fbq('consent', 'revoke');
+      if (!personal) tasteClear(); // switching personalisation off deletes what it learned
+      else tasteInit();
       close();
-      toast(marketing ? 'Cookie choices saved — marketing cookies on' : 'Cookie choices saved — essential only');
+      toast(marketing && personal ? 'Cookie choices saved — all on' : !marketing && !personal ? 'Cookie choices saved — essential only' : `Cookie choices saved — ${personal ? 'personalised suggestions' : 'marketing cookies'} on`);
     };
     el.addEventListener('click', e => {
       const more = e.target.closest('.ckc__more');
       if (more) { const on = more.getAttribute('aria-expanded') !== 'true'; more.setAttribute('aria-expanded', on); slide($(more.getAttribute('aria-controls')), on); return; }
-      if (e.target.closest('.ckc__switch')) { setSwitch(sw.getAttribute('aria-checked') !== 'true'); return; }
+      const swb = e.target.closest('.ckc__switch');
+      if (swb) { swb.setAttribute('aria-checked', swb.getAttribute('aria-checked') !== 'true'); return; }
       const b = e.target.closest('[data-ck]');
       if (!b) return;
       const k = b.dataset.ck;
-      if (k === 'all') save(true);
-      else if (k === 'essential') save(false);
-      else if (k === 'save') save(sw.getAttribute('aria-checked') === 'true');
+      if (k === 'all') save(true, true);
+      else if (k === 'essential') save(false, false);
+      else if (k === 'save') save(swOn('marketing'), swOn('personal'));
       else if (k === 'manage') show('manage');
       else if (k === 'back') { if (consentGet() && layer === 'manage' && opener && opener.closest && opener.closest('.footer')) close(); else show('notice'); }
     });
@@ -2457,6 +2700,7 @@
     openSearch: () => search && search.open(),
     toggleTheme, setTheme, themeMode, isNight, slide, staggerCards, revealWords, sheetDrag, quickAdd, budget: BUDGET, STAR_OUTLINE,
     consent: { open: n => consentUI && consentUI.open(n), get: consentGet },
+    taste: { get: tasteGet, suggest, clear: tasteClear, on: personalOK }, // the on-device interest model (personalised suggestions)
     ref: { get: () => ref, apply: applyRef, clear: clearRef, api: crApi, norm: codeNorm, pctOf, TAG: TAG_SVG, me: () => store.get(ME_KEY, null), setMe: v => { if (v) store.set(ME_KEY, v); else try { localStorage.removeItem(ME_KEY); } catch (e) { /* storage unavailable */ } } },
     seo, abs, clip, ldCrumbs, ldFaq, px, pxItem, YEAR, SITE,
   };
