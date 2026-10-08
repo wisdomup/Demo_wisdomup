@@ -1,6 +1,6 @@
 // WisdomUp — Home (HomeEditorial) page. Shared chrome, cards, rails and hero come from common.js.
 (function () {
-  const { D, $, esc, reduced, vw, code, url, add, btnBuy, mountRail, mountHero, mountAccordion, SLIDE_T } = WU;
+  const { D, $, esc, reduced, vw, code, url, add, btnBuy, mountRail, mountHero, mountAccordion, SLIDE_T, DEPTS, CATS, typeLabel } = WU;
 
   // Studio photo (catalogue thumb) framed on a background sampled from the photo
   const WIDE = 'object-fit: cover; object-position: 50% 50%;'; // landscape frames show the whole packshot
@@ -16,21 +16,21 @@
   // Series spotlight: the TS true wireless family
   const SERIES = ['ts-11anc', 'ts-12', 'ts-13', 'ts-11', 'ts-10'].filter(P);
   const PROMOS = [
-    { id: 'cj-46', kicker: '3-in-1 wireless charger', chips: ['15W phone', 'Earbuds + watch'], bg: 'linear-gradient(120deg,#2a2a2e,#0a0f1a)' },
+    { id: 'cj-46', kicker: '3-in-1 wireless charger', chips: ['15W phone', 'Earbuds + watch'], bg: 'linear-gradient(120deg,#2C2D30,#0C0C0D)' },
     { id: 'cdb-18', kicker: 'Magnetic power bank', chips: ['10,000mAh', '15W wireless'], bg: 'linear-gradient(120deg,#1b1b1b,#050505)' },
-    { id: 'cc-16', kicker: 'Fast car charger', chips: ['33W PD', 'USB + USB-C'], bg: 'linear-gradient(120deg,#4a2a18,#a4582a)' },
-    { id: 'ocd-28', kicker: 'Wall charger + cable', chips: ['20W', 'EU or UK plug'], bg: 'linear-gradient(120deg,#0f2d2a,#050a0a)' },
-    { id: 'sjx-59', kicker: 'Laptop-ready cable', chips: ['240W', 'USB-C to USB-C'], bg: 'linear-gradient(120deg,#22304a,#0b0f18)' },
+    { id: 'cc-16', kicker: 'Fast car charger', chips: ['33W PD', 'USB + USB-C'], bg: 'linear-gradient(120deg,#5A1208,#1A0503)' },
+    { id: 'ocd-28', kicker: 'Wall charger + cable', chips: ['20W', 'EU or UK plug'], bg: 'linear-gradient(120deg,#34302C,#0E0D0C)' },
+    { id: 'sjx-59', kicker: 'Laptop-ready cable', chips: ['240W', 'USB-C to USB-C'], bg: 'linear-gradient(120deg,#2C2D30,#0C0C0D)' },
     { id: 'tde-18', kicker: 'ANC headphones', chips: ['ANC', '40 hrs'], bg: 'linear-gradient(120deg,#3a0f12,#0d0505)' },
     { id: 'mkf-02', kicker: 'Creator wireless mic', chips: ['2.4GHz', '<20ms latency'], bg: 'linear-gradient(120deg,#2a2622,#0d0c0b)' },
-    { id: 'yx-31', kicker: 'Party speaker', chips: ['220W', 'LED lights'], bg: 'linear-gradient(120deg,#2a1640,#120a24)' },
-    { id: 'lfj-09', kicker: 'Grooming kit', chips: ['Clipper + shaver', 'Charging base'], bg: 'linear-gradient(120deg,#33401c,#0d1206)' },
+    { id: 'yx-31', kicker: 'Party speaker', chips: ['220W', 'LED lights'], bg: 'linear-gradient(120deg,#5A1208,#1A0503)' },
+    { id: 'lfj-09', kicker: 'Grooming kit', chips: ['Clipper + shaver', 'Charging base'], bg: 'linear-gradient(120deg,#34302C,#0E0D0C)' },
   ].filter(t => P(t.id));
   const LOOP = [
-    { id: 'ts-11anc', kicker: 'Noise cancelling · TS-11ANC', title: 'Silence, on demand.', sub: 'Active noise cancelling and Bluetooth 6.0 in a pocket-sized case.', tag: 'Earbuds', bg: 'linear-gradient(120deg,#22304a,#0b0f18)' },
-    { id: 'yx-28', kicker: 'Party speaker · YX-28', title: 'Bring the venue home.', sub: '150W, an RGB light show and an 18,000mAh battery.', tag: 'Speakers', bg: 'linear-gradient(120deg,#2a1640,#120a24)' },
+    { id: 'ts-11anc', kicker: 'Noise cancelling · TS-11ANC', title: 'Silence, on demand.', sub: 'Active noise cancelling and Bluetooth 6.0 in a pocket-sized case.', tag: 'Earbuds', bg: 'linear-gradient(120deg,#2C2D30,#0C0C0D)' },
+    { id: 'yx-28', kicker: 'Party speaker · YX-28', title: 'Bring the venue home.', sub: '150W, an RGB light show and an 18,000mAh battery.', tag: 'Speakers', bg: 'linear-gradient(120deg,#5A1208,#1A0503)' },
     { id: 'os-6', kicker: 'Open-ear · OS-6', title: 'Hear the city. Keep the music.', sub: 'Open-ear comfort with Bluetooth 6.0.', tag: 'Earbuds', bg: 'linear-gradient(120deg,#3a0f12,#0d0505)' },
-    { id: 'cdb-18', kicker: 'Magnetic power bank · CDB-18', title: 'Snap on. Power up.', sub: '15W magnetic wireless charging with a built-in watch charger.', tag: 'Power Banks', bg: 'linear-gradient(120deg,#2a2a2e,#0a0f1a)' },
+    { id: 'cdb-18', kicker: 'Magnetic power bank · CDB-18', title: 'Snap on. Power up.', sub: '15W magnetic wireless charging with a built-in watch charger.', tag: 'Power Banks', bg: 'linear-gradient(120deg,#2C2D30,#0C0C0D)' },
     { id: 'txd-01', kicker: 'Electric shaver · TXD-01', title: 'A closer, cleaner shave.', sub: 'Five stainless steel blades and 100+ minutes per charge.', tag: 'Grooming', bg: 'linear-gradient(120deg,#2a2622,#0d0c0b)' },
   ].filter(s => P(s.id)).map(s => ({ ...s, ctaLabel: `Shop ${P(s.id).code} · ${P(s.id).priceText}` }));
   const TAG_SVG = '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M1 2.2V7.4c0 .4.2.8.5 1.1l6.9 6.9a1.5 1.5 0 0 0 2.1 0l4.9-4.9a1.5 1.5 0 0 0 0-2.1L8.5 1.5A1.6 1.6 0 0 0 7.4 1H2.2C1.5 1 1 1.5 1 2.2Zm3.5 1.3a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4Z"></path></svg>';
@@ -222,6 +222,27 @@
   tick();
   setInterval(tick, 1000);
   $('remind').addEventListener('click', WU.live.remind);
+
+  /* ---------- Explore the range (2026-10-08, "also add this section on the light theme"): every department, then every product
+     type, as chips — the night home's chip cloud in day colours; built from the catalogue so it never misses a new type ---------- */
+  // Phones show the departments and fold the product types behind one capsule (37 chips were a 14-row wall); every link stays
+  // in the page, so search engines still see the whole range
+  if ($('xrange')) {
+    const types = CATS.filter(t => D.products.some(p => p.type === t));
+    $('xrange').innerHTML = DEPTS.filter(d => D.products.some(p => d.types.includes(p.type)))
+      .map(d => `<a class="chip xrange__chip xrange__chip--dept" href="${url.dept(d.id)}">${esc(d.label)}</a>`).join('')
+      + `<button type="button" class="chip xrange__toggle" aria-expanded="false" aria-controls="xrange">All ${types.length} product types</button>`
+      + types.map(t => `<a class="chip xrange__chip xrange__chip--type" href="${url.cat(t)}">${esc(typeLabel(t))}</a>`).join('');
+    $('xrange').addEventListener('click', e => {
+      const b = e.target.closest('.xrange__toggle');
+      if (!b) return;
+      const open = b.getAttribute('aria-expanded') !== 'true';
+      b.setAttribute('aria-expanded', open);
+      b.textContent = open ? 'Fewer' : `All ${types.length} product types`;
+      $('xrange').classList.toggle('is-open', open);
+      if (open && !reduced()) [...$('xrange').querySelectorAll('.xrange__chip--type')].forEach((c, i) => c.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 300, delay: Math.min(i, 14) * 25, easing: 'ease', fill: 'backwards' }));
+    });
+  }
 
   /* ---------- Promo carousel ---------- */
   (function promos() {
