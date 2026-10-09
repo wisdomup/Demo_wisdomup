@@ -680,3 +680,8 @@ html[data-theme="night"] .ck__err { background: var(--n-red-soft); box-shadow: i
   html[data-theme="night"] .ck__sumbody { box-shadow: inset 0 1.5px 0 var(--n-line2); }
   html[data-theme="night"] .ck__sumtoggle:focus-visible { outline-color: #fff; }
 }
+/* Compact cookie notice (2026-10-10) */
+html[data-theme="night"] .ckc.is-bar .ckc__box { box-shadow: inset 0 0 0 1.5px var(--n-line2), 0 18px 48px rgba(0,0,0,.55); }
+html[data-theme="night"] .ckc__note p { color: var(--n-text2); }
+html[data-theme="night"] :is(.ckc__note b, .ckc__note a) { color: var(--n-text); }
+html[data-theme="night"] .ckc__note a:focus-visible { outline-color: #fff; }

@@ -2672,22 +2672,12 @@
     el.className = 'ckc'; el.id = 'ckc'; el.hidden = true;
     el.innerHTML = `
       <div class="ckc__scrim"></div>
-      <section class="ckc__box" role="dialog" aria-modal="true" aria-labelledby="ckc-h1" tabindex="-1">
-        <div class="ckc__layer" data-layer="notice">
-          <div class="ckc__scroll">
-            ${LOGO}
-            <h2 class="ckc__h" id="ckc-h1">Your cookie choices on this site</h2>
-            <div class="ckc__text">
-              <p>WisdomUp keeps your cart, wishlist, recently viewed products, orders, saved checkout details, your order note and any creator code you arrived with in this browser. That storage is <b>essential</b> — the shop needs it to work — so it can’t be switched off.</p>
-              <p>With your permission we also:</p>
-              <ul><li>Remember what you browse and search <b>on this device only</b>, to suggest products for you in search.</li><li>Use <b>marketing cookies</b> from Meta to measure which Facebook and Instagram ads bring visits and orders, and to show our ads to people who have visited the shop.</li></ul>
-              <p>Select ‘Accept all’ to allow both, or ‘Essential only’ to keep them off. To decide category by category, select ‘Manage settings’. You can change your choice at any time from ‘Cookie preferences’ at the foot of every page.</p>
-            </div>
-          </div>
-          <div class="ckc__acts">
+      <section class="ckc__box" role="dialog" aria-modal="false" aria-labelledby="ckc-h1" tabindex="-1">
+        <div class="ckc__layer ckc__note" data-layer="notice">
+          <p id="ckc-h1"><b>Cookies.</b> We keep your cart and settings in this browser. ‘Accept all’ also turns on personalised search suggestions and Meta’s ad cookies. <a href="#" data-ck="manage">Cookie settings</a></p>
+          <div class="ckc__pair">
             <button type="button" class="ckc__btn ckc__btn--red" data-ck="essential">Essential only</button>
             <button type="button" class="ckc__btn ckc__btn--red" data-ck="all">Accept all</button>
-            <button type="button" class="ckc__btn ckc__btn--line ckc__btn--wide" data-ck="manage">Manage settings</button>
           </div>
         </div>
         <div class="ckc__layer" data-layer="manage" hidden>
@@ -2725,7 +2715,7 @@
     // the blocks of a layer rise in one after another (the menu's glide curve, 100ms apart)
     const glide = (root, from = 'translate3d(0, 16px, 0)') => {
       anims.forEach(a => a.cancel()); anims = [];
-      if (reduced() || !root.animate) return;
+      if (reduced() || !root.animate || !root.querySelector('.ckc__scroll')) return;
       const blocks = [...root.querySelector('.ckc__scroll').children, root.querySelector('.ckc__acts')];
       blocks.forEach((b, i) => anims.push(b.animate([{ opacity: 0, transform: from }, { opacity: 1, transform: 'none' }],
         { duration: 600, delay: Math.min(i * 100, 700), easing: 'cubic-bezier(.075,.82,.165,1)', fill: 'backwards' })));
@@ -2748,11 +2738,18 @@
       layers.notice.hidden = name !== 'notice'; layers.manage.hidden = name !== 'manage'; layer = name;
       box.setAttribute('aria-labelledby', name === 'notice' ? 'ckc-h1' : 'ckc-h2');
       el.querySelectorAll('.ckc__more').forEach(b => { b.setAttribute('aria-expanded', 'false'); $(b.getAttribute('aria-controls')).hidden = true; });
+      // the first-visit notice is a small card that leaves the page usable (2026-10-10, "small and compact … so it doesn't cover the
+      // screen"): no scrim, no scroll lock, focus stays where it is; the manage layer is a real modal
+      const bar = name === 'notice';
+      el.classList.toggle('is-bar', bar);
+      box.setAttribute('aria-modal', bar ? 'false' : 'true');
       el.hidden = false;
-      document.documentElement.style.overflow = 'hidden';
+      document.documentElement.style.overflow = bar ? '' : 'hidden';
       requestAnimationFrame(() => requestAnimationFrame(() => { el.classList.add('is-open'); glide(layers[name]); }));
-      setTimeout(() => box.focus({ preventScroll: true }), 80); // focus the dialog (announced by screen readers); Tab reaches the buttons
+      if (!bar) setTimeout(() => box.focus({ preventScroll: true }), 80); // focus the dialog (announced by screen readers); Tab reaches the buttons
     }
+    // from the card to the full settings (and back): swap at once, then the new form rises in
+    const swap = name => { clearTimeout(hideT); el.classList.remove('is-open'); el.hidden = true; open(name); };
     function close() {
       el.classList.remove('is-open');
       document.documentElement.style.overflow = '';
@@ -2777,15 +2774,16 @@
       const b = e.target.closest('[data-ck]');
       if (!b) return;
       const k = b.dataset.ck;
+      if (b.tagName === 'A') e.preventDefault();
       if (k === 'all') save(true, true);
       else if (k === 'essential') save(false, false);
       else if (k === 'save') save(swOn('marketing'), swOn('personal'));
-      else if (k === 'manage') show('manage');
-      else if (k === 'back') { if (consentGet() && layer === 'manage' && opener && opener.closest && opener.closest('.footer')) close(); else show('notice'); }
+      else if (k === 'manage') { if (layer === 'notice') { const o = opener; swap('manage'); opener = o; } else show('manage'); }
+      else if (k === 'back') { if (consentGet()) close(); else swap('notice'); }
     });
     el.addEventListener('keydown', e => {
       if (e.key === 'Escape' && layer === 'manage') { e.preventDefault(); el.querySelector('[data-ck="back"]').click(); return; }
-      if (e.key !== 'Tab') return;
+      if (e.key !== 'Tab' || layer === 'notice') return;
       const f = [...layers[layer].querySelectorAll('button')].filter(x => x.offsetParent !== null);
       const first = f[0], last = f[f.length - 1];
       if (document.activeElement === box) { e.preventDefault(); (e.shiftKey ? last : first).focus(); }

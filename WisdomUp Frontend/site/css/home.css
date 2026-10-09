@@ -1068,6 +1068,17 @@ body:has(.buybar.is-on) .totop { bottom: calc(96px + env(safe-area-inset-bottom)
 .ckc__more svg { transition: transform var(--m-primary, 500ms cubic-bezier(.3,1,.3,1)); }
 .ckc__more[aria-expanded="true"] svg { transform: rotate(90deg); }
 .ckc__desc p { margin: 0; padding: 0 56px 16px 0; font: 400 13px/1.6 var(--font); color: #3D4656; }
+/* COMPACT NOTICE (2026-10-10): the first-visit card — bottom-right, 400px, one short paragraph + two equal red capsules; no scrim,
+   the page stays usable. "Cookie settings" opens the full manage dialog above. */
+.ckc.is-bar { inset: auto 16px 16px auto; display: block; width: min(400px, calc(100% - 32px)); padding: 0; pointer-events: none; }
+.ckc.is-bar .ckc__scrim { display: none; }
+.ckc.is-bar .ckc__box { width: 100%; max-height: none; border-radius: 16px; pointer-events: auto; box-shadow: inset 0 0 0 1.5px #E3E4E6, 0 18px 48px rgba(0,0,0,.16); }
+.ckc__note { gap: 12px; padding: 16px 18px; }
+.ckc__note p { margin: 0; font: 400 13px/1.5 var(--font); color: #3D3F44; text-wrap: pretty; }
+.ckc__note b { font-weight: 700; color: #111; }
+.ckc__note a { color: #111; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
+.ckc__note a:focus-visible { outline: 2px solid #111; outline-offset: 2px; border-radius: 4px; }
+.ckc__pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 @media (max-width: 639px) {
   .ckc { padding: 0; place-items: end stretch; }
   .ckc__box { width: 100%; max-height: calc(100dvh - 60px); border-radius: 20px 20px 0 0; box-shadow: 0 -12px 40px rgba(0,0,0,.22); }
@@ -1079,4 +1090,7 @@ body:has(.buybar.is-on) .totop { bottom: calc(96px + env(safe-area-inset-bottom)
   .ckc__btn { padding: 0 10px; }
   .ckc__quick .ckc__btn { min-width: 0; flex: 1; }
   .ckc__desc p { padding-right: 0; }
+  .ckc.is-bar { inset: auto 10px calc(10px + env(safe-area-inset-bottom)) 10px; width: auto; }
+  .ckc.is-bar .ckc__box { border-radius: 16px; box-shadow: inset 0 0 0 1.5px #E3E4E6, 0 12px 36px rgba(0,0,0,.2); }
+  .ckc__note { padding: 14px 16px; }
 }

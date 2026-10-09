@@ -115,6 +115,8 @@ html[data-theme="night"] .wpc__cta { --fill: #fff; --fill-text: #D91E05; }
 .ckc.is-open .ckc__scrim { opacity: 1; }
 .ckc__box { opacity: 0; transform: translate3d(0, 2rem, 0) scale(.98); transition: transform var(--m-drawer), opacity var(--m-primary); }
 .ckc.is-open .ckc__box { opacity: 1; transform: none; }
+.ckc.is-bar .ckc__box { opacity: 0; transform: translate3d(0, calc(100% + 24px), 0); }
+.ckc.is-bar.is-open .ckc__box { opacity: 1; transform: none; }
 @media (max-width: 639px) {
   .ckc__box { opacity: 1; transform: translate3d(0, 104%, 0); }
   .ckc.is-open .ckc__box { transform: none; }
