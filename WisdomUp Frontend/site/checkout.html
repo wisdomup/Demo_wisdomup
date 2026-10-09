@@ -38,7 +38,11 @@
   <main class="ck" id="ck">
     <header class="ck__top">
       <h1 class="ck__h">Checkout</h1>
-      <p class="ck__secure"><span data-icon="shield" data-size="18"></span>Secure checkout · Cash on Delivery available · 7-day money-back guarantee</p>
+      <ul class="ck__trust" aria-label="Good to know">
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6.5" width="18" height="11" rx="2.5"/><circle class="r" cx="12" cy="12" r="2.4"/></svg>Cash on Delivery</li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path class="r" d="M4 4v4h4"/></svg>7-day money-back</li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5.5c0 4.3-3 8-7 9.5-4-1.5-7-5.2-7-9.5V6z"/><path class="r" d="M9 12l2 2 4-4"/></svg>Confirmed on WhatsApp before dispatch</li>
+      </ul>
     </header>
     <form class="ck__form" id="ck-form" novalidate>
       <div class="ck__err" id="ck-err" role="alert" hidden></div>
@@ -79,11 +83,14 @@
 
     <aside class="ck__sum" aria-labelledby="ck-sum-h">
       <div class="ck__sumcard">
-        <div class="ck__sumhead"><h2 id="ck-sum-h">Order summary</h2><button type="button" class="link-arrow" data-open-cart>Edit cart</button></div>
-        <div id="ck-lines"></div>
-        <label class="cartd__gift ck__gift"><input type="checkbox" id="ck-gift"><span>Add gift wrapping</span><b id="ck-gift-p"></b></label>
-        <div class="ck__ref" id="ck-ref" aria-live="polite"></div>
-        <dl class="ck__tot" id="ck-tot"></dl>
+        <button type="button" class="ck__sumtoggle" id="ck-sumtoggle" aria-expanded="false" aria-controls="ck-sumbody"><span class="ck__sumtoggle-t">Order summary <small id="ck-sumcount"></small></span><b id="ck-sumtotal"></b><span class="ck__sumchev" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span></button>
+        <div class="ck__sumbody" id="ck-sumbody">
+          <div class="ck__sumhead"><h2 id="ck-sum-h">Order summary</h2><button type="button" class="link-arrow" data-open-cart>Edit cart</button></div>
+          <div class="ck__lines" id="ck-lines"></div>
+          <label class="ck__gift"><input type="checkbox" id="ck-gift"><span>Add gift wrapping</span><b id="ck-gift-p"></b></label>
+          <div class="ck__ref" id="ck-ref" aria-live="polite"></div>
+          <dl class="ck__tot" id="ck-tot"></dl>
+        </div>
         <button type="submit" form="ck-form" class="btn-buy ck__place" id="ck-place">Place order</button>
         <p class="ck__fine">Prices include all taxes. Your order is confirmed by phone or WhatsApp before dispatch.</p>
       </div>

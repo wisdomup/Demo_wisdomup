@@ -64,8 +64,18 @@
       const label = busy ? 'Placing order…' : `Place order · ${rs(t.total)}`;
       $('ck-place').textContent = label;
       $('ck-place-form').textContent = label;
+      const n = cart.count();
+      $('ck-sumcount').textContent = `· ${n} item${n === 1 ? '' : 's'}`;
+      $('ck-sumtotal').textContent = rs(t.total);
       paintOptions();
     }
+    // Narrow screens (the summary sits above the form): the summary is folded to one line — items and the total — until tapped
+    const sumToggle = $('ck-sumtoggle'), sumBody = $('ck-sumbody');
+    const narrow = matchMedia('(max-width: 1023px)');
+    const foldSummary = () => { if (narrow.matches) { sumBody.hidden = sumToggle.getAttribute('aria-expanded') !== 'true'; } else { sumBody.hidden = false; } };
+    sumToggle.addEventListener('click', () => { const open = sumToggle.getAttribute('aria-expanded') !== 'true'; sumToggle.setAttribute('aria-expanded', open); WU.slide(sumBody, open); });
+    narrow.addEventListener('change', foldSummary);
+    foldSummary();
     /* ---------- Creator code (the creators program): the code from a creator's link, or one typed here. Checked with the
        server before it shows a discount; the order server checks it again. ---------- */
     let refOpen = false, refErr = '', refBusy = false;
