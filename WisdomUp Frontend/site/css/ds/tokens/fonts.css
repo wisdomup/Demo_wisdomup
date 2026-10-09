@@ -1,2 +1,4 @@
-/* Inter (all UI) + Michroma (banner product names). Source specifies Google Fonts; no binaries were supplied. */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Michroma&display=swap");
+/* ONE family: Inter, every weight 100-900 (2026-10-09, copied from f1store.formula1.com, which uses Inter for headings, body,
+   nav, buttons and prices and nothing else; it self-hosts nine static weights, we load the same range as the variable font).
+   Michroma (the old display face for numbers and codes) is gone. Source specifies Google Fonts; no binaries were supplied. */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");

@@ -5,7 +5,7 @@
    capsules; cards 16px, panels 24px+.
    ========================================================================== */
 
-.af-h { margin: 0; font: 800 clamp(30px, 3.2vw, 48px)/1.05 var(--font); letter-spacing: -.01em; text-transform: uppercase; color: #111; text-align: center; text-wrap: balance; }
+.af-h { margin: 0; font: 700 clamp(30px, 3.2vw, 48px)/1.05 var(--font); letter-spacing: -.01em; text-transform: uppercase; color: #111; text-align: center; text-wrap: balance; }
 .af-photo { display: block; overflow: hidden; border-radius: 14px; box-shadow: 0 18px 40px rgba(0,0,0,.28); }
 .af-photo img { display: block; width: 100%; height: 100%; }
 
@@ -52,7 +52,7 @@
 .afs__ic { display: grid; place-items: center; width: 112px; height: 112px; margin-bottom: 14px; border-radius: 50%; background: #fff; box-shadow: inset 0 0 0 1.5px #E3E4E6, 0 10px 30px rgba(0,0,0,.05); }
 .afs__ic svg { width: 48px; height: 48px; fill: none; stroke: #111; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 .afs__ic .r { stroke: #D91E05; }
-.afs__step h3 { margin: 0; font: 700 20px/1.2 var(--font); color: #111; }
+.afs__step h3 { margin: 0; font: 600 20px/1.2 var(--font); color: #111; }
 .afs__step p { margin: 0; font: 400 15px/1.45 var(--font); color: #4A4D53; }
 @media (max-width: 639px) {
   .afs__steps { gap: 8px; }
@@ -156,7 +156,7 @@
 .afw__grid { max-width: 1080px; margin: clamp(28px, 3.4vw, 48px) auto 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(24px, 4vw, 56px); }
 .afw__card { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
 .afw__img { position: relative; width: 100%; aspect-ratio: 4 / 3; margin-bottom: 14px; border-radius: 24px; background: #F5F6F8; overflow: hidden; }
-.afw__card h3 { margin: 0; font: 700 clamp(20px, 1.8vw, 24px)/1.25 var(--font); color: #111; text-wrap: balance; }
+.afw__card h3 { margin: 0; font: 600 clamp(20px, 1.8vw, 24px)/1.25 var(--font); color: #111; text-wrap: balance; }
 .afw__card p { margin: 0; max-width: 46ch; font: 400 16px/1.55 var(--font); color: #4A4D53; text-wrap: pretty; }
 .afw__ph { position: absolute; aspect-ratio: 4 / 5; box-shadow: 0 18px 40px rgba(0,0,0,.14); }
 .afw__ph--1 { left: 10%; top: 24%; width: 32%; transform: rotate(-6deg); }
@@ -181,7 +181,7 @@
 .afhp__row:first-of-type { margin-top: clamp(12px, 2vw, 24px); }
 .afhp__row:last-child { box-shadow: none; }
 .afhp__n { font: 700 13px/1 var(--font); letter-spacing: .16em; color: #D91E05; }
-.afhp__copy h3 { margin: 10px 0 12px; font: 700 clamp(22px, 2.2vw, 30px)/1.2 var(--font); letter-spacing: -.01em; color: #111; text-wrap: balance; }
+.afhp__copy h3 { margin: 10px 0 12px; font: 600 clamp(22px, 2.2vw, 30px)/1.2 var(--font); letter-spacing: -.01em; color: #111; text-wrap: balance; }
 .afhp__copy p { margin: 0; max-width: 56ch; font: 400 16px/1.6 var(--font); color: #4A4D53; text-wrap: pretty; }
 .afhp__art { display: grid; place-items: center; min-height: 260px; padding: clamp(20px, 2.6vw, 32px); border-radius: 24px; background: #F5F6F8; }
 @media (max-width: 767px) {
@@ -221,7 +221,7 @@
 
 /* ---------- 5. Join ---------- */
 .afj { margin: var(--sec) var(--gutter, 28px) 0; padding: clamp(40px, 5vw, 72px) 20px; border-radius: clamp(24px, 4vw, 40px); background: #F5F6F8; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
-.afj__h { margin: 0; font: 800 clamp(28px, 3vw, 44px)/1.05 var(--font); letter-spacing: -.01em; text-transform: uppercase; color: #111; text-wrap: balance; }
+.afj__h { margin: 0; font: 700 clamp(28px, 3vw, 44px)/1.05 var(--font); letter-spacing: -.01em; text-transform: uppercase; color: #111; text-wrap: balance; }
 .afj p { margin: 0; font: 400 16px/1.5 var(--font); color: #4A4D53; }
 .page--aff .afj__go { margin-top: 10px; min-width: min(100%, 300px); justify-content: center; }
 .afj__more { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 12px; margin-top: 8px; font: 500 14px/1.4 var(--font); color: #6B6F76; }

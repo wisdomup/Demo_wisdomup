@@ -73,7 +73,7 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
 .crumbs a { color: var(--muted); }
 .crumbs a:hover { color: #1B1B1B; text-decoration: underline; text-underline-offset: 3px; }
 .crumbs [aria-current] { color: #464646; }
-.grad-h { margin: 0; font: 800 clamp(28px, 3.6vw, 44px)/1.1 var(--font); letter-spacing: -.01em; text-transform: uppercase; background: var(--grad-heading); -webkit-background-clip: text; background-clip: text; color: transparent; width: fit-content; }
+.grad-h { margin: 0; font: 700 clamp(28px, 3.6vw, 44px)/1.1 var(--font); letter-spacing: -.01em; text-transform: uppercase; background: var(--grad-heading); -webkit-background-clip: text; background-clip: text; color: transparent; width: fit-content; }
 .split { margin: var(--sec) var(--gutter, 28px) 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: clamp(20px, 3vw, 40px); align-items: start; }
 .panel-list { background: #fff; border: 1.5px solid var(--line, #E4E4E4); border-radius: 24px; padding: 8px clamp(20px, 3vw, 32px); }
 .seo-lite { margin: var(--sec) var(--gutter, 28px) 0; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
@@ -162,13 +162,13 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
 .pdsec { scroll-margin-top: 190px; }
 .overview { margin: var(--sec) var(--gutter, 28px) 0; display: flex; flex-direction: column; gap: 36px; }
 .overview__head { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr)); gap: 24px 40px; align-items: end; }
-.overview__head h2 { margin: 0; font: 300 clamp(34px, 4.6vw, 56px)/1.04 var(--font); letter-spacing: -.02em; color: #464646; text-wrap: balance; }
+.overview__head h2 { margin: 0; font: 400 clamp(34px, 4.6vw, 56px)/1.04 var(--font); letter-spacing: -.02em; color: #464646; text-wrap: balance; }
 .overview__head h2 b { font-weight: 800; }
 .overview__head p { margin: 0; font: 400 17px/1.6 var(--font); color: #464646; max-width: 480px; text-wrap: pretty; }
 .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 16px; }
 .pd-stat { display: flex; flex-direction: column; justify-content: space-between; gap: 14px; padding: 28px 24px; border-radius: 24px; min-height: 200px; box-sizing: border-box; border: 1.5px solid transparent; }
 .pd-stat--light { border-color: var(--line, #E4E4E4); }
-.pd-stat__v { font: 400 clamp(32px, 3.4vw, 44px)/1 var(--font-display); }
+.pd-stat__v { font: 700 clamp(32px, 3.4vw, 44px)/1 var(--font-display); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
 .pd-stat__t { font: 700 15px/1.3 var(--font); text-transform: uppercase; }
 .pd-stat__s { font: 400 14px/1.5 var(--font); opacity: .85; }
 .specs-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 20px; padding: 16px 0; border-bottom: 1.5px solid var(--line, #E4E4E4); font: 400 15px/1.5 var(--font); color: #464646; }
@@ -176,7 +176,7 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
 .specs-row b { font-weight: 600; }
 .reviews-box { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding: 32px; }
 .reviews-box .stars { font-size: 22px; }
-.reviews-box h3 { margin: 0; font: 700 18px/1.3 var(--font); color: #464646; }
+.reviews-box h3 { margin: 0; font: 600 18px/1.3 var(--font); color: #464646; }
 .reviews-box p { margin: 0; font: 400 15px/1.5 var(--font); color: var(--muted); }
 .buybar { position: fixed; left: 50%; bottom: 16px; z-index: 30; transform: translate(-50%, calc(100% + 40px)); transition: transform 320ms cubic-bezier(.2,.7,.2,1); width: min(760px, calc(100% - 24px)); display: flex; align-items: center; gap: 14px; padding: 8px 8px 8px 10px; border-radius: 999px; background: rgba(208,212,212,.78); backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%); box-shadow: 0 10px 24px rgba(0,0,0,.1); box-sizing: border-box; }
 .buybar.is-on { transform: translate(-50%, 0); }
@@ -251,7 +251,7 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
 .bk-cats .cat__ring svg { position: absolute; left: 50%; top: 44%; width: 118%; translate: -50% -50%; }
 .bk-cats .cat:hover { color: #1B1B1B; }
 .bulk-steps { margin: var(--sec) var(--gutter, 28px) 0; border-radius: clamp(24px, 4vw, 40px); background: var(--navy-deep, #1B1B1B); color: #fff; padding: clamp(28px, 5vw, 64px) clamp(20px, 4.5vw, 56px); display: flex; flex-direction: column; gap: clamp(24px, 4vw, 44px); box-sizing: border-box; }
-.bulk-steps h2 { margin: 0; font: 300 clamp(30px, 3.6vw, 44px)/1.08 var(--font); letter-spacing: -.02em; color: #fff; text-wrap: balance; }
+.bulk-steps h2 { margin: 0; font: 400 clamp(30px, 3.6vw, 44px)/1.08 var(--font); letter-spacing: -.02em; color: #fff; text-wrap: balance; }
 .bulk-steps h2 b { font-weight: 800; }
 .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 16px; }
 .step { display: flex; flex-direction: column; gap: 12px; padding: 26px; border-radius: 24px; background: rgba(255,255,255,.06); }
@@ -284,7 +284,7 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
 .pbanner { position: relative; height: clamp(260px, calc((100vw - 2 * var(--gutter, 28px)) / 4.2 * 1.18), 420px); margin: 0 var(--gutter, 28px); border-radius: 32px; overflow: hidden; color: #fff;
   background: radial-gradient(90% 80% at 85% 85%, rgba(217,30,5,.3) 0%, rgba(217,30,5,0) 60%), radial-gradient(120% 120% at 70% 30%, #2A2A2E 0%, #161618 55%, #0B0B0C 100%); }
 .pbanner__copy { position: absolute; left: clamp(28px, 4.5vw, 64px); top: 50%; transform: translateY(-50%); max-width: 44%; display: flex; flex-direction: column; gap: 14px; z-index: 1; }
-.pbanner__h { margin: 0; font: 300 clamp(36px, 4.2vw, 60px)/1.02 var(--font); letter-spacing: -.02em; color: #fff; }
+.pbanner__h { margin: 0; font: 400 clamp(36px, 4.2vw, 60px)/1.02 var(--font); letter-spacing: -.02em; color: #fff; }
 .pbanner__h b { font-weight: 800; background: var(--grad-gold); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .pbanner__sub { margin: 0; max-width: 30ch; font: 500 16px/1.5 var(--font); color: #D8D2CC; }
 .pbanner__art { position: absolute; top: 0; bottom: 0; right: 0; left: 44%; pointer-events: none; }
@@ -332,7 +332,7 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
 .mcrumbs #mcrumbs-tail a:hover { color: #1B1B1B; text-decoration: underline; text-underline-offset: 3px; }
 .mcrumbs #mcrumbs-tail svg { width: 12px; height: 12px; color: #B4B9C3; flex: none; }
 .mcrumbs b { max-width: 100%; font-weight: 600; color: #111; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.mtitle { margin: 2px 0 0; font: 800 clamp(28px, 7.4vw, 34px)/1.1 var(--font); letter-spacing: -.02em; color: #111; text-wrap: balance; }
+.mtitle { margin: 2px 0 0; font: 700 clamp(28px, 7.4vw, 34px)/1.1 var(--font); letter-spacing: -.02em; color: #111; text-wrap: balance; }
 .mdesc { margin: 0; display: flex; align-items: baseline; justify-content: center; gap: 6px; width: 100%; max-width: 640px; font: 400 15px/1.5 var(--font); color: #6B6E73; }
 .mdesc__t { flex: 0 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mdesc.is-open { display: block; }
@@ -447,7 +447,7 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
 .fdrawer[hidden] { display: none; }
 .fdrawer.is-dragging { transition: none; }
 .fdrawer__head { display: flex; align-items: center; gap: 12px; padding: 16px 16px 16px 20px; border-bottom: 1.5px solid #EEF0F2; }
-.fdrawer__head h2 { margin: 0; margin-right: auto; font: 800 22px/1 var(--font); letter-spacing: -.01em; color: #0B0B0B; }
+.fdrawer__head h2 { margin: 0; margin-right: auto; font: 700 22px/1 var(--font); letter-spacing: -.01em; color: #0B0B0B; }
 .fdrawer__clear { height: 44px; padding: 0 4px; border: 0; background: none; font: 600 15px/1 var(--font); color: #0B0B0B; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .fdrawer__x { flex: none; width: 44px; height: 44px; border: 1.5px solid #0B0B0B; border-radius: 50%; background: #fff; color: #0B0B0B; display: grid; place-items: center; cursor: pointer; }
 .fdrawer__x:focus-visible, .fdrawer__clear:focus-visible { outline: 2px solid #111; outline-offset: 3px; }
@@ -599,7 +599,7 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
 
 .ord { max-width: 1240px; margin: 16px auto 0; padding: 0 var(--gutter, 28px); display: flex; flex-direction: column; gap: 20px; }
 .ord__hero { display: flex; align-items: flex-start; gap: 18px; padding: clamp(20px, 3vw, 32px); border-radius: 24px; background: var(--aqua-band, #F5F6F8); }
-.ord__hero h1 { margin: 6px 0 8px; font: 800 clamp(26px, 3vw, 36px)/1.1 var(--font); color: #0B0B0B; }
+.ord__hero h1 { margin: 6px 0 8px; font: 700 clamp(26px, 3vw, 36px)/1.1 var(--font); color: #0B0B0B; }
 .ord__hero p { margin: 0; max-width: 62ch; font: 400 15px/1.6 var(--font); color: #1B1B1B; }
 .ord__tick { flex: none; width: 56px; height: 56px; border-radius: 50%; background: #1F5E3A; color: #fff; display: grid; place-items: center; }
 .ord__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 420px); gap: 20px; align-items: start; }
@@ -684,7 +684,7 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
    PRODUCT PAGE tidy pass (2026-10-06, "fix the single product page UI"): ONE accent = the red of the main Add to cart button.
    The blue price / gradient "% off" / blue % badge, the cream gift + offer boxes and the multicolour day icons are gone.
    ========================================================================== */
-.pdp2__title { text-transform: none; font-weight: 700; font-size: clamp(24px, 2.6vw, 32px); letter-spacing: -.01em; color: #1F2328; }
+.pdp2__title { text-transform: none; font-weight: 600; font-size: clamp(24px, 2.6vw, 32px); letter-spacing: -.01em; color: #1F2328; }
 .pdp2__rate { white-space: nowrap; }
 .pdp2__rate svg { flex: none; width: 15px; height: 15px; } /* the outline star had no size and drew huge */
 .pdp2__now { color: #0B0B0B; }
@@ -721,7 +721,7 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
 .ck { max-width: 1240px; margin: 16px auto 0; padding: 0 var(--gutter, 28px); display: grid; grid-template-columns: minmax(0, 1fr) minmax(340px, 420px); gap: clamp(24px, 3vw, 40px); align-items: start; }
 .ck[hidden], .ck-empty[hidden] { display: none; }
 .ck__top { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 14px; margin-bottom: 4px; }
-.ck__h { margin: 0; font: 800 clamp(30px, 3.2vw, 44px)/1.05 var(--font); letter-spacing: -.02em; color: #111; }
+.ck__h { margin: 0; font: 700 clamp(30px, 3.2vw, 44px)/1.05 var(--font); letter-spacing: -.02em; color: #111; }
 .ck__trust { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
 .ck__trust li { display: inline-flex; align-items: center; gap: 8px; height: var(--chip, 32px); padding: 0 13px 0 11px; border-radius: 999px; background: #F5F6F8; box-shadow: inset 0 0 0 1.5px #E3E4E6; font: 600 12px/1 var(--font); color: #111; white-space: nowrap; }
 .ck__trust svg { flex: none; width: 16px; height: 16px; fill: none; stroke: #111; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }

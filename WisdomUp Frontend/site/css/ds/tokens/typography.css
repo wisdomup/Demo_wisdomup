@@ -1,10 +1,11 @@
 /* Wisdomup — type tokens */
 :root {
   --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  --font-display: "Michroma", "Unbounded", "Inter", sans-serif;  /* banner product names only */
+  --font-display: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; /* 2026-10-09: big numbers and codes are Inter too (F1 store: one family) */
+  --fw-h1: 700; --fw-h2: 700; --fw-h3: 600; /* heading weights measured on f1store.formula1.com: H1 700, H2 600-700, no lighter or heavier headings */
   --fs-utility: 14px; /* @kind font */   --fw-utility: 500; /* @kind font */
   --fs-cat: 15px; /* @kind font */       --fw-cat: 500; /* @kind font */
-  --fs-section: 22px; /* @kind font */   --fw-section: 800; /* @kind font */
+  --fs-section: 22px; /* @kind font */   --fw-section: 700; /* @kind font */
   --fs-card-title: 15px; /* @kind font */
   --fs-card-meta: 11px; /* @kind font */
   --fs-card-price: 17px; /* @kind font */

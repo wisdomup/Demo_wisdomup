@@ -37,7 +37,7 @@
 /* ---------- Calculator ---------- */
 .cr-calc { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); border-radius: 24px; overflow: hidden; box-shadow: inset 0 0 0 1.5px #E3E4E6; }
 .cr-calc__in { display: flex; flex-direction: column; gap: 22px; padding: clamp(22px, 3.4vw, 40px); }
-.cr-calc__h { margin: -8px 0 0; font: 800 clamp(26px, 2.8vw, 34px)/1.1 var(--font); letter-spacing: -.02em; color: #111; }
+.cr-calc__h { margin: -8px 0 0; font: 700 clamp(26px, 2.8vw, 34px)/1.1 var(--font); letter-spacing: -.02em; color: #111; }
 .cr-range { display: flex; flex-direction: column; gap: 12px; }
 .cr-range label { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font: 500 15px/1.35 var(--font); color: #3D3F44; }
 .cr-range output { font: 800 20px/1 var(--font); color: #111; font-variant-numeric: tabular-nums; white-space: nowrap; }
@@ -125,7 +125,7 @@
    ========================================================================== */
 .crd { max-width: 1240px; margin: 16px auto 0; padding: 0 var(--gutter, 28px); box-sizing: border-box; }
 .crd-login { max-width: 480px; margin: 8px auto 0; }
-.crd-login__h { margin: -6px 0 0; font: 800 clamp(28px, 3vw, 36px)/1.1 var(--font); letter-spacing: -.02em; color: #111; }
+.crd-login__h { margin: -6px 0 0; font: 700 clamp(28px, 3vw, 36px)/1.1 var(--font); letter-spacing: -.02em; color: #111; }
 .crd-login > p { margin: 0; font: 400 15px/1.55 var(--font); color: #3D3F44; }
 .crd-login .btn-buy { align-self: flex-start; }
 .crd-login__alt a { color: #111; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
@@ -133,7 +133,7 @@
 .crd-main { display: flex; flex-direction: column; gap: 16px; }
 .crd-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px; padding: 8px 0 8px; }
 .crd-top__who { display: flex; flex-direction: column; gap: 10px; }
-.crd-top__h { margin: 0; font: 800 clamp(32px, 4vw, 48px)/1 var(--font); letter-spacing: -.03em; color: #111; }
+.crd-top__h { margin: 0; font: 700 clamp(32px, 4vw, 48px)/1 var(--font); letter-spacing: -.03em; color: #111; }
 .crd-top__tags { display: flex; flex-wrap: wrap; gap: 8px; }
 .crd-top__acts { display: flex; gap: 8px; }
 .crd-tag { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 13px; border-radius: 999px; background: #F5F6F8; box-shadow: inset 0 0 0 1.5px #E3E4E6; font: 600 13px/1 var(--font); color: #242424; }
@@ -145,7 +145,7 @@
 .crd-note b { color: #111; }
 .crd-note a { color: #111; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
 .crd-card { display: flex; flex-direction: column; gap: 14px; padding: clamp(18px, 2.4vw, 26px); border-radius: 24px; background: #fff; box-shadow: inset 0 0 0 1.5px #E3E4E6; min-width: 0; }
-.crd-card h2, .crd-sub { margin: 0; font: 800 18px/1.25 var(--font); color: #111; }
+.crd-card h2, .crd-sub { margin: 0; font: 700 18px/1.25 var(--font); color: #111; }
 .crd-sub { margin-top: 8px; }
 .crd-card__head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 16px; }
 .crd-fine { margin: 0; font: 400 13px/1.5 var(--font); color: #6B6F76; }
