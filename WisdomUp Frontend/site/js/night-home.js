@@ -123,7 +123,7 @@
         </div>
       </section>
       <section aria-labelledby="nh-new-h">
-        ${head('New for 2026', `${fresh.length} new launches — the latest Bluetooth 6.0 earbuds, neckbands, party speakers and fast chargers.`, url.filter('new'), 'View all', false, 'nh-new-h')}
+        ${head('New Arrivals', `${fresh.length} new launches — the latest Bluetooth 6.0 earbuds, neckbands, party speakers and fast chargers.`, url.filter('new'), 'View all', false, 'nh-new-h')}
         ${grid(fresh.slice(0, 12))}
         <div class="nh-more"><a class="nh-btn nh-btn--ghost" href="${url.filter('new')}">View all ${fresh.length} new products ↗</a></div>
       </section>
@@ -136,7 +136,7 @@
         </div>
       </section>` : ''}
       <section aria-labelledby="nh-best-h">
-        ${head('Best sellers & essentials', 'What customers buy most, plus the chargers, cables and power banks everyone needs.', url.filter('best'), 'View all', false, 'nh-best-h')}
+        ${head('Best Sellers', 'What customers buy most, plus the chargers, cables and power banks everyone needs.', url.filter('best'), 'View all', false, 'nh-best-h')}
         ${grid(bestRow.slice(0, 12))}
       </section>
       ${MICS.length ? `

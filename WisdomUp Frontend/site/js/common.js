@@ -2811,7 +2811,7 @@
     const rep = list => list.find(p => p.thumb && p.tabs.includes('new')) || list.find(p => p.thumb) || list[0];
     const lead = D.byId('ts-11anc') || D.products.find(p => p.src && p.tabs.includes('new'));
     const thumb = p => p ? `<span class="mnav__thumb" style="background: ${photoBg(p)};">${p.thumb ? `<img src="${p.thumb}" alt="" loading="lazy" style="${photoFit(p)}">` : art(p.art, { alt: '' })}</span>` : '';
-    const quick = [['New for 2026', url.filter('new')], ['Best sellers', url.filter('best')], ['Under Rs.1,000', url.products + '?price=u1'], ['Fast charging', url.products + '?feat=fast']];
+    const quick = [['New arrivals', url.filter('new')], ['Best sellers', url.filter('best')], ['Under Rs.1,000', url.products + '?price=u1'], ['Fast charging', url.products + '?feat=fast']];
     const groups = [
       ['For business', [['Corporate gifts', url.corporate], ['Bulk & wholesale', url.bulk], ['Content creators', url.creators], ['WisdomUp Live', url.live]]],
       ['Support', [['Help Center', url.help], ['Track your order', url.track], ['Shipping', url.shipping], ['Returns & refunds', url.returns], ['Warranty', url.warranty]]],

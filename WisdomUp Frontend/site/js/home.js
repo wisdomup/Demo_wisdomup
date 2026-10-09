@@ -186,14 +186,14 @@
   }
 
   /* ---------- Shop rails ---------- */
-  // New for 2026: one per product type first (variety), then the rest
+  // New Arrivals: one per product type first (variety), then the rest
   const fresh = D.products.filter(p => p.tabs.includes('new'));
   const firstOfType = fresh.filter((p, i) => fresh.findIndex(x => x.type === p.type) === i);
-  mountRail($('rail-new'), { title: 'New for 2026', items: firstOfType.concat(fresh.filter(p => !firstOfType.includes(p))).slice(0, 16), allHref: url.filter('new') });
+  mountRail($('rail-new'), { title: 'New Arrivals', items: firstOfType.concat(fresh.filter(p => !firstOfType.includes(p))).slice(0, 16), allHref: url.filter('new') });
   // Best sellers, topped up with everyday essentials (chargers, cables, power banks) so the rail is never thin
   const best = D.products.filter(p => p.tabs.includes('best'));
   const essentials = ['ocd-28', 'sjx-49', 'cdb-17', 'cc-14', 'cj-47', 'ej-ly7', 'tde-18', 'sjx-15'].map(P).filter(Boolean);
-  mountRail($('rail-best'), { title: 'Best Sellers & Essentials', items: best.concat(essentials.filter(p => !best.includes(p))), allHref: url.filter('best') });
+  mountRail($('rail-best'), { title: 'Best Sellers', items: best.concat(essentials.filter(p => !best.includes(p))), allHref: url.filter('best') });
   // Budget rails: one product per type first so the row shows the range (not 16 handsfree), then the rest, cheapest first
   const byPrice = (a, b) => a.price - b.price;
   const variety = list => { const first = list.filter((p, i) => list.findIndex(x => x.type === p.type) === i); return first.concat(list.filter(p => !first.includes(p))); };

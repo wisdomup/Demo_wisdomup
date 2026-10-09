@@ -5,7 +5,7 @@
 
   /* ---------- Filter dimensions (all derived from catalogue fields) ---------- */
   const FILTERS = {
-    new: { label: 'New for 2026', test: p => p.tabs.includes('new') },
+    new: { label: 'New arrivals', test: p => p.tabs.includes('new') },
     best: { label: 'Best sellers', test: p => p.tabs.includes('best') },
   };
   const PRICES = {
