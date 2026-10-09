@@ -113,9 +113,8 @@
 /* ---------- Gaps: 4px tight groups · 8px chip rows · 11px between groups ---------- */
 .mbar__pills, .policy__links, .search__pages, .bk-chips, .opt-chips, .series__chips, .series__btns, .cta-band__actions { gap: var(--gap-2); }
 .buybox { gap: var(--gap-2); }
-.shop-rail__ctrls { gap: var(--gap-1); }
+.shop-rail__ctrls { gap: calc(var(--gap-1) * 2); } /* rail arrows 8px apart (doubled 2026-10-10) */
 .shop-rail__all { margin-right: 6px; }
-.loop__ctrls { gap: var(--gap-3); }
 .duo__foot, .bk-foot, .bulk__cta { gap: var(--gap-3); }
 .mcount { font: 500 14px/1.3 var(--font); }
 .msort__btn { height: var(--ctl); font: 500 14px/1 var(--font); }
@@ -137,8 +136,8 @@ button.link-arrow { height: var(--ctl); padding: 0; border: 0; background: none;
    4px inside tight icon-only groups (rail arrows, product tabs bar, view toggle) ---------- */
 .wu-chip-track { gap: var(--gap-2) !important; }            /* home quick chips (also the marquee) */
 @media (max-width: 639px) and (hover: hover) { .wu-chip-track { padding-right: var(--gap-2); } }  /* marquee loop stays seamless: end padding = gap */
-.loop__ctrls { gap: var(--gap-2); }                          /* carousel prev · pause · next */
-.shop-rail__all { margin-right: var(--gap-1); }              /* "Shop all" → arrows = 4 + 4 = 8px */
+.loop__ctrls { gap: calc(var(--gap-2) * 2); }               /* carousel prev · pause · next — 16px (doubled 2026-10-10) */
+.shop-rail__all { margin-right: 0; }                          /* "Shop all" → arrows stays 8px (the arrows' own gap) */
 .mview { gap: var(--gap-1); }                                /* 1 / 2 per row toggle */
 .ihero__actions, .mnav__quick, .rv__actions, .ord__actions, .cta-band__actions, .mnav__foot { gap: var(--gap-2); }
 .quick { gap: var(--gap-2); }                                /* quick chips on wide screens */
