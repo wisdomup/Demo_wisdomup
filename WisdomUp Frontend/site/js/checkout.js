@@ -36,9 +36,11 @@
           <span class="ckopt__t"><b>${esc(o.label)}</b><small>${esc(o.eta)}${o.freeOver ? ` · free over ${esc(rs(SHOP.freeDeliveryFrom))}` : ''}</small></span>
           <b class="ckopt__p">${fee ? esc(rs(fee)) : 'Free'}</b></label>`;
       }).join('');
+      // a transfer method without account details yet (shop.js): say plainly that the details come on WhatsApp (2026-10-10, the audit)
+      const payNote = (k, o) => k === 'cod' || o.accountNumber || o.iban ? o.note : `We’ll WhatsApp you our ${o.label} details when we confirm your order — then share the receipt there.`;
       $('ck-payment').innerHTML = Object.entries(SHOP.payments).map(([k, o]) => `
         <label class="ckopt"><input type="radio" name="payment" value="${k}"${k === payment ? ' checked' : ''}><span class="ckopt__dot" aria-hidden="true"></span>
-          <span class="ckopt__t"><b>${esc(o.label)}</b><small>${esc(o.note)}</small></span></label>`).join('');
+          <span class="ckopt__t"><b>${esc(o.label)}</b><small>${esc(payNote(k, o))}</small></span></label>`).join('');
     }
     function paintSummary() {
       const lines = cart.lines();

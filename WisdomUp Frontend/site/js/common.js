@@ -27,6 +27,8 @@
     corporate: 'corporate.html',
     creators: 'creators.html',
     affiliate: 'affiliate.html',
+    privacy: 'privacy.html',
+    terms: 'terms.html',
     about: 'about.html',
     where: 'where-to-buy.html',
     blog: 'blog.html',
@@ -47,7 +49,7 @@
     'Bulk Order': url.bulk, 'Corporate Order': url.corporate, 'Content Creators Program': url.creators, 'Affiliate Program': url.affiliate, 'Live Shopping': url.live,
     'About Us': url.about, 'Where to Buy': url.where, Blog: url.blog,
     'Smart Help Center': url.help, 'Help Center': url.help, 'Order Tracker': url.track, 'Express Delivery': url.express,
-    'Exchange & Refund Policy': url.returns, 'Warranty Policy': url.warranty, 'Shipping Policy': url.shipping, 'Download e-Manual': url.manuals,
+    'Exchange & Refund Policy': url.returns, 'Warranty Policy': url.warranty, 'Privacy Policy': url.privacy, 'Terms of Service': url.terms, 'Shipping Policy': url.shipping, 'Download e-Manual': url.manuals,
   };
   const linkFor = label => LINKS[label] || url.help; // every footer/utility label has a page; unknown labels fall back to Help
   // Marks the footer/utility link for the page you're on (aria-current) so people can see where they are.
@@ -254,8 +256,50 @@
     window.fbq('init', PIXEL_ID);
     window.fbq('track', 'PageView');
   }
-  loadPixel();
-  const px = (event, data, opts) => { if (PIXEL_ID && window.fbq && marketingOK()) window.fbq('track', event, data || {}, opts); };
+  // GOOGLE TAG + TIKTOK PIXEL (2026-10-10, from the audit "no tracking at all"): beside the Meta Pixel, each OFF until its ID is set in
+  // shop.js and loaded only for visitors who allowed marketing cookies. px() sends every event to each tag in its own language;
+  // no customer details are ever sent. (Server-side Conversions APIs need tokens — later, with the live database.)
+  const GTAG_ID = /^(G|AW)-[A-Z0-9]{4,20}$/.test(String(SHOP.googleTagId || '').trim()) ? String(SHOP.googleTagId).trim() : '';
+  const TT_ID = /^[A-Z0-9]{10,30}$/.test(String(SHOP.tiktokPixelId || '').trim()) ? String(SHOP.tiktokPixelId).trim() : '';
+  const TRACKERS = [PIXEL_ID && 'Meta Pixel (Facebook and Instagram)', GTAG_ID && 'Google tag (Google Analytics and Google Ads)', TT_ID && 'TikTok Pixel'].filter(Boolean);
+  const GRANT = { ad_storage: 'granted', analytics_storage: 'granted', ad_user_data: 'granted', ad_personalization: 'granted' };
+  function loadGtag() {
+    if (!GTAG_ID || !marketingOK()) return;
+    if (window.gtag) { window.gtag('consent', 'update', GRANT); return; }
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () { window.dataLayer.push(arguments); };
+    window.gtag('consent', 'default', GRANT);
+    window.gtag('js', new Date());
+    window.gtag('config', GTAG_ID);
+    const sc = document.createElement('script'); sc.async = true; sc.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(GTAG_ID);
+    document.head.append(sc);
+  }
+  function loadTikTok() {
+    if (!TT_ID || !marketingOK()) return;
+    if (window.ttq) { if (window.ttq.grantConsent) window.ttq.grantConsent(); return; }
+    /* eslint-disable */ // TikTok's published base code
+    !function (w, d, t) { w.TiktokAnalyticsObject = t; var ttq = w[t] = w[t] || []; ttq.methods = ['page', 'track', 'identify', 'instances', 'debug', 'on', 'off', 'once', 'ready', 'alias', 'group', 'enableCookie', 'disableCookie', 'holdConsent', 'revokeConsent', 'grantConsent']; ttq.setAndDefer = function (t, e) { t[e] = function () { t.push([e].concat(Array.prototype.slice.call(arguments, 0))); }; }; for (var i = 0; i < ttq.methods.length; i++) ttq.setAndDefer(ttq, ttq.methods[i]); ttq.instance = function (t) { for (var e = ttq._i[t] || [], n = 0; n < ttq.methods.length; n++) ttq.setAndDefer(e, ttq.methods[n]); return e; }; ttq.load = function (e, n) { var r = 'https://analytics.tiktok.com/i18n/pixel/events.js'; ttq._i = ttq._i || {}; ttq._i[e] = []; ttq._i[e]._u = r; ttq._t = ttq._t || {}; ttq._t[e] = +new Date(); ttq._o = ttq._o || {}; ttq._o[e] = n || {}; var o = d.createElement('script'); o.type = 'text/javascript'; o.async = !0; o.src = r + '?sdkid=' + e + '&lib=' + t; var a = d.getElementsByTagName('script')[0]; a.parentNode.insertBefore(o, a); }; ttq.load(TT_ID); ttq.page(); }(window, document, 'ttq');
+    /* eslint-enable */
+  }
+  const loadTags = () => { loadPixel(); loadGtag(); loadTikTok(); };
+  const revokeTags = () => {
+    if (window.fbq) window.fbq('consent', 'revoke');
+    if (window.gtag) window.gtag('consent', 'update', { ad_storage: 'denied', analytics_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' });
+    if (window.ttq && window.ttq.revokeConsent) window.ttq.revokeConsent();
+  };
+  loadTags();
+  const GA_EV = { ViewContent: 'view_item', AddToCart: 'add_to_cart', AddToWishlist: 'add_to_wishlist', InitiateCheckout: 'begin_checkout', Purchase: 'purchase', Search: 'search', Lead: 'generate_lead', Contact: 'contact' };
+  const TT_EV = { ViewContent: 'ViewContent', AddToCart: 'AddToCart', AddToWishlist: 'AddToWishlist', InitiateCheckout: 'InitiateCheckout', Purchase: 'CompletePayment', Search: 'Search', Lead: 'SubmitForm', Contact: 'Contact' };
+  const px = (event, data, opts) => {
+    if (!marketingOK()) return;
+    const dt = data || {};
+    if (PIXEL_ID && window.fbq) window.fbq('track', event, dt, opts);
+    if (GTAG_ID && window.gtag && GA_EV[event]) {
+      const items = (dt.contents || []).map(c => ({ item_id: c.id, quantity: c.quantity, price: c.item_price }));
+      window.gtag('event', GA_EV[event], { currency: dt.currency || 'PKR', value: dt.value, items: items.length ? items : undefined, search_term: dt.search_string, transaction_id: opts && opts.eventID, item_name: dt.content_name });
+    }
+    if (TT_ID && window.ttq && TT_EV[event]) window.ttq.track(TT_EV[event], { contents: (dt.contents || []).map(c => ({ content_id: c.id, quantity: c.quantity, price: c.item_price })), value: dt.value, currency: dt.currency || 'PKR', query: dt.search_string }, opts && opts.eventID ? { event_id: opts.eventID } : undefined);
+  };
   const pxItem = (p, sku, qty = 1) => { const v = (skuIndex[sku] || {}).v || {}; const price = v.price || p.price; return { content_ids: [sku || p.code], content_name: p.title, content_category: p.cat, content_type: 'product', contents: [{ id: sku || p.code, quantity: qty, item_price: price }], value: price * qty, currency: 'PKR' }; };
   const skuIndex = {};
   D.products.forEach(p => (p.variants.length ? p.variants : [{ sku: p.code, attrs: {}, price: p.price, thumb: p.thumb, bg: p.bg, ar: p.ar }])
@@ -472,38 +516,116 @@
     });
   }
 
-  /* ---------- Reviews: written by shoppers, stored on this device until a shared review database is connected.
-     No invented ratings anywhere: stars only appear when a product has real reviews. ---------- */
-  const REV_KEY = 'wu-reviews', HELP_KEY = 'wu-helpful';
+  /* ---------- Reviews (shared since 2026-10-10, from the audit "reviews only save in the writer's own browser"): approved reviews come
+     from the order server (/api/orders?rv=…, checked in admin before they appear) and every shopper sees them; this device keeps
+     its own in wu-reviews so the writer sees theirs at once ("awaiting approval"). Without the database (the demo: the API answers
+     503 or is missing) reviews stay on this device, as before. No invented ratings anywhere: stars only when real reviews exist. ---------- */
+  const REV_KEY = 'wu-reviews', HELP_KEY = 'wu-helpful', RV_SUM_KEY = 'wu-rv-sum';
   const revAll = () => store.get(REV_KEY, {}) || {};
+  const RVS = { live: null, sums: {}, lists: {}, wait: null }; // live: null = not asked yet · true = shared reviews · false = this device only
+  async function rvCall(q, body) {
+    let res, data;
+    try {
+      res = await fetch('/api/orders?rv=' + q, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : undefined);
+      data = await res.json().catch(() => null);
+    } catch (e) { throw Object.assign(new Error('offline'), { offline: true }); }
+    if (res.ok && data && data.ok) return data;
+    if (!data || [503, 405, 501].includes(res.status) || res.status >= 500 || (res.status === 404 && !data.error)) throw Object.assign(new Error('offline'), { offline: true });
+    throw Object.assign(new Error(data.error || 'Please try again.'), { status: res.status, field: data.field });
+  }
+  const mine = pid => (revAll()[pid] || []).slice();
+  const rvTally = l => { const dist = [0, 0, 0, 0, 0]; l.forEach(r => { dist[5 - r.rating] += 1; }); return { count: l.length, avg: l.length ? l.reduce((n, r) => n + r.rating, 0) / l.length : 0, dist }; };
   const reviews = {
-    list: pid => (revAll()[pid] || []).slice(),
-    summary(pid) {
-      const l = reviews.list(pid), dist = [0, 0, 0, 0, 0];
-      l.forEach(r => { dist[5 - r.rating] += 1; });
-      return { count: l.length, avg: l.length ? l.reduce((n, r) => n + r.rating, 0) / l.length : 0, dist };
+    live: () => RVS.live === true,
+    // what a shopper sees: this device's own reviews that are not (yet) public, then the approved ones
+    list(pid) {
+      const shared = RVS.lists[pid] || [], ids = new Set(shared.map(r => r.id));
+      const own = mine(pid).filter(r => !ids.has(r.serverId)).map(r => ({ ...r, own: true, status: r.status || 'device' }));
+      return own.concat(shared);
     },
-    // Verified buyer: this product is in an order placed from this device
+    // the public number: approved reviews when shared reviews are on, this device's own when they are not
+    summary(pid) {
+      if (!RVS.live) return rvTally(mine(pid));
+      if (RVS.lists[pid]) return rvTally(RVS.lists[pid]);
+      const sm = RVS.sums[pid];
+      return sm ? { count: sm[1], avg: sm[0], dist: [0, 0, 0, 0, 0] } : rvTally([]);
+    },
+    // Verified buyer: this product is in an order placed from this device (the server checks the order + phone again)
     verified: pid => (store.get('wu-orders', []) || []).some(o => (o.items || []).some(i => i.id === pid)),
-    add(pid, r) {
+    proof(pid) {
+      const o = (store.get('wu-orders', []) || []).find(x => (x.items || []).some(i => i.id === pid));
+      return o ? { order: o.number, phone: (o.customer || {}).phone } : {};
+    },
+    // once per visit (cached 5 minutes): are shared reviews on, and every product's approved average for the cards
+    init() {
+      if (RVS.wait) return RVS.wait;
+      RVS.wait = (async () => {
+        let cached = null;
+        try { cached = JSON.parse(sessionStorage.getItem(RV_SUM_KEY) || 'null'); } catch (e) { /* storage blocked */ }
+        if (cached && Date.now() - cached.at < 300000) { RVS.live = cached.live; RVS.sums = cached.sums || {}; }
+        else {
+          try { const d = await rvCall('summary'); RVS.live = true; RVS.sums = d.summary || {}; }
+          catch (e) { RVS.live = false; }
+          try { sessionStorage.setItem(RV_SUM_KEY, JSON.stringify({ at: Date.now(), live: RVS.live, sums: RVS.sums })); } catch (e) { /* storage blocked */ }
+        }
+        if (RVS.live) window.dispatchEvent(new CustomEvent('wu-reviews', { detail: { all: true } }));
+      })();
+      return RVS.wait;
+    },
+    async load(pid) {
+      await reviews.init();
+      if (!RVS.live) return;
+      try { RVS.lists[pid] = (await rvCall('list&pid=' + encodeURIComponent(pid))).reviews || []; }
+      catch (e) { if (e.offline) RVS.live = false; }
+      window.dispatchEvent(new CustomEvent('wu-reviews', { detail: { pid } }));
+    },
+    // → 'pending' (sent; public once checked) or 'device' (no shared reviews yet: kept on this device). Field errors throw.
+    async add(pid, r) {
+      await reviews.init();
+      const rev = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), rating: Math.max(1, Math.min(5, r.rating | 0)), title: r.title, text: r.text, name: r.name, city: r.city, sku: r.sku, verified: reviews.verified(pid), helpful: 0, createdAt: new Date().toISOString(), status: 'device' };
+      if (RVS.live) {
+        try {
+          const d = await rvCall('add', { pid, rating: rev.rating, title: rev.title, text: rev.text, name: rev.name, city: rev.city, sku: rev.sku, ...reviews.proof(pid) });
+          Object.assign(rev, { status: 'pending', serverId: d.review.id, verified: !!d.review.verified });
+        } catch (e) { if (!e.offline) throw e; RVS.live = false; }
+      }
       const all = revAll();
-      const rev = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), rating: Math.max(1, Math.min(5, r.rating | 0)), title: r.title, text: r.text, name: r.name, city: r.city, sku: r.sku, verified: reviews.verified(pid), helpful: 0, createdAt: new Date().toISOString() };
       all[pid] = [rev].concat(all[pid] || []);
       store.set(REV_KEY, all);
       window.dispatchEvent(new CustomEvent('wu-reviews', { detail: { pid } }));
-      return rev;
+      return rev.status;
     },
     helpful(pid, id) {
       const done = store.get(HELP_KEY, []);
       if (done.includes(id)) return false;
-      const all = revAll(), r = (all[pid] || []).find(x => x.id === id);
-      if (!r) return false;
-      r.helpful += 1;
-      store.set(REV_KEY, all);
+      const shared = (RVS.lists[pid] || []).find(x => x.id === id);
+      if (shared) { shared.helpful = (shared.helpful || 0) + 1; rvCall('helpful', { id }).catch(() => {}); }
+      else {
+        const all = revAll(), r = (all[pid] || []).find(x => x.id === id);
+        if (!r) return false;
+        r.helpful = (r.helpful || 0) + 1;
+        store.set(REV_KEY, all);
+      }
       store.set(HELP_KEY, done.concat(id));
       return true;
     },
   };
+  /* ---------- Leads (2026-10-10, from the audit "lead forms go nowhere"): the bulk / corporate / help / newsletter forms send to the
+     order server (?lead=add; admin.html lists them). Without the database (the demo) the form hands over to WhatsApp with
+     everything filled in — the shopper taps Send, so nothing is lost and nothing pretends to have been sent. ---------- */
+  async function sendLead(kind, fields) {
+    let res, data;
+    try {
+      res = await fetch('/api/orders?lead=add', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ kind, fields, page: location.pathname, website: fields.website || '' }) });
+      data = await res.json().catch(() => null);
+    } catch (e) { return { ok: false, offline: true }; }
+    if (res.ok && data && data.ok) return { ok: true };
+    if (data && data.field && res.status === 400) return { ok: false, field: data.field, error: data.error };
+    return { ok: false, offline: true };
+  }
+  const waLink = (text, to = SHOP.whatsapp) => `https://wa.me/${to}?text=${encodeURIComponent(text)}`;
+  const leadText = (title, rows) => [`*${title}* — WisdomUp website`].concat(rows.filter(r => r[1]).map(([k, v]) => `${k}: ${v}`)).join('\n');
+  const WA_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.2a9.8 9.8 0 0 0-8.4 14.8L2.3 21.8l4.9-1.3A9.8 9.8 0 1 0 12 2.2zm0 17.8c-1.5 0-3-.4-4.2-1.2l-.3-.2-2.9.8.8-2.8-.2-.3A8 8 0 1 1 12 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8-.2-.1-.4-.1-.5.1l-.8 1c-.1.2-.3.2-.5.1a6.6 6.6 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 0 0-.7.3 2.8 2.8 0 0 0-.9 2.1 4.9 4.9 0 0 0 1 2.6 11.2 11.2 0 0 0 4.3 3.8c1.6.7 2.2.8 3 .6.5-.1 1.4-.6 1.6-1.1.2-.6.2-1 .1-1.1l-.5-.3z"/></svg>';
   const starsSvg = (val, size = 16) => [1, 2, 3, 4, 5].map(i => {
     const fill = Math.max(0, Math.min(1, val - i + 1));
     return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true"><defs><linearGradient id="sg${i}-${Math.round(fill * 100)}"><stop offset="${fill * 100}%" stop-color="#E2A92C"/><stop offset="${fill * 100}%" stop-color="#D9DCE1"/></linearGradient></defs><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z" fill="url(#sg${i}-${Math.round(fill * 100)})"/></svg>`;
@@ -1187,6 +1309,8 @@
       ['Shipping Policy', url.shipping, 'shipping delivery express courier free cod cash on delivery time days'],
       ['Exchange & Refund Policy', url.returns, 'return refund exchange money back 7-day guarantee'],
       ['Warranty Policy', url.warranty, 'warranty repair replacement claim defect guarantee'],
+      ['Privacy Policy', url.privacy, 'privacy data personal information cookies delete'],
+      ['Terms of Service', url.terms, 'terms conditions rules legal agreement'],
       ['Order Tracker', url.track, 'track tracking order status where parcel'],
       ['Help Center', url.help, 'help support contact faq question phone email'],
       ['e-Manuals', url.manuals, 'manual pair pairing guide setup reset instructions'],
@@ -1298,6 +1422,12 @@
   };
   // "SJX-49 Fast Charging Cable" → name "Fast Charging Cable" + model "SJX-49" (every catalogue title starts with its code)
   const cardName = p => (p.title.toUpperCase().startsWith(p.code.toUpperCase()) ? p.title.slice(p.code.length).replace(/^[\s\-–—|:·]+/, '') : '') || p.title;
+  const cardRating = pid => { const rv = reviews.summary(pid); return rv.count ? `<span class="wpc__rating" aria-label="Rated ${rv.avg.toFixed(1)} out of 5 from ${rv.count} review${rv.count > 1 ? 's' : ''}">${STAR_SVG}<span>${rv.avg.toFixed(1)}</span><small>(${rv.count})</small></span>` : `<span class="wpc__rating wpc__rating--none" aria-label="No reviews yet">${STAR_OUTLINE}<span>0.0</span></span>`; };
+  // the shared averages arrive after the first paint: every card already on the page takes its real number
+  window.addEventListener('wu-reviews', e => {
+    if (!e.detail || !e.detail.all) return;
+    document.querySelectorAll('.wpc[data-pid] .wpc__rating').forEach(el => { el.outerHTML = cardRating(el.closest('.wpc').dataset.pid); });
+  });
   function productCard(p, opts = {}) {
     const seed = seedOf(p), off = !!p.soldOut, href = url.product(p.id);
     const badge = opts.badge !== undefined ? opts.badge : p.ribbon;
@@ -1316,7 +1446,7 @@
           <div class="wpc__body">
             <div class="wpc__head">
               <h3 class="wpc__title"><a href="${href}" aria-label="${esc(p.title)}">${esc(cardName(p))}</a></h3>
-              <div class="wpc__model"><span class="wpc__code">${esc(p.code)}</span><i aria-hidden="true"></i><span class="wpc__cat">${esc(p.cat)}</span>${(() => { const rv = reviews.summary(p.id); return rv.count ? `<span class="wpc__rating" aria-label="Rated ${rv.avg.toFixed(1)} out of 5 from ${rv.count} review${rv.count > 1 ? 's' : ''}">${STAR_SVG}<span>${rv.avg.toFixed(1)}</span><small>(${rv.count})</small></span>` : `<span class="wpc__rating wpc__rating--none" aria-label="No reviews yet">${STAR_OUTLINE}<span>0.0</span></span>`; })()}</div>
+              <div class="wpc__model"><span class="wpc__code">${esc(p.code)}</span><i aria-hidden="true"></i><span class="wpc__cat">${esc(p.cat)}</span>${cardRating(p.id)}</div>
             </div>
             ${colours.length > 1 ? `<div class="wpc__swatches" role="radiogroup" aria-label="Colour">${colours.map((c, i) => `<button type="button" class="wpc__swatch" role="radio" aria-label="${esc(c.name)}" aria-checked="${i === 0}" style="background: ${c.hex}; --sw: ${c.hex};"></button>`).join('')}</div>` : ''}
             ${(() => { // real options on the card (Shokz-style): the first option type as chips; else the spec trio
@@ -1511,7 +1641,7 @@
     const isLight = s => { const h = String((s.bg || [])[0] || '').replace('#', ''); if (h.length !== 6) return false; const v = h.match(/../g).map(x => parseInt(x, 16) / 255).map(x => x <= .03928 ? x / 12.92 : Math.pow((x + .055) / 1.055, 2.4)); return .2126 * v[0] + .7152 * v[1] + .0722 * v[2] > .18; };
     el.innerHTML = slides.map((s, k) => `
       <div class="hero__slide hero__slide--full${k === 0 ? ' is-on' : ''}" aria-roledescription="slide" aria-label="${k + 1} of ${n}"${k ? ' aria-hidden="true"' : ''}>
-        <a class="hero__full" href="${url.product(s.pid)}" aria-label="${esc(s.hint || s.name || '')}" draggable="false"${k ? ' tabindex="-1"' : ''} style="background: ${s.bg ? `radial-gradient(110% 80% at 50% 45%, ${s.bg[0]}, ${s.bg[1]})` : '#111'};"><img class="hero__fimg" src="${s.src}" alt="" draggable="false"${k ? ' loading="lazy"' : ''}></a>
+        <a class="hero__full" href="${url.product(s.pid)}" aria-label="${esc(s.hint || s.name || '')}" draggable="false"${k ? ' tabindex="-1"' : ''} style="background: ${s.bg ? `radial-gradient(110% 80% at 50% 45%, ${s.bg[0]}, ${s.bg[1]})` : '#111'};"><img class="hero__fimg" src="${s.src}" alt="" draggable="false"${k ? ' loading="lazy"' : ' fetchpriority="high"'}></a>
       </div>`).join('') + `
       <div class="hero__bar">
         <button type="button" class="hero__arrow hero__arrow--prev" aria-label="Previous slide"><svg viewBox="0 0 37 24" aria-hidden="true"><path d="M10 5L3 12M3 12L10 19M3 12H33.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -1863,9 +1993,16 @@
     const current = groupEls.find(g => g.querySelector('[aria-current="page"]')) || null; // open the group for this page
     FT_ACC.addEventListener('change', () => setGroup(current));
     setGroup(current);
-    el.querySelector('.newsletter').addEventListener('submit', e => {
+    el.querySelector('.newsletter').addEventListener('submit', async e => {
       e.preventDefault();
-      if (e.currentTarget.querySelector('input').value) el.querySelector('.footer__nl-msg').textContent = 'Thanks — you’re on the list.';
+      const form = e.currentTarget, input = form.querySelector('input'), msg = el.querySelector('.footer__nl-msg'), email = input.value.trim();
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { msg.textContent = 'Enter a valid email address.'; input.focus(); return; }
+      const btn = form.querySelector('button'); btn.disabled = true;
+      const r = await sendLead('newsletter', { email });
+      btn.disabled = false;
+      if (r.ok) { msg.textContent = 'Thanks — you’re on the list.'; input.value = ''; px('Lead', { content_name: 'Newsletter' }); }
+      else if (r.field) msg.textContent = r.error;
+      else msg.innerHTML = `Our email list opens soon. For new launches now, <a href="${waLink(leadText('New launches', [['Please add me to WisdomUp updates', email]]))}" target="_blank" rel="noopener">message us on WhatsApp</a>.`;
     });
     // The reveal (reworked 2026-10-06 — the old version pinned the footer to the screen bottom, so an opened accordion
     // group grew UPWARD and pushed the logo/newsletter/headers under the page): the footer stays IN the flow and is only
@@ -1930,6 +2067,47 @@
   /* ---------- Init chrome on every page ---------- */
   let search, toTop = null;
   // Back to top: the way back to the nav (search, cart, menu) while a priority bar holds it back
+  // FLOATING WHATSAPP (2026-10-10, from the audit "WhatsApp is hard to find"): bottom-right on every page, the nav's smoked glass
+  // (no green — the day colour rule), a circle on phones and a "Chat on WhatsApp" capsule ≥1024px; the product page sets its
+  // message to the product (WU.wa.set). Hidden while the cookie card is up (it sits in the same corner).
+  let waFab = null, waMsg = 'Hi WisdomUp, I have a question.';
+  function mountWhatsApp() {
+    if (!SHOP.whatsapp) return;
+    waFab = document.createElement('a');
+    waFab.className = 'wafab';
+    waFab.target = '_blank'; waFab.rel = 'noopener';
+    waFab.setAttribute('aria-label', 'Chat with WisdomUp on WhatsApp');
+    waFab.innerHTML = WA_SVG + '<span>Chat on WhatsApp</span>';
+    const paint = () => { waFab.href = waLink(waMsg); };
+    waFab.addEventListener('click', () => px('Contact', { content_name: 'WhatsApp' }));
+    paint();
+    document.body.append(waFab);
+    WU.wa = { set: t => { waMsg = t; paint(); }, link: waLink, text: leadText, svg: WA_SVG };
+  }
+  // NAV LABELS (2026-10-10, from the audit "the nav's category icons have no labels"): hovering or tabbing to an icon in the wide
+  // nav shows its name in a small capsule under the nav (one shared element — the nav clips anything inside it). The current
+  // category already shows its label, so it gets none. Mouse/keyboard only; touch screens use the menu.
+  function mountNavTips() {
+    const tip = document.createElement('div');
+    tip.className = 'navtip'; tip.setAttribute('aria-hidden', 'true'); tip.hidden = true;
+    document.body.append(tip);
+    let on = null;
+    const show = b => {
+      const label = b.getAttribute('aria-label');
+      const own = b.querySelector('span'); // a label already on show (the current category, Shop All) needs no tip
+      if (!label || b.getAttribute('aria-current') === 'true' || (own && own.getBoundingClientRect().width > 4)) return hide();
+      on = b; tip.textContent = label; tip.hidden = false;
+      const r = b.getBoundingClientRect(), navR = (b.closest('.site-nav') || b).getBoundingClientRect();
+      tip.style.left = Math.round(r.left + r.width / 2) + 'px';
+      tip.style.top = Math.round(navR.bottom + 8) + 'px';
+      requestAnimationFrame(() => tip.classList.add('is-on'));
+    };
+    const hide = () => { on = null; tip.classList.remove('is-on'); tip.hidden = true; };
+    const pick = e => e.target.closest && e.target.closest('.site-nav .navbtn[aria-label]');
+    document.addEventListener('pointerover', e => { if (e.pointerType !== 'mouse') return; const b = pick(e); if (b && b !== on) show(b); else if (!b && on) hide(); });
+    document.addEventListener('focusin', e => { const b = pick(e); if (b && b.matches(':focus-visible')) show(b); else if (on) hide(); });
+    window.addEventListener('scroll', () => { if (on) hide(); }, { passive: true });
+  }
   function mountToTop() {
     toTop = document.createElement('button');
     toTop.type = 'button';
@@ -1948,6 +2126,7 @@
       const sub = document.querySelector('.subfooter');
       const over = sub ? Math.max(0, Math.round(innerHeight - sub.getBoundingClientRect().top)) : 0;
       toTop.style.setProperty('--totop-lift', over + 'px');
+      if (waFab) waFab.style.setProperty('--totop-lift', over + 'px');
     };
     const soon = () => { if (!raf) raf = requestAnimationFrame(lift); };
     window.addEventListener('scroll', soon, { passive: true });
@@ -2102,7 +2281,7 @@
         el.classList.add('is-in');
         revealer.unobserve(el);
       }));
-    }, { rootMargin: '0px 0px -6% 0px', threshold: 0.08 });
+    }, { rootMargin: '0px 0px 12% 0px', threshold: 0 }); // starts just BEFORE a block scrolls in (it was 6% after), so nothing sits blank while you scroll — the audit, 2026-10-10; durations unchanged
     const kindOf = el => {
       if (el.matches(ZOOM_SEL)) return 'zoom';
       if (el.matches(GRID_SEL)) return 'grid';
@@ -2314,6 +2493,7 @@
   // prices — Rs.6,840 for the TS-11ANC next to Rs.5,850 everywhere else). data-price="id" → that product's price;
   // data-from="type" → the lowest price in that type; data-from="id,id" → the lowest of those products.
   function fillPrices(root = document) {
+    root.querySelectorAll('[data-free-from]').forEach(el => { el.textContent = D.rs(SHOP.freeDeliveryFrom); }); // the threshold lives in shop.js
     root.querySelectorAll('[data-price]').forEach(el => { const p = D.byId(el.dataset.price); if (p) el.textContent = p.priceText; });
     root.querySelectorAll('[data-from]').forEach(el => {
       const k = el.dataset.from.split(',').map(x => x.trim());
@@ -2340,6 +2520,9 @@
     fillPrices();
     initMotion();
     mountToTop();
+    mountWhatsApp();
+    mountNavTips();
+    reviews.init(); // shared reviews on? (and every product's average for the cards)
     runEdges();
     faqFromPage();
     // A floating capsule ([data-edge], e.g. the All Products filters' twin) glows only while its bar is away
@@ -2666,7 +2849,7 @@
     const CATS = [
       { id: 'essential', name: 'Essential', always: true, desc: 'Your cart, wishlist, orders placed from this device, reviews you wrote, saved checkout details, display choices (day or night, grid view) and the creator code from a creator’s link (so its discount reaches checkout; kept 30 days, removable in the cart). A creator’s link also adds one to that creator’s visit count — no personal details are sent. Kept in this browser only and never shared with advertisers. The shop cannot work without it, so it is always on.' },
       { id: 'personal', name: 'Personalised suggestions', desc: 'Remembers, on this device only, which products and categories you open and how long you look at them, what you search for and what you add to your cart or wishlist — so search can suggest products for you (“Picked for you”) and keep your recent searches. It is never sent to us, to advertisers or anyone else, and switching it off deletes it.' },
-      { id: 'marketing', name: 'Marketing', desc: 'Meta Pixel (Facebook and Instagram). It records page views, searches, add-to-cart and purchases — the product, price and quantity, never your name, phone number or address — so we can measure our ads and show them to people who have visited the shop. It sets Meta cookies in this browser.' },
+      { id: 'marketing', name: 'Marketing', desc: TRACKERS.length ? `${TRACKERS.join(', ')}. ${TRACKERS.length > 1 ? 'They record' : 'It records'} page views, searches, add-to-cart and purchases — the product, price and quantity, never your name, phone number or address — so we can measure our ads and show them to people who have visited the shop. ${TRACKERS.length > 1 ? 'They set their own cookies' : 'It sets its own cookies'} in this browser.` : 'Ad-measurement tags from Meta (Facebook and Instagram), Google or TikTok. None is switched on yet; any we add loads only if you allow this, and records page views, searches, add-to-cart and purchases — the product, price and quantity, never your name, phone number or address.' },
     ];
     const el = document.createElement('div');
     el.className = 'ckc'; el.id = 'ckc'; el.hidden = true;
@@ -2674,7 +2857,7 @@
       <div class="ckc__scrim"></div>
       <section class="ckc__box" role="dialog" aria-modal="false" aria-labelledby="ckc-h1" tabindex="-1">
         <div class="ckc__layer ckc__note" data-layer="notice">
-          <p id="ckc-h1"><b>Cookies.</b> We keep your cart and settings in this browser. ‘Accept all’ also turns on personalised search suggestions and Meta’s ad cookies. <a href="#" data-ck="manage">Cookie settings</a></p>
+          <p id="ckc-h1"><b>Cookies.</b> We keep your cart and settings in this browser. ‘Accept all’ also turns on personalised search suggestions and ad-measurement cookies. <a href="#" data-ck="manage">Cookie settings</a></p>
           <div class="ckc__pair">
             <button type="button" class="ckc__btn ckc__btn--red" data-ck="essential">Essential only</button>
             <button type="button" class="ckc__btn ckc__btn--red" data-ck="all">Accept all</button>
@@ -2759,8 +2942,8 @@
     const save = (marketing, personal) => {
       const was = marketingOK();
       try { localStorage.setItem(CONSENT_KEY, JSON.stringify({ v: 2, marketing: !!marketing, personal: !!personal, at: new Date().toISOString() })); } catch (e) {}
-      if (marketing) loadPixel();
-      else if (was && window.fbq) window.fbq('consent', 'revoke');
+      if (marketing) loadTags();
+      else if (was) revokeTags();
       if (!personal) tasteClear(); // switching personalisation off deletes what it learned
       else tasteInit();
       close();
@@ -2794,6 +2977,8 @@
     return { open, close, get: consentGet };
   }
   let consentUI = null;
+  // any [data-cookie-settings] link in page copy (e.g. the Privacy Policy) opens the cookie settings
+  document.addEventListener('click', e => { const l = e.target.closest('[data-cookie-settings]'); if (l) { e.preventDefault(); if (consentUI) consentUI.open('manage'); } });
   const quickAdd = (id, btn) => { const p = D.byId(id); if (!p || p.soldOut) return false; if (!(p.variants && p.variants.length > 1) || !qaddUI) { add(id); return true; } qaddUI.open(p, btn); return true; };
 
   function mountMenu() {
@@ -2972,7 +3157,7 @@
     D, $, esc, reduced, vw, code, EASE, SLIDE_T: 'transform 640ms ' + EASE,
     CATS, slug, url, catHref, linkFor,
     icons: { STAR_SVG }, btnBuy,
-    store, add, toast, reviews, starsSvg, cart: { lines: cartLines, count: cartCount, totals: cartTotals, setQty, clear: clearCart, setGift, gift: () => giftWrap, open: b => cartUI && cartUI.open(b), skuInfo: sku => skuIndex[sku] }, SHOP, wished, toggleWish, wishBtn, paintWish, wishList: () => wish.slice(),
+    store, add, toast, reviews, starsSvg, lead: { send: sendLead, text: leadText, wa: waLink }, cart: { lines: cartLines, count: cartCount, totals: cartTotals, setQty, clear: clearCart, setGift, gift: () => giftWrap, open: b => cartUI && cartUI.open(b), skuInfo: sku => skuIndex[sku] }, SHOP, wished, toggleWish, wishBtn, paintWish, wishList: () => wish.slice(),
     productCard, colorsOf, photoBg, photoFit, ratingOf, reviewsOf, seedOf, mountRail, mountHero, mountGlide, mountAccordion, DEPTS, typeLabel,
     edge: addEdge, // the nav's rainbow edge light on any capsule: WU.edge(host, () => shouldGlowNow)
     initChrome, placeNav, setActiveCat, navOffset, scrollToEl,

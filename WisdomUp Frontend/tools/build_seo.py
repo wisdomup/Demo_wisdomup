@@ -17,6 +17,7 @@ or claims the catalogue cannot back up). Keyword choices are explained in SEO-RE
 """
 import datetime
 import html
+import hashlib
 import json
 import os
 import re
@@ -77,6 +78,12 @@ PAGES = {
     'affiliate.html': dict(path='affiliate.html', crumb='Affiliate Program',
         title='Affiliate Program — Share and Earn up to 12% | WisdomUp',
         desc='Become a WisdomUp affiliate in 3 easy steps: join free, share your link or code, and earn up to 12% on every delivered order — your followers save 5%.'),
+    'privacy.html': dict(path='privacy.html', crumb='Privacy Policy',
+        title='Privacy Policy | WisdomUp',
+        desc='How WisdomUp handles your details: what we collect when you order, enquire or review, what stays in your browser, cookies and ad tags, and your choices.'),
+    'terms.html': dict(path='terms.html', crumb='Terms of Service',
+        title='Terms of Service | WisdomUp',
+        desc='WisdomUp terms in plain words: orders and confirmation, prices in PKR, Cash on Delivery and transfers, delivery, 7-day returns, creator codes and reviews.'),
     'help.html': dict(path='help.html', crumb='Help Center',
         title='Help Center — Delivery, Returns, Warranty & Pairing | WisdomUp',
         desc='WisdomUp support: delivery times, Cash on Delivery, returns, warranty claims, pairing earbuds and payments — plus how to reach us on phone, WhatsApp and email.'),
@@ -191,9 +198,29 @@ def sitemap():
         for t in d['types']:
             if t in types_live and t not in seen:
                 seen.append(t)
-    urls += [(f'products.html?cat={t}', '0.8', 'daily') for t in seen]
-    urls += [(f'product.html?id={p["id"]}', '0.7', 'weekly', [p['src']] if p.get('src') else [], None) for p in CATALOG['products']]
-    urls += [(p['path'], '0.5', 'monthly') for n, p in PAGES.items() if p.get('index', True) and not p.get('dynamic') and n not in ('index.html', 'products.html')]
+    # REAL lastmod dates (2026-10-10, from the audit "nearly all show the build date"): a product's date moves only when its own data
+    # changes (title, price, specs, photo …), a category's when its products or prices change — fingerprints kept in
+    # tools/seo_lastmod.json; static pages use the date their file last changed; posts their own date.
+    fp_path = os.path.join(ROOT, 'tools', 'seo_lastmod.json')
+    try:
+        fps = json.load(open(fp_path, encoding='utf-8'))
+    except (FileNotFoundError, ValueError):
+        fps = {}
+    def dated(key, data):
+        h = hashlib.md5(json.dumps(data, sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:12]
+        old = fps.get(key)
+        if not old or old[0] != h:
+            fps[key] = [h, TODAY]
+        return fps[key][1]
+    def file_date(name):
+        return datetime.date.fromtimestamp(os.path.getmtime(os.path.join(SITE, name))).isoformat()
+    by_type = {}
+    for p in CATALOG['products']:
+        by_type.setdefault(p['type'], []).append([p['id'], p.get('price'), p.get('was'), p.get('soldOut')])
+    urls += [(f'products.html?cat={t}', '0.8', 'daily', [], dated('c:' + t, by_type.get(t, []))) for t in seen]
+    urls += [(f'product.html?id={p["id"]}', '0.7', 'weekly', [p['src']] if p.get('src') else [], dated('p:' + p['id'], {k: v for k, v in p.items() if k not in ('bg', 'ar')})) for p in CATALOG['products']]
+    urls += [(p['path'], '0.5', 'monthly', [], file_date(n)) for n, p in PAGES.items() if p.get('index', True) and not p.get('dynamic') and n not in ('index.html', 'products.html')]
+    json.dump(fps, open(fp_path, 'w', encoding='utf-8'), indent=0, sort_keys=True)
     src = {p['id']: p.get('src') for p in CATALOG['products']}
     for slug, iso, prods in posts:
         urls.append((f'article.html?p={slug}', '0.6', 'monthly', [src[i] for i in prods if src.get(i)][:1], iso))

@@ -14,6 +14,16 @@ Creators program (affiliate / referral) — same function, chosen by ?cr=… (on
   POST  ?cr=payout   the creator saves payout details {code, key, method, title, number}
   GET   ?cr=admin    every creator with their numbers (header X-Admin-Key)
   PATCH ?cr=admin    {code, status | rate | payout:{amount, note} | resetKey} (header X-Admin-Key)
+Leads (2026-10-10) — the bulk / corporate / help / newsletter forms, so enquiries reach the shop instead of staying in the browser:
+  POST  ?lead=add    {kind, fields, page, website(honeypot)} → stored for the admin page
+  GET   ?lead=admin  newest leads (header X-Admin-Key)      PATCH ?lead=admin {id, status: new|done}
+Reviews (2026-10-10) — shared by every shopper, checked before they appear:
+  GET   ?rv=summary  {pid: [average, count]} of approved reviews (CDN-cached)
+  GET   ?rv=list&pid=…  approved reviews of one product (CDN-cached)
+  POST  ?rv=add      {pid, rating, title, text, name, city, sku, order, phone} → pending (verified when order + phone match)
+  POST  ?rv=helpful  {id}
+  GET   ?rv=admin    reviews waiting for approval + the latest approved (header X-Admin-Key)
+  PATCH ?rv=admin    {id, action: approve|reject} (header X-Admin-Key)
 An order may carry `ref` (a creator code): the server checks it is active and not the buyer's own, takes the follower
 discount (shop.js creators.discountPct) off the items and stamps the order. Commission is never stored — it is worked out
 from the orders (cr_stats), so marking an order delivered or cancelled in admin moves it between pending / approved / void.
@@ -452,6 +462,168 @@ def creators_api(method, action, headers, body_bytes):
 
 
 # ---------- Storage ----------
+# ---------- Leads: the enquiry forms (bulk, corporate, help, newsletter) ----------
+LEAD_KINDS = {'bulk': 'Bulk order', 'corporate': 'Corporate order', 'help': 'Help request', 'newsletter': 'Newsletter'}
+LEAD_STATUSES = ('new', 'done')
+
+
+def now_iso():
+    return datetime.now(PKT).isoformat(timespec='seconds')
+
+
+def lead_add(body, st):
+    if body.get('website'):  # the honeypot: a bot filled the hidden field — pretend it worked, store nothing
+        return {'id': 'ok', 'kind': 'spam'}
+    kind = body.get('kind')
+    if kind not in LEAD_KINDS:
+        raise Bad('Unknown form.')
+    raw = body.get('fields') or {}
+    if not isinstance(raw, dict):
+        raise Bad('Could not read the form.')
+    fields = {}
+    for k, v in list(raw.items())[:24]:
+        k = re.sub(r'[^a-z0-9_]', '', str(k).lower())[:30]
+        if k and k != 'website':
+            fields[k] = text(', '.join(map(str, v)) if isinstance(v, list) else v, k, 1200, required=False)
+    email = fields.get('email', '')
+    if email and not re.fullmatch(r'[^@\s]+@[^@\s]+\.[^@\s]+', email):
+        raise Bad('Enter a valid email address.', 'email')
+    if fields.get('phone'):
+        ph = phone_norm(fields['phone'])
+        if ph:
+            fields['phone'] = ph
+        elif len(re.sub(r'\D', '', fields['phone'])) < 10:
+            raise Bad('Enter a phone number we can reach, e.g. 0300 1234567.', 'phone')
+    if kind == 'newsletter':
+        if not email:
+            raise Bad('Enter your email address.', 'email')
+    else:
+        if len(fields.get('name', '')) < 2:
+            raise Bad('Enter your name.', 'name')
+        if not (fields.get('phone') or email):
+            raise Bad('Add a phone number or email so we can reply.', 'phone')
+    lead = {'id': 'L' + secrets.token_hex(5), 'kind': kind, 'fields': fields, 'page': text(body.get('page'), 'page', 200, required=False),
+            'status': 'new', 'createdAt': now_iso()}
+    st.lead_add(lead)
+    return lead
+
+
+def leads_api(method, action, headers, body_bytes):
+    body = json.loads(body_bytes or b'{}') if method in ('POST', 'PATCH') else {}
+    st = store('Our enquiry inbox is being set up — please send this on WhatsApp for now.')
+    if action == 'add' and method == 'POST':
+        lead = lead_add(body, st)
+        return 201, {'ok': True, 'id': lead['id']}
+    if action == 'admin':
+        if not admin_ok(headers):
+            raise Bad('Wrong admin key.', status=403)
+        if method == 'GET':
+            return 200, {'ok': True, 'leads': st.leads(500), 'kinds': LEAD_KINDS}
+        if method == 'PATCH':
+            lid, status = str(body.get('id', '')), body.get('status')
+            if status not in LEAD_STATUSES:
+                raise Bad('Unknown status.')
+            lead = st.lead_get(lid)
+            if not lead:
+                raise Bad('Lead not found.', status=404)
+            lead['status'] = status
+            lead['doneAt'] = now_iso() if status == 'done' else None
+            st.lead_save(lead)
+            return 200, {'ok': True, 'lead': lead}
+    return 405, {'ok': False, 'error': 'Method not allowed.'}
+
+
+# ---------- Reviews: shared, checked before they appear ----------
+def product_ids():
+    skus, _ = catalog()
+    return {v['id'] for v in skus.values()}
+
+
+def rv_public(r, helpful=0):
+    return {**{k: r.get(k) for k in ('id', 'pid', 'rating', 'title', 'text', 'name', 'city', 'sku', 'verified', 'createdAt')}, 'helpful': int(helpful or 0)}
+
+
+def rv_add(body, st):
+    if body.get('website'):
+        return {'id': 'ok', 'status': 'pending'}
+    pid = str(body.get('pid', ''))
+    if pid not in product_ids():
+        raise Bad('Unknown product.')
+    try:
+        rating = int(body.get('rating'))
+    except (TypeError, ValueError):
+        rating = 0
+    if not 1 <= rating <= 5:
+        raise Bad('Choose a star rating.', 'pick')
+    review = {'id': 'R' + secrets.token_hex(5), 'pid': pid, 'rating': rating,
+              'title': text(body.get('title'), 'title', 80, required=False),
+              'text': text(body.get('text'), 'text', 1000, required=False),
+              'name': text(body.get('name'), 'name', 40, required=False),
+              'city': text(body.get('city'), 'city', 40, required=False),
+              'sku': text(body.get('sku'), 'sku', 40, required=False),
+              'verified': False, 'status': 'pending', 'createdAt': now_iso()}
+    if len(review['text']) < 20:
+        raise Bad('Please write at least 20 characters.', 'text')
+    if len(review['name']) < 2:
+        raise Bad('Enter your name.', 'name')
+    # Verified buyer: the order number and the phone it was placed with, and this product is in it
+    number, phone = str(body.get('order', '')).strip().upper(), phone_norm(body.get('phone'))
+    if re.fullmatch(r'WU-\d{5,}', number) and phone:
+        o = st.get(number)
+        review['verified'] = bool(o and o['customer']['phone'] == phone and o.get('status') != 'cancelled'
+                                  and any(l.get('id') == pid for l in o.get('items', [])))
+    st.rv_save(review)
+    st.rv_queue(review['id'])
+    return review
+
+
+def rv_summary_of(reviews):
+    return [round(sum(r['rating'] for r in reviews) / len(reviews), 2), len(reviews)] if reviews else None
+
+
+def reviews_api(method, action, query, headers, body_bytes):
+    body = json.loads(body_bytes or b'{}') if method in ('POST', 'PATCH') else {}
+    st = store('Shared reviews are being set up.')
+    cache = {'_cache': 'public, max-age=0, s-maxage=120, stale-while-revalidate=600'}
+    if action == 'summary' and method == 'GET':
+        return 200, {'ok': True, 'summary': st.rv_sums(), **cache}
+    if action == 'list' and method == 'GET':
+        pid = str(query.get('pid', ''))
+        if pid not in product_ids():
+            raise Bad('Unknown product.')
+        items = st.rv_by(pid)
+        helps = st.rv_helps([r['id'] for r in items])
+        return 200, {'ok': True, 'reviews': [rv_public(r, helps.get(r['id'])) for r in items], 'summary': rv_summary_of(items), **cache}
+    if action == 'add' and method == 'POST':
+        r = rv_add(body, st)
+        return 201, {'ok': True, 'review': {'id': r['id'], 'status': 'pending', 'verified': r.get('verified', False)}}
+    if action == 'helpful' and method == 'POST':
+        r = st.rv_get(str(body.get('id', '')))
+        if not r or r.get('status') != 'approved':
+            raise Bad('Review not found.', status=404)
+        return 200, {'ok': True, 'helpful': st.rv_help(r['id'])}
+    if action == 'admin':
+        if not admin_ok(headers):
+            raise Bad('Wrong admin key.', status=403)
+        if method == 'GET':
+            return 200, {'ok': True, 'pending': st.rv_pending(), 'recent': st.rv_recent(60)}
+        if method == 'PATCH':
+            r = st.rv_get(str(body.get('id', '')))
+            if not r:
+                raise Bad('Review not found.', status=404)
+            act = body.get('action')
+            if act == 'approve':
+                r['status'], r['approvedAt'] = 'approved', now_iso()
+                st.rv_save(r)
+                st.rv_publish(r)
+            elif act == 'reject':
+                st.rv_remove(r)
+            else:
+                raise Bad('Unknown action.')
+            return 200, {'ok': True, 'review': r}
+    return 405, {'ok': False, 'error': 'Method not allowed.'}
+
+
 class RedisStore:
     def __init__(self, url, token):
         self.url, self.token = url.rstrip('/'), token
@@ -536,6 +708,82 @@ class RedisStore:
         return [json.loads(r) for r in raws or [] if r]
 
 
+    # leads
+    def lead_add(self, lead):
+        self.lead_save(lead)
+        self.cmd('LPUSH', 'wu:leads', lead['id'])
+        self.cmd('LTRIM', 'wu:leads', 0, 4999)
+
+    def lead_save(self, lead):
+        self.cmd('HSET', 'wu:lead', lead['id'], json.dumps(lead, ensure_ascii=False))
+
+    def lead_get(self, lid):
+        raw = self.cmd('HGET', 'wu:lead', lid)
+        return json.loads(raw) if raw else None
+
+    def leads(self, n=500):
+        ids = self.cmd('LRANGE', 'wu:leads', 0, n - 1) or []
+        rows = self.cmd('HMGET', 'wu:lead', *ids) if ids else []
+        return [json.loads(x) for x in rows if x]
+
+    # reviews: wu:rv (id → json), wu:rv:pending (ids), wu:rv:p:<pid> (approved ids), wu:rv:sum (pid → [avg, n]), wu:rv:help (id → n)
+    def rv_save(self, r):
+        self.cmd('HSET', 'wu:rv', r['id'], json.dumps(r, ensure_ascii=False))
+
+    def rv_get(self, rid):
+        raw = self.cmd('HGET', 'wu:rv', rid)
+        return json.loads(raw) if raw else None
+
+    def _rv_many(self, ids):
+        rows = self.cmd('HMGET', 'wu:rv', *ids) if ids else []
+        return [json.loads(x) for x in rows if x]
+
+    def rv_queue(self, rid):
+        self.cmd('LPUSH', 'wu:rv:pending', rid)
+
+    def rv_pending(self):
+        return self._rv_many(self.cmd('LRANGE', 'wu:rv:pending', 0, 499) or [])
+
+    def rv_by(self, pid):
+        return self._rv_many(self.cmd('LRANGE', 'wu:rv:p:' + pid, 0, 199) or [])
+
+    def rv_recent(self, n=60):
+        return self._rv_many(self.cmd('LRANGE', 'wu:rv:recent', 0, n - 1) or [])
+
+    def _rv_resum(self, pid):
+        sm = rv_summary_of(self.rv_by(pid))
+        if sm:
+            self.cmd('HSET', 'wu:rv:sum', pid, json.dumps(sm))
+        else:
+            self.cmd('HDEL', 'wu:rv:sum', pid)
+
+    def rv_publish(self, r):
+        self.cmd('LREM', 'wu:rv:pending', 0, r['id'])
+        self.cmd('LREM', 'wu:rv:p:' + r['pid'], 0, r['id'])
+        self.cmd('LPUSH', 'wu:rv:p:' + r['pid'], r['id'])
+        self.cmd('LPUSH', 'wu:rv:recent', r['id'])
+        self.cmd('LTRIM', 'wu:rv:recent', 0, 199)
+        self._rv_resum(r['pid'])
+
+    def rv_remove(self, r):
+        self.cmd('LREM', 'wu:rv:pending', 0, r['id'])
+        self.cmd('LREM', 'wu:rv:p:' + r['pid'], 0, r['id'])
+        self.cmd('LREM', 'wu:rv:recent', 0, r['id'])
+        self.cmd('HDEL', 'wu:rv', r['id'])
+        self._rv_resum(r['pid'])
+
+    def rv_sums(self):
+        flat = self.cmd('HGETALL', 'wu:rv:sum') or []
+        return {flat[i]: json.loads(flat[i + 1]) for i in range(0, len(flat), 2)}
+
+    def rv_help(self, rid):
+        return int(self.cmd('HINCRBY', 'wu:rv:help', rid, 1))
+
+    def rv_helps(self, ids):
+        vals = self.cmd('HMGET', 'wu:rv:help', *ids) if ids else []
+        return {i: int(v) for i, v in zip(ids, vals) if v}
+
+
 class FileStore:
     """Local development only: one JSON file per order in WisdomUp Frontend/.data/orders/."""
     def __init__(self):
@@ -613,6 +861,107 @@ class FileStore:
         return [o for o in self.recent(100000) if (o.get('ref') or {}).get('code') == code]
 
 
+    # leads + reviews (local): .data/leads.json, .data/reviews.json
+    def _j(self, name, data=None):
+        p = os.path.join(ROOT, '.data', name)
+        if data is not None:
+            with open(p, 'w', encoding='utf-8') as f:
+                json.dump(data, f, ensure_ascii=False, indent=1)
+            return data
+        try:
+            with open(p, encoding='utf-8') as f:
+                return json.load(f)
+        except (FileNotFoundError, ValueError):
+            return {}
+
+    def lead_add(self, lead):
+        d = self._j('leads.json')
+        d.setdefault('ids', []).insert(0, lead['id'])
+        d.setdefault('all', {})[lead['id']] = lead
+        self._j('leads.json', d)
+
+    def lead_save(self, lead):
+        d = self._j('leads.json')
+        d.setdefault('all', {})[lead['id']] = lead
+        self._j('leads.json', d)
+
+    def lead_get(self, lid):
+        return self._j('leads.json').get('all', {}).get(lid)
+
+    def leads(self, n=500):
+        d = self._j('leads.json')
+        return [d['all'][i] for i in d.get('ids', [])[:n] if i in d.get('all', {})]
+
+    def _rv(self, data=None):
+        d = self._j('reviews.json', data)
+        for k, v in (('all', {}), ('pending', []), ('by', {}), ('recent', []), ('sum', {}), ('help', {})):
+            d.setdefault(k, v)
+        return d
+
+    def rv_save(self, r):
+        d = self._rv()
+        d['all'][r['id']] = r
+        self._rv(d)
+
+    def rv_get(self, rid):
+        return self._rv()['all'].get(rid)
+
+    def rv_queue(self, rid):
+        d = self._rv()
+        d['pending'].insert(0, rid)
+        self._rv(d)
+
+    def rv_pending(self):
+        d = self._rv()
+        return [d['all'][i] for i in d['pending'] if i in d['all']]
+
+    def rv_by(self, pid):
+        d = self._rv()
+        return [d['all'][i] for i in d['by'].get(pid, [])[:200] if i in d['all']]
+
+    def rv_recent(self, n=60):
+        d = self._rv()
+        return [d['all'][i] for i in d['recent'][:n] if i in d['all']]
+
+    def _resum(self, d, pid):
+        sm = rv_summary_of([d['all'][i] for i in d['by'].get(pid, []) if i in d['all']])
+        if sm:
+            d['sum'][pid] = sm
+        else:
+            d['sum'].pop(pid, None)
+
+    def rv_publish(self, r):
+        d = self._rv()
+        d['all'][r['id']] = r
+        d['pending'] = [i for i in d['pending'] if i != r['id']]
+        d['by'][r['pid']] = [r['id']] + [i for i in d['by'].get(r['pid'], []) if i != r['id']]
+        d['recent'] = ([r['id']] + [i for i in d['recent'] if i != r['id']])[:200]
+        self._resum(d, r['pid'])
+        self._rv(d)
+
+    def rv_remove(self, r):
+        d = self._rv()
+        d['pending'] = [i for i in d['pending'] if i != r['id']]
+        d['by'][r['pid']] = [i for i in d['by'].get(r['pid'], []) if i != r['id']]
+        d['recent'] = [i for i in d['recent'] if i != r['id']]
+        d['all'].pop(r['id'], None)
+        self._resum(d, r['pid'])
+        self._rv(d)
+
+    def rv_sums(self):
+        return self._rv()['sum']
+
+    def rv_help(self, rid):
+        d = self._rv()
+        d['help'][rid] = d['help'].get(rid, 0) + 1
+        self._rv(d)
+        return d['help'][rid]
+
+    def rv_helps(self, ids):
+        h = self._rv()['help']
+        return {i: h[i] for i in ids if i in h}
+
+
 def store(missing='Online ordering is being set up — please order on WhatsApp for now.'):
     url = os.environ.get('KV_REST_API_URL') or os.environ.get('UPSTASH_REDIS_REST_URL')
     token = os.environ.get('KV_REST_API_TOKEN') or os.environ.get('UPSTASH_REDIS_REST_TOKEN')
@@ -636,6 +985,10 @@ def handle(method, query, headers, body_bytes):
         q = {k: v[0] for k, v in parse_qs(query).items()}
         if q.get('cr'):
             return creators_api(method, q['cr'], headers, body_bytes)
+        if q.get('lead'):
+            return leads_api(method, q['lead'], headers, body_bytes)
+        if q.get('rv'):
+            return reviews_api(method, q['rv'], q, headers, body_bytes)
         if method == 'POST':
             body = json.loads(body_bytes or b'{}')
             st = store()
@@ -685,10 +1038,11 @@ class handler(BaseHTTPRequestHandler):  # Vercel entry point
     def _go(self, method):
         n = int(self.headers.get('Content-Length') or 0)
         status, payload = handle(method, urlparse(self.path).query, self.headers, self.rfile.read(n) if n else b'')
+        cache = payload.pop('_cache', None) if isinstance(payload, dict) else None
         out = json.dumps(payload, ensure_ascii=False).encode()
         self.send_response(status)
         self.send_header('Content-Type', 'application/json; charset=utf-8')
-        self.send_header('Cache-Control', 'no-store')
+        self.send_header('Cache-Control', cache if cache and status == 200 else 'no-store')
         self.send_header('Content-Length', str(len(out)))
         self.end_headers()
         self.wfile.write(out)

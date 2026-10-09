@@ -94,9 +94,7 @@
   function build() {
     host.innerHTML = `
     <div class="nh">
-      <section class="nh-stripwrap" aria-label="Our promises">
-        <div class="nh-strip">${[['truck', 'Delivery to every city in Pakistan', url.shipping], ['smile', '7-day money-back guarantee', url.returns], ['medal', 'WisdomUp brand warranty', url.warranty], ['shield', 'Cash on Delivery · JazzCash · EasyPaisa', url.help]].map(([ic, t, h]) => `<a href="${h}">${icon(ic, 22)}<span>${esc(t)}</span></a>`).join('')}</div>
-      </section>
+      <!-- the promise strip moved above both homes as the shared .home-intro (2026-10-10) -->
       <section aria-label="Shop by department">
         <div class="nh-promo">
           <div class="nh-live" role="group" aria-labelledby="nh-live-h">

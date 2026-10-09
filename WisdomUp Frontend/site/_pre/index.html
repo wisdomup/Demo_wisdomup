@@ -40,27 +40,27 @@
 <link rel="icon" href="favicon.ico" sizes="32x32">
 <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
-<link rel="stylesheet" href="css/ds/tokens/fonts.css">
-<link rel="stylesheet" href="css/ds/tokens/colors.css">
-<link rel="stylesheet" href="css/ds/tokens/typography.css">
-<link rel="stylesheet" href="css/ds/tokens/spacing.css">
-<link rel="stylesheet" href="css/ds/tokens/base.css">
-<link rel="stylesheet" href="css/ds/styles/components.css">
-<link rel="stylesheet" href="css/wu-rail.css">
-<link rel="stylesheet" href="css/home.css">
-<link rel="stylesheet" href="css/pages.css">
-<link rel="stylesheet" href="css/info.css">
-<link rel="stylesheet" href="css/controls.css">
-<link rel="stylesheet" href="css/night.css">
-<link rel="stylesheet" href="css/night-home.css">
-<link rel="stylesheet" href="css/motion.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap">
+<link rel="preload" as="image" href="img/p/ts-11anc.jpg" fetchpriority="high"><!-- the first banner slide (D.lifestyle[0]) -->
+<link rel="stylesheet" href="css/ds/tokens/colors.css?v=90866fc5">
+<link rel="stylesheet" href="css/ds/tokens/typography.css?v=ed291863">
+<link rel="stylesheet" href="css/ds/tokens/spacing.css?v=2d88693b">
+<link rel="stylesheet" href="css/ds/tokens/base.css?v=8ea7591d">
+<link rel="stylesheet" href="css/ds/styles/components.css?v=0497221e">
+<link rel="stylesheet" href="css/wu-rail.css?v=7e14a6c3">
+<link rel="stylesheet" href="css/home.css?v=a495fab2">
+<link rel="stylesheet" href="css/pages.css?v=3b82ff86">
+<link rel="stylesheet" href="css/info.css?v=96e87232">
+<link rel="stylesheet" href="css/controls.css?v=a315d52e">
+<link rel="stylesheet" href="css/night.css?v=54be01c4">
+<link rel="stylesheet" href="css/night-home.css?v=406d4055">
+<link rel="stylesheet" href="css/motion.css?v=fa568ed2">
 </head>
 <body>
 <div class="page">
 
   <div class="wu-util"><nav class="utility" aria-label="Utility" id="utility"><a href="live.html" class="gold">Live Shopping</a><a href="bulk-order.html">Bulk Order</a><a href="corporate.html">Corporate Order</a><a href="shipping.html#express">Express Delivery</a><a href="track.html">Order Tracker</a><a href="help.html">Help Center</a></nav></div>
   <header class="nav site-nav" id="site-nav"></header>
-  <h1 class="visually-hidden">WisdomUp Pakistan — wireless earbuds, power banks, chargers, handsfree, speakers and mobile accessories</h1>
 
   <!-- Quick chips + hero banner: SHARED by day and night (same banner, same position — 2026-10-06) -->
   <div class="hero-stack">
@@ -98,7 +98,7 @@
     <div class="hero-anchor" data-nav-anchor="">
       <section class="hero is-light" id="hero" aria-roledescription="carousel" aria-label="Featured launches">
       <div class="hero__slide hero__slide--full is-on" aria-roledescription="slide" aria-label="1 of 5">
-        <a class="hero__full" href="product.html?id=ts-11anc" aria-label="TS-11ANC Noise-Cancelling Wireless Earbuds" draggable="false" style="background: radial-gradient(110% 80% at 50% 45%, #cccbcb, #a0a0a0);"><img class="hero__fimg" src="img/p/ts-11anc.jpg" alt="" draggable="false"></a>
+        <a class="hero__full" href="product.html?id=ts-11anc" aria-label="TS-11ANC Noise-Cancelling Wireless Earbuds" draggable="false" style="background: radial-gradient(110% 80% at 50% 45%, #cccbcb, #a0a0a0);"><img class="hero__fimg" src="img/p/ts-11anc.jpg" alt="" draggable="false" fetchpriority="high"></a>
       </div>
       <div class="hero__slide hero__slide--full" aria-roledescription="slide" aria-label="2 of 5" aria-hidden="true">
         <a class="hero__full" href="product.html?id=yx-28" aria-label="YX-28 150W Party Speaker with RGB Lights" draggable="false" tabindex="-1" style="background: radial-gradient(110% 80% at 50% 45%, #ac9f9c, #a3a09f);"><img class="hero__fimg" src="img/p/yx-28.jpg" alt="" draggable="false" loading="lazy"></a>
@@ -121,6 +121,18 @@
       </div></section>
     </div>
   </div>
+
+  <!-- HOME INTRO (2026-10-10, from the audit "make the homepage H1 visible" + the phone's first screen had no message): the visible H1
+       and four promises, shared by day and night (night's own promise strip became this row) -->
+  <section class="home-intro" aria-labelledby="home-h1">
+    <h1 class="home-intro__h" id="home-h1">Earbuds, power banks, chargers &amp; more — delivered across Pakistan</h1>
+    <ul class="home-intro__list">
+      <li><a href="shipping.html#payment"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6.5" width="18" height="11" rx="2.5"></rect><circle class="r" cx="12" cy="12" r="2.4"></circle></svg>Cash on Delivery</a></li>
+      <li><a href="shipping.html#charges"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 7h11v9h-11zM13.5 10h4l3 3v3h-7"></path><circle class="r" cx="7" cy="17.5" r="1.8"></circle><circle class="r" cx="17" cy="17.5" r="1.8"></circle></svg><span>Free delivery from <span data-free-from="">Rs.10,000</span></span></a></li>
+      <li><a href="returns.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7"></path><path class="r" d="M4 4v4h4"></path></svg>7-day money-back</a></li>
+      <li><a href="warranty.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5.5c0 4.3-3 8-7 9.5-4-1.5-7-5.2-7-9.5V6z"></path><path class="r" d="M9 12l2 2 4-4"></path></svg>WisdomUp warranty</a></li>
+    </ul>
+  </section>
 
   <!-- DAY home page below the banner (hidden while the night theme is on; night renders its own layout into #night-home) -->
   <div id="day-home">
@@ -564,7 +576,7 @@
         <h2 class="h-light">Watch it demoed. <b>Add it to cart mid-stream.</b></h2>
         <p class="duo__p">Live-only prices on whatever the host is holding. Next show starts in:</p>
       </div>
-      <div class="countdown" id="countdown" role="timer" aria-label="Time until the next live show"><div class="countdown__cell"><span class="countdown__v">00</span><span class="countdown__l">Days</span></div><div class="countdown__cell"><span class="countdown__v">10</span><span class="countdown__l">Hrs</span></div><div class="countdown__cell"><span class="countdown__v">36</span><span class="countdown__l">Min</span></div><div class="countdown__cell"><span class="countdown__v">12</span><span class="countdown__l">Sec</span></div></div>
+      <div class="countdown" id="countdown" role="timer" aria-label="Time until the next live show"><div class="countdown__cell"><span class="countdown__v">06</span><span class="countdown__l">Days</span></div><div class="countdown__cell"><span class="countdown__v">16</span><span class="countdown__l">Hrs</span></div><div class="countdown__cell"><span class="countdown__v">45</span><span class="countdown__l">Min</span></div><div class="countdown__cell"><span class="countdown__v">18</span><span class="countdown__l">Sec</span></div></div>
       <div class="duo__foot">
         <button type="button" class="btn-pill" id="remind">Remind me</button>
         <span class="duo__note">Fridays · 8 PM PKT · <a class="duo__more" href="live.html">See the show ›</a></span>
@@ -592,6 +604,7 @@
           <div class="promo__inner">
             <span class="promo__kicker"><span>3-in-1 wireless charger</span></span>
             <div class="promo__name">CJ-46</div>
+            <div class="promo__meta"><span class="promo__title">3-in-1 Foldable Magnetic Wireless Charger</span><b class="promo__price">Rs.13,320</b></div>
             <div class="promo__chips"><span class="promo__chip">15W phone</span><span class="promo__chip">Earbuds + watch</span></div>
           </div>
           <span class="ph promo__img promo__ph" style="background: radial-gradient(110% 80% at 50% 45%, #989799 0%, #a3a2a2 100%);"><img src="img/p/s/cj-46.jpg" alt="" loading="lazy" style="object-fit: cover; object-position: 6% 50%;"></span>
@@ -602,6 +615,7 @@
           <div class="promo__inner">
             <span class="promo__kicker"><span>Magnetic power bank</span></span>
             <div class="promo__name">CDB-18</div>
+            <div class="promo__meta"><span class="promo__title">10000mAh Magnetic Wireless Power Bank</span><b class="promo__price">Rs.9,900</b></div>
             <div class="promo__chips"><span class="promo__chip">10,000mAh</span><span class="promo__chip">15W wireless</span></div>
           </div>
           <span class="ph promo__img promo__ph" style="background: radial-gradient(110% 80% at 50% 45%, #b4b4b5 0%, #848486 100%);"><img src="img/p/s/cdb-18.jpg" alt="" loading="lazy" style="object-fit: cover; object-position: 6% 50%;"></span>
@@ -612,6 +626,7 @@
           <div class="promo__inner">
             <span class="promo__kicker"><span>Fast car charger</span></span>
             <div class="promo__name">CC-16</div>
+            <div class="promo__meta"><span class="promo__title">33W PD USB + USB-C Car Charger</span><b class="promo__price">Rs.2,286</b></div>
             <div class="promo__chips"><span class="promo__chip">33W PD</span><span class="promo__chip">USB + USB-C</span></div>
           </div>
           <span class="ph promo__img promo__ph" style="background: radial-gradient(110% 80% at 50% 45%, #97999e 0%, #777a82 100%);"><img src="img/p/s/cc-16.jpg" alt="" loading="lazy" style="object-fit: cover; object-position: 6% 50%;"></span>
@@ -622,6 +637,7 @@
           <div class="promo__inner">
             <span class="promo__kicker"><span>Wall charger + cable</span></span>
             <div class="promo__name">OCD-28</div>
+            <div class="promo__meta"><span class="promo__title">20W USB + USB-C Wall Charger with Cable</span><b class="promo__price">Rs.2,250</b></div>
             <div class="promo__chips"><span class="promo__chip">20W</span><span class="promo__chip">EU or UK plug</span></div>
           </div>
           <span class="ph promo__img promo__ph" style="background: radial-gradient(110% 80% at 50% 45%, #d4cac9 0%, #a1a1a1 100%);"><img src="img/p/s/ocd-28t.jpg" alt="" loading="lazy" style="object-fit: cover; object-position: 6% 50%;"></span>
@@ -632,6 +648,7 @@
           <div class="promo__inner">
             <span class="promo__kicker"><span>Laptop-ready cable</span></span>
             <div class="promo__name">SJX-59</div>
+            <div class="promo__meta"><span class="promo__title">240W Fast Charging Cable</span><b class="promo__price">Rs.2,250</b></div>
             <div class="promo__chips"><span class="promo__chip">240W</span><span class="promo__chip">USB-C to USB-C</span></div>
           </div>
           <span class="ph promo__img promo__ph" style="background: radial-gradient(110% 80% at 50% 45%, #bab5b3 0%, #a0a1a1 100%);"><img src="img/p/s/sjx-59.jpg" alt="" loading="lazy" style="object-fit: cover; object-position: 6% 50%;"></span>
@@ -642,6 +659,7 @@
           <div class="promo__inner">
             <span class="promo__kicker"><span>ANC headphones</span></span>
             <div class="promo__name">TDE-18</div>
+            <div class="promo__meta"><span class="promo__title">ANC Wireless Headphones</span><b class="promo__price">Rs.11,100</b></div>
             <div class="promo__chips"><span class="promo__chip">ANC</span><span class="promo__chip">40 hrs</span></div>
           </div>
           <span class="ph promo__img promo__ph" style="background: radial-gradient(110% 80% at 50% 45%, #d1cfcf 0%, #a7a6a5 100%);"><img src="img/p/s/tde-18.jpg" alt="" loading="lazy" style="object-fit: cover; object-position: 6% 50%;"></span>
@@ -652,6 +670,7 @@
           <div class="promo__inner">
             <span class="promo__kicker"><span>Creator wireless mic</span></span>
             <div class="promo__name">MKF-02</div>
+            <div class="promo__meta"><span class="promo__title">Wireless Clip-On Microphone</span><b class="promo__price">Rs.4,680</b></div>
             <div class="promo__chips"><span class="promo__chip">2.4GHz</span><span class="promo__chip">&lt;20ms latency</span></div>
           </div>
           <span class="ph promo__img promo__ph" style="background: radial-gradient(110% 80% at 50% 45%, #b8b7b7 0%, #a5a5a5 100%);"><img src="img/p/s/mkf-02.jpg" alt="" loading="lazy" style="object-fit: cover; object-position: 6% 50%;"></span>
@@ -662,6 +681,7 @@
           <div class="promo__inner">
             <span class="promo__kicker"><span>Party speaker</span></span>
             <div class="promo__name">YX-31</div>
+            <div class="promo__meta"><span class="promo__title">220W Party Speaker with LED Lights</span><b class="promo__price">Rs.80,200</b></div>
             <div class="promo__chips"><span class="promo__chip">220W</span><span class="promo__chip">LED lights</span></div>
           </div>
           <span class="ph promo__img promo__ph" style="background: radial-gradient(110% 80% at 50% 45%, #a3928f 0%, #a19d9d 100%);"><img src="img/p/s/yx-31.jpg" alt="" loading="lazy" style="object-fit: cover; object-position: 6% 50%;"></span>
@@ -672,6 +692,7 @@
           <div class="promo__inner">
             <span class="promo__kicker"><span>Grooming kit</span></span>
             <div class="promo__name">LFJ-09</div>
+            <div class="promo__meta"><span class="promo__title">Hair Clipper &amp; Shaver Kit</span><b class="promo__price">Rs.8,280</b></div>
             <div class="promo__chips"><span class="promo__chip">Clipper + shaver</span><span class="promo__chip">Charging base</span></div>
           </div>
           <span class="ph promo__img promo__ph" style="background: radial-gradient(110% 80% at 50% 45%, #d8d2d0 0%, #a0a1a1 100%);"><img src="img/p/s/lfj-09.jpg" alt="" loading="lazy" style="object-fit: cover; object-position: 6% 50%;"></span>
@@ -1102,21 +1123,21 @@
           </div>
         </article>
       </div>
-      <div class="wpc" data-pid="yp-15">
+      <div class="wpc" data-pid="yp-22">
         <article class="wpc__card">
-          <a class="wpc__media" href="product.html?id=yp-15" tabindex="-1" aria-hidden="true" style="background: radial-gradient(110% 80% at 50% 45%, #a49d9e 0%, #7d7f81 100%);">
-            <img class="wpc__photo" src="img/p/s/yp-15.jpg" alt="YP-15 3.5mm AUX Cable, 2m" loading="lazy" style="object-fit: cover; object-position: 6% 50%;">
+          <a class="wpc__media" href="product.html?id=yp-22" tabindex="-1" aria-hidden="true" style="background: radial-gradient(110% 80% at 50% 45%, #c4c7c8 0%, #70a5ac 100%);">
+            <img class="wpc__photo" src="img/p/s/yp-22.jpg" alt="YP-22 Micro-USB to Lightning Adapter" loading="lazy" style="object-fit: cover; object-position: 6% 50%;">
             
           </a>
-          <button type="button" class="wpc__wish" data-wish="yp-15" aria-pressed="false" aria-label="Save YP-15 3.5mm AUX Cable, 2m to wishlist"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 20.2l-1.3-1.2C6.1 14.9 3.2 12.3 3.2 9a4.6 4.6 0 0 1 4.7-4.7c1.6 0 3.1.7 4.1 1.9a5.4 5.4 0 0 1 4.1-1.9A4.6 4.6 0 0 1 20.8 9c0 3.3-2.9 5.9-7.5 10z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path></svg></button>
+          <button type="button" class="wpc__wish" data-wish="yp-22" aria-pressed="false" aria-label="Save YP-22 Micro-USB to Lightning Adapter to wishlist"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 20.2l-1.3-1.2C6.1 14.9 3.2 12.3 3.2 9a4.6 4.6 0 0 1 4.7-4.7c1.6 0 3.1.7 4.1 1.9a5.4 5.4 0 0 1 4.1-1.9A4.6 4.6 0 0 1 20.8 9c0 3.3-2.9 5.9-7.5 10z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path></svg></button>
           <div class="wpc__body">
             <div class="wpc__head">
-              <h3 class="wpc__title"><a href="product.html?id=yp-15" aria-label="YP-15 3.5mm AUX Cable, 2m">3.5mm AUX Cable, 2m</a></h3>
-              <div class="wpc__model"><span class="wpc__code">YP-15</span><i aria-hidden="true"></i><span class="wpc__cat">Adapters &amp; OTG</span><span class="wpc__rating wpc__rating--none" aria-label="No reviews yet"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z" fill="none" stroke="#E2A92C" stroke-width="1.8" stroke-linejoin="round"></path></svg><span>0.0</span></span></div>
+              <h3 class="wpc__title"><a href="product.html?id=yp-22" aria-label="YP-22 Micro-USB to Lightning Adapter">Micro-USB to Lightning Adapter</a></h3>
+              <div class="wpc__model"><span class="wpc__code">YP-22</span><i aria-hidden="true"></i><span class="wpc__cat">Adapters &amp; OTG</span><span class="wpc__rating wpc__rating--none" aria-label="No reviews yet"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z" fill="none" stroke="#E2A92C" stroke-width="1.8" stroke-linejoin="round"></path></svg><span>0.0</span></span></div>
             </div>
             
             
-            <div class="wpc__prices"><span class="wpc__price">Rs.504</span></div>
+            <div class="wpc__prices"><span class="wpc__price">Rs.585</span></div>
             <div class="wpc__foot">
               <button type="button" class="wpc__cta"><span class="wpc__cta-ic"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" style="flex: none;"><g fill="currentColor"><path d="M2 3.5h3l2.6 11.2h10.6L21 7H7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="9.5" cy="19.5" r="1.7"></circle><circle cx="17" cy="19.5" r="1.7"></circle></g></svg></span><span class="wpc__cta-t">Add to cart</span></button>
             </div>
@@ -2134,7 +2155,7 @@
       <div class="series__price">
         <span class="series__now" id="series-now">Rs.5,850</span>
         <span class="series__was" id="series-was">Rs.6,840</span>
-        <span class="series__off" id="series-off">14</span>
+        <span class="series__off" id="series-off">14% off</span>
       </div>
       <div class="series__btns" id="series-btns"><a class="btn-buy" href="product.html?id=ts-11anc"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true" style="flex: none;"><g fill="currentColor"><path d="M2 3.5h3l2.6 11.2h10.6L21 7H7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="9.5" cy="19.5" r="1.7"></circle><circle cx="17" cy="19.5" r="1.7"></circle></g></svg>Buy Now</a><button type="button" class="btn-cart"><span class="plus">+</span>Add to cart</button></div>
     </div>
@@ -2203,7 +2224,7 @@
 
   <section class="pp" aria-labelledby="pp-h">
     <div class="pp__card">
-      <div class="pp__media"><img src="img/personalized-earbuds.jpg" alt="Two earbud charging cases personalised with printed names" loading="lazy"></div>
+      <div class="pp__media"><img src="img/p/ts-11anc.jpg" alt="WisdomUp TS-11ANC wireless earbuds with their charging case" loading="lazy" width="1000" height="709"></div>
       <div class="pp__copy">
         <h2 class="pp__h" id="pp-h">Personalized</h2>
         <div class="pp__sub">Product Printing</div>
@@ -2418,7 +2439,7 @@ support</span></a></div></section></div>
             </div>
           </div>
           <div class="footer__grid">
-            <div class="ft__group"><h4><button type="button" class="ft__q" aria-expanded="true" aria-controls="ft-g0" tabindex="-1"><span>Products</span><span class="ft__chev"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" style="flex: none;"><path d="M9 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></button></h4><div class="ft__links" id="ft-g0"><a href="products.html">All Items</a><a href="products.html?dept=audio">Audio</a><a href="products.html?dept=charging">Charging</a><a href="products.html?dept=cables">Cables &amp; Adapters</a><a href="products.html?dept=car">Car Accessories</a><a href="products.html?dept=computer">Computer</a><a href="products.html?dept=care">Personal Care</a></div></div><div class="ft__group"><h4><button type="button" class="ft__q" aria-expanded="true" aria-controls="ft-g1" tabindex="-1"><span>Explore</span><span class="ft__chev"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" style="flex: none;"><path d="M9 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></button></h4><div class="ft__links" id="ft-g1"><a href="bulk-order.html">Bulk Order</a><a href="corporate.html">Corporate Order</a><a href="creators.html">Content Creators Program</a><a href="affiliate.html">Affiliate Program</a><a href="live.html">Live Shopping</a><a href="about.html">About Us</a><a href="where-to-buy.html">Where to Buy</a><a href="blog.html">Blog</a></div></div><div class="ft__group"><h4><button type="button" class="ft__q" aria-expanded="true" aria-controls="ft-g2" tabindex="-1"><span>Support</span><span class="ft__chev"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" style="flex: none;"><path d="M9 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></button></h4><div class="ft__links" id="ft-g2"><a href="help.html">Smart Help Center</a><a href="track.html">Order Tracker</a><a href="returns.html">Exchange &amp; Refund Policy</a><a href="warranty.html">Warranty Policy</a><a href="shipping.html">Shipping Policy</a><a href="manuals.html">Download e-Manual</a></div></div><div class="ft__group"><h4><button type="button" class="ft__q" aria-expanded="true" aria-controls="ft-g3" tabindex="-1"><span>Contact</span><span class="ft__chev"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" style="flex: none;"><path d="M9 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></button></h4><div class="ft__links" id="ft-g3"><a href="help.html">We’re here to help ›</a><a href="mailto:support@wisdomup.pk">support@wisdomup.pk</a><a href="tel:+923279800153">+92 327 9800153</a><a href="#cookie-preferences">Cookie preferences</a></div></div>
+            <div class="ft__group"><h4><button type="button" class="ft__q" aria-expanded="true" aria-controls="ft-g0" tabindex="-1"><span>Products</span><span class="ft__chev"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" style="flex: none;"><path d="M9 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></button></h4><div class="ft__links" id="ft-g0"><a href="products.html">All Items</a><a href="products.html?dept=audio">Audio</a><a href="products.html?dept=charging">Charging</a><a href="products.html?dept=cables">Cables &amp; Adapters</a><a href="products.html?dept=car">Car Accessories</a><a href="products.html?dept=computer">Computer</a><a href="products.html?dept=care">Personal Care</a></div></div><div class="ft__group"><h4><button type="button" class="ft__q" aria-expanded="true" aria-controls="ft-g1" tabindex="-1"><span>Explore</span><span class="ft__chev"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" style="flex: none;"><path d="M9 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></button></h4><div class="ft__links" id="ft-g1"><a href="bulk-order.html">Bulk Order</a><a href="corporate.html">Corporate Order</a><a href="creators.html">Content Creators Program</a><a href="affiliate.html">Affiliate Program</a><a href="live.html">Live Shopping</a><a href="about.html">About Us</a><a href="where-to-buy.html">Where to Buy</a><a href="blog.html">Blog</a></div></div><div class="ft__group"><h4><button type="button" class="ft__q" aria-expanded="true" aria-controls="ft-g2" tabindex="-1"><span>Support</span><span class="ft__chev"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" style="flex: none;"><path d="M9 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></button></h4><div class="ft__links" id="ft-g2"><a href="help.html">Smart Help Center</a><a href="track.html">Order Tracker</a><a href="returns.html">Exchange &amp; Refund Policy</a><a href="warranty.html">Warranty Policy</a><a href="shipping.html">Shipping Policy</a><a href="manuals.html">Download e-Manual</a><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div></div><div class="ft__group"><h4><button type="button" class="ft__q" aria-expanded="true" aria-controls="ft-g3" tabindex="-1"><span>Contact</span><span class="ft__chev"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" style="flex: none;"><path d="M9 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></button></h4><div class="ft__links" id="ft-g3"><a href="help.html">We’re here to help ›</a><a href="mailto:support@wisdomup.pk">support@wisdomup.pk</a><a href="tel:+923279800153">+92 327 9800153</a><a href="#cookie-preferences">Cookie preferences</a></div></div>
           </div>
         </footer>
         <div class="subfooter">
@@ -2447,14 +2468,14 @@ support</span></a></div></section></div>
   <div class="toast" id="toast" role="status" hidden=""></div>
 </div>
 
-<script src="js/catalog.js"></script>
-<script src="js/shop.js"></script>
-<script src="js/wu-data.js"></script>
-<script src="js/ds-icons.js"></script>
-<script src="js/common.js"></script>
-<script src="js/posts.js"></script>
-<script src="js/home.js"></script>
-<script src="js/night-home.js"></script>
+<script src="js/catalog.js?v=e0f706e7"></script>
+<script src="js/shop.js?v=7582d314"></script>
+<script src="js/wu-data.js?v=cdf27841"></script>
+<script src="js/ds-icons.js?v=ab37eba9"></script>
+<script src="js/common.js?v=7a44775d"></script>
+<script src="js/posts.js?v=5bc5e04c"></script>
+<script src="js/home.js?v=c9efb8fb"></script>
+<script src="js/night-home.js?v=079fb4d8"></script>
 
 </body>
 </html>

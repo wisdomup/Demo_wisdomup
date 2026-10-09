@@ -245,6 +245,8 @@
   }
 
   /* ---------- Promo carousel ---------- */
+  // each card names its product and price (2026-10-10, the audit: the codes alone said nothing, and could slide under the photo)
+  const promoName = p => (p.title.toUpperCase().startsWith(p.code.toUpperCase()) ? p.title.slice(p.code.length).replace(/^[\s\-–—|:·]+/, '') : '') || p.title;
   (function promos() {
     const n = PROMOS.length, track = $('promo-track'), band = $('promos');
     let idx = n, hover = false;
@@ -254,6 +256,7 @@
           <div class="promo__inner">
             <span class="promo__kicker"><span>${esc(t.kicker)}</span></span>
             <div class="promo__name">${esc(P(t.id).code)}</div>
+            <div class="promo__meta"><span class="promo__title">${esc(promoName(P(t.id)))}</span><b class="promo__price">${esc(P(t.id).priceText)}</b></div>
             <div class="promo__chips">${t.chips.map(ch => `<span class="promo__chip">${esc(ch)}</span>`).join('')}</div>
           </div>
           ${photo(P(t.id), 'promo__img promo__ph')}
@@ -303,7 +306,7 @@
       $('series-meta').textContent = p.meta;
       $('series-now').textContent = p.priceText;
       $('series-was').textContent = p.wasText || '';
-      $('series-off').textContent = p.off || '';
+      $('series-off').textContent = p.off ? p.off + '% off' : ''; // was the bare number ("14") — the audit, 2026-10-10
       $('series-btns').innerHTML = btnBuy('Buy Now', url.product(p.id)) + '<button type="button" class="btn-cart"><span class="plus">+</span>Add to cart</button>';
       $('series-chips').querySelectorAll('.chip').forEach((c, i) => c.setAttribute('aria-pressed', i === sel));
       sart();

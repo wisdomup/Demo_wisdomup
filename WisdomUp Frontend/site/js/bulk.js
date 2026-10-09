@@ -30,7 +30,7 @@
   const form = $('bulk-form'), hint = $('bk-hint');
   const REQ = { name: v => v.trim(), phone: v => v.replace(/\D/g, '').length >= 10, email: v => /^\S+@\S+\.\S+$/.test(v.trim()), city: v => v.trim() };
   form.addEventListener('input', e => { const f = e.target.closest('.field'); if (f) f.classList.remove('is-bad'); hint.classList.remove('is-err'); hint.textContent = 'Inquiries go straight to our bulk desk.'; });
-  form.addEventListener('submit', e => {
+  form.addEventListener('submit', async e => {
     e.preventDefault();
     const bad = Object.keys(REQ).filter(k => !REQ[k](form.elements[k].value));
     Object.keys(REQ).forEach(k => {
@@ -43,9 +43,22 @@
       form.elements[bad[0]].focus();
       return;
     }
-    const interests = picked('interests');
-    $('bk-first').textContent = (form.elements.name.value.trim().split(' ')[0] || 'there') + '.';
-    $('bk-done-text').textContent = `Our bulk desk will message you on WhatsApp at ${form.elements.phone.value.trim()} within one working day with ${picked('types')[0].toLowerCase()} pricing for ${interests.length ? interests.join(', ').toLowerCase() : 'the full range'} (${picked('volumes')[0]} a month).`;
+    const interests = picked('interests'), v = n => form.elements[n].value.trim();
+    // Send to the shop's enquiry inbox; without it (the demo) hand over to WhatsApp with everything filled in (2026-10-10, the audit)
+    const go = form.querySelector('[type="submit"]');
+    go.disabled = true; go.classList.add('is-loading');
+    const fields = { name: v('name'), phone: v('phone'), email: v('email'), city: v('city'), store: v('store'), note: v('note'), type: picked('types')[0], interests: interests.join(', '), volume: picked('volumes')[0], website: form.elements.website ? form.elements.website.value : '' };
+    const r = await WU.lead.send('bulk', fields);
+    go.disabled = false; go.classList.remove('is-loading');
+    if (r.field && form.elements[r.field]) { form.elements[r.field].closest('.field').classList.add('is-bad'); hint.classList.add('is-err'); hint.textContent = r.error; form.elements[r.field].focus(); return; }
+    const first = v('name').split(' ')[0] || 'there', what = `${picked('types')[0].toLowerCase()} pricing for ${interests.length ? interests.join(', ').toLowerCase() : 'the full range'} (${picked('volumes')[0]} a month)`;
+    const wa = WU.lead.wa(WU.lead.text('Bulk order inquiry', [['Name', fields.name], ['I am a', fields.type], ['WhatsApp', fields.phone], ['Email', fields.email], ['City', fields.city], ['Business', fields.store], ['Interested in', fields.interests], ['Monthly quantity', fields.volume], ['Note', fields.note]]));
+    $('bk-done').querySelector('.badge-grad').textContent = r.ok ? 'Inquiry received' : 'One last step';
+    $('bk-done').querySelector('h2').innerHTML = `${r.ok ? 'Thanks' : 'Almost done'}, <b id="bk-first">${WU.esc(first)}.</b>`;
+    $('bk-done-text').textContent = r.ok
+      ? `Our bulk desk will message you on WhatsApp at ${fields.phone} within one working day with ${what}.`
+      : `Tap Send on WhatsApp — the message opens with your inquiry filled in. Our bulk desk replies within one working day with ${what}.`;
+    $('bk-wa').hidden = r.ok; $('bk-wa').href = wa;
     $('bk-fill').hidden = true;
     $('bk-done').hidden = false;
     WU.px('Lead', { content_name: 'Bulk order inquiry' }); // pixel: a wholesale lead (no personal details are sent)

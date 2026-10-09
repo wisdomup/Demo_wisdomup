@@ -73,9 +73,9 @@
       if (f) f.classList.remove('is-bad');
       if (hint) { hint.classList.remove('is-err'); hint.textContent = hintText; }
     });
-    form.addEventListener('submit', e => {
+    form.addEventListener('submit', async e => {
       e.preventDefault();
-      const fields = [...form.querySelectorAll('input, textarea')].filter(el => el.name);
+      const fields = [...form.querySelectorAll('input, textarea')].filter(el => el.name && el.name !== 'website');
       const bad = fields.filter(el => !valid(el));
       fields.forEach(el => { el.closest('.field')?.classList.toggle('is-bad', bad.includes(el)); el.setAttribute('aria-invalid', bad.includes(el)); });
       if (bad.length) {
@@ -91,9 +91,34 @@
         return p.length > 1 ? p.slice(0, -1).join(', ') + ' and ' + p[p.length - 1] : (p[0] || '');
       };
       const text = (form.dataset.success || '').replace(/\{(\w+)\}/g, (_, k) => k === 'first' ? (v('name').split(' ')[0] || 'there') : k in form.elements ? v(k) : list(k));
-      done.querySelector('[data-first]').textContent = (v('name').split(' ')[0] || 'there') + '.';
-      done.querySelector('[data-msg]').textContent = text;
+      // Send to the shop's enquiry inbox; without it (the demo) hand over to WhatsApp with everything filled in (2026-10-10, the audit)
+      const go = form.querySelector('[type="submit"]'), title = form.dataset.leadTitle || 'Website enquiry';
+      const data = {};
+      fields.forEach(el => { data[el.name] = el.value.trim(); });
+      form.querySelectorAll('.bk-chips[data-name]').forEach(box => { data[box.dataset.name] = picked(box.dataset.name).join(', '); });
+      data.website = form.elements.website ? form.elements.website.value : '';
+      go.disabled = true; go.classList.add('is-loading');
+      const r = await WU.lead.send(form.dataset.lead || 'help', data);
+      go.disabled = false; go.classList.remove('is-loading');
+      if (r.field && form.elements[r.field]) {
+        form.elements[r.field].closest('.field')?.classList.add('is-bad');
+        if (hint) { hint.classList.add('is-err'); hint.textContent = r.error; }
+        form.elements[r.field].focus();
+        return;
+      }
+      const labelOf = name => { const el = form.elements[name], lab = el && el.id && form.querySelector(`label[for="${el.id}"]`); const legend = form.querySelector(`.bk-chips[data-name="${name}"]`)?.closest('fieldset')?.querySelector('legend'); return ((lab || legend || {}).textContent || name).replace('*', '').trim(); };
+      const wa = WU.lead.wa(WU.lead.text(title, Object.keys(data).filter(k => k !== 'website').map(k => [labelOf(k), data[k]])));
+      const first = v('name').split(' ')[0] || 'there';
+      const badge = done.querySelector('.badge-grad');
+      if (!badge.dataset.ok) badge.dataset.ok = badge.textContent;
+      badge.textContent = r.ok ? badge.dataset.ok : 'One last step';
+      done.querySelector('h2').innerHTML = `${r.ok ? 'Thanks' : 'Almost done'}, <b data-first>${esc(first)}.</b>`;
+      done.querySelector('[data-msg]').textContent = r.ok ? text : 'Tap Send on WhatsApp — the message opens with everything you wrote filled in, and we reply within one working day.';
+      let link = done.querySelector('[data-wa]');
+      if (!link) { link = document.createElement('a'); link.className = 'btn-buy bk-wa'; link.target = '_blank'; link.rel = 'noopener'; link.dataset.wa = ''; link.innerHTML = (WU.wa ? WU.wa.svg : '') + '<span>Send on WhatsApp</span>'; done.querySelector('[data-reset]').before(link); }
+      link.hidden = r.ok; link.href = wa;
       fill.hidden = true; done.hidden = false;
+      WU.px('Lead', { content_name: title }); // pixel: an enquiry (no personal details are sent)
       scrollToEl(form, 0);
     });
     done.querySelector('[data-reset]').addEventListener('click', () => {

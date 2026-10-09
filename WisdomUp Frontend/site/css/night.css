@@ -685,3 +685,16 @@ html[data-theme="night"] .ckc.is-bar .ckc__box { box-shadow: inset 0 0 0 1.5px v
 html[data-theme="night"] .ckc__note p { color: var(--n-text2); }
 html[data-theme="night"] :is(.ckc__note b, .ckc__note a) { color: var(--n-text); }
 html[data-theme="night"] .ckc__note a:focus-visible { outline-color: #fff; }
+
+/* Floating WhatsApp, Order on WhatsApp, review tag (2026-10-10) */
+html[data-theme="night"] .wafab { background: rgba(26, 29, 33, .78); box-shadow: inset 0 0 0 1.5px var(--n-line2), 0 10px 28px rgba(0,0,0,.5); }
+html[data-theme="night"] .wafab:focus-visible { outline-color: #fff; }
+html[data-theme="night"] .pdp2__wa { box-shadow: inset 0 0 0 1.5px #fff; color: #fff; }
+html[data-theme="night"] .rv__wait { background: var(--n-raise); box-shadow: inset 0 0 0 1.5px var(--n-line2); color: var(--n-text2); }
+html[data-theme="night"] .series__off { background: var(--n-red-soft); color: var(--n-red-text); -webkit-text-fill-color: currentColor; }
+/* Home intro (2026-10-10) */
+html[data-theme="night"] .home-intro__h { color: var(--n-text); }
+html[data-theme="night"] .home-intro__list a { background: var(--n-raise); box-shadow: inset 0 0 0 1.5px var(--n-line2); color: var(--n-text); }
+html[data-theme="night"] .home-intro__list svg { stroke: #fff; }
+html[data-theme="night"] .home-intro__list .r { stroke: var(--n-red-text); }
+

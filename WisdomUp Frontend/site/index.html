@@ -39,27 +39,27 @@
 <link rel="icon" href="favicon.ico" sizes="32x32">
 <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
-<link rel="stylesheet" href="css/ds/tokens/fonts.css">
-<link rel="stylesheet" href="css/ds/tokens/colors.css">
-<link rel="stylesheet" href="css/ds/tokens/typography.css">
-<link rel="stylesheet" href="css/ds/tokens/spacing.css">
-<link rel="stylesheet" href="css/ds/tokens/base.css">
-<link rel="stylesheet" href="css/ds/styles/components.css">
-<link rel="stylesheet" href="css/wu-rail.css">
-<link rel="stylesheet" href="css/home.css">
-<link rel="stylesheet" href="css/pages.css">
-<link rel="stylesheet" href="css/info.css">
-<link rel="stylesheet" href="css/controls.css">
-<link rel="stylesheet" href="css/night.css">
-<link rel="stylesheet" href="css/night-home.css">
-<link rel="stylesheet" href="css/motion.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap">
+<link rel="preload" as="image" href="img/p/ts-11anc.jpg" fetchpriority="high"><!-- the first banner slide (D.lifestyle[0]) -->
+<link rel="stylesheet" href="css/ds/tokens/colors.css?v=90866fc5">
+<link rel="stylesheet" href="css/ds/tokens/typography.css?v=ed291863">
+<link rel="stylesheet" href="css/ds/tokens/spacing.css?v=2d88693b">
+<link rel="stylesheet" href="css/ds/tokens/base.css?v=8ea7591d">
+<link rel="stylesheet" href="css/ds/styles/components.css?v=0497221e">
+<link rel="stylesheet" href="css/wu-rail.css?v=7e14a6c3">
+<link rel="stylesheet" href="css/home.css?v=a495fab2">
+<link rel="stylesheet" href="css/pages.css?v=3b82ff86">
+<link rel="stylesheet" href="css/info.css?v=96e87232">
+<link rel="stylesheet" href="css/controls.css?v=a315d52e">
+<link rel="stylesheet" href="css/night.css?v=54be01c4">
+<link rel="stylesheet" href="css/night-home.css?v=406d4055">
+<link rel="stylesheet" href="css/motion.css?v=fa568ed2">
 </head>
 <body>
 <div class="page">
 
   <div class="wu-util"><nav class="utility" aria-label="Utility" id="utility"></nav></div>
   <header class="nav site-nav" id="site-nav"></header>
-  <h1 class="visually-hidden">WisdomUp Pakistan — wireless earbuds, power banks, chargers, handsfree, speakers and mobile accessories</h1>
 
   <!-- Quick chips + hero banner: SHARED by day and night (same banner, same position — 2026-10-06) -->
   <div class="hero-stack">
@@ -68,6 +68,18 @@
       <section class="hero" id="hero" aria-roledescription="carousel" aria-label="Featured launches"></section>
     </div>
   </div>
+
+  <!-- HOME INTRO (2026-10-10, from the audit "make the homepage H1 visible" + the phone's first screen had no message): the visible H1
+       and four promises, shared by day and night (night's own promise strip became this row) -->
+  <section class="home-intro" aria-labelledby="home-h1">
+    <h1 class="home-intro__h" id="home-h1">Earbuds, power banks, chargers &amp; more — delivered across Pakistan</h1>
+    <ul class="home-intro__list">
+      <li><a href="shipping.html#payment"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6.5" width="18" height="11" rx="2.5"/><circle class="r" cx="12" cy="12" r="2.4"/></svg>Cash on Delivery</a></li>
+      <li><a href="shipping.html#charges"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 7h11v9h-11zM13.5 10h4l3 3v3h-7"/><circle class="r" cx="7" cy="17.5" r="1.8"/><circle class="r" cx="17" cy="17.5" r="1.8"/></svg><span>Free delivery from <span data-free-from>Rs.10,000</span></span></a></li>
+      <li><a href="returns.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path class="r" d="M4 4v4h4"/></svg>7-day money-back</a></li>
+      <li><a href="warranty.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5.5c0 4.3-3 8-7 9.5-4-1.5-7-5.2-7-9.5V6z"/><path class="r" d="M9 12l2 2 4-4"/></svg>WisdomUp warranty</a></li>
+    </ul>
+  </section>
 
   <!-- DAY home page below the banner (hidden while the night theme is on; night renders its own layout into #night-home) -->
   <div id="day-home">
@@ -161,7 +173,7 @@
 
   <section class="pp" aria-labelledby="pp-h">
     <div class="pp__card">
-      <div class="pp__media"><img src="img/personalized-earbuds.jpg" alt="Two earbud charging cases personalised with printed names" loading="lazy"></div>
+      <div class="pp__media"><img src="img/p/ts-11anc.jpg" alt="WisdomUp TS-11ANC wireless earbuds with their charging case" loading="lazy" width="1000" height="709"></div>
       <div class="pp__copy">
         <h2 class="pp__h" id="pp-h">Personalized</h2>
         <div class="pp__sub">Product Printing</div>
@@ -274,13 +286,13 @@
   <div class="toast" id="toast" role="status" hidden></div>
 </div>
 
-<script src="js/catalog.js"></script>
-<script src="js/shop.js"></script>
-<script src="js/wu-data.js"></script>
-<script src="js/ds-icons.js"></script>
-<script src="js/common.js"></script>
-<script src="js/posts.js"></script>
-<script src="js/home.js"></script>
-<script src="js/night-home.js"></script>
+<script src="js/catalog.js?v=e0f706e7"></script>
+<script src="js/shop.js?v=7582d314"></script>
+<script src="js/wu-data.js?v=cdf27841"></script>
+<script src="js/ds-icons.js?v=ab37eba9"></script>
+<script src="js/common.js?v=7a44775d"></script>
+<script src="js/posts.js?v=5bc5e04c"></script>
+<script src="js/home.js?v=c9efb8fb"></script>
+<script src="js/night-home.js?v=079fb4d8"></script>
 </body>
 </html>

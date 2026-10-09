@@ -142,6 +142,7 @@
           <button type="button" class="pdp2__add" data-add${p.soldOut ? ' disabled' : ''}>${icon('cart', 20)}<span>${p.soldOut ? 'Sold out' : 'Add to cart'}</span></button>
           ${WU.wishBtn(p, 'pdp2__wish')}
         </div>
+        ${WU.SHOP.whatsapp && !p.soldOut ? `<a class="pdp2__wa" id="pd-wa" target="_blank" rel="noopener">${WU.wa ? WU.wa.svg : ''}<span>Order on WhatsApp</span></a>` : ''}
         ${WU.ref && WU.ref.me() && (WU.SHOP.creators || {}).on ? `<div class="pd-crlink"><span>${WU.ref.TAG}Creator <b>${esc(WU.ref.me().code)}</b> · your link to this product</span><button type="button" class="btn-outline" data-crlink>Copy link</button></div>` : ''}
         <label class="gift" style="cursor: pointer;"><input type="checkbox" id="gift" style="accent-color: var(--focus); width: 18px; height: 18px;"><span>Add gift wrapping @ <b>${esc(WU.D.rs(WU.SHOP.giftWrap))}</b></span></label>
         <div class="offer"><div class="offer__head">Free shipping on this order<span>%</span></div><div class="offer__body"><span id="offer-text"></span><a href="${url.shipping}" style="white-space: nowrap; margin-left: 12px;">Details ›</a></div></div>
@@ -214,6 +215,17 @@
     $('stage-img').src = src;
     document.querySelectorAll('#thumbs .thumb').forEach((t, i) => t.setAttribute('aria-current', images[i] === src));
   }
+  // ORDER ON WHATSAPP (2026-10-10, from the audit): the message names the product, option, quantity, price and link; the floating
+  // WhatsApp button carries the same message on this page
+  function paintWa() {
+    if (!WU.wa) return;
+    const v = V[cur], u = new URL(url.product(p.id), location.href);
+    if (V.length > 1) u.searchParams.set('sku', v.sku);
+    const opt = Object.values(v.attrs || {}).join(', ');
+    const msg = `Assalam o Alaikum WisdomUp, I'd like to order:\n${qty} × ${p.title}${opt ? ` (${opt})` : ''} — ${v.priceText} each\nModel ${v.sku}\n${u.href}`;
+    if ($('pd-wa')) $('pd-wa').href = WU.wa.link(msg);
+    WU.wa.set(msg);
+  }
   function setVariant(i, push = true) {
     if (i < 0 || (i === cur && push)) return;
     cur = i;
@@ -235,6 +247,7 @@
     showImage(v.img);
     paintSpecs();
     paintOffer();
+    paintWa();
     if (push && V.length > 1) history.replaceState(null, '', `${location.pathname}?id=${encodeURIComponent(p.id)}&sku=${encodeURIComponent(v.sku)}${location.hash}`);
   }
   document.querySelectorAll('.pdp2__opt[data-axis]').forEach(box => box.addEventListener('click', e => {
@@ -271,11 +284,13 @@
     qty = Math.min(10, Math.max(1, qty + +b.dataset.q));
     $('qty').textContent = qty;
     paintOffer();
+    paintWa();
   });
   document.addEventListener('click', e => {
     // Add to cart (the ONE main action since 2026-10-06 — "Buy Now" was removed): the chosen option and quantity go in and the
     // cart panel opens, with its Checkout button
     if (e.target.closest('[data-add]') && !p.soldOut) add(p.id, qty, V[cur].sku, { open: true });
+    if (e.target.closest('#pd-wa')) WU.px('Contact', { content_name: 'Order on WhatsApp', content_ids: [V[cur].sku] });
     // Creators signed in on this device: copy this product (and the chosen option) with their code
     if (e.target.closest('[data-crlink]')) {
       const u = new URL(url.product(p.id), location.href);
@@ -287,7 +302,8 @@
   $('gift').checked = WU.cart.gift();
   $('gift').addEventListener('change', e => { WU.cart.setGift(e.target.checked); toast(e.target.checked ? `Gift wrapping added (${WU.D.rs(WU.SHOP.giftWrap)})` : 'Gift wrapping removed'); });
 
-  /* ---------- Reviews (real ones only; stored on this device until the shared review database is connected) ---------- */
+  /* ---------- Reviews (real ones only): approved reviews from the shop's server for everyone, this device's own on top
+     ("awaiting approval"); on the demo (no database) they stay on this device ---------- */
   const R = WU.reviews, stars = WU.starsSvg;
   let rvSort = 'new', rvStar = 0, rvForm = false, rvPick = 0;
   const SORTERS = { new: (a, b) => b.createdAt.localeCompare(a.createdAt), high: (a, b) => b.rating - a.rating, low: (a, b) => a.rating - b.rating, helpful: (a, b) => b.helpful - a.helpful };
@@ -313,8 +329,8 @@
           <div class="field"><label for="rv-city">City</label><input id="rv-city" name="city" maxlength="40" autocomplete="address-level2" value="${esc(contact.city || '')}"></div>
         </div>
         ${R.verified(p.id) ? '<p class="rv__note rv__note--ok">You ordered this product — your review will show a <b>Verified buyer</b> badge.</p>' : ''}
-        <div class="rv__actions"><button type="submit" class="btn-navy">Post review</button><button type="button" class="btn-outline" data-rv-cancel>Cancel</button></div>
-        <p class="rv__note">Reviews are saved on this device for now. Reviews from every shopper will appear here once our review system goes live.</p>
+        <div class="rv__actions"><button type="submit" class="btn-navy" id="rv-go">Post review</button><button type="button" class="btn-outline" data-rv-cancel>Cancel</button></div>
+        <p class="rv__note">${R.live() ? 'Every review is read by our team before it appears — usually within a day. We never edit what you write.' : 'Reviews are saved on this device for now. Reviews from every shopper will appear here once our review system goes live.'}</p>
       </form>
       ${sum.count > 1 ? `<div class="rv__tools"><span>${rvStar ? `Showing ${rvStar}★ reviews · <button type="button" class="link-arrow" data-star="0">Show all</button>` : `${sum.count} reviews`}</span>
         <label class="rv__sort">Sort <select id="rv-sort">${[['new', 'Newest'], ['high', 'Highest rating'], ['low', 'Lowest rating'], ['helpful', 'Most helpful']].map(([k, l]) => `<option value="${k}"${k === rvSort ? ' selected' : ''}>${l}</option>`).join('')}</select></label></div>` : ''}
@@ -322,8 +338,8 @@
         <article class="rv__item">
           <header><span class="rv__stars" aria-label="${r.rating} out of 5">${stars(r.rating, 16)}</span>${r.title ? `<b>${esc(r.title)}</b>` : ''}</header>
           <p>${esc(r.text)}</p>
-          <footer><span>${esc(r.name)}${r.city ? ', ' + esc(r.city) : ''} · ${esc(new Date(r.createdAt).toLocaleDateString('en-PK', { day: 'numeric', month: 'short', year: 'numeric' }))}${r.verified ? ' · <i class="rv__ver">Verified buyer</i>' : ''}${r.sku && r.sku !== p.code ? ` · ${esc(r.sku)}` : ''}</span>
-            <button type="button" class="rv__help" data-help="${esc(r.id)}">Helpful${r.helpful ? ` (${r.helpful})` : ''}</button></footer>
+          <footer><span>${esc(r.name)}${r.city ? ', ' + esc(r.city) : ''} · ${esc(new Date(r.createdAt).toLocaleDateString('en-PK', { day: 'numeric', month: 'short', year: 'numeric' }))}${r.verified ? ' · <i class="rv__ver">Verified buyer</i>' : ''}${r.sku && r.sku !== p.code ? ` · ${esc(r.sku)}` : ''}${r.own && r.status === 'pending' ? ' · <i class="rv__wait">Awaiting approval — only you can see this</i>' : ''}</span>
+            ${r.own && r.status === 'pending' ? '' : `<button type="button" class="rv__help" data-help="${esc(r.id)}">Helpful${r.helpful ? ` (${r.helpful})` : ''}</button>`}</footer>
         </article>`).join('')}</div>`;
   }
   $('rv').addEventListener('click', e => {
@@ -338,7 +354,7 @@
     if (h) { if (R.helpful(p.id, h.dataset.help)) paintReviews(); else toast('You already marked this review helpful'); }
   });
   $('rv').addEventListener('change', e => { if (e.target.id === 'rv-sort') { rvSort = e.target.value; paintReviews(); } });
-  $('rv').addEventListener('submit', e => {
+  $('rv').addEventListener('submit', async e => {
     e.preventDefault();
     const f = e.target, v = n => f.elements[n].value.trim();
     const errs = [];
@@ -352,12 +368,24 @@
       (errs[0][0] === 'pick' ? f.querySelector('[data-pick]') : f.elements[errs[0][0]]).focus();
       return;
     }
-    R.add(p.id, { rating: rvPick, title: v('title'), text: v('text'), name: v('name'), city: v('city'), sku: V[cur].sku });
+    const go = $('rv-go');
+    go.disabled = true; go.classList.add('is-loading');
+    let status;
+    try { status = await R.add(p.id, { rating: rvPick, title: v('title'), text: v('text'), name: v('name'), city: v('city'), sku: V[cur].sku }); }
+    catch (err) {
+      go.disabled = false; go.classList.remove('is-loading');
+      const k = err.field === 'pick' ? 'pick' : (err.field && f.elements[err.field] ? err.field : null);
+      if (k) { const box = k === 'pick' ? f.querySelector('.rv__pick') : f.elements[k].closest('.field'); box.classList.add('is-bad'); box.insertAdjacentHTML('beforeend', `<span class="field__err">${esc(err.message)}</span>`); }
+      else toast(err.message || 'Your review could not be sent. Please try again.');
+      return;
+    }
     rvForm = false; rvPick = 0; rvStar = 0; rvSort = 'new';
     paintReviews();
-    toast('Thanks — your review is posted');
+    toast(status === 'pending' ? 'Thanks — your review will appear once our team has read it' : 'Thanks — your review is saved on this device');
   });
+  window.addEventListener('wu-reviews', e => { if (!rvForm && (!e.detail || e.detail.all || e.detail.pid === p.id)) paintReviews(); });
   paintReviews();
+  R.load(p.id);
 
   /* ---------- Tabs, accordion, related ---------- */
   mountAccordion($('pd-faq-list'), FAQS, { idPrefix: 'pdfaq' });

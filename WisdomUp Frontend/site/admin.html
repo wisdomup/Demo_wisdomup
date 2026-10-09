@@ -13,26 +13,26 @@
 <link rel="icon" href="favicon.ico" sizes="32x32">
 <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
-<link rel="stylesheet" href="css/ds/tokens/fonts.css">
-<link rel="stylesheet" href="css/ds/tokens/colors.css">
-<link rel="stylesheet" href="css/ds/tokens/typography.css">
-<link rel="stylesheet" href="css/ds/tokens/spacing.css">
-<link rel="stylesheet" href="css/ds/tokens/base.css">
-<link rel="stylesheet" href="css/ds/styles/components.css">
-<link rel="stylesheet" href="css/home.css">
-<link rel="stylesheet" href="css/pages.css">
-<link rel="stylesheet" href="css/info.css">
-<link rel="stylesheet" href="css/controls.css">
-<link rel="stylesheet" href="css/night.css">
-<link rel="stylesheet" href="css/motion.css">
-<link rel="stylesheet" href="css/admin.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap">
+<link rel="stylesheet" href="css/ds/tokens/colors.css?v=90866fc5">
+<link rel="stylesheet" href="css/ds/tokens/typography.css?v=ed291863">
+<link rel="stylesheet" href="css/ds/tokens/spacing.css?v=2d88693b">
+<link rel="stylesheet" href="css/ds/tokens/base.css?v=8ea7591d">
+<link rel="stylesheet" href="css/ds/styles/components.css?v=0497221e">
+<link rel="stylesheet" href="css/home.css?v=a495fab2">
+<link rel="stylesheet" href="css/pages.css?v=3b82ff86">
+<link rel="stylesheet" href="css/info.css?v=96e87232">
+<link rel="stylesheet" href="css/controls.css?v=a315d52e">
+<link rel="stylesheet" href="css/night.css?v=54be01c4">
+<link rel="stylesheet" href="css/motion.css?v=fa568ed2">
+<link rel="stylesheet" href="css/admin.css?v=e99b69b4">
 </head>
 <body>
 <div class="adm">
   <header class="adm__bar">
     <img src="img/wu-logo.png" alt="WisdomUp" height="30">
     <b id="adm-title">Orders</b>
-    <nav class="policy__links adm__views" id="adm-views" aria-label="Admin views" hidden><a href="#orders" data-view="orders" aria-current="true">Orders</a><a href="#creators" data-view="creators">Creators</a></nav>
+    <nav class="policy__links adm__views" id="adm-views" aria-label="Admin views" hidden><a href="#orders" data-view="orders" aria-current="true">Orders</a><a href="#leads" data-view="leads">Leads</a><a href="#reviews" data-view="reviews">Reviews</a><a href="#creators" data-view="creators">Creators</a></nav>
     <span class="adm__sp"></span>
     <button type="button" class="btn-outline" id="adm-refresh" hidden>Refresh</button>
     <button type="button" class="btn-outline" id="adm-out" hidden>Sign out</button>
@@ -40,7 +40,7 @@
 
   <form class="adm__login" id="adm-login">
     <h1>Shop admin</h1>
-    <p>Enter the admin key to see orders and creators. It is kept for this browser tab only.</p>
+    <p>Enter the admin key to see orders, enquiries, reviews and creators. It is kept for this browser tab only.</p>
     <div class="field"><label for="adm-key">Admin key</label><input id="adm-key" type="password" autocomplete="current-password" required></div>
     <button type="submit" class="btn-navy">Show orders</button>
     <p class="adm__err" id="adm-err" role="alert" hidden></p>
@@ -55,6 +55,19 @@
       </div>
       <div class="adm__list" id="adm-list" aria-live="polite"></div>
     </section>
+    <section id="adm-leads" hidden>
+      <div class="adm__stats" id="adm-lstats"></div>
+      <div class="adm__tools">
+        <div class="policy__links" id="adm-lfilter" role="group" aria-label="Filter enquiries"></div>
+        <label class="hsearch adm__search"><input type="search" id="adm-lq" placeholder="Search name, phone, email, city or message" aria-label="Search enquiries"></label>
+      </div>
+      <div class="adm__list" id="adm-llist" aria-live="polite"></div>
+    </section>
+    <section id="adm-reviews" hidden>
+      <div class="adm__stats" id="adm-rstats"></div>
+      <p class="adm__prog">Reviews appear on the site only after you approve them. Approve honest reviews good or bad — reject spam, abuse, personal details or reviews of a different product.</p>
+      <div class="adm__list" id="adm-rlist" aria-live="polite"></div>
+    </section>
     <section id="adm-creators" hidden>
       <div class="adm__stats" id="adm-cstats"></div>
       <p class="adm__prog" id="adm-prog"></p>
@@ -67,7 +80,7 @@
   </main>
   <div class="toast" id="toast" role="status" hidden></div>
 </div>
-<script src="js/shop.js"></script>
-<script src="js/admin.js"></script>
+<script src="js/shop.js?v=7582d314"></script>
+<script src="js/admin.js?v=42c7606c"></script>
 </body>
 </html>

@@ -66,3 +66,13 @@ body { background: #F4F5F7; }
 .adm__newkey code { font: 700 13px/1 ui-monospace, Menlo, monospace; color: #111; }
 .adm__newkey a { margin-left: 6px; font-weight: 700; color: #111; }
 .adm__newkey small { display: block; color: var(--muted); }
+/* Leads + Reviews views (2026-10-10) */
+.adm__h2 { margin: 18px 0 4px; font: 700 16px/1.2 var(--font); color: #111; }
+.adm__muted { color: #767B83 !important; font-size: 12px !important; }
+.adm__stars { color: #E2A92C; letter-spacing: 1px; font-size: 14px; }
+.adm__rvbody { display: flex; flex-direction: column; gap: 6px; padding: 4px 0 12px; }
+.adm__rvbody b { font: 700 15px/1.3 var(--font); color: #111; }
+.adm__rvbody p { margin: 0; font: 400 14px/1.6 var(--font); color: #3D3F44; max-width: 70ch; }
+html[data-theme="night"] .adm__h2, html[data-theme="night"] .adm__rvbody b { color: var(--n-text); }
+html[data-theme="night"] .adm__rvbody p { color: var(--n-text2); }
+

@@ -280,11 +280,11 @@ a.feat__slide:hover { color: #111; }
 .wpc__row { display: flex; align-items: center; justify-content: space-between; gap: 2.791cqw; }
 .wpc__head { display: flex; flex-direction: column; gap: 1.395cqw; }
 .wpc__title { cursor: pointer; margin: 0; font: 600 max(14px, 4.186cqw)/1.25 var(--font); letter-spacing: -.005em; color: #1F2328; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
-.wpc__model { display: flex; align-items: center; gap: 1.628cqw; min-width: 0; font: 500 max(11px, 2.977cqw)/1.2 var(--font); letter-spacing: .02em; color: #8A8F98; white-space: nowrap; }
+.wpc__model { display: flex; align-items: center; gap: 1.628cqw; min-width: 0; font: 500 max(12px, 2.977cqw)/1.2 var(--font); letter-spacing: .02em; color: #767B83; white-space: nowrap; }
 .wpc__code { flex: none; font-weight: 600; color: #5A6170; }
 .wpc__cat { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .wpc__model i { flex: none; width: 3px; height: 3px; border-radius: 999px; background: currentColor; opacity: .6; }
-.wpc__rating { display: flex; align-items: center; gap: 1.163cqw; font: 600 max(11px, 3.023cqw)/1 var(--font); color: #2B2B2B; white-space: nowrap; }
+.wpc__rating { display: flex; align-items: center; gap: 1.163cqw; font: 600 max(12px, 3.023cqw)/1 var(--font); color: #2B2B2B; white-space: nowrap; }
 .wpc__model .wpc__rating { flex: none; margin-left: auto; padding-left: 2.326cqw; letter-spacing: 0; }
 .wpc__rating svg { display: block; width: max(13px, 3.488cqw); height: max(13px, 3.488cqw); }
 .wpc__rating small { font-size: inherit; font-weight: 400; color: #5A5A5A; }
@@ -301,7 +301,7 @@ a.feat__slide:hover { color: #111; }
 .wpc__optchip { height: max(24px, 6.512cqw); padding: 0 2.326cqw; border: 0; border-radius: 999px; background: transparent; box-shadow: inset 0 0 0 1.5px #D9DCE1; font: 500 max(11px, 2.977cqw)/1 var(--font); color: #5A6170; white-space: nowrap; cursor: pointer; transition: box-shadow var(--m-primary, 500ms), color var(--m-primary, 500ms); }
 .wpc__optchip[aria-checked="true"] { box-shadow: inset 0 0 0 1.5px #0B0B0B; color: #0B0B0B; font-weight: 600; }
 .wpc__optmore { font: 500 max(11px, 2.977cqw)/1 var(--font); color: #767B83; }
-.wpc__opts { display: none; font: 600 max(10px, 2.791cqw)/1 var(--font); color: #5A6170; white-space: nowrap; }
+.wpc__opts { display: none; font: 600 max(11px, 2.791cqw)/1 var(--font); color: #5A6170; white-space: nowrap; }
 /* spec trio (products without options): bold value over a tiny label, hairline separators */
 .wpc__specs { display: flex; align-items: stretch; min-width: 0; margin: 0; }
 .wpc__specs > div { display: flex; flex-direction: column-reverse; justify-content: center; gap: .698cqw; min-width: 0; padding: 0 2.558cqw; border-left: 1.5px solid #E6E7EA; }
@@ -312,8 +312,8 @@ a.feat__slide:hover { color: #111; }
 .wpc__prices { display: flex; flex-wrap: wrap; align-items: baseline; gap: 1.163cqw 2.326cqw; min-width: 0; margin-top: auto; padding-top: 1.163cqw; } /* margin-top: auto = the row's spare height sits above the price + CTA */
 .wpc__price { display: inline-flex; align-items: baseline; gap: 1.395cqw; font: 700 max(17px, 5.581cqw)/1 var(--font); letter-spacing: -.01em; color: #0B0B0B; white-space: nowrap; }
 .wpc__price small { font: 600 max(9px, 2.558cqw)/1 var(--font); letter-spacing: .06em; text-transform: uppercase; color: #8A8F98; }
-.wpc__was { font: 400 max(11px, 3.256cqw)/1 var(--font); color: #767B83; text-decoration: line-through; text-decoration-thickness: 1px; white-space: nowrap; }
-.wpc__off { align-self: center; padding: .93cqw 1.86cqw; border-radius: 999px; background: #FDECEA; font: 700 max(10px, 2.791cqw)/1 var(--font); color: #D91E05; white-space: nowrap; }
+.wpc__was { font: 400 max(12px, 3.256cqw)/1 var(--font); color: #767B83; text-decoration: line-through; text-decoration-thickness: 1px; white-space: nowrap; }
+.wpc__off { align-self: center; padding: .93cqw 1.86cqw; border-radius: 999px; background: #FDECEA; font: 700 max(11px, 2.791cqw)/1 var(--font); color: #D91E05; white-space: nowrap; } /* phone floors 12 / 11px (2026-10-10, the audit: 10–11px was too small) */
 /* CTA: a full-width capsule — ink in day, the night red in night; the site-wide liquid fill is its only hover */
 .wpc__foot { display: flex; }
 a.wpc__cta, a.wpc__cta:hover { color: #fff; text-decoration: none; }
@@ -1094,3 +1094,45 @@ body:has(.buybar.is-on) .totop { bottom: calc(96px + env(safe-area-inset-bottom)
   .ckc.is-bar .ckc__box { border-radius: 16px; box-shadow: inset 0 0 0 1.5px #E3E4E6, 0 12px 36px rgba(0,0,0,.2); }
   .ckc__note { padding: 14px 16px; }
 }
+
+/* FLOATING WHATSAPP (2026-10-10, from the audit "WhatsApp is hard to find"): bottom-right on every page in the back-to-top's smoked
+   glass (no green — the day colour rule); a 48px circle, a "Chat on WhatsApp" capsule from 1024px; rides above the copyright band
+   (--totop-lift) and the product buy bar; out of the way while the cookie card is up (same corner). */
+.wafab { position: fixed; right: max(16px, env(safe-area-inset-right)); bottom: calc(20px + env(safe-area-inset-bottom) + var(--totop-lift, 0px)); z-index: 32; display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-width: 48px; height: 48px; padding: 0 12px; border-radius: 999px; background: rgba(22, 18, 17, .64); -webkit-backdrop-filter: blur(20px) saturate(140%); backdrop-filter: blur(20px) saturate(140%); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.16), 0 10px 28px rgba(0,0,0,.22); color: #fff; font: 600 14px/1 var(--font); letter-spacing: .01em; text-decoration: none; transition: opacity 300ms ease, transform 500ms cubic-bezier(.3,1,.3,1); }
+.wafab svg { flex: none; width: 24px; height: 24px; }
+.wafab span { display: none; }
+.wafab:focus-visible { outline: 2px solid #0B0B0B; outline-offset: 3px; }
+@media (min-width: 1024px) { .wafab { padding: 0 18px 0 14px; } .wafab span { display: inline; } }
+body:has(.buybar.is-on) .wafab { bottom: calc(96px + env(safe-area-inset-bottom) + var(--totop-lift, 0px)); }
+body:has(.ckc.is-bar:not([hidden])) .wafab { opacity: 0; pointer-events: none; transform: translateY(12px); }
+@media print { .wafab { display: none; } }
+/* TS spotlight + promo cards (2026-10-10, from the audit): the discount is a soft red "‹n›% off" capsule (it printed a bare "14" in
+   ink), the model code never breaks ("TS- / 11ANC"); promo cards keep their copy clear of the photo and show name + price */
+.series__code { white-space: nowrap; font-size: clamp(40px, 6vw, 80px); }
+.series__off { display: inline-flex; align-items: center; height: 24px; padding: 0 9px; border-radius: 999px; background: rgba(217,30,5,.1); -webkit-background-clip: border-box; background-clip: border-box; color: #B81A04; font: 700 12px/1 var(--font); }
+.series__off:empty { display: none; }
+.promo__inner { position: relative; z-index: 1; padding-right: 42%; }
+.promo__name { white-space: nowrap; }
+.promo__meta { display: flex; flex-direction: column; gap: 6px; margin: -4px 0 14px; }
+.promo__title { font: 600 14px/1.3 var(--font); color: rgba(255,255,255,.86); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.promo__price { font: 700 18px/1 var(--font); color: #fff; }
+/* NAV LABELS (2026-10-10): the icon's name in a small smoked-glass capsule under the nav on hover / keyboard focus */
+.navtip { position: fixed; z-index: 60; transform: translate(-50%, -4px); padding: 0 10px; height: 26px; display: flex; align-items: center; border-radius: 999px; background: rgba(22, 18, 17, .86); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.12), 0 6px 18px rgba(0,0,0,.18); color: #fff; font: 600 12px/1 var(--font); letter-spacing: .01em; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 200ms ease, transform 300ms cubic-bezier(.3,1,.3,1); }
+.navtip.is-on { opacity: 1; transform: translate(-50%, 0); }
+.navtip[hidden] { display: none; }
+@media (prefers-reduced-motion: reduce) { .navtip { transition: none; } }
+/* the white logo keeps its edge over light banners (the audit: "the logo is faint on the grey pill") */
+.site-nav img { filter: drop-shadow(0 1px 1.5px rgba(0,0,0,.35)); }
+/* HOME INTRO (2026-10-10): the visible H1 + four promise capsules under the banner, both themes (night.css recolours) */
+.home-intro { margin: 20px var(--gutter, 28px) 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; }
+.home-intro__h { margin: 0; font: 700 clamp(17px, 1.5vw, 21px)/1.3 var(--font); letter-spacing: -.01em; color: #111; text-wrap: balance; }
+.home-intro__list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.home-intro__list a { display: inline-flex; align-items: center; gap: 8px; height: var(--chip, 32px); padding: 0 13px 0 11px; border-radius: 999px; background: #F5F6F8; box-shadow: inset 0 0 0 1.5px #E3E4E6; font: 600 12px/1 var(--font); color: #111; text-decoration: none; white-space: nowrap; }
+.home-intro__list svg { flex: none; width: 16px; height: 16px; fill: none; stroke: #111; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.home-intro__list .r { stroke: #D91E05; }
+@media (max-width: 639px) {
+  .home-intro { margin-top: 14px; gap: 10px; }
+  .home-intro__list { gap: 6px; }
+  .home-intro__list a { height: 30px; padding: 0 11px 0 9px; font-size: 11.5px; }
+}
+

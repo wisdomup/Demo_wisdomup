@@ -282,6 +282,10 @@ def main():
                     os.remove(fp)
     size = sum(r[4] for r in results)
     print(f'Done: {len(results)} pages in {time.time() - t0:.0f}s, {size / 1e6:.1f} MB in site/_pre/')
+    # CSS/JS version stamps on every page, the snapshots included (tools/build_assets.py; vercel.json caches stamped files for a year)
+    import importlib.util
+    spec = importlib.util.spec_from_file_location('build_assets', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'build_assets.py'))
+    ba = importlib.util.module_from_spec(spec); spec.loader.exec_module(ba); ba.main()
     for p in problems:
         print('  ! ' + p)
     if problems:

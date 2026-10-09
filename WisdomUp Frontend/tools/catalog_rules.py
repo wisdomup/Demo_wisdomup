@@ -75,7 +75,9 @@ NAME_TYPE = {
     '鼠标': 'mice', '鼠标垫': 'mouse-pads', '内存卡': 'memory-cards', 'USB': 'usb-drives', '读卡器': 'card-readers',
     '剃须刀': 'shavers', '理发器': 'clippers',
 }
-CODE_TYPE = {'YP-08': 'audio-cables', 'YP-12': 'audio-cables'}
+CODE_TYPE = {'YP-08': 'audio-cables', 'YP-12': 'audio-cables',
+             # 3.5mm AUX cables the sheet lists as audio adapters (2026-10-10, the audit: YP-15 sat under Adapters & OTG)
+             'YP-14': 'audio-cables', 'YP-15': 'audio-cables', 'YP-16': 'audio-cables', 'YP-17': 'audio-cables'}
 
 # Not sold in Pakistan: US and Argentina plug chargers. Rows without a price are skipped too.
 SKIP_NAMES = {'充电器套装(美规)', '充电头(美规)', '充电器（阿根廷规）'}

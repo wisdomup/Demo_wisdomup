@@ -36,19 +36,19 @@
 <link rel="icon" href="favicon.ico" sizes="32x32">
 <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
-<link rel="stylesheet" href="css/ds/tokens/fonts.css">
-<link rel="stylesheet" href="css/ds/tokens/colors.css">
-<link rel="stylesheet" href="css/ds/tokens/typography.css">
-<link rel="stylesheet" href="css/ds/tokens/spacing.css">
-<link rel="stylesheet" href="css/ds/tokens/base.css">
-<link rel="stylesheet" href="css/ds/styles/components.css">
-<link rel="stylesheet" href="css/wu-rail.css">
-<link rel="stylesheet" href="css/home.css">
-<link rel="stylesheet" href="css/pages.css">
-<link rel="stylesheet" href="css/info.css">
-<link rel="stylesheet" href="css/controls.css">
-<link rel="stylesheet" href="css/night.css">
-<link rel="stylesheet" href="css/motion.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap">
+<link rel="stylesheet" href="css/ds/tokens/colors.css?v=90866fc5">
+<link rel="stylesheet" href="css/ds/tokens/typography.css?v=ed291863">
+<link rel="stylesheet" href="css/ds/tokens/spacing.css?v=2d88693b">
+<link rel="stylesheet" href="css/ds/tokens/base.css?v=8ea7591d">
+<link rel="stylesheet" href="css/ds/styles/components.css?v=0497221e">
+<link rel="stylesheet" href="css/wu-rail.css?v=7e14a6c3">
+<link rel="stylesheet" href="css/home.css?v=a495fab2">
+<link rel="stylesheet" href="css/pages.css?v=3b82ff86">
+<link rel="stylesheet" href="css/info.css?v=96e87232">
+<link rel="stylesheet" href="css/controls.css?v=a315d52e">
+<link rel="stylesheet" href="css/night.css?v=54be01c4">
+<link rel="stylesheet" href="css/motion.css?v=fa568ed2">
 </head>
 <body>
 <div class="page page--product">
@@ -92,6 +92,7 @@
           <button type="button" class="pdp2__add" data-add=""><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="flex: none;"><g fill="currentColor"><path d="M2 3.5h3l2.6 11.2h10.6L21 7H7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="9.5" cy="19.5" r="1.7"></circle><circle cx="17" cy="19.5" r="1.7"></circle></g></svg><span>Add to cart</span></button>
           <button type="button" class="pdp2__wish" data-wish="sjx-45" aria-pressed="false" aria-label="Save SJX-45 Fast Charging Cable with LED to wishlist"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 20.2l-1.3-1.2C6.1 14.9 3.2 12.3 3.2 9a4.6 4.6 0 0 1 4.7-4.7c1.6 0 3.1.7 4.1 1.9a5.4 5.4 0 0 1 4.1-1.9A4.6 4.6 0 0 1 20.8 9c0 3.3-2.9 5.9-7.5 10z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path></svg></button>
         </div>
+        <a class="pdp2__wa" id="pd-wa" target="_blank" rel="noopener" href="https://wa.me/923279800153?text=Assalam%20o%20Alaikum%20WisdomUp%2C%20I'd%20like%20to%20order%3A%0A1%20%C3%97%20SJX-45%20Fast%20Charging%20Cable%20with%20LED%20(USB-A%20to%20USB-C)%20%E2%80%94%20Rs.1%2C050%20each%0AModel%20SJX-45T%0Ahttp%3A%2F%2F127.0.0.1%3A8765%2Fsite%2Fproduct.html%3Fid%3Dsjx-45%26sku%3DSJX-45T"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.2a9.8 9.8 0 0 0-8.4 14.8L2.3 21.8l4.9-1.3A9.8 9.8 0 1 0 12 2.2zm0 17.8c-1.5 0-3-.4-4.2-1.2l-.3-.2-2.9.8.8-2.8-.2-.3A8 8 0 1 1 12 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8-.2-.1-.4-.1-.5.1l-.8 1c-.1.2-.3.2-.5.1a6.6 6.6 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 0 0-.7.3 2.8 2.8 0 0 0-.9 2.1 4.9 4.9 0 0 0 1 2.6 11.2 11.2 0 0 0 4.3 3.8c1.6.7 2.2.8 3 .6.5-.1 1.4-.6 1.6-1.1.2-.6.2-1 .1-1.1l-.5-.3z"></path></svg><span>Order on WhatsApp</span></a>
         
         <label class="gift" style="cursor: pointer;"><input type="checkbox" id="gift" style="accent-color: var(--focus); width: 18px; height: 18px;"><span>Add gift wrapping @ <b>Rs.490</b></span></label>
         <div class="offer"><div class="offer__head">Free shipping on this order<span>%</span></div><div class="offer__body"><span id="offer-text">Orders above Rs.10,000 ship free nationwide. Add Rs.8,950 more to qualify.</span><a href="shipping.html" style="white-space: nowrap; margin-left: 12px;">Details ›</a></div></div>
@@ -137,8 +138,8 @@
           <div class="field"><label for="rv-city">City</label><input id="rv-city" name="city" maxlength="40" autocomplete="address-level2" value=""></div>
         </div>
         
-        <div class="rv__actions"><button type="submit" class="btn-navy">Post review</button><button type="button" class="btn-outline" data-rv-cancel="">Cancel</button></div>
-        <p class="rv__note">Reviews are saved on this device for now. Reviews from every shopper will appear here once our review system goes live.</p>
+        <div class="rv__actions"><button type="submit" class="btn-navy" id="rv-go">Post review</button><button type="button" class="btn-outline" data-rv-cancel="">Cancel</button></div>
+        <p class="rv__note">Every review is read by our team before it appears — usually within a day. We never edit what you write.</p>
       </form>
       
       <div class="rv__list"></div></div>
@@ -369,7 +370,7 @@
             </div>
           </div>
           <div class="footer__grid">
-            <div class="ft__group"><h4><button type="button" class="ft__q" aria-expanded="true" aria-controls="ft-g0" tabindex="-1"><span>Products</span><span class="ft__chev"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" style="flex: none;"><path d="M9 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></button></h4><div class="ft__links" id="ft-g0"><a href="products.html">All Items</a><a href="products.html?dept=audio">Audio</a><a href="products.html?dept=charging">Charging</a><a href="products.html?dept=cables">Cables &amp; Adapters</a><a href="products.html?dept=car">Car Accessories</a><a href="products.html?dept=computer">Computer</a><a href="products.html?dept=care">Personal Care</a></div></div><div class="ft__group"><h4><button type="button" class="ft__q" aria-expanded="true" aria-controls="ft-g1" tabindex="-1"><span>Explore</span><span class="ft__chev"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" style="flex: none;"><path d="M9 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></button></h4><div class="ft__links" id="ft-g1"><a href="bulk-order.html">Bulk Order</a><a href="corporate.html">Corporate Order</a><a href="creators.html">Content Creators Program</a><a href="affiliate.html">Affiliate Program</a><a href="live.html">Live Shopping</a><a href="about.html">About Us</a><a href="where-to-buy.html">Where to Buy</a><a href="blog.html">Blog</a></div></div><div class="ft__group"><h4><button type="button" class="ft__q" aria-expanded="true" aria-controls="ft-g2" tabindex="-1"><span>Support</span><span class="ft__chev"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" style="flex: none;"><path d="M9 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></button></h4><div class="ft__links" id="ft-g2"><a href="help.html">Smart Help Center</a><a href="track.html">Order Tracker</a><a href="returns.html">Exchange &amp; Refund Policy</a><a href="warranty.html">Warranty Policy</a><a href="shipping.html">Shipping Policy</a><a href="manuals.html">Download e-Manual</a></div></div><div class="ft__group"><h4><button type="button" class="ft__q" aria-expanded="true" aria-controls="ft-g3" tabindex="-1"><span>Contact</span><span class="ft__chev"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" style="flex: none;"><path d="M9 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></button></h4><div class="ft__links" id="ft-g3"><a href="help.html">We’re here to help ›</a><a href="mailto:support@wisdomup.pk">support@wisdomup.pk</a><a href="tel:+923279800153">+92 327 9800153</a><a href="#cookie-preferences">Cookie preferences</a></div></div>
+            <div class="ft__group"><h4><button type="button" class="ft__q" aria-expanded="true" aria-controls="ft-g0" tabindex="-1"><span>Products</span><span class="ft__chev"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" style="flex: none;"><path d="M9 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></button></h4><div class="ft__links" id="ft-g0"><a href="products.html">All Items</a><a href="products.html?dept=audio">Audio</a><a href="products.html?dept=charging">Charging</a><a href="products.html?dept=cables">Cables &amp; Adapters</a><a href="products.html?dept=car">Car Accessories</a><a href="products.html?dept=computer">Computer</a><a href="products.html?dept=care">Personal Care</a></div></div><div class="ft__group"><h4><button type="button" class="ft__q" aria-expanded="true" aria-controls="ft-g1" tabindex="-1"><span>Explore</span><span class="ft__chev"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" style="flex: none;"><path d="M9 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></button></h4><div class="ft__links" id="ft-g1"><a href="bulk-order.html">Bulk Order</a><a href="corporate.html">Corporate Order</a><a href="creators.html">Content Creators Program</a><a href="affiliate.html">Affiliate Program</a><a href="live.html">Live Shopping</a><a href="about.html">About Us</a><a href="where-to-buy.html">Where to Buy</a><a href="blog.html">Blog</a></div></div><div class="ft__group"><h4><button type="button" class="ft__q" aria-expanded="true" aria-controls="ft-g2" tabindex="-1"><span>Support</span><span class="ft__chev"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" style="flex: none;"><path d="M9 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></button></h4><div class="ft__links" id="ft-g2"><a href="help.html">Smart Help Center</a><a href="track.html">Order Tracker</a><a href="returns.html">Exchange &amp; Refund Policy</a><a href="warranty.html">Warranty Policy</a><a href="shipping.html">Shipping Policy</a><a href="manuals.html">Download e-Manual</a><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a></div></div><div class="ft__group"><h4><button type="button" class="ft__q" aria-expanded="true" aria-controls="ft-g3" tabindex="-1"><span>Contact</span><span class="ft__chev"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" style="flex: none;"><path d="M9 4l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></button></h4><div class="ft__links" id="ft-g3"><a href="help.html">We’re here to help ›</a><a href="mailto:support@wisdomup.pk">support@wisdomup.pk</a><a href="tel:+923279800153">+92 327 9800153</a><a href="#cookie-preferences">Cookie preferences</a></div></div>
           </div>
         </footer>
         <div class="subfooter">
@@ -397,12 +398,12 @@
   <div class="toast toast--top" id="toast" role="status" hidden=""></div>
 </div>
 
-<script src="js/catalog.js"></script>
-<script src="js/shop.js"></script>
-<script src="js/wu-data.js"></script>
-<script src="js/ds-icons.js"></script>
-<script src="js/common.js"></script>
-<script src="js/product.js"></script>
+<script src="js/catalog.js?v=e0f706e7"></script>
+<script src="js/shop.js?v=7582d314"></script>
+<script src="js/wu-data.js?v=cdf27841"></script>
+<script src="js/ds-icons.js?v=ab37eba9"></script>
+<script src="js/common.js?v=7a44775d"></script>
+<script src="js/product.js?v=062aac05"></script>
 
 </body>
 </html>

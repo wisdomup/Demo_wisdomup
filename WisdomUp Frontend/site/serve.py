@@ -55,6 +55,7 @@ class NoCacheHandler(http.server.SimpleHTTPRequestHandler):
             return False
         n = int(self.headers.get('Content-Length') or 0)
         status, payload = orders.handle(method, query, self.headers, self.rfile.read(n) if n else b'')
+        payload.pop('_cache', None) if isinstance(payload, dict) else None  # the CDN cache hint is for Vercel only
         out = orders.json.dumps(payload, ensure_ascii=False).encode()
         self.send_response(status)
         self.send_header('Content-Type', 'application/json; charset=utf-8')

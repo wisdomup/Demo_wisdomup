@@ -1,4 +1,2 @@
-/* ONE family: Inter, every weight 100-900 (2026-10-09, copied from f1store.formula1.com, which uses Inter for headings, body,
-   nav, buttons and prices and nothing else; it self-hosts nine static weights, we load the same range as the variable font).
-   Michroma (the old display face for numbers and codes) is gone. Source specifies Google Fonts; no binaries were supplied. */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");
+/* Inter — every weight 100–900 (the F1 store's one family, 2026-10-09). Since 2026-10-10 each page links the Google Fonts stylesheet
+   directly in its <head> (with preconnects), instead of this file @importing it — one round trip less before text can paint. */
