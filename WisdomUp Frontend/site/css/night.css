@@ -687,7 +687,7 @@ html[data-theme="night"] :is(.ckc__note b, .ckc__note a) { color: var(--n-text);
 html[data-theme="night"] .ckc__note a:focus-visible { outline-color: #fff; }
 
 /* Floating WhatsApp, Order on WhatsApp, review tag (2026-10-10) */
-html[data-theme="night"] .wafab { background: rgba(26, 29, 33, .78); box-shadow: inset 0 0 0 1.5px var(--n-line2), 0 10px 28px rgba(0,0,0,.5); }
+html[data-theme="night"] .wafab { background: var(--n-text); color: #0B0B0B; box-shadow: 0 0 0 1.5px var(--n-bg); } /* the night secondary pill: white, ink type; its edge = the stage colour, seen only over light photos */
 html[data-theme="night"] .wafab:focus-visible { outline-color: #fff; }
 html[data-theme="night"] .pdp2__wa { box-shadow: inset 0 0 0 1.5px #fff; color: #fff; }
 html[data-theme="night"] .rv__wait { background: var(--n-raise); box-shadow: inset 0 0 0 1.5px var(--n-line2); color: var(--n-text2); }
