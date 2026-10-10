@@ -21,7 +21,7 @@ window.WU_STORE = (function () {
   // Hero slides: flagship products with studio photos (copy pulls live price/specs from the catalogue)
   const HERO = [
     ['ts-11anc', 'New · Noise-cancelling earbuds', 'Silence, on demand.', { wide: 'img/hero/ts-11anc-wide.webp', tall: 'img/hero/ts-11anc-tall.webp', bg: ['#3A0905', '#0A0606'], at: '72% 20%' }],
-    ['yx-28', 'Party speaker · RGB light show', 'Bring the venue home.'],
+    ['tde-18', 'Noise-cancelling headphones', 'Your world, on mute.', { wide: 'img/hero/tde-18-wide.webp', tall: 'img/hero/tde-18-tall.webp', bg: ['#B81A04', '#3A0503'], at: '85% 30%', atTall: '52% 50%', tallSize: [1086, 1448] }], // replaced YX-28 (2026-10-11)
     ['os-6', 'New · Open-ear earbuds', 'Hear the city. Keep the music.', { wide: 'img/hero/os-6-wide.webp', tall: 'img/hero/os-6-tall.webp', bg: ['#3A0A08', '#0A0707'], at: '82% 10%', atTall: '50% 42%' }],
     // OS-4 is NOT in the catalogue (not in the supplier sheets) — the owner's call (2026-10-10, "just add the slide with earbuds filter
     // link"): an art-only slide whose link is the Earbuds category (`href`) instead of a product page; `label` names it for screen readers
