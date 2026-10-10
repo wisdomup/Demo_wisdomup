@@ -143,6 +143,9 @@ button { font-family: inherit; }
    file (≈60–84% across), centred in the portrait one — never the packshot crop (6% 50%) the catalogue photos use. */
 .hero__fimg--art, .hero__fimg.hero__fimg--art { object-position: var(--art-at, 72% 50%); } /* per slide: `at` in wu-data.js HERO */
 @media (max-width: 639px) { .hero__fimg.hero__fimg--art { object-position: var(--art-at-tall, 50% 42%); } } /* the portrait file (see <picture>) */
+/* art whose product touches the top edge (`below: true` in HERO — TXD-01): on the landscape file the image starts under the nav and
+   fades in from the slide's backdrop, so the product never sits behind the nav's glass; phones use the portrait file as it is */
+@media (min-width: 640px) { .hero__fimg.hero__fimg--below { top: 64px; height: calc(100% - 64px); -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 56px); mask-image: linear-gradient(to bottom, transparent 0, #000 56px); } }
 .hero__full:focus-visible { outline: 2px solid #fff; outline-offset: -6px; }
 .hero.is-light .hero__bar { border-top-color: rgba(11, 11, 11, .16); }
 .hero.is-light .hero__bar .hero__arrow, .hero.is-light .dot { color: #0B0B0B; }
