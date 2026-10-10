@@ -48,11 +48,11 @@
 <link rel="stylesheet" href="css/ds/tokens/base.css?v=8ea7591d">
 <link rel="stylesheet" href="css/ds/styles/components.css?v=0497221e">
 <link rel="stylesheet" href="css/wu-rail.css?v=7e14a6c3">
-<link rel="stylesheet" href="css/home.css?v=a495fab2">
+<link rel="stylesheet" href="css/home.css?v=b7afd6ca">
 <link rel="stylesheet" href="css/pages.css?v=3b82ff86">
 <link rel="stylesheet" href="css/info.css?v=96e87232">
 <link rel="stylesheet" href="css/controls.css?v=a315d52e">
-<link rel="stylesheet" href="css/night.css?v=54be01c4">
+<link rel="stylesheet" href="css/night.css?v=7c2b330c">
 <link rel="stylesheet" href="css/night-home.css?v=406d4055">
 <link rel="stylesheet" href="css/motion.css?v=fa568ed2">
 </head>
@@ -122,15 +122,15 @@
     </div>
   </div>
 
-  <!-- HOME INTRO (2026-10-10, from the audit "make the homepage H1 visible" + the phone's first screen had no message): the visible H1
-       and four promises, shared by day and night (night's own promise strip became this row) -->
+  <!-- HOME INTRO (2026-10-10): the visible H1 + four promises, shared by day and night — laid out like ronin.pk's "Exceptional
+       Quality Delivered" (centred two-tone heading over a soft grey panel of four animated icons), in our colours and words -->
   <section class="home-intro" aria-labelledby="home-h1">
-    <h1 class="home-intro__h" id="home-h1">Earbuds, power banks, chargers &amp; more — delivered across Pakistan</h1>
+    <h1 class="home-intro__h" id="home-h1"><span>Earbuds, power banks, chargers &amp; more — delivered across Pakistan</span></h1>
     <ul class="home-intro__list">
-      <li><a href="shipping.html#payment"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6.5" width="18" height="11" rx="2.5"></rect><circle class="r" cx="12" cy="12" r="2.4"></circle></svg>Cash on Delivery</a></li>
-      <li><a href="shipping.html#charges"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 7h11v9h-11zM13.5 10h4l3 3v3h-7"></path><circle class="r" cx="7" cy="17.5" r="1.8"></circle><circle class="r" cx="17" cy="17.5" r="1.8"></circle></svg><span>Free delivery from <span data-free-from="">Rs.10,000</span></span></a></li>
-      <li><a href="returns.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7"></path><path class="r" d="M4 4v4h4"></path></svg>7-day money-back</a></li>
-      <li><a href="warranty.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5.5c0 4.3-3 8-7 9.5-4-1.5-7-5.2-7-9.5V6z"></path><path class="r" d="M9 12l2 2 4-4"></path></svg>WisdomUp warranty</a></li>
+      <li><a href="shipping.html#charges"><svg class="hi-ic hi-ic--truck" viewBox="0 0 48 48" aria-hidden="true"><g class="hi-move"><rect x="11" y="13" width="19" height="18" rx="2.5"></rect><path d="M30 19h7.2l5.3 6.4V31H30z"></path><path d="M33 22h3.6l2.6 3.2H33z"></path><circle class="hi-wheel" cx="18" cy="33.5" r="3.6"></circle><circle class="hi-wheel" cx="36" cy="33.5" r="3.6"></circle></g><path class="r hi-speed" d="M2 18h6M4 23.5h5M2 29h6"></path></svg><span>Free delivery<br>from <span data-free-from="">Rs.10,000</span></span></a></li>
+      <li><a href="shipping.html#payment"><svg class="hi-ic hi-ic--cash" viewBox="0 0 48 48" aria-hidden="true"><rect class="hi-note2" x="9" y="11" width="32" height="19" rx="3"></rect><g class="hi-note"><rect x="6" y="17" width="34" height="20" rx="3"></rect><circle class="r hi-coin" cx="23" cy="27" r="4.6"></circle><path d="M11 22.5h2M33 31.5h2"></path></g></svg><span>Cash on<br>Delivery</span></a></li>
+      <li><a href="returns.html"><svg class="hi-ic hi-ic--back" viewBox="0 0 48 48" aria-hidden="true"><g class="hi-spin"><path d="M12.6 17.4A13.5 13.5 0 1 1 10.5 27"></path><path class="r" d="M11.4 9.6v8h8"></path></g><text x="24.3" y="29.6" text-anchor="middle">7</text></svg><span>7-day<br>money-back</span></a></li>
+      <li><a href="warranty.html"><svg class="hi-ic hi-ic--medal" viewBox="0 0 48 48" aria-hidden="true"><g class="hi-swing"><path d="M17.5 29.5 13 42l5.6-2.4 3.2 5.2 3.6-11.4M30.5 29.5 35 42l-5.6-2.4-3.2 5.2-3.6-11.4"></path><circle cx="24" cy="19.5" r="12"></circle><circle cx="24" cy="19.5" r="8.4"></circle><path class="r hi-check" d="M20 19.8l3 3 5.4-6"></path></g></svg><span>WisdomUp<br>warranty</span></a></li>
     </ul>
   </section>
 
@@ -576,7 +576,7 @@
         <h2 class="h-light">Watch it demoed. <b>Add it to cart mid-stream.</b></h2>
         <p class="duo__p">Live-only prices on whatever the host is holding. Next show starts in:</p>
       </div>
-      <div class="countdown" id="countdown" role="timer" aria-label="Time until the next live show"><div class="countdown__cell"><span class="countdown__v">06</span><span class="countdown__l">Days</span></div><div class="countdown__cell"><span class="countdown__v">16</span><span class="countdown__l">Hrs</span></div><div class="countdown__cell"><span class="countdown__v">45</span><span class="countdown__l">Min</span></div><div class="countdown__cell"><span class="countdown__v">18</span><span class="countdown__l">Sec</span></div></div>
+      <div class="countdown" id="countdown" role="timer" aria-label="Time until the next live show"><div class="countdown__cell"><span class="countdown__v">06</span><span class="countdown__l">Days</span></div><div class="countdown__cell"><span class="countdown__v">06</span><span class="countdown__l">Hrs</span></div><div class="countdown__cell"><span class="countdown__v">25</span><span class="countdown__l">Min</span></div><div class="countdown__cell"><span class="countdown__v">57</span><span class="countdown__l">Sec</span></div></div>
       <div class="duo__foot">
         <button type="button" class="btn-pill" id="remind">Remind me</button>
         <span class="duo__note">Fridays · 8 PM PKT · <a class="duo__more" href="live.html">See the show ›</a></span>
@@ -2472,7 +2472,7 @@ support</span></a></div></section></div>
 <script src="js/shop.js?v=7582d314"></script>
 <script src="js/wu-data.js?v=cdf27841"></script>
 <script src="js/ds-icons.js?v=ab37eba9"></script>
-<script src="js/common.js?v=7a44775d"></script>
+<script src="js/common.js?v=30554d85"></script>
 <script src="js/posts.js?v=5bc5e04c"></script>
 <script src="js/home.js?v=c9efb8fb"></script>
 <script src="js/night-home.js?v=079fb4d8"></script>

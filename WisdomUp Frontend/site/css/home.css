@@ -1123,16 +1123,48 @@ body:has(.ckc.is-bar:not([hidden])) .wafab { opacity: 0; pointer-events: none; t
 @media (prefers-reduced-motion: reduce) { .navtip { transition: none; } }
 /* the white logo keeps its edge over light banners (the audit: "the logo is faint on the grey pill") */
 .site-nav img { filter: drop-shadow(0 1px 1.5px rgba(0,0,0,.35)); }
-/* HOME INTRO (2026-10-10): the visible H1 + four promise capsules under the banner, both themes (night.css recolours) */
-.home-intro { margin: 20px var(--gutter, 28px) 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; }
-.home-intro__h { margin: 0; font: 700 clamp(17px, 1.5vw, 21px)/1.3 var(--font); letter-spacing: -.01em; color: #111; text-wrap: balance; }
-.home-intro__list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
-.home-intro__list a { display: inline-flex; align-items: center; gap: 8px; height: var(--chip, 32px); padding: 0 13px 0 11px; border-radius: 999px; background: #F5F6F8; box-shadow: inset 0 0 0 1.5px #E3E4E6; font: 600 12px/1 var(--font); color: #111; text-decoration: none; white-space: nowrap; }
-.home-intro__list svg { flex: none; width: 16px; height: 16px; fill: none; stroke: #111; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-.home-intro__list .r { stroke: #D91E05; }
+/* HOME INTRO (2026-10-10, "make this part same as ronin.pk" — measured there: a centred 700 heading with a two-tone gradient and
+   .03em tracking over a #F3F2F2 panel, 24px corners, shadow 7px 8px 51px rgba(0,0,0,.07), padding 14/30/20, four columns of a
+   ~50px animated icon over a short grey label). Ours: the gradient runs ink → brand red (day colour rule — Ronin's is purple),
+   the icons are our own line drawings with one red detail and a gentle loop (Ronin uses GIFs), the four promises are real
+   (Ronin's "70M+ customers" / "365 days" are not ours). Each column links to its policy. Night recolours in night.css. */
+.home-intro { margin: clamp(28px, 4vw, 48px) var(--gutter, 28px) 0; display: flex; flex-direction: column; align-items: center; gap: clamp(16px, 2vw, 24px); text-align: center; }
+.home-intro__h { margin: 0; max-width: 34ch; font: 700 clamp(19px, 2vw, 28px)/1.25 var(--font); letter-spacing: .03em; text-wrap: balance; color: #111; }
+@media (min-width: 1024px) { .home-intro__h { max-width: none; } } /* one line on desktop, like Ronin's */
+/* the gradient sits on an INLINE span (box-decoration-break: slice), so it flows once across all lines — on a phone the
+   heading wraps and only its end turns red, instead of the gradient restarting on every line */
+.home-intro__h > span { background: linear-gradient(90deg, #5A5D63 0%, #111 30%, #111 62%, #D91E05 96%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-box-decoration-break: slice; box-decoration-break: slice; }
+.home-intro__list { list-style: none; margin: 0; padding: clamp(14px, 1.6vw, 22px) clamp(14px, 3vw, 40px) clamp(18px, 2vw, 26px); width: min(100%, 920px); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(4px, 1.6vw, 24px);
+  border-radius: clamp(24px, 3.4vw, 40px); background: #F3F2F2; box-shadow: 7px 8px 51px rgba(0,0,0,.07); }
+.home-intro__list a { display: flex; flex-direction: column; align-items: center; gap: clamp(8px, 1vw, 12px); padding: 6px 2px; border-radius: 16px; text-decoration: none; color: #6B6F76; font: 500 clamp(12px, 1.25vw, 17px)/1.4 var(--font); }
+.home-intro__list a > span { text-wrap: balance; }
+.home-intro__list a:focus-visible { outline: 2px solid #111; outline-offset: 2px; }
+.hi-ic { width: clamp(40px, 4.6vw, 56px); height: clamp(40px, 4.6vw, 56px); overflow: visible; fill: none; stroke: #1B1B1B; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; transition: transform 500ms cubic-bezier(.3,1,.3,1); }
+.hi-ic .r { stroke: #D91E05; }
+.hi-ic .hi-wheel { fill: #F3F2F2; }
+.hi-ic .hi-note2 { fill: #F3F2F2; opacity: .55; }
+.hi-ic .hi-note rect { fill: #F3F2F2; }
+.hi-ic text { fill: #1B1B1B; stroke: none; font: 700 13px/1 var(--font); }
+@media (hover: hover) and (pointer: fine) { .home-intro__list a:hover .hi-ic { transform: translateY(-3px); } .home-intro__list a:hover { color: #111; } }
+/* the loops (Ronin's icons are animated GIFs): slow, small, out of step with each other; still for reduced motion */
+@keyframes hi-drive { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(2px); } }
+@keyframes hi-speed { 0% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -22; } }
+@keyframes hi-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-1.5px); } }
+@keyframes hi-coin { 0%, 70%, 100% { transform: scale(1); } 80% { transform: scale(1.18); } }
+@keyframes hi-spin { 0%, 55% { transform: rotate(0); } 85%, 100% { transform: rotate(-360deg); } }
+@keyframes hi-swing { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-5deg); } 75% { transform: rotate(5deg); } }
+@keyframes hi-check { 0%, 30% { stroke-dashoffset: 14; } 55%, 100% { stroke-dashoffset: 0; } }
+.hi-move { animation: hi-drive 1.6s ease-in-out infinite; }
+.hi-speed { stroke-dasharray: 6 5; animation: hi-speed 1.1s linear infinite; }
+.hi-note { animation: hi-bob 2.4s ease-in-out infinite; }
+.hi-coin { transform-box: fill-box; transform-origin: center; animation: hi-coin 2.4s ease-in-out infinite; }
+.hi-spin { transform-box: view-box; transform-origin: 24px 24px; animation: hi-spin 4s cubic-bezier(.7,0,.3,1) infinite; }
+.hi-swing { transform-box: view-box; transform-origin: 24px 4px; animation: hi-swing 3.2s ease-in-out infinite; }
+.hi-check { stroke-dasharray: 14; animation: hi-check 3.2s ease-out infinite; }
+@media (prefers-reduced-motion: reduce) { .hi-ic, .hi-ic * { animation: none !important; } .hi-check { stroke-dashoffset: 0; } }
 @media (max-width: 639px) {
-  .home-intro { margin-top: 14px; gap: 10px; }
-  .home-intro__list { gap: 6px; }
-  .home-intro__list a { height: 30px; padding: 0 11px 0 9px; font-size: 11.5px; }
+  .home-intro { margin-top: 22px; gap: 14px; }
+  .home-intro__list { border-radius: 22px; padding: 12px 6px 14px; gap: 2px; }
+  .home-intro__list a { padding: 4px 0; gap: 6px; line-height: 1.3; }
 }
 
