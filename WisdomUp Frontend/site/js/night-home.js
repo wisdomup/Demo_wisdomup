@@ -94,7 +94,6 @@
   function build() {
     host.innerHTML = `
     <div class="nh">
-      <!-- the promise strip moved above both homes as the shared .home-intro (2026-10-10) -->
       <section aria-label="Shop by department">
         <div class="nh-promo">
           <div class="nh-live" role="group" aria-labelledby="nh-live-h">
