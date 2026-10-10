@@ -51,8 +51,7 @@
   // A category link (#cat-earbuds) filters the grid
   const catFromHash = () => CATS.find(c => '#' + slug(c) === location.hash) || null;
   if (catFromHash()) { state.cat = catFromHash(); state.dept = null; }
-  const PAGE = 24;
-  let shown = PAGE;
+  const PAGE = 24; // about 24 cards a page — rounded to WHOLE rows by WU.rowPager (the FULL ROWS rule, 2026-10-11): 25 on 5 columns
 
   WU.initChrome();
   $('pbanner-sub').textContent = `${D.products.length} products · earbuds, chargers, cables, speakers & more`;
@@ -95,16 +94,12 @@
   /* ---------- Render ---------- */
   const SEP = '<svg class="mcrumbs__sep" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M9 5.5 15.5 12 9 18.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   let all = [];
-  function paintGrid() {
-    const slice = all.slice(0, shown);
-    $('mgrid').innerHTML = slice.length ? slice.map(p => WU.productCard(p)).join('')
-      : `<div class="empty"><h2>No products match yet</h2><p>Try removing a filter.</p><a class="btn-pill" href="${url.products}">See all products</a></div>`;
-    const left = all.length - slice.length;
-    $('mgrid-more').hidden = left <= 0;
-    $('mgrid-shown').textContent = `Showing ${slice.length} of ${all.length}`;
-    $('show-more').textContent = `Show ${Math.min(PAGE, left)} more`;
-    WU.paintWish();
-  }
+  // whole rows a page; "Show ‹n› more" until every match is out, then "Show less" (WU.rowPager draws the cards and the button)
+  const pager = WU.rowPager($('mgrid'), { min: PAGE, list: () => all, card: p => WU.productCard(p), btn: $('show-more'), after: (n, total, per) => {
+    if (!total) $('mgrid').innerHTML = `<div class="empty"><h2>No products match yet</h2><p>Try removing a filter.</p><a class="btn-pill" href="${url.products}">See all products</a></div>`;
+    $('mgrid-more').hidden = total <= per;
+    $('mgrid-shown').textContent = `Showing ${n} of ${total}`;
+  } });
   /* ---------- Buying guide under the grid: the category's copy, common questions and related categories.
      One short paragraph shows; the rest opens with "Read more" (never hidden from people — only folded). ---------- */
   let guideKey = null;
@@ -133,8 +128,7 @@
   });
   function render() {
     all = order(matching(state), state.sort);
-    shown = PAGE;
-    paintGrid();
+    pager.reset();
     const total = all.length;
     const labels = [state.filter && FILTERS[state.filter].label, state.price && PRICES[state.price].label, ...state.conns, ...state.feats.map(k => FEATS[k])].filter(Boolean);
     const n = activeCount(state);
@@ -184,13 +178,6 @@
     paintSortList();
     spy();
   }
-  $('show-more').addEventListener('click', () => {
-    const first = shown;
-    shown += PAGE;
-    paintGrid();
-    const next = $('mgrid').children[first];
-    if (next) { const a = next.querySelector('.wpc__title a'); if (a) a.focus({ preventScroll: true }); }
-  });
 
   // Floating twin of the filter capsule (#mfloat): copies of the chips that pass clicks to the real ones.
   // Copies carry no ids / ARIA and never take focus — keyboard and screen-reader users use the real chips.

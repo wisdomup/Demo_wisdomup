@@ -73,7 +73,7 @@
     // the higher-priced model under Rs.25,000 first (it earns more per order, and is still an everyday buy); commission at the starting rate
     const PICK_TYPES = ['earbuds', 'headphones', 'speakers', 'microphones', 'neckbands', 'power-banks', 'shavers', 'clippers'];
     const live = D.products.filter(p => !p.soldOut), tagged = p => p.tabs.includes('best') || p.tabs.includes('new');
-    const picks = PICK_TYPES.map(t => { const of = live.filter(p => p.type === t && p.price <= 25000); const pool = of.some(tagged) ? of.filter(tagged) : of; return pool.sort((a, b) => b.price - a.price)[0]; }).filter(Boolean).slice(0, 6);
+    const picks = PICK_TYPES.map(t => { const of = live.filter(p => p.type === t && p.price <= 25000); const pool = of.some(tagged) ? of.filter(tagged) : of; return pool.sort((a, b) => b.price - a.price)[0]; }).filter(Boolean);
     const earnOn = price => R.pctOf(price - R.pctOf(price, CR.discountPct || 0), tiers[0].pct);
     $('cr-picks').innerHTML = picks.map(p => `
       <a class="cr-pick" href="${url.product(p.id)}">
@@ -82,6 +82,10 @@
         <span class="cr-pick__p">${esc(p.priceText)}</span>
         <span class="cr-pick__e">You earn <b>${esc(rs(earnOn(p.price)))}</b> per order</span>
       </a>`).join('');
+    // WHOLE rows only (the FULL ROWS rule, 2026-10-11): up to eight picks, the ones that would start a half-empty row stay hidden
+    const pickRows = () => { const g = $('cr-picks'), n = WU.fullRowCount(g, picks.length); [...g.children].forEach((c, i) => { c.hidden = i >= n; }); };
+    pickRows();
+    if ('ResizeObserver' in window) new ResizeObserver(pickRows).observe($('cr-picks'));
 
     // Terms link opens the fold-out
     document.addEventListener('click', e => { if (e.target.closest('[data-terms]')) { $('terms').open = true; } });

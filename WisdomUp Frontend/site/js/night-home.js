@@ -30,7 +30,10 @@
       ${p.soldOut ? '' : `<button type="button" class="nh-tile__add" data-nh-add="${p.id}" aria-label="Add ${esc(p.title)} to cart">${icon('cart', 16)}</button>`}
       <a class="nh-tile__cap" href="${url.product(p.id)}"><b class="nh-tile__p">${esc(p.priceText)}${p.wasText ? ` <s class="nh-tile__was">${esc(p.wasText)}</s>` : ''}</b><span class="nh-tile__n">${esc(p.title)}</span></a>
     </article>`;
-  const grid = (items, id) => `<div class="nh-grid"${id ? ` id="${id}"` : ''}>${items.map(tile).join('')}</div>`;
+  // Grids show WHOLE rows (the FULL ROWS rule, 2026-10-11 — WU.rowPager in common.js): two rows (phones: four rows of two), and
+  // "Show ‹n› more" adds as many again until the list runs out; then "Show less". The tiles are drawn by the pager after build().
+  const grid = key => `<div class="nh-grid" id="nh-${key}-grid"></div>`;
+  const moreBtn = key => `<button type="button" class="nh-btn nh-btn--ghost" id="nh-${key}-more" aria-controls="nh-${key}-grid" hidden>Show more</button>`;
 
   /* ---------- Live card (redesigned 2026-10-07, "this part looks ugly … make it beautiful"): a stage-lit black panel — badge +
      schedule, the title and the Live page's own line, a countdown to the next show (Friday 8 PM PKT, worked out in Pakistan
@@ -78,10 +81,11 @@
 
   /* ---------- budget state ---------- */
   let band = 0;
-  const bandItems = () => variety(D.products.filter(BANDS[band][2]).sort(byPrice)).slice(0, 12);
+  const bandItems = () => variety(D.products.filter(BANDS[band][2]).sort(byPrice));
   const bandAll = () => `View all ${D.products.filter(BANDS[band][2]).length} ${esc(BANDS[band][1].replace(/^Under/, 'under'))} ↗`;
+  const pagers = {};
   const paintBand = () => {
-    $('nh-budget-grid').outerHTML = grid(bandItems(), 'nh-budget-grid');
+    pagers.budget.reset();
     WU.staggerCards($('nh-budget-grid'));
     $('nh-budget-all').href = url.products + '?price=' + BANDS[band][0];
     $('nh-budget-all').innerHTML = bandAll();
@@ -121,8 +125,8 @@
       </section>
       <section aria-labelledby="nh-new-h">
         ${head('New Arrivals', `${fresh.length} new launches — the latest Bluetooth 6.0 earbuds, neckbands, party speakers and fast chargers.`, url.filter('new'), 'View all', false, 'nh-new-h')}
-        ${grid(fresh.slice(0, 12))}
-        <div class="nh-more"><a class="nh-btn nh-btn--ghost" href="${url.filter('new')}">View all ${fresh.length} new products ↗</a></div>
+        ${grid('new')}
+        <div class="nh-more">${moreBtn('new')}<a class="nh-btn" href="${url.filter('new')}">View all ${fresh.length} new products ↗</a></div>
       </section>
       ${SERIES.length ? `
       <section aria-label="TS true wireless series">
@@ -134,7 +138,8 @@
       </section>` : ''}
       <section aria-labelledby="nh-best-h">
         ${head('Best Sellers', 'What customers buy most, plus the chargers, cables and power banks everyone needs.', url.filter('best'), 'View all', false, 'nh-best-h')}
-        ${grid(bestRow.slice(0, 12))}
+        ${grid('best')}
+        <div class="nh-more">${moreBtn('best')}</div>
       </section>
       ${MICS.length ? `
       <section aria-label="Creator microphones">
@@ -151,8 +156,8 @@
           <div class="nh-head__t"><h2 class="nh-h" id="nh-budget-h">Shop by budget</h2><p class="nh-sub">Real prices, every product with warranty and Cash on Delivery.</p></div>
           <div class="nh-seg" role="group" aria-label="Budget" style="--i: 0;"><span class="nh-seg__thumb" aria-hidden="true"></span>${BANDS.map(([k, label], i) => { const [w, ...v] = label.split(' '); return `<button type="button" data-nh-band="${i}" aria-pressed="${i === 0}" aria-label="${esc(label)}"><span class="nh-seg__k">${esc(w)}</span><span class="nh-seg__v">${esc(v.join(' '))}</span></button>`; }).join('')}</div>
         </header>
-        ${grid(bandItems(), 'nh-budget-grid')}
-        <div class="nh-more"><a class="nh-btn nh-btn--ghost" id="nh-budget-all" href="${url.products}?price=u1">${bandAll()}</a></div>
+        ${grid('budget')}
+        <div class="nh-more">${moreBtn('budget')}<a class="nh-btn" id="nh-budget-all" href="${url.products}?price=u1">${bandAll()}</a></div>
       </section>
       <section aria-label="Bulk orders">
         <div class="nh-fan">
@@ -172,6 +177,10 @@
         <div class="panel-list faq__list" id="nh-faq"></div>
       </section>
     </div>`;
+    [['new', () => fresh], ['best', () => bestRow], ['budget', bandItems]].forEach(([key, list]) => {
+      pagers[key] = WU.rowPager($(`nh-${key}-grid`), { min: 8, list, card: tile, btn: $(`nh-${key}-more`) });
+      pagers[key].reset();
+    });
     if (D.faqs && D.faqs.length) mountAccordion($('nh-faq'), D.faqs, { idPrefix: 'nhfaq' });
     mountFan($('nh-fan'));
     setInterval(() => { const el = $('nh-live-cd'); if (el && !host.hidden) el.innerHTML = liveCells(); }, 1000);

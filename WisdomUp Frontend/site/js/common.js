@@ -1299,6 +1299,7 @@
         <div class="search__pages" data-help hidden></div>
         <div class="search__head"><div class="search__label"><b></b></div><p class="search__why" hidden></p></div>
         <div class="search__grid"></div>
+        <div class="search__more"><button type="button" class="btn-pill" aria-label="Show more results" hidden>Show more</button></div>
       </div>`;
     document.body.appendChild(host);
     const input = host.querySelector('input'), grid = host.querySelector('.search__grid'), label = host.querySelector('.search__label b'), why = host.querySelector('.search__why');
@@ -1324,13 +1325,15 @@
       ['Blog', url.blog, 'blog guide tips how to article'],
     ];
     const BG = D.media;
-    let lastHits = [], lastKey = '';
+    let lastHits = [], lastKey = '', heading = () => '';
     const card = (p, i) => `
         <a class="ccard" href="${url.product(p.id)}" data-pid="${p.id}">
           <div class="ccard__media" style="background: ${p.thumb ? photoBg(p) : BG[i % BG.length]};">${p.thumb ? `<img src="${p.thumb}" alt="${esc(p.title)}" loading="lazy" style="width: 100%; height: 100%; ${photoFit(p)}">` : art(p.art, { alt: p.title, style: 'width: 100%; height: 100%;' })}${p.ribbon || p.cat ? `<div class="ccard__tag"><span>${esc(p.ribbon || p.cat)}</span></div>` : ''}</div>
           <div class="ccard__body"><div class="ccard__title">${esc(code(p))}</div><p class="ccard__meta">${esc(p.meta)}</p></div>
           <div class="ccard__foot"><span class="ccard__price">${esc(p.priceText)}</span>${p.wasText ? `<s class="ccard__was">${esc(p.wasText)}</s>` : ''}</div>
         </a>`;
+    // results come in WHOLE rows (the FULL ROWS rule): two rows (phones: four rows of two), "Show ‹n› more" until every match is out, then "Show less"
+    const pager = rowPager(grid, { min: 8, list: () => lastHits, card, btn: host.querySelector('.search__more button'), after: n => { label.textContent = heading(n); } });
     const paint = () => {
       const raw = input.value.trim(), q = raw.toLowerCase();
       const pages = q.length > 1 ? PAGES.filter(([t, , k]) => (t + ' ' + k).toLowerCase().split(/\s+/).some(w => w.startsWith(q) || q.split(/\s+/).some(x => x.length > 2 && w.startsWith(x)))).slice(0, 4) : [];
@@ -1342,15 +1345,15 @@
         recentEl.hidden = !terms.length;
         recentEl.querySelector('.search__terms').innerHTML = terms.map(t => `<button type="button" data-term="${esc(t)}">${esc(t)}</button>`).join('');
         catsEl.hidden = true;
-        const picks = suggest(8);
-        lastHits = picks ? picks.items : D.products.filter(p => p.tabs.includes('best') || p.tabs.includes('new')).slice(0, 8);
-        label.textContent = picks ? 'Picked for you' : 'Popular right now';
+        const picks = suggest(48);
+        lastHits = picks ? picks.items : D.products.filter(p => p.tabs.includes('best') || p.tabs.includes('new'));
+        heading = () => picks ? 'Picked for you' : 'Popular right now';
         if (picks) { why.hidden = false; why.innerHTML = `${esc(picks.reason)} · <button type="button" class="search__clear" data-clear="all">Clear history</button>`; }
-        grid.innerHTML = lastHits.map(card).join('');
+        pager.reset();
         return;
       }
       recentEl.hidden = true;
-      const r = runSearch(raw), res = r.hits.slice(0, 8);
+      const r = runSearch(raw);
       lastHits = r.hits; lastKey = r.key;
       // category suggestions: the types the results fall in, most results first
       const counts = {}; r.hits.forEach(p => { counts[p.type] = (counts[p.type] || 0) + 1; });
@@ -1361,12 +1364,12 @@
       const fix = r.fixes.length ? `Showing results for “${esc(r.fixes.reduce((t, [a, b]) => t.replace(new RegExp('\\b' + reEsc(a) + '\\b', 'i'), b), raw))}”` : '';
       const said = r.understood.length ? `Understood: ${r.understood.map(esc).join(' · ')}` : '';
       const price = r.maxPrice ? ` under ${esc(D.rs(r.maxPrice))}` : '';
-      label.textContent = !r.hits.length ? (pages.length ? 'No products — see the page above' : 'No matches — try “earbuds”, “charger” or “cable”')
+      heading = n => !r.hits.length ? (pages.length ? 'No products — see the page above' : 'No matches — try “earbuds”, “charger” or “cable”')
         : r.overBudget ? `Nothing under ${D.rs(r.maxPrice)} — lowest prices first`
-        : r.loose ? `No exact match for “${r.dropped.join(' ')}” — closest ${res.length === 1 ? 'product' : 'products'}`
-        : (r.hits.length > res.length ? `Top ${res.length} of ${r.hits.length} results` : r.hits.length + ' result' + (r.hits.length > 1 ? 's' : '')) + price;
+        : r.loose ? `No exact match for “${r.dropped.join(' ')}” — closest ${n === 1 ? 'product' : 'products'}`
+        : (r.hits.length > n ? `Top ${n} of ${r.hits.length} results` : r.hits.length + ' result' + (r.hits.length > 1 ? 's' : '')) + price;
       if (fix || said) { why.hidden = false; why.innerHTML = [fix, said].filter(Boolean).join(' · '); }
-      grid.innerHTML = res.map(card).join('');
+      pager.reset();
     };
     host.classList.add('is-anim');
     let closing = 0, commitT = 0, committed = '';
@@ -2233,6 +2236,58 @@
       a.onfinish = () => { panel.hidden = true; panel.classList.remove('wu-slide'); panel.getAnimations().forEach(x => x.cancel()); };
       a.oncancel = () => panel.classList.remove('wu-slide');
     }
+  }
+
+  /* FULL ROWS (rule of 2026-10-11 — on the night home's New Arrivals grid: "it shall fill the two rows with products, also when
+     clicked on show more it shall show the full rows until the products are finished, then it can show less", then "fix it
+     throughout the website"). A product grid that shows PART of a list shows WHOLE rows: the count comes from the grid's real
+     column count (it changes with the screen), never a fixed number. One page = at least two rows and at least `min` products —
+     cols × max(2, ceil(min / cols)); "Show ‹n› more" adds one page; only the last page may end short, because the list ran out;
+     then the button reads "Show less" and folds back to one page (the grid's top glides back into view if it was above the
+     screen). The pager redraws when the column count changes (ResizeObserver; heights alone never trigger it). New cards reveal
+     through the motion engine's MutationObserver like any later content. Used by the night home grids, All Products and the
+     search panel; the creators page's picks use fullRowCount() to trim to whole rows without a button. */
+  const gridCols = g => {
+    if (!g || !g.offsetWidth) return 0;
+    const t = getComputedStyle(g).gridTemplateColumns;
+    return !t || t === 'none' || t.includes('(') ? 0 : t.trim().split(/\s+/).filter(v => parseFloat(v) > 0).length; // auto-fit's collapsed (0px) tracks are not columns
+  };
+  const fullRowCount = (g, n) => { const c = gridCols(g); return c && n > c ? n - n % c : n; };
+  function rowPager(grid, { min = 8, list, card, btn, after }) {
+    // list(): the whole list; card(item): its markup; btn: the Show more / Show less button; after(n, total, per): page extras
+    let pages = 1, cols = gridCols(grid), shown = -1;
+    const per = () => { if (!cols) cols = gridCols(grid); return cols ? cols * Math.max(2, Math.ceil(min / cols)) : min; }; // a grid that was hidden (search) is measured when it first paints
+    const paint = () => {
+      const items = list(), total = items.length, n = Math.min(total, pages * per());
+      if (shown < 0) grid.innerHTML = items.slice(0, n).map(card).join('');
+      else if (n > shown) grid.insertAdjacentHTML('beforeend', items.slice(shown, n).map(card).join(''));
+      else while (grid.children.length > n) grid.lastElementChild.remove();
+      shown = n;
+      if (btn) {
+        const all = n >= total;
+        btn.hidden = total <= per();
+        btn.textContent = all ? 'Show less' : `Show ${Math.min(per(), total - n)} more`;
+        btn.setAttribute('aria-expanded', String(all && pages > 1));
+      }
+      paintWish();
+      if (after) after(n, total, per());
+    };
+    const reset = () => { pages = 1; shown = -1; paint(); };
+    const more = () => {
+      const before = shown;
+      if (shown >= list().length) { // everything is out: fold back to one page and bring the grid's top back if it scrolled away
+        pages = 1; paint();
+        grid.style.scrollMarginTop = '120px'; // clear of the nav (or the search field); scrollIntoView also scrolls the search panel, not just the page
+        if (grid.getBoundingClientRect().top < 80) grid.scrollIntoView({ block: 'start', behavior: reduced() ? 'auto' : 'smooth' });
+        return;
+      }
+      pages++; paint();
+      const next = grid.children[before], a = next && next.querySelector('a');
+      if (a) a.focus({ preventScroll: true });
+    };
+    if (btn) btn.addEventListener('click', more);
+    if ('ResizeObserver' in window) new ResizeObserver(() => { const c = gridCols(grid); if (c && c !== cols) { cols = c; if (shown >= 0) paint(); } }).observe(grid);
+    return { paint, reset, more, per };
   }
 
   // Grid items enter 50px lower and fade in, 500ms ease, 100ms apart (phones 30px / 300ms / 50ms) — used when a tab swaps its cards
@@ -3162,7 +3217,7 @@
     edge: addEdge, // the nav's rainbow edge light on any capsule: WU.edge(host, () => shouldGlowNow)
     initChrome, placeNav, setActiveCat, navOffset, scrollToEl,
     openSearch: () => search && search.open(),
-    toggleTheme, setTheme, themeMode, isNight, slide, staggerCards, revealWords, sheetDrag, quickAdd, budget: BUDGET, STAR_OUTLINE,
+    toggleTheme, setTheme, themeMode, isNight, slide, staggerCards, rowPager, gridCols, fullRowCount, revealWords, sheetDrag, quickAdd, budget: BUDGET, STAR_OUTLINE,
     consent: { open: n => consentUI && consentUI.open(n), get: consentGet },
     taste: { get: tasteGet, suggest, clear: tasteClear, on: personalOK },
     live: { next: nextLive, parts: liveParts, remind: liveReminder }, fillPrices, // the on-device interest model (personalised suggestions)
