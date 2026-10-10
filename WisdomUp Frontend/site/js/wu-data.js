@@ -27,7 +27,7 @@ window.WU_STORE = (function () {
     // link"): an art-only slide whose link is the Earbuds category (`href`) instead of a product page; `label` names it for screen readers
     ['os-4', 'Open-ear earbuds', '', { wide: 'img/hero/os-4-wide.webp', tall: 'img/hero/os-4-tall.webp', bg: ['#2E0605', '#0A0606'], at: '75% 0%', atTall: '50% 46%', href: 'products.html?cat=earbuds', label: 'OS-4 open-ear earbuds — shop all earbuds' }],
     ['cdb-18', 'Magnetic wireless power bank', 'Snap on. Power up.', { wide: 'img/hero/cdb-18-wide.webp', tall: 'img/hero/cdb-18-tall.webp', bg: ['#2A0605', '#060606'], at: '90% 30%', atTall: '50% 50%' }], // campaign art (2026-10-11)
-    ['txd-01', 'New · Personal care', 'A closer, cleaner shave.', { wide: 'img/hero/txd-01-wide.webp', tall: 'img/hero/txd-01-tall.webp', bg: ['#110101', '#0E0101'], at: '66% 40%', atTall: '50% 45%', wideSize: [1971, 798], fit: true }], // campaign art (2026-10-11)
+    ['txd-01', 'New · Personal care', 'A closer, cleaner shave.', { wide: 'img/hero/txd-01-wide.webp?v=2', tall: 'img/hero/txd-01-tall.webp?v=2', bg: ['#110101', '#0E0101'], at: '66% 40%', atTall: '50% 45%', wideSize: [1971, 798], fit: true }], // campaign art (2026-10-11)
   // a 4th item = banner ART for that slide (2026-10-10): `wide` (landscape file, ≥640px) + `tall` (portrait file, phones) + its backdrop `bg`,
   // optional `at` / `atTall` = object-position for each file (defaults 72% 50% / 50% 42%). Choose `at` so the product stays clear of the
   // nav at the TOP on short wide screens (1366×768, 1920×900 crop the top + bottom → a low y) and inside the frame on upright tablets
