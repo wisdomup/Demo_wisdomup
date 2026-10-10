@@ -30,10 +30,10 @@
       ${p.soldOut ? '' : `<button type="button" class="nh-tile__add" data-nh-add="${p.id}" aria-label="Add ${esc(p.title)} to cart">${icon('cart', 16)}</button>`}
       <a class="nh-tile__cap" href="${url.product(p.id)}"><b class="nh-tile__p">${esc(p.priceText)}${p.wasText ? ` <s class="nh-tile__was">${esc(p.wasText)}</s>` : ''}</b><span class="nh-tile__n">${esc(p.title)}</span></a>
     </article>`;
-  // Grids show WHOLE rows (the FULL ROWS rule, 2026-10-11 — WU.rowPager in common.js): two rows (phones: four rows of two), and
-  // "Show ‹n› more" adds as many again until the list runs out; then "Show less". The tiles are drawn by the pager after build().
+  // Grids show WHOLE rows (the FULL ROWS rule, 2026-10-11 — WU.rowPager in common.js): two rows (phones: four rows of two). No
+  // Show more / View all row under them (removed 2026-10-11, "remove these two buttons from homepage") — the heading's "View all ↗"
+  // leads on. The tiles are drawn by the pager after build().
   const grid = key => `<div class="nh-grid" id="nh-${key}-grid"></div>`;
-  const moreBtn = key => `<button type="button" class="nh-btn nh-btn--ghost" id="nh-${key}-more" aria-controls="nh-${key}-grid" hidden>Show more</button>`;
 
   /* ---------- Live card (redesigned 2026-10-07, "this part looks ugly … make it beautiful"): a stage-lit black panel — badge +
      schedule, the title and the Live page's own line, a countdown to the next show (Friday 8 PM PKT, worked out in Pakistan
@@ -82,13 +82,10 @@
   /* ---------- budget state ---------- */
   let band = 0;
   const bandItems = () => variety(D.products.filter(BANDS[band][2]).sort(byPrice));
-  const bandAll = () => `View all ${D.products.filter(BANDS[band][2]).length} ${esc(BANDS[band][1].replace(/^Under/, 'under'))} ↗`;
   const pagers = {};
   const paintBand = () => {
     pagers.budget.reset();
     WU.staggerCards($('nh-budget-grid'));
-    $('nh-budget-all').href = url.products + '?price=' + BANDS[band][0];
-    $('nh-budget-all').innerHTML = bandAll();
     host.querySelector('.nh-seg').style.setProperty('--i', band);
     host.querySelectorAll('[data-nh-band]').forEach((b, i) => b.setAttribute('aria-pressed', i === band));
     paintWish();
@@ -126,7 +123,6 @@
       <section aria-labelledby="nh-new-h">
         ${head('New Arrivals', `${fresh.length} new launches — the latest Bluetooth 6.0 earbuds, neckbands, party speakers and fast chargers.`, url.filter('new'), 'View all', false, 'nh-new-h')}
         ${grid('new')}
-        <div class="nh-more">${moreBtn('new')}<a class="nh-btn" href="${url.filter('new')}">View all ${fresh.length} new products ↗</a></div>
       </section>
       ${SERIES.length ? `
       <section aria-label="TS true wireless series">
@@ -139,7 +135,6 @@
       <section aria-labelledby="nh-best-h">
         ${head('Best Sellers', 'What customers buy most, plus the chargers, cables and power banks everyone needs.', url.filter('best'), 'View all', false, 'nh-best-h')}
         ${grid('best')}
-        <div class="nh-more">${moreBtn('best')}</div>
       </section>
       ${MICS.length ? `
       <section aria-label="Creator microphones">
@@ -157,7 +152,6 @@
           <div class="nh-seg" role="group" aria-label="Budget" style="--i: 0;"><span class="nh-seg__thumb" aria-hidden="true"></span>${BANDS.map(([k, label], i) => { const [w, ...v] = label.split(' '); return `<button type="button" data-nh-band="${i}" aria-pressed="${i === 0}" aria-label="${esc(label)}"><span class="nh-seg__k">${esc(w)}</span><span class="nh-seg__v">${esc(v.join(' '))}</span></button>`; }).join('')}</div>
         </header>
         ${grid('budget')}
-        <div class="nh-more">${moreBtn('budget')}<a class="nh-btn" id="nh-budget-all" href="${url.products}?price=u1">${bandAll()}</a></div>
       </section>
       <section aria-label="Bulk orders">
         <div class="nh-fan">
@@ -178,7 +172,7 @@
       </section>
     </div>`;
     [['new', () => fresh], ['best', () => bestRow], ['budget', bandItems]].forEach(([key, list]) => {
-      pagers[key] = WU.rowPager($(`nh-${key}-grid`), { min: 8, list, card: tile, btn: $(`nh-${key}-more`) });
+      pagers[key] = WU.rowPager($(`nh-${key}-grid`), { min: 8, list, card: tile });
       pagers[key].reset();
     });
     if (D.faqs && D.faqs.length) mountAccordion($('nh-faq'), D.faqs, { idPrefix: 'nhfaq' });
