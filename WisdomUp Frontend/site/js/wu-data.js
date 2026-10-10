@@ -20,13 +20,14 @@ window.WU_STORE = (function () {
   const byId = id => products.find(p => p.id === id);
   // Hero slides: flagship products with studio photos (copy pulls live price/specs from the catalogue)
   const HERO = [
-    ['ts-11anc', 'New · Noise-cancelling earbuds', 'Silence, on demand.'],
+    ['ts-11anc', 'New · Noise-cancelling earbuds', 'Silence, on demand.', { wide: 'img/hero/ts-11anc-wide.webp', tall: 'img/hero/ts-11anc-tall.webp', bg: ['#3A0905', '#0A0606'] }],
     ['yx-28', 'Party speaker · RGB light show', 'Bring the venue home.'],
     ['os-6', 'New · Open-ear earbuds', 'Hear the city. Keep the music.'],
     ['cdb-18', 'Magnetic wireless power bank', 'Snap on. Power up.'],
     ['txd-01', 'New · Personal care', 'A closer, cleaner shave.'],
-  ].map(([pid, kicker, line]) => ({ pid, p: byId(pid), kicker, line })).filter(h => h.p)
-    .map(h => ({ slotId: 'hero-' + h.pid, pid: h.pid, kicker: h.kicker, name: h.p.code, line: h.line, sub: h.p.meta, ctaLabel: 'Shop now · ' + h.p.priceText, src: h.p.src, bg: h.p.bg, pack: true, hint: h.p.title }));
+  // a 4th item = banner ART for that slide (2026-10-10): `wide` (landscape, shown ≥640px) + `tall` (portrait, phones) + its backdrop `bg`
+  ].map(([pid, kicker, line, art]) => ({ pid, p: byId(pid), kicker, line, art })).filter(h => h.p)
+    .map(h => ({ slotId: 'hero-' + h.pid, pid: h.pid, kicker: h.kicker, name: h.p.code, line: h.line, sub: h.p.meta, ctaLabel: 'Shop now · ' + h.p.priceText, src: h.art ? h.art.wide : h.p.src, art: h.art || null, bg: h.art ? h.art.bg : h.p.bg, pack: true, hint: h.p.title }));
   return {
     rs,
     products,
