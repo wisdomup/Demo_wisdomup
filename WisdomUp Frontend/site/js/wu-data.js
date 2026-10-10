@@ -20,14 +20,20 @@ window.WU_STORE = (function () {
   const byId = id => products.find(p => p.id === id);
   // Hero slides: flagship products with studio photos (copy pulls live price/specs from the catalogue)
   const HERO = [
-    ['ts-11anc', 'New · Noise-cancelling earbuds', 'Silence, on demand.', { wide: 'img/hero/ts-11anc-wide.webp', tall: 'img/hero/ts-11anc-tall.webp', bg: ['#3A0905', '#0A0606'] }],
+    ['ts-11anc', 'New · Noise-cancelling earbuds', 'Silence, on demand.', { wide: 'img/hero/ts-11anc-wide.webp', tall: 'img/hero/ts-11anc-tall.webp', bg: ['#3A0905', '#0A0606'], at: '72% 20%' }],
     ['yx-28', 'Party speaker · RGB light show', 'Bring the venue home.'],
-    ['os-6', 'New · Open-ear earbuds', 'Hear the city. Keep the music.'],
+    ['os-6', 'New · Open-ear earbuds', 'Hear the city. Keep the music.', { wide: 'img/hero/os-6-wide.webp', tall: 'img/hero/os-6-tall.webp', bg: ['#3A0A08', '#0A0707'], at: '82% 10%', atTall: '50% 42%' }],
+    // OS-4 is NOT in the catalogue (not in the supplier sheets) — the owner's call (2026-10-10, "just add the slide with earbuds filter
+    // link"): an art-only slide whose link is the Earbuds category (`href`) instead of a product page; `label` names it for screen readers
+    ['os-4', 'Open-ear earbuds', '', { wide: 'img/hero/os-4-wide.webp', tall: 'img/hero/os-4-tall.webp', bg: ['#2E0605', '#0A0606'], at: '75% 0%', atTall: '50% 46%', href: 'products.html?cat=earbuds', label: 'OS-4 open-ear earbuds — shop all earbuds' }],
     ['cdb-18', 'Magnetic wireless power bank', 'Snap on. Power up.'],
     ['txd-01', 'New · Personal care', 'A closer, cleaner shave.'],
-  // a 4th item = banner ART for that slide (2026-10-10): `wide` (landscape, shown ≥640px) + `tall` (portrait, phones) + its backdrop `bg`
-  ].map(([pid, kicker, line, art]) => ({ pid, p: byId(pid), kicker, line, art })).filter(h => h.p)
-    .map(h => ({ slotId: 'hero-' + h.pid, pid: h.pid, kicker: h.kicker, name: h.p.code, line: h.line, sub: h.p.meta, ctaLabel: 'Shop now · ' + h.p.priceText, src: h.art ? h.art.wide : h.p.src, art: h.art || null, bg: h.art ? h.art.bg : h.p.bg, pack: true, hint: h.p.title }));
+  // a 4th item = banner ART for that slide (2026-10-10): `wide` (landscape file, ≥640px) + `tall` (portrait file, phones) + its backdrop `bg`,
+  // optional `at` / `atTall` = object-position for each file (defaults 72% 50% / 50% 42%). Choose `at` so the product stays clear of the
+  // nav at the TOP on short wide screens (1366×768, 1920×900 crop the top + bottom → a low y) and inside the frame on upright tablets
+  // (768×1024, 820×1180 crop the sides → an x near the product's own centre)
+  ].map(([pid, kicker, line, art]) => ({ pid, p: byId(pid), kicker, line, art })).filter(h => h.p || (h.art && h.art.href))
+    .map(h => ({ slotId: 'hero-' + h.pid, pid: h.pid, kicker: h.kicker, name: h.p ? h.p.code : h.art.label, line: h.line, sub: h.p ? h.p.meta : '', ctaLabel: h.p ? 'Shop now · ' + h.p.priceText : '', src: h.art ? h.art.wide : h.p.src, art: h.art || null, href: h.art && h.art.href || null, bg: h.art ? h.art.bg : h.p.bg, pack: true, hint: h.p ? h.p.title : h.art.label }));
   return {
     rs,
     products,
