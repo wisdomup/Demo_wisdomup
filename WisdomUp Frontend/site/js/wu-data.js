@@ -26,7 +26,7 @@ window.WU_STORE = (function () {
     // OS-4 is NOT in the catalogue (not in the supplier sheets) — the owner's call (2026-10-10, "just add the slide with earbuds filter
     // link"): an art-only slide whose link is the Earbuds category (`href`) instead of a product page; `label` names it for screen readers
     ['os-4', 'Open-ear earbuds', '', { wide: 'img/hero/os-4-wide.webp', tall: 'img/hero/os-4-tall.webp', bg: ['#2E0605', '#0A0606'], at: '75% 0%', atTall: '50% 46%', href: 'products.html?cat=earbuds', label: 'OS-4 open-ear earbuds — shop all earbuds' }],
-    ['cdb-18', 'Magnetic wireless power bank', 'Snap on. Power up.'],
+    ['cdb-18', 'Magnetic wireless power bank', 'Snap on. Power up.', { wide: 'img/hero/cdb-18-wide.webp', tall: 'img/hero/cdb-18-tall.webp', bg: ['#2A0605', '#060606'], at: '90% 30%', atTall: '50% 50%' }], // campaign art (2026-10-11)
     ['txd-01', 'New · Personal care', 'A closer, cleaner shave.'],
   // a 4th item = banner ART for that slide (2026-10-10): `wide` (landscape file, ≥640px) + `tall` (portrait file, phones) + its backdrop `bg`,
   // optional `at` / `atTall` = object-position for each file (defaults 72% 50% / 50% 42%). Choose `at` so the product stays clear of the
