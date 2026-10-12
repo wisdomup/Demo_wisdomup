@@ -66,6 +66,15 @@ button { font-family: inherit; }
    Used on the nav and on the stuck filter capsule. */
 .wu-edge { position: absolute; inset: 0; z-index: 2; padding: 1.5px; border-radius: inherit; pointer-events: none; -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#fff 0 0) content-box exclude, linear-gradient(#fff 0 0); }
 @media (prefers-reduced-motion: reduce) { .wu-edge { display: none; } }
+/* INNER GLOW (2026-10-12, after the Google search pill: "add the inner glow in the nav bar when the glow is revolving, mimic it"): the
+   arc's colours bleed softly INTO the pill and travel round with it — strongest at the rim, gone by the middle. runEdges() paints the
+   same conic gradient on <b>, a 9px ring inside the edge (7px on phones); <i> blurs it (the blur sits on the parent, so it softens the ring AFTER
+   its mask); the outer span clips it to the pill. Under the icons (z -1), brightened with screen. Nav + floating filter capsule. */
+.wu-glow { position: absolute; inset: 0; z-index: -1; border-radius: inherit; overflow: hidden; pointer-events: none; mix-blend-mode: screen; opacity: .95; }
+.wu-glow > i { position: absolute; inset: 0; border-radius: inherit; filter: blur(12px); }
+.wu-glow b { position: absolute; inset: 0; border-radius: inherit; padding: 9px; -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#fff 0 0) content-box exclude, linear-gradient(#fff 0 0); }
+@media (max-width: 639px) { .wu-glow > i { filter: blur(9px); } .wu-glow b { padding: 7px; } } /* the 43px phone pill */
+@media (prefers-reduced-motion: reduce) { .wu-glow { display: none; } }
 .site-nav::after, .mfloat .mbar__cap::after { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; opacity: .09; pointer-events: none; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
 .site-nav__glass { display: none; }
 .site-nav__logo { position: relative; display: block; aspect-ratio: 957 / 556; }

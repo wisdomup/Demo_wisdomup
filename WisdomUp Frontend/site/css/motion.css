@@ -60,6 +60,10 @@
 html[data-theme="night"] :is(.btn-buy, .ck__place, .cartd__go, .fdrawer__apply, .nh-btn--primary) { --fill: #fff; --fill-text: #D91E05; }
 html[data-theme="night"] :is(.btn-pill, .btn-navy, .pp__cta, .loop__cta, .shop-rail__all) { --fill: #111; --fill-text: #fff; }
 html[data-theme="night"] :is(.btn-outline, .btn-cart, .seo__toggle, .mnav__foot a, .nh-btn:not(.nh-btn--primary), .nh-btn--ghost) { --fill: #fff; --fill-text: #0B0B0B; }
+/* The Live banner's pair (2026-10-12, info.css): red "Shop new arrivals" and glass "Remind me" both fill WHITE on hover, like the
+   Live Shopping card's "Watch the show" / "Shop new arrivals" — red type on the red one, ink on the glass one; both themes */
+.ihero--dark .ihero__actions .btn-outline.wu-fill { --fill: #fff; --fill-text: #D91E05; }
+.ihero--dark .ihero__actions .btn-pill.wu-fill { --fill: #fff; --fill-text: #0B0B0B; }
 @media (hover: hover) and (pointer: fine) {
   /* ONE HOVER for every button (2026-10-07, "the same hover as the Display mode button"): the liquid fill rises, the text turns,
      and the 1.5px stroke takes the fill's colour — so the stroke and the fill read as one shape, exactly like the sort capsule */

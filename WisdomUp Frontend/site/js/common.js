@@ -823,13 +823,22 @@
   };
   // Every pill that carries the light: host element → { el: its .wu-edge ring, on: () => should it glow now }
   const edges = new Map();
-  function addEdge(host, on) {
+  // glow: also an INNER GLOW (2026-10-12, after the Google search pill: "add the inner glow in the nav bar when the glow is revolving,
+  // mimic it") — the arc's colours bleed softly into the pill and travel round with it (.wu-glow, home.css; same gradient, painted
+  // on a ring that is then blurred and clipped to the pill). The nav and its twin, the floating filter capsule.
+  function addEdge(host, on, { glow } = {}) {
     if (!host || reduced()) return;
     let el = [...host.children].find(c => c.classList.contains('wu-edge'));
     if (!el) { host.insertAdjacentHTML('beforeend', '<span class="wu-edge" aria-hidden="true"></span>'); el = host.lastElementChild; }
-    edges.set(host, { el, on });
+    let gl = null;
+    if (glow) {
+      let g = [...host.children].find(c => c.classList.contains('wu-glow'));
+      if (!g) { host.insertAdjacentHTML('afterbegin', '<span class="wu-glow" aria-hidden="true"><i><b></b></i></span>'); g = host.firstElementChild; }
+      gl = g.querySelector('b');
+    }
+    edges.set(host, { el, on, gl });
   }
-  const mountNavEdge = () => addEdge(nav, () => !navHidden);
+  const mountNavEdge = () => addEdge(nav, () => !navHidden, { glow: true });
   function runEdges() {
     if (reduced()) return;
     const SAMPLES = 96;
@@ -842,7 +851,7 @@
       const t = (d - 2 * line - arc) / r;
       return [r - r * Math.sin(t), r + r * Math.cos(t)];
     };
-    const paint = (el, w, h, lap) => {
+    const paint = (el, w, h, lap, gl) => {
         const line = Math.max(0, w - h), arc = Math.PI * h / 2, total = 2 * line + 2 * arc;
         const wrap = q => (q % total + total) % total;
         const head = lap * total; // head's distance, clockwise from the top centre
@@ -862,6 +871,7 @@
         });
         stops.push(`${edgeColor(head / total)} 360deg`);
         el.style.backgroundImage = `conic-gradient(from 0deg at 50% 50%, ${stops.join(',')})`;
+        if (gl) gl.style.backgroundImage = el.style.backgroundImage; // the inner glow follows the same arc
     };
     let pos = 0, vel = 0, soft = 0, last = 0; // head position (laps), speed (laps/s), smoothed target (laps)
     const goal = now => { // where the pull wants the head: a steady drift plus a step every EDGE_PULL
@@ -879,11 +889,11 @@
         pos += vel * h;
       }
       const lap = (pos % 1 + 1) % 1;
-      edges.forEach(({ el, on }, host) => {
+      edges.forEach(({ el, on, gl }, host) => {
         if (!host.isConnected || !el.isConnected) { edges.delete(host); return; }
         if (!on()) return;
         const w = host.offsetWidth, h = host.offsetHeight;
-        if (w && h) paint(el, w, h, lap);
+        if (w && h) paint(el, w, h, lap, gl && gl.isConnected ? gl : null);
       });
       requestAnimationFrame(step);
     };
@@ -2371,8 +2381,19 @@
     // The stroke a button has at rest (2026-10-07, "keeping the liquidy effect … all strokes 1.5px, only the buttons"): 'b' = a border,
     // 'r' = an inset ring. The hover keeps that stroke at 1.5px in the fill's colour (motion.css .wu-line-b / .wu-line-r) instead of
     // dropping it while the fill is still rising.
-    const lineMark = b => {
-      if (b.classList.contains('wu-line-b') || b.classList.contains('wu-line-r')) return;
+    // The resting stroke can differ by THEME (fixed 2026-10-12, "on hover the black stroke doesn't show" on Shop all: night gives it
+    // an inset red ring, day none) — so the tag remembers the theme it was read in, and after a day/night switch every filled
+    // button is read again AT REST, once the theme's own colour transitions have settled (a hovered one when the pointer leaves);
+    // a button first hovered in night used to keep its night hover in day (a white inner ring, no ink edge).
+    const lineTheme = () => isNight() ? 'n' : 'd';
+    const lineAgain = b => setTimeout(() => { if (b.isConnected && !b.matches(':hover')) lineMark(b, true); }, 1200); // after the 500–600ms colour + stroke transitions (+100ms delay) have finished
+    window.addEventListener('wu-theme', () => document.querySelectorAll('.wu-fill').forEach(lineAgain));
+    document.addEventListener('pointerleave', e => { const b = e.target; if (b instanceof Element && b.classList.contains('wu-fill') && b.dataset.lineTheme && b.dataset.lineTheme !== lineTheme()) lineAgain(b); }, true);
+    const lineMark = (b, again) => {
+      const t = lineTheme();
+      if (!again && b.dataset.lineTheme === t) return;
+      b.dataset.lineTheme = t;
+      b.classList.remove('wu-line-b', 'wu-line-r');
       const cs = getComputedStyle(b);
       const a = c => { const v = (String(c).match(/[\d.]+/g) || []).map(Number); return v.length > 3 ? v[3] : 1; };
       if (['Top', 'Right', 'Bottom', 'Left'].some(k => parseFloat(cs['border' + k + 'Width']) > 0 && cs['border' + k + 'Style'] !== 'none' && a(cs['border' + k + 'Color']) > .05)) { b.classList.add('wu-line-b'); return; }
@@ -2637,7 +2658,7 @@
     runEdges();
     faqFromPage();
     // A floating capsule ([data-edge], e.g. the All Products filters' twin) glows only while its bar is away
-    document.querySelectorAll('[data-edge]').forEach(cap => addEdge(cap, () => !!pBar && pBar.classList.contains('is-stuck')));
+    document.querySelectorAll('[data-edge]').forEach(cap => addEdge(cap, () => !!pBar && pBar.classList.contains('is-stuck'), { glow: true }));
     if (nav) nav.addEventListener('click', e => {
       const a = e.target.closest('[data-act]');
       if (!a) return;

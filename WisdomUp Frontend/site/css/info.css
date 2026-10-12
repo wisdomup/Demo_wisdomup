@@ -23,8 +23,14 @@
 /* Buttons */
 .btn-outline { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 22px; border: 1.5px solid #1B1B1B; border-radius: 999px; background: #fff; color: #1B1B1B; font: 700 15px/1 var(--font); cursor: pointer; text-decoration: none; transition: background-color 180ms ease, color 180ms ease; }
 .btn-outline:hover { background: #1B1B1B; color: #fff; }
-.ihero--dark .btn-outline { background: transparent; border-color: #fff; color: #fff; }
-.ihero--dark .btn-outline:hover { background: #fff; color: #1B1B1B; }
+/* The Live banner's two buttons = the Live Shopping card's pair (2026-10-12, "keep it red, on hover it turns white, same like the two
+   buttons on the live stream card" — night-home.css .nh-live): "Shop new arrivals" SOLID BRAND RED, "Remind me" DARK GLASS with a
+   faint 1.5px white ring; on hover both fill WHITE (motion.css) — red type on the red one, ink on the glass one. Both themes; the
+   resting colour stays put under the rising fill. */
+.ihero--dark .ihero__actions .btn-outline { background: #D91E05; border-color: #D91E05; color: #fff; box-shadow: none; }
+.ihero--dark .ihero__actions .btn-pill { background: rgba(22, 22, 24, .55); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-color: transparent; box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .12); color: #fff; }
+.ihero--dark .ihero__actions .btn-outline:hover { background: #D91E05; }            /* (hover: only the resting colour under the fill —  */
+.ihero--dark .ihero__actions .btn-pill:hover { background: rgba(22, 22, 24, .55); } /*  the text colour comes from the fill, motion.css) */
 .btn-navy { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 22px; border: 0; border-radius: 999px; background: #1B1B1B; color: #fff; font: 700 15px/1 var(--font); cursor: pointer; text-decoration: none; }
 .btn-navy:hover { color: #fff; filter: brightness(1.2); }
 .link-arrow { display: inline-flex; align-items: center; gap: 6px; font: 700 15px/1.2 var(--font); color: #111; text-decoration: none; }
