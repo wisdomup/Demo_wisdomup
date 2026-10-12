@@ -481,6 +481,26 @@ def main():
         }
         products.append(p)
 
+    # Specs from the owner's listing sheet (tools/listing_specs.json, curated 2026-10-13 — see tools/check_listing_specs.py):
+    # appended after a product's own specs; a label the product already has keeps the supplier-sheet value. On those
+    # products, same-label duplicates from the supplier rules (e.g. car chargers' two "Input" rows) collapse to the fuller one;
+    # products the listing sheet doesn't cover are left exactly as the supplier sheets make them.
+    listing = json.load(open(os.path.join(ROOT, 'tools', 'listing_specs.json'), encoding='utf-8'))
+    for p in products:
+        if p['id'] not in listing:
+            continue
+        merged = {}
+        for k, v in p['specs']:
+            if k not in merged or len(v) > len(merged[k]):
+                merged[k] = v
+        p['specs'] = [[k, merged[k]] for k in dict.fromkeys(k for k, _ in p['specs'])]
+        n = 0
+        for k, v in (listing.get(p['id']) or {}).get('add', []):
+            if k not in merged:
+                p['specs'].append([k, v]); merged[k] = v; n += 1
+        if n:
+            p['listing'] = n  # how many specs at the END of p.specs came from the listing sheet (product.js: stat cards)
+
     # Order: department order, then type order, newest first, then model number
     t_order = [t for _, _, ts in DEPARTMENTS for t in ts]
     natural = lambda s: [int(x) if x.isdigit() else x for x in re.split(r'(\d+)', s)]

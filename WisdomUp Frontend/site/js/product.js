@@ -52,7 +52,12 @@
     { cls: 'pd-stat--light', bg: '#fff', fg: '#464646' },
     { cls: 'pd-stat--dark', bg: 'linear-gradient(160deg, #2A2A2E 0%, #121214 70%)', fg: '#fff' }, // day scheme: charcoal, no purple
   ];
-  const STATS = p.specs.filter(([k]) => !/Colours|Design|Type|Charging port|Interface|Plugs|Input/.test(k)).slice(0, 3)
+  // Stat cards: the product's own (supplier-sheet) specs first. Specs from the owner's listing sheet (2026-10-13; p.listing = how many,
+  // appended last by tools/build_catalog.py) only fill places left empty, and only with SHORT values (37Wh, 48W max, ABS) — a reading
+  // like "5V 3A · 9V 2A · 12V 1.5A" or "Lightning plug → …" stays in the spec table, never in a big stat card.
+  const STAT_SKIP = /Colours|Design|Type|Charging port|Interface|Plugs|Input/, ownN = p.specs.length - (p.listing || 0);
+  const STATS = p.specs.slice(0, ownN).filter(([k]) => !STAT_SKIP.test(k))
+    .concat(p.specs.slice(ownN).filter(([k, v]) => !STAT_SKIP.test(k) && k !== 'Certifications' && v.length <= 16 && !/[·→,]/.test(v))).slice(0, 3)
     .map(([k, v]) => ({ v, t: k, s: '' }))
     .concat([{ v: 'Warranty', t: 'Brand cover', s: 'Manufacturing defects covered — see the warranty policy.' }]);
   const FAQS = (FAQ[dept.id] || []).concat([
