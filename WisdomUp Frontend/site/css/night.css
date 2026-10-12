@@ -629,22 +629,22 @@ html[data-theme="night"] :is(.af-h, .afj__h, .afs__step h3, .afw__card h3, .afhp
 html[data-theme="night"] :is(.afs__step p, .afw__card p, .afhp__copy p, .afj p) { color: var(--n-text2); }
 html[data-theme="night"] :is(.afs, .afw__img, .afhp__art, .afj) { background: var(--n-bg2); box-shadow: inset 0 0 0 1.5px var(--n-line); }
 html[data-theme="night"] .afs__steps::before { background: var(--n-line2); }
-html[data-theme="night"] .afs__ic { background: var(--n-raise); box-shadow: inset 0 0 0 1.5px var(--n-line2); }
+html[data-theme="night"] .afs__ic { background: var(--n-raise); box-shadow: inset 0 0 0 1.5px var(--n-line); }
 html[data-theme="night"] :is(.afs__ic svg, .afw__pill svg, .afm svg) { stroke: #fff; }
 html[data-theme="night"] :is(.afs__ic, .afw__pill) .r { stroke: var(--n-red-text); }
-html[data-theme="night"] .afw__pill { background: var(--n-raise); box-shadow: inset 0 0 0 1.5px var(--n-line2); color: var(--n-text); }
+html[data-theme="night"] .afw__pill { background: var(--n-raise); box-shadow: inset 0 0 0 1.5px var(--n-line); color: var(--n-text); }
 html[data-theme="night"] .afw__ph { box-shadow: 0 18px 40px rgba(0,0,0,.5); }
 html[data-theme="night"] .afhp__row { box-shadow: inset 0 -1.5px 0 var(--n-line); }
 html[data-theme="night"] .afhp__row:last-child { box-shadow: none; }
 html[data-theme="night"] .afhp__n { color: var(--n-red-text); }
-html[data-theme="night"] .afm { background: var(--n-card); box-shadow: inset 0 0 0 1.5px var(--n-line2); }
+html[data-theme="night"] .afm { background: var(--n-card); box-shadow: inset 0 0 0 1.5px var(--n-line); }
 html[data-theme="night"] :is(.afm__label, .afm__lab, .afm__tierrow) { color: var(--n-muted); }
 html[data-theme="night"] :is(.afm__code, .afm__search, .afm__it, .afm__tierrow b) { color: var(--n-text); }
 html[data-theme="night"] :is(.afm__link, .afm__cap) { background: var(--n-raise); color: var(--n-text2); }
 html[data-theme="night"] .afm__it b { color: var(--n-text2); }
 html[data-theme="night"] .afm__btn { box-shadow: inset 0 0 0 1.5px #fff; color: #fff; }
 html[data-theme="night"] .afm__btn--ink { background: #fff; color: #0B0B0B; box-shadow: none; }
-html[data-theme="night"] .afm__search { box-shadow: inset 0 0 0 1.5px var(--n-line2); }
+html[data-theme="night"] .afm__search { box-shadow: inset 0 0 0 1.5px var(--n-line); }
 html[data-theme="night"] .afm__item { box-shadow: inset 0 -1.5px 0 var(--n-line); }
 html[data-theme="night"] .afm__item:last-child { box-shadow: none; }
 html[data-theme="night"] .afm__bars { box-shadow: inset 0 -1.5px 0 var(--n-line2); }
@@ -700,3 +700,11 @@ html[data-theme="night"] .pdp2__wa { box-shadow: inset 0 0 0 1.5px #fff; color: 
 html[data-theme="night"] .rv__wait { background: var(--n-raise); box-shadow: inset 0 0 0 1.5px var(--n-line2); color: var(--n-text2); }
 html[data-theme="night"] .series__off { background: var(--n-red-soft); color: var(--n-red-text); -webkit-text-fill-color: currentColor; }
 
+/* ---------- ONE STROKE ON NIGHT CARDS (2026-10-12, "the strokes on the black theme are very thick, the light theme has perfect strokes,
+   match them … cards and placeholders, skip the buttons"). MEASURED on 19 pages in both themes: a day card's line stands out ~1.27:1
+   from its background and most night lines match (7% white ≈ 1.21:1) — but the shared night surface rule above gives a long list of
+   surfaces BOTH a border and an inset ring, so every card that has a border in day carried TWO 1.5px lines in night (a 3px edge):
+   the product page's stat cards, offer box, review summary and spec table, the Live page tiles, callouts, corporate perks. Those keep
+   their border (as in day) and lose the ring — and the faint top sheen line that sat right inside it. Buttons and fields untouched. */
+html[data-theme="night"] :is(.pd-stat, .offer, .rv__sum, .callout, .perk, div.tile, .contact-card, .toc, .kv, .kv > *, .cities span, .manual, .iform, .track__form, .bk-form, .panel-list),
+html[data-theme="night"] #spec-list { box-shadow: none !important; } /* .kv > * = key/value table cells (each had a full ring on top of its row line); .cities span = Where to Buy city tags */
