@@ -417,5 +417,6 @@
   // the section tabs carry the nav's rainbow edge light — the same glow and motion, nothing else of the nav's skin (2026-10-07)
   WU.edge($('pdtabs').querySelector('.pdtabs__in'), () => true);
   WU.edge($('buybar'), () => $('buybar').classList.contains('is-on')); // the floating buy bar too, while it is showing
+  WU.liquid($('pdtabs').querySelector('.pdtabs__in')); WU.liquid($('buybar')); // and the nav's liquid glass (2026-10-12)
   onScroll();
 })();

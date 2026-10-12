@@ -193,6 +193,7 @@
     }).join('');
   };
   mfloat.addEventListener('mousedown', e => e.preventDefault()); // a click must not move focus onto a copy
+  WU.liquid(mfloat.querySelector('.mbar__cap')); // the twin wears the nav's liquid glass too (common.js liquid())
   mfloat.addEventListener('click', e => { const b = e.target.closest('[data-proxy]'); if (b) $(b.dataset.proxy).click(); });
   // Flag a chip row that is wider than its capsule, so its ends can fade
   const markPillScroll = () => document.querySelectorAll('.mbar__pills').forEach(p => p.classList.toggle('is-scroll', p.scrollWidth > p.clientWidth + 1));

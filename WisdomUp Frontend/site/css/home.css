@@ -44,8 +44,23 @@ button { font-family: inherit; }
 .site-nav, .mfloat .mbar__cap { background-color: rgba(22, 18, 17, .64); background-image: linear-gradient(115deg, rgba(255,255,255,.10) 0%, rgba(255,255,255,0) 24%, rgba(255,255,255,0) 72%, rgba(255,255,255,.07) 100%); backdrop-filter: blur(30px) saturate(170%); -webkit-backdrop-filter: blur(30px) saturate(170%); border-radius: 999px; box-shadow: 0 10px 30px rgba(0,0,0,.16), inset 0 -14px 30px -16px rgba(226,232,255,.12); }
 .site-nav { position: fixed; z-index: 40; overflow: hidden; transition: transform 320ms cubic-bezier(.2,.7,.2,1), background-color 320ms cubic-bezier(.2,.7,.2,1); }
 .site-nav.on-dark { background-color: rgba(86, 78, 74, .30); }
-/* Hair-thin edge, as on ClickUp Brain² (their cards/pills: 0.5px solid rgba(255,255,255,.12) + a soft cool inset glow) */
-.site-nav::before, .mfloat .mbar__cap::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; border: 1.5px solid rgba(226, 232, 255, .12); pointer-events: none; }
+/* LIQUID GLASS (2026-10-12, "install liquid-glass-js … nav bar", built in CSS instead of the library; the same day "apply this on
+   all floating capsules" — nav, floating filter capsule, product section tabs + buy bar, toast, WhatsApp button, nav labels; NOT
+   the back-to-top button). common.js liquid(el) adds the rim and, in Chromium, the bend.
+   RIM (`.wu-rim`, every browser): a 1.5px SPECULAR ring — bright where light catches the curve (the top of the left end, the
+   bottom of the right end), faint along the straight runs — in place of each capsule's flat hairline. */
+.wu-rim { position: absolute; inset: 0; z-index: 1; border-radius: inherit; padding: 1.5px; pointer-events: none;
+  background: linear-gradient(118deg, rgba(255,255,255,var(--rim-hi, .62)) 0%, rgba(255,255,255,.16) 8%, rgba(255,255,255,.07) 38%, rgba(255,255,255,.07) 64%, rgba(255,255,255,.15) 92%, rgba(255,255,255,var(--rim-lo, .44)) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#fff 0 0) content-box exclude, linear-gradient(#fff 0 0); }
+/* BEND (Chromium, `.is-lq`): an SVG lens map (var(--lq), drawn by liquid() for each capsule's size) runs on the live backdrop
+   BEFORE a lighter blur, so the page under the rim curves visibly. Each capsule keeps its own tint; --lq-rest = its blur after
+   the bend (over a dark banner the nav's drops to 4px, so the photo bends like it would under thick glass). */
+.is-lq { -webkit-backdrop-filter: var(--lq) var(--lq-rest, blur(10px) saturate(190%)) !important; backdrop-filter: var(--lq) var(--lq-rest, blur(10px) saturate(190%)) !important; }
+.site-nav.on-dark { --lq-rest: blur(4px) saturate(190%); }
+.pdtabs__in, .toast { --lq-rest: blur(10px) saturate(150%); }
+.buybar { --lq-rest: blur(8px) saturate(160%); }
+.navtip { --lq-rest: blur(6px) saturate(170%); }
+.wafab { --lq-rest: blur(8px) saturate(180%); }
 /* Moving edge light: a rainbow arc on the 1px edge (speed, length and colours copied from the "Memory Updated" card on
    clickup.com/lp/brain). runEdges() in common.js paints the gradient; this layer shows it only through a 1px ring.
    Used on the nav and on the stuck filter capsule. */
@@ -1119,9 +1134,10 @@ body:has(.buybar.is-on) .totop { bottom: calc(96px + env(safe-area-inset-bottom)
 /* FLOATING WHATSAPP (2026-10-10, from the audit "WhatsApp is hard to find"): bottom-right on every page, a solid ink capsule (no
    green — the day colour rule; no shadow); a 48px circle, a "Chat on WhatsApp" capsule from 1024px; rides above the copyright band
    (--totop-lift) and the product buy bar; out of the way while the cookie card is up (same corner). */
-.wafab { position: fixed; right: max(16px, env(safe-area-inset-right)); bottom: calc(20px + env(safe-area-inset-bottom) + var(--totop-lift, 0px)); z-index: 32; display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-width: 48px; height: 48px; padding: 0 12px; border-radius: 999px; background: #1B1B1B; color: #fff; box-shadow: 0 0 0 1.5px #fff; font: 600 14px/1 var(--font); letter-spacing: .01em; text-decoration: none; transition: opacity 300ms ease, transform 500ms cubic-bezier(.3,1,.3,1); }
-/* (2026-10-10, "remove the shadow … match the design theme"): the site's solid INK capsule (like .btn-pill / "Shop all") — no drop
-   shadow, no glass; the 1.5px white outer edge only shows where it floats over a dark slide or photo; hover = the liquid fill */
+.wafab { position: fixed; right: max(16px, env(safe-area-inset-right)); bottom: calc(20px + env(safe-area-inset-bottom) + var(--totop-lift, 0px)); z-index: 32; display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-width: 48px; height: 48px; padding: 0 12px; border-radius: 999px; background: rgba(22, 18, 17, .72); -webkit-backdrop-filter: blur(20px) saturate(170%); backdrop-filter: blur(20px) saturate(170%); color: #fff; font: 600 14px/1 var(--font); letter-spacing: .01em; text-decoration: none; transition: opacity 300ms ease, transform 500ms cubic-bezier(.3,1,.3,1); }
+/* (2026-10-10, "remove the shadow … match the design theme"): no drop shadow; hover = the liquid fill. Since 2026-10-12 ("apply
+   this on all floating capsules") it is the nav's LIQUID GLASS — the smoked tint (a touch darker, .72, for the white glyph on white
+   pages), the specular rim (.wu-rim) instead of the white outer edge, and the bend in Chromium */
 .wafab svg { flex: none; width: 24px; height: 24px; }
 .wafab span { display: none; }
 .wafab:focus-visible { outline: 2px solid #0B0B0B; outline-offset: 3px; }
@@ -1140,7 +1156,7 @@ body:has(.ckc.is-bar:not([hidden])) .wafab { opacity: 0; pointer-events: none; t
 .promo__title { font: 600 14px/1.3 var(--font); color: rgba(255,255,255,.86); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .promo__price { font: 700 18px/1 var(--font); color: #fff; }
 /* NAV LABELS (2026-10-10): the icon's name in a small smoked-glass capsule under the nav on hover / keyboard focus */
-.navtip { position: fixed; z-index: 60; transform: translate(-50%, -4px); padding: 0 10px; height: 26px; display: flex; align-items: center; border-radius: 999px; background: rgba(22, 18, 17, .86); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.12), 0 6px 18px rgba(0,0,0,.18); color: #fff; font: 600 12px/1 var(--font); letter-spacing: .01em; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 200ms ease, transform 300ms cubic-bezier(.3,1,.3,1); }
+.navtip { position: fixed; z-index: 60; transform: translate(-50%, -4px); padding: 0 10px; height: 26px; display: flex; align-items: center; border-radius: 999px; background: rgba(22, 18, 17, .86); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: 0 6px 18px rgba(0,0,0,.18); color: #fff; font: 600 12px/1 var(--font); letter-spacing: .01em; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 200ms ease, transform 300ms cubic-bezier(.3,1,.3,1); }
 .navtip.is-on { opacity: 1; transform: translate(-50%, 0); }
 .navtip[hidden] { display: none; }
 @media (prefers-reduced-motion: reduce) { .navtip { transition: none; } }

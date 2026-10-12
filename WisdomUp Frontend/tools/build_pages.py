@@ -219,6 +219,11 @@ def build_one(t, tmp):
     # again anyway, so leave it out and a rebuild without real changes leaves the files untouched
     body = re.sub(r'(<div class="footer-wrap[^"]*" id="footer") style="[^"]*"', r'\1', body)
     body = strip_clones(body)
+    # liquid glass (common.js liquid()): the lens filters live in a top-level <svg> (dropped above) and are drawn again on load,
+    # so leave out the marks that point at them — a saved url(#wu-lq-…) would name a filter that does not exist yet
+    body = re.sub(r'(class="[^"]*?) is-lq\b', r'\1', body)
+    body = re.sub(r'\s*--lq:\s*url\([^)]*\);?', '', body)
+    body = re.sub(r' style=""', '', body)
     body = re.sub(r'\n{3,}', '\n\n', body)
     out = re.sub(r'(<body[^>]*>).*(</body>)', lambda m: m.group(1) + body + m.group(2), out, count=1, flags=re.S)
     out = out.replace('<!-- pre-rendered', '<!-- (old) pre-rendered')

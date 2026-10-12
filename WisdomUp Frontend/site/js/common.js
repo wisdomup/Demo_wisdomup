@@ -100,6 +100,7 @@
     t.innerHTML = (svg || icon('bag', 18)) + '<span>' + esc(msg) + '</span>';
     t.hidden = false;
     addEdge(t, () => !t.hidden); // floating capsules carry the nav's edge light (2026-10-07); re-added because the content was replaced
+    liquid(t); // …and the liquid glass (2026-10-12)
     clearTimeout(toastT);
     toastT = setTimeout(() => { t.hidden = true; }, 2400);
   }
@@ -742,6 +743,60 @@
     paintWish();
     paintThemeBtns();
     mountNavEdge();
+    liquid(nav);
+  }
+  /* LIQUID GLASS (2026-10-12, "install liquid-glass-js … nav bar": that library bends a one-time html2canvas screenshot of the
+     page, which goes stale under our moving banner and is heavy on phones, so the user chose this CSS route). The nav — and its
+     twin, the floating filter capsule — bends the LIVE page behind it at its rim, like Apple's Liquid Glass: `backdrop-filter:
+     url(#…)` runs an SVG feDisplacementMap whose map is drawn here for the pill's exact size — no shift along the middle, a
+     lens-shaped pull toward the centre near the edge (1 − √(1 − t²), t = closeness to the rim), so whatever passes under the rim
+     looks magnified and curved. Redrawn when the pill changes size. Chromium only (Chrome, Edge, Samsung Internet, Android):
+     Safari and Firefox can't run SVG filters inside backdrop-filter, so they keep the frosted glass; skipped for reduced
+     transparency. The specular rim (`.wu-rim`, home.css) is plain CSS and shows everywhere.
+     EVERY FLOATING CAPSULE (2026-10-12, "apply this on all floating capsules — not the back to top button"): the nav, the
+     floating filter capsule, the product page's section tabs and buy bar, the toast, the WhatsApp button and the nav's labels.
+     Call liquid(el) again after replacing a capsule's content (toast, label): the rim comes back, the map follows the new size. */
+  const LQ_OK = !!(navigator.userAgentData && window.CSS && CSS.supports('backdrop-filter', 'url(#a) blur(1px)')) && !matchMedia('(prefers-reduced-transparency: reduce)').matches;
+  let lqDefs = null, lqN = 0;
+  const lqDone = new WeakSet(); // kept in memory, never in the markup, so a pre-rendered page (tools/build_pages.py) always gets its own lens
+  function liquid(el) {
+    if (!el) return;
+    if (![...el.children].some(c => c.classList.contains('wu-rim'))) el.insertAdjacentHTML('afterbegin', '<i class="wu-rim" aria-hidden="true"></i>');
+    if (!LQ_OK || lqDone.has(el) || !('ResizeObserver' in window)) return;
+    lqDone.add(el);
+    if (!lqDefs) {
+      document.body.insertAdjacentHTML('beforeend', '<svg class="wu-lq-defs" aria-hidden="true" focusable="false" width="0" height="0" style="position: absolute; width: 0; height: 0; overflow: hidden;"><defs></defs></svg>');
+      lqDefs = document.body.lastElementChild.firstElementChild;
+    }
+    const id = 'wu-lq-' + (++lqN);
+    lqDefs.insertAdjacentHTML('beforeend', `<filter id="${id}" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB"><feImage x="0" y="0" preserveAspectRatio="none" result="map"/><feDisplacementMap in="SourceGraphic" in2="map" xChannelSelector="R" yChannelSelector="G"/></filter>`);
+    const f = lqDefs.lastElementChild, fi = f.firstElementChild, fd = f.lastElementChild;
+    const cv = document.createElement('canvas'), cx = cv.getContext('2d');
+    let W = 0, H = 0;
+    const draw = () => {
+      const w = Math.round(el.offsetWidth), h = Math.round(el.offsetHeight);
+      if (!w || !h || (w === W && h === H)) return;
+      W = w; H = h;
+      const r = h / 2, max = Math.max(5, h * .2), S = max * 2.2; // the deepest pull at the rim (11px on the 56px nav) and the map's range
+      cv.width = w; cv.height = h;
+      const img = cx.createImageData(w, h), px = img.data;
+      for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+        const vx = x + .5 - Math.min(Math.max(x + .5, r), w - r), vy = y + .5 - r, len = Math.hypot(vx, vy) || 1;
+        const t = Math.min(1, len / r), m = max * (1 - Math.sqrt(1 - t * t)); // 0 along the middle, `max` at the rim
+        const i = (y * w + x) * 4;
+        px[i] = Math.round(127.5 - 255 * (vx / len) * m / S); // sample toward the centre: the rim shows the content just inside it, stretched
+        px[i + 1] = Math.round(127.5 - 255 * (vy / len) * m / S);
+        px[i + 2] = 128; px[i + 3] = 255;
+      }
+      cx.putImageData(img, 0, 0);
+      fi.setAttribute('width', w); fi.setAttribute('height', h);
+      fi.setAttribute('href', cv.toDataURL());
+      fd.setAttribute('scale', S.toFixed(2));
+      el.style.setProperty('--lq', `url(#${id})`);
+      el.classList.add('is-lq');
+    };
+    new ResizeObserver(draw).observe(el);
+    draw();
   }
   // Edge light: one rainbow arc glides clockwise round a pill's 1px edge (the nav, and the stuck filter capsule). Speed, length and colours are copied from
   // the "Memory Updated" card on clickup.com/lp/brain — a conic gradient spun once every 4s whose lit arc covers ~40% of
@@ -2085,6 +2140,7 @@
     waFab.addEventListener('click', () => px('Contact', { content_name: 'WhatsApp' }));
     paint();
     document.body.append(waFab);
+    liquid(waFab); // a floating capsule: liquid glass (2026-10-12)
     WU.wa = { set: t => { waMsg = t; paint(); }, link: waLink, text: leadText, svg: WA_SVG };
   }
   // NAV LABELS (2026-10-10, from the audit "the nav's category icons have no labels"): hovering or tabbing to an icon in the wide
@@ -2099,7 +2155,7 @@
       const label = b.getAttribute('aria-label');
       const own = b.querySelector('span'); // a label already on show (the current category, Shop All) needs no tip
       if (!label || b.getAttribute('aria-current') === 'true' || (own && own.getBoundingClientRect().width > 4)) return hide();
-      on = b; tip.textContent = label; tip.hidden = false;
+      on = b; tip.textContent = label; tip.hidden = false; liquid(tip); // the label replaced the rim; liquid glass like the nav
       const r = b.getBoundingClientRect(), navR = (b.closest('.site-nav') || b).getBoundingClientRect();
       tip.style.left = Math.round(r.left + r.width / 2) + 'px';
       tip.style.top = Math.round(navR.bottom + 8) + 'px';
@@ -3217,7 +3273,7 @@
     edge: addEdge, // the nav's rainbow edge light on any capsule: WU.edge(host, () => shouldGlowNow)
     initChrome, placeNav, setActiveCat, navOffset, scrollToEl,
     openSearch: () => search && search.open(),
-    toggleTheme, setTheme, themeMode, isNight, slide, staggerCards, rowPager, gridCols, fullRowCount, revealWords, sheetDrag, quickAdd, budget: BUDGET, STAR_OUTLINE,
+    toggleTheme, setTheme, themeMode, isNight, slide, staggerCards, rowPager, gridCols, fullRowCount, liquid, revealWords, sheetDrag, quickAdd, budget: BUDGET, STAR_OUTLINE,
     consent: { open: n => consentUI && consentUI.open(n), get: consentGet },
     taste: { get: tasteGet, suggest, clear: tasteClear, on: personalOK },
     live: { next: nextLive, parts: liveParts, remind: liveReminder }, fillPrices, // the on-device interest model (personalised suggestions)

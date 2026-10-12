@@ -59,7 +59,14 @@ html[data-theme="night"] :is(.btn-pill, .btn-buy, .chip, .fbtn, .opt-chip, .faq_
 
 /* ---------- Nav: flat dark glass + brighter hairline (the edge light stays) ---------- */
 html[data-theme="night"] .site-nav, html[data-theme="night"] .site-nav.on-dark, html[data-theme="night"] .mfloat .mbar__cap { background-color: rgba(26, 29, 33, .78); background-image: none; box-shadow: none; }
-html[data-theme="night"] .site-nav::before, html[data-theme="night"] .mfloat .mbar__cap::before { border-color: var(--n-line2); }
+html[data-theme="night"] .wu-rim { --rim-hi: .46; --rim-lo: .32; } /* the liquid-glass rim (home.css), a touch softer on the dark stage */
+html[data-theme="night"] .site-nav.is-lq.on-dark { background-color: rgba(26, 29, 33, .52); }
+/* the other floating capsules in liquid glass (2026-10-12): their flat 1.5px hairlines give way to the specular rim (.wu-rim);
+   the white night capsules (toast, WhatsApp) become white glass, ink type kept */
+html[data-theme="night"] .pdtabs__in { box-shadow: 0 10px 30px rgba(0,0,0,.35) !important; }
+html[data-theme="night"] .buybar { box-shadow: 0 10px 30px rgba(0,0,0,.35) !important; }
+html[data-theme="night"] .toast { background: rgba(244, 245, 246, .84); -webkit-backdrop-filter: blur(18px) saturate(140%); backdrop-filter: blur(18px) saturate(140%); }
+html[data-theme="night"] .wafab { background: rgba(244, 245, 246, .86) !important; box-shadow: none !important; -webkit-backdrop-filter: blur(20px) saturate(140%); backdrop-filter: blur(20px) saturate(140%); } /* liquid glass over the banner: clear enough for the bend to show */
 html[data-theme="night"] .site-nav .navbtn--all { background: rgba(255,255,255,.06); border-color: var(--n-line2); }
 html[data-theme="night"] .wu-util .utility a { color: var(--n-muted); }
 html[data-theme="night"] .wu-util .utility a:hover, html[data-theme="night"] .wu-util .utility a[aria-current="page"] { color: #fff; }
