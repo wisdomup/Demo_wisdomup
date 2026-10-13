@@ -78,7 +78,9 @@
     return i >= 0 ? i : V.findIndex(v => v.attrs[axis] === val);
   };
   const available = (axis, val) => V.some(v => v.attrs[axis] === val && p.axes.every(k => k === axis || v.attrs[k] === V[cur].attrs[k]));
-  const images = V.map(v => v.img).filter((x, i, a) => x && a.indexOf(x) === i);
+  // the variants' photos, then the owner's extra gallery photos (p.photos — tools/set_photo.py SKU IMAGE N, 2026-10-13)
+  const images = V.map(v => v.img).concat(p.photos || []).filter((x, i, a) => x && a.indexOf(x) === i);
+  const studio = !!p.bg && /^#(f[2-9a-f]){3}$/i.test(p.bg[1]); // a studio cut-out on white: thumbnails centred, not product-side
 
   // ---- SEO: title, description, canonical address, social preview and structured data for this product ----
   const canon = url.product(p.id);
@@ -122,7 +124,7 @@
           ${images.length > 1 ? `<button type="button" class="pdp2__chev pdp2__chev--prev" data-img="-1" aria-label="Previous image">${icon('chev-l', 22)}</button>
           <button type="button" class="pdp2__chev pdp2__chev--next" data-img="1" aria-label="Next image">${icon('chev-r', 22)}</button>` : ''}
         </div>
-        ${images.length > 1 ? `<div class="thumbs" id="thumbs">${images.map((im, i) => `<button type="button" class="thumb" data-i="${i}" aria-current="${im === V[cur].img}" aria-label="Photo ${i + 1}"><img src="${im.replace('img/p/', 'img/p/s/')}" alt="" style="width: 100%; height: 100%; object-fit: cover; object-position: 6% 50%; border-radius: inherit;"></button>`).join('')}</div>` : ''}
+        ${images.length > 1 ? `<div class="thumbs" id="thumbs">${images.map((im, i) => `<button type="button" class="thumb" data-i="${i}" aria-current="${im === V[cur].img}" aria-label="Photo ${i + 1}"><img src="${im.replace('img/p/', 'img/p/s/')}" alt="" style="width: 100%; height: 100%; object-fit: cover; object-position: ${(p.photos || []).includes(im) ? '50% 0' : studio ? '50% 50%' : '6% 50%'}; border-radius: inherit;"></button>`).join('')}</div>` : ''}
       </div>
 
       <div class="pdp2__info">
@@ -218,6 +220,7 @@
     const v = V.find(x => x.img === src) || V[cur];
     $('stage').style.background = photoBg(v);
     $('stage-img').src = src;
+    $('stage-img').classList.toggle('is-life', (p.photos || []).includes(src)); // owner's extra photos fill the square from the top
     document.querySelectorAll('#thumbs .thumb').forEach((t, i) => t.setAttribute('aria-current', images[i] === src));
   }
   // ORDER ON WHATSAPP (2026-10-10, from the audit): the message names the product, option, quantity, price and link; the floating
@@ -261,7 +264,7 @@
   }));
   const goImage = i => {
     const vi = V.findIndex(v => v.img === images[i]);
-    if (vi >= 0) setVariant(vi); else showImage(images[i]);
+    if (vi >= 0 && vi !== cur) setVariant(vi); else showImage(images[i]); // back to the chosen variant's own photo from an extra one
   };
   $('stage').addEventListener('click', e => {
     const b = e.target.closest('[data-img]');

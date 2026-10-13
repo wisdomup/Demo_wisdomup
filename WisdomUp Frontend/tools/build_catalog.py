@@ -480,6 +480,16 @@ def main():
             'axes': axes, 'variants': variants if len(variants) > 1 else [],
             'skus': [v['sku'] for v in variants],
         }
+        # extra gallery photos from tools/set_photo.py (img/p/‹id›-2.jpg, -3 …): shown on the product page after the product's own photo
+        extra = []
+        for n in range(2, 10):
+            mp = os.path.join(IMG_BIG, f'{p["id"]}-{n}.json')
+            if not os.path.exists(mp):
+                break
+            m = json.load(open(mp))
+            extra.append(f'img/p/{p["id"]}-{n}.jpg' + ('?v=' + m['v'] if m.get('v') else ''))
+        if extra:
+            p['photos'] = extra
         products.append(p)
 
     # Specs from the owner's listing sheet (tools/listing_specs.json, curated 2026-10-13 — see tools/check_listing_specs.py):

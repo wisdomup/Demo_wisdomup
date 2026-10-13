@@ -1,6 +1,9 @@
 """Replace a product's photo with a supplied image (2026-10-13, "replace on the product links of TS-2 and TS-3").
 
-usage:  python3 tools/set_photo.py SKU IMAGE   (SKU as in site/img/p, e.g. ts-2; IMAGE = jpg / png / webp)
+usage:  python3 tools/set_photo.py SKU IMAGE      (SKU as in site/img/p, e.g. ts-2; IMAGE = jpg / png / webp)
+        python3 tools/set_photo.py SKU IMAGE N    (N = 2, 3 … an EXTRA gallery photo for the product page: SKU-N.jpg;
+                                                  build_catalog.py lists them as p.photos, product.js shows them after the
+                                                  product's own photo with thumbnails and arrows)
 Writes site/img/p/SKU.jpg (1000px, like build_catalog.py's photo()), site/img/p/s/SKU.jpg (480px) and SKU.json (edge / centre
 colours, size, and `v` = the file's md5[:8]) — build_catalog.py reads that cache instead of the supplier sheet's photo, and puts
 `?v=` on the paths so browsers that cached the old photo (img/* is cached a week) fetch the new one. Then run
@@ -19,7 +22,10 @@ sys.path.insert(0, os.path.join(ROOT, 'tools'))
 from build_catalog import IMG_BIG, IMG_SMALL, bmp_px, hexc, grab  # noqa: E402
 
 
-def main(sku, image):
+def main(sku, image, n=None):
+    if n:
+        assert n.isdigit() and int(n) >= 2, 'the extra photo number must be 2 or more (1 is the product photo itself)'
+        sku = f'{sku}-{int(n)}'
     big, small, meta_path = os.path.join(IMG_BIG, sku + '.jpg'), os.path.join(IMG_SMALL, sku + '.jpg'), os.path.join(IMG_BIG, sku + '.json')
     run = lambda *a: subprocess.run(['sips', *a], check=True, capture_output=True)
     run('-s', 'format', 'jpeg', '-s', 'formatOptions', '72', '-Z', '1000', image, '--out', big)
@@ -39,6 +45,6 @@ def main(sku, image):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 3:
+    if len(sys.argv) not in (3, 4):
         sys.exit(__doc__)
-    main(sys.argv[1], sys.argv[2])
+    main(*sys.argv[1:])
