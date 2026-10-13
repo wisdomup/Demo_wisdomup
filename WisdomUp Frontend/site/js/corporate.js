@@ -7,6 +7,104 @@
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
 
+  /* ---------- who we gift for: higgsfield's client-card row. FACTS ONLY — no named clients yet, so the cards are the teams we make
+     gifts for, each with a real product + price. Real corporate clients go in CLIENTS (only with their permission):
+     { name, sub, img, title, line, href } — when there is at least one, they replace the sectors and the heading says so. ---------- */
+  const CLIENTS = [];
+  const byId = id => D.products.find(p => p.id === id);
+  const SECTORS = [
+    { name: 'Banks & finance', img: 'img/hero/ts-11anc-tall.webp', at: '50% 45%', pid: 'ts-11anc', title: 'Client gifts that stay on the desk' },
+    { name: 'Tech & telecom', img: 'img/hero/os-4-tall.webp', at: '50% 40%', pid: 'os-4', title: 'Open-ear earbuds for long days on calls' },
+    { name: 'Schools & universities', img: 'img/p/ts-11-2.jpg', at: '50% 30%', pid: 'ts-11', title: 'Graduation and staff gifts' },
+    { name: 'Events & agencies', img: 'img/hero/cdb-18-tall.webp', at: '50% 45%', pid: 'cdb-18', title: 'Giveaways that keep phones charged' },
+    { name: 'Healthcare & pharma', img: 'img/hero/tde-18-tall.webp', at: '50% 50%', pid: 'tde-18', title: 'Thank-you gifts for doctors and teams' },
+    { name: 'Retail & FMCG', img: 'img/hero/txd-01-tall.webp', at: '50% 45%', pid: 'txd-01', title: 'Grooming sets for staff rewards' }
+  ];
+  const track = $('cp-clients');
+  if (track) {
+    const real = CLIENTS.length > 0;
+    if (real) { $('cp-clients-tag').textContent = 'Corporate clients'; $('cp-clients-h').textContent = 'Companies already gifting with WisdomUp'; }
+    const cards = (real ? CLIENTS : SECTORS).map(c => {
+      const p = c.pid && byId(c.pid);
+      if (!real && !p) return '';
+      const line = real ? c.line : `${p.title} · ${p.priceText}`;
+      const href = real ? (c.href || '#quote') : url.product(p.id);
+      return `<a class="cp-cl" role="listitem" href="${href}" draggable="false"><img src="${c.img}" alt="" loading="lazy" draggable="false" style="object-position: ${c.at || '50% 50%'};"><span class="cp-cl__name">${esc(c.name)}${c.sub ? `<small>${esc(c.sub)}</small>` : ''}</span><span class="cp-cl__txt"><h3>${esc(c.title)}</h3><span>${esc(line)}</span></span></a>`;
+    }).join('');
+    track.innerHTML = cards;
+    // the progress line under the row: the thumb's width is the share of the row on screen, it moves with the scroll
+    const bar = track.parentElement.querySelector('.cp-clients__bar');
+    const paint = () => {
+      const max = track.scrollWidth - track.clientWidth, w = Math.max(.12, Math.min(1, track.clientWidth / track.scrollWidth));
+      bar.style.setProperty('--bw', (w * 100) + '%');
+      bar.style.setProperty('--bx', (max > 0 ? (track.scrollLeft / max) * ((1 - w) / w) * 100 : 0) + '%');
+      bar.hidden = max <= 2;
+    };
+    track.addEventListener('scroll', () => requestAnimationFrame(paint), { passive: true });
+    new ResizeObserver(paint).observe(track); paint();
+    // a mouse can drag the row (touch and trackpads scroll it natively); a drag never opens a card
+    if (fine) {
+      let x0 = 0, s0 = 0, moved = false, down = false;
+      track.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse' || e.button) return; down = true; moved = false; x0 = e.clientX; s0 = track.scrollLeft; });
+      window.addEventListener('pointermove', e => {
+        if (!down) return;
+        const dx = e.clientX - x0;
+        if (!moved && Math.abs(dx) > 5) { moved = true; track.classList.add('is-drag'); }
+        if (moved) track.scrollLeft = s0 - dx;
+      });
+      window.addEventListener('pointerup', () => {
+        if (!down) return; down = false;
+        if (moved) {
+          // settle on the nearest card, then let the snap take over again
+          const step = (track.querySelector('.cp-cl') || {}).offsetWidth + 16 || 1;
+          track.classList.remove('is-drag');
+          track.scrollTo({ left: Math.round(track.scrollLeft / step) * step, behavior: reduced ? 'auto' : 'smooth' });
+        }
+      });
+      track.addEventListener('click', e => { if (moved) { e.preventDefault(); moved = false; } }, true);
+    }
+  }
+
+  /* ---------- the quote form in two steps, like higgsfield's: 1 = who you are + the occasion, 2 = products, quantity, date, notes.
+     Continue checks step 1 with info.js's rules (required, a real email, a 10-digit phone); the send itself is info.js's. ---------- */
+  const form = $('corp-form');
+  if (form && form.querySelector('[data-step="2"]')) {
+    const steps = [...form.querySelectorAll('[data-step]')], bars = [...form.querySelectorAll('.cp-form__bars i')];
+    const back = form.querySelector('[data-back]'), next = form.querySelector('[data-next]'), send = form.querySelector('[data-send]'), label = form.querySelector('[data-step-label]');
+    let step = 1;
+    const go = (n, focus = true) => {
+      step = n;
+      steps.forEach(s => { s.hidden = +s.dataset.step !== n; });
+      bars.forEach((b, i) => b.classList.toggle('is-on', i < n));
+      back.hidden = n === 1; next.hidden = n !== 1; send.hidden = n !== 2;
+      if (label) label.textContent = `Step ${n} of 2`;
+      if (focus) { const f = form.querySelector(`[data-step="${n}"] input, [data-step="${n}"] select, [data-step="${n}"] .chip`); if (f) f.focus(); }
+    };
+    const ok = el => {
+      const v = el.value.trim();
+      if (el.required && !v) return false;
+      if (v && el.type === 'email') return /^\S+@\S+\.\S+$/.test(v);
+      if (v && el.type === 'tel') return v.replace(/\D/g, '').length >= 10;
+      return true;
+    };
+    const checkStep1 = () => {
+      const els = [...form.querySelectorAll('[data-step="1"] input[name]')];
+      const bad = els.filter(el => !ok(el));
+      els.forEach(el => { el.closest('.field').classList.toggle('is-bad', bad.includes(el)); el.setAttribute('aria-invalid', bad.includes(el)); });
+      if (bad.length) bad[0].focus();
+      return !bad.length;
+    };
+    next.addEventListener('click', () => { if (checkStep1()) go(2); });
+    back.addEventListener('click', () => go(1));
+    // Enter in a step-1 field means Continue, never a send that skips step 2
+    form.addEventListener('submit', e => { if (step === 1) { e.preventDefault(); e.stopImmediatePropagation(); if (checkStep1()) go(2); } }, true);
+    // a field the server rejects sits on step 1: go back to it
+    new MutationObserver(() => { if (step === 2 && form.querySelector('[data-step="1"] .field.is-bad')) go(1, false); }).observe(form, { subtree: true, attributes: true, attributeFilter: ['class'] });
+    form.querySelector('[data-reset]').addEventListener('click', () => go(1, false));
+    form.addEventListener('input', e => { const f = e.target.closest('.field'); if (f) f.classList.remove('is-bad'); });
+    go(1, false);
+  }
+
   /* ---------- live counts in the hero ---------- */
   const fill = { count: D.products.length.toLocaleString('en-PK'), ranges: (DEPTS || []).length };
   document.querySelectorAll('[data-cp]').forEach(el => { if (fill[el.dataset.cp] != null) el.textContent = fill[el.dataset.cp]; });

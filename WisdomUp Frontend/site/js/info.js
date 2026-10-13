@@ -75,7 +75,7 @@
     });
     form.addEventListener('submit', async e => {
       e.preventDefault();
-      const fields = [...form.querySelectorAll('input, textarea')].filter(el => el.name && el.name !== 'website');
+      const fields = [...form.querySelectorAll('input, textarea, select')].filter(el => el.name && el.name !== 'website'); // select: the corporate form's occasion (2026-10-14)
       const bad = fields.filter(el => !valid(el));
       fields.forEach(el => { el.closest('.field')?.classList.toggle('is-bad', bad.includes(el)); el.setAttribute('aria-invalid', bad.includes(el)); });
       if (bad.length) {

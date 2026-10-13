@@ -819,3 +819,9 @@ html[data-theme="night"] .page--corp .cp-step li { color: #C9CDD2; }
 html[data-theme="night"] .page--corp .cp-pill { background: #1A1D21; box-shadow: 0 10px 28px rgba(0,0,0,.3), inset 0 0 0 1.5px rgba(255,255,255,.07); color: #fff; }
 html[data-theme="night"] .page--corp .cp-faq .faq__q { color: #fff; }
 html[data-theme="night"] .page--corp .cp-more__chips a { color: #fff; }
+/* corporate "who we gift for" row + form (2026-10-14): the cards keep their photos; the row's hairline and progress line on the stage */
+html[data-theme="night"] .page--corp .cp-cl { box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.07); }
+html[data-theme="night"] .page--corp .cp-clients__bar { background: rgba(255,255,255,.1); }
+html[data-theme="night"] .page--corp .cp-clients__bar i { background: #fff; }
+html[data-theme="night"] .page--corp a.cp-cl, html[data-theme="night"] .page--corp .cp-cl__txt h3 { color: #fff; }
+html[data-theme="night"] .page--corp .cp-faq__more { color: rgba(255,255,255,.55); }

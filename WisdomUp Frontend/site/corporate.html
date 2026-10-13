@@ -37,9 +37,9 @@
 <link rel="stylesheet" href="css/home.css?v=387a2c7e">
 <link rel="stylesheet" href="css/pages.css?v=a5e2d128">
 <link rel="stylesheet" href="css/info.css?v=4adf166c">
-<link rel="stylesheet" href="css/corporate.css?v=d66a3bb6">
+<link rel="stylesheet" href="css/corporate.css?v=35570884">
 <link rel="stylesheet" href="css/controls.css?v=a315d52e">
-<link rel="stylesheet" href="css/night.css?v=d8eff0f0">
+<link rel="stylesheet" href="css/night.css?v=bbee31e0">
 <link rel="stylesheet" href="css/motion.css?v=faacb267">
 </head>
 <body>
@@ -69,6 +69,12 @@
       <p>Branded WisdomUp earbuds, speakers, mics and chargers for employees, clients and events — with volume pricing, custom packaging and gift-ready boxes.</p>
       <a class="cp-btn cp-btn--light" href="#quote">Request a quote</a>
     </div>
+  </section>
+
+  <section class="cp-sec cp-clients" aria-labelledby="cp-clients-h">
+    <div class="cp-head"><span class="cp-tag" id="cp-clients-tag">Who we gift for</span><h2 id="cp-clients-h">Made for teams across Pakistan</h2></div>
+    <div class="cp-clients__track" id="cp-clients" role="list" aria-labelledby="cp-clients-h"></div>
+    <div class="cp-clients__bar" aria-hidden="true"><i></i></div>
   </section>
 
   <section class="cp-sec cp-occ" aria-labelledby="cp-occ-h">
@@ -160,19 +166,41 @@
         <h2 id="cp-contact-h">Talk to our corporate team</h2>
         <p class="cp-contact__k">What you get</p>
         <ul class="cp-list">
-          <li><span class="cp-ic" data-icon="medal" data-size="20"></span>Your brand on the packaging, sleeves and cards</li>
-          <li><span class="cp-ic" data-icon="grid" data-size="20"></span>Tiered pricing across any mix of products</li>
-          <li><span class="cp-ic" data-icon="user" data-size="20"></span>One contact for quotes, samples and delivery</li>
-          <li><span class="cp-ic" data-icon="shield" data-size="20"></span>The standard WisdomUp warranty on every unit</li>
+          <li><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.6 2H13a1 1 0 0 1 1 1v4.4a1 1 0 0 1-.3.7l-5.6 5.6a1 1 0 0 1-1.4 0L2.3 9.3a1 1 0 0 1 0-1.4l5.6-5.6a1 1 0 0 1 .7-.3Z"/><circle cx="10.8" cy="5.2" r=".9"/></svg>Your brand on the packaging, sleeves and cards</li>
+          <li><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>Tiered pricing across any mix of products</li>
+          <li><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="5.2" r="2.7"/><path d="M2.8 14c.6-2.6 2.7-4.2 5.2-4.2s4.6 1.6 5.2 4.2"/></svg>One contact for quotes, samples and delivery</li>
+          <li><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 1.8 13.2 4v3.7c0 3.2-2.2 5.6-5.2 6.5-3-.9-5.2-3.3-5.2-6.5V4L8 1.8Z"/><path d="m5.8 8 1.6 1.6 2.8-3"/></svg>The standard WisdomUp warranty on every unit</li>
         </ul>
-        <p class="cp-contact__note">We reply within one working day. Retailers and distributors: see <a href="bulk-order.html">Bulk Order</a>.</p>
+        <p class="cp-contact__k cp-contact__k--pay">Pay the way your finance team prefers</p>
+        <div class="cp-pays" aria-label="Payment methods"><span>Cash on Delivery</span><span>Bank transfer</span><span>JazzCash</span><span>EasyPaisa</span></div>
       </div>
-      <form class="iform cp-form" id="corp-form" data-inquiry data-lead="corporate" data-lead-title="Corporate quote request" novalidate data-success="Our corporate team will email you at {email} within one working day with a quote for {products} ({qty} units)." data-error="Please fill in your name, company, a valid work email and phone number." aria-labelledby="corp-form-h">
-      <div data-fill style="display: flex; flex-direction: column; gap: 18px;">
-        <div><h2 class="iform__h" id="corp-form-h">Request a corporate quote</h2><p class="cp-form__sub">Tell us what you need and we’ll come back with pricing and a branding mock-up.</p></div>
-        <div class="bk-fields"><div class="field"><label for="f-name">Full name<i>*</i></label><input id="f-name" name="name" type="text" placeholder="Your full name" autocomplete="name" required></div><div class="field"><label for="f-company">Company<i>*</i></label><input id="f-company" name="company" type="text" placeholder="Company name" autocomplete="organization" required></div><div class="field"><label for="f-email">Work email<i>*</i></label><input id="f-email" name="email" type="email" placeholder="name@company.com" autocomplete="email" required></div><div class="field"><label for="f-phone">Phone / WhatsApp<i>*</i></label><input id="f-phone" name="phone" type="tel" placeholder="+92 300 1234567" autocomplete="tel" required></div></div><fieldset class="bk-group"><legend>Occasion</legend><div class="bk-chips" data-name="occasion" data-single><button type="button" class="chip" aria-pressed="true">Employee gifts</button><button type="button" class="chip" aria-pressed="false">Client gifts</button><button type="button" class="chip" aria-pressed="false">Events & conferences</button><button type="button" class="chip" aria-pressed="false">Eid & festive</button></div></fieldset><fieldset class="bk-group"><legend>Products</legend><div class="bk-chips" data-name="products"><button type="button" class="chip" aria-pressed="true">Earbuds</button><button type="button" class="chip" aria-pressed="false">Neckbands</button><button type="button" class="chip" aria-pressed="false">Speakers</button><button type="button" class="chip" aria-pressed="false">Microphones</button><button type="button" class="chip" aria-pressed="false">Chargers</button></div></fieldset><fieldset class="bk-group"><legend>Quantity</legend><div class="bk-chips" data-name="qty" data-single><button type="button" class="chip" aria-pressed="true">50–200</button><button type="button" class="chip" aria-pressed="false">200–1,000</button><button type="button" class="chip" aria-pressed="false">1,000+</button></div></fieldset><div class="field"><label for="f-date">When do you need them?</label><input id="f-date" name="date" type="text" placeholder="e.g. by 15 December"></div><div class="field"><label for="f-note">Branding and anything else</label><textarea id="f-note" name="note" placeholder="Logo printing, gift boxes, delivery to several offices…"></textarea></div>
+      <form class="iform cp-form" id="corp-form" data-inquiry data-lead="corporate" data-lead-title="Corporate quote request" novalidate data-success="Our corporate team will email you at {email} within one working day with a quote for {products} ({qty} units)." data-error="Please check the highlighted fields." aria-labelledby="corp-form-h">
+      <div data-fill class="cp-form__fill">
+        <div class="cp-form__head"><h3 class="iform__h" id="corp-form-h">Request a quote</h3><p class="cp-form__sub">Tell us what you need and we’ll get back to you within one working day</p></div>
+        <div class="cp-form__step" data-step="1">
+          <div class="cp-form__grid">
+            <div class="field" data-err="Full name is required"><label for="f-name">Full name<i>*</i></label><input id="f-name" name="name" type="text" placeholder="Your full name" autocomplete="name" required></div>
+            <div class="field" data-err="Company name is required"><label for="f-company">Company name<i>*</i></label><input id="f-company" name="company" type="text" placeholder="Company name" autocomplete="organization" required></div>
+            <div class="field" data-err="Please enter a valid work email"><label for="f-email">Work email<i>*</i></label><input id="f-email" name="email" type="email" placeholder="name@company.com" autocomplete="email" required></div>
+            <div class="field" data-err="Please enter a valid phone number"><label for="f-phone">Phone / WhatsApp<i>*</i></label><input id="f-phone" name="phone" type="tel" placeholder="+92 300 1234567" autocomplete="tel" required></div>
+            <div class="field cp-form__full"><label for="f-occasion">What is the occasion?</label><span class="cp-select"><select id="f-occasion" name="occasion"><option>Employee gifts</option><option>Client gifts</option><option>Events &amp; conferences</option><option>Eid &amp; festive</option><option>Something else</option></select></span></div>
+          </div>
+        </div>
+        <div class="cp-form__step" data-step="2" hidden>
+          <fieldset class="bk-group"><legend>Products</legend><div class="bk-chips" data-name="products"><button type="button" class="chip" aria-pressed="true">Earbuds</button><button type="button" class="chip" aria-pressed="false">Headphones</button><button type="button" class="chip" aria-pressed="false">Neckbands</button><button type="button" class="chip" aria-pressed="false">Speakers</button><button type="button" class="chip" aria-pressed="false">Microphones</button><button type="button" class="chip" aria-pressed="false">Power banks</button><button type="button" class="chip" aria-pressed="false">Chargers</button></div></fieldset>
+          <fieldset class="bk-group"><legend>Quantity</legend><div class="bk-chips" data-name="qty" data-single><button type="button" class="chip" aria-pressed="true">50–200</button><button type="button" class="chip" aria-pressed="false">200–1,000</button><button type="button" class="chip" aria-pressed="false">1,000+</button></div></fieldset>
+          <div class="cp-form__grid">
+            <div class="field cp-form__full"><label for="f-date">When do you need them?</label><input id="f-date" name="date" type="text" placeholder="e.g. by 15 December"></div>
+            <div class="field cp-form__full"><label for="f-note">Branding and anything else</label><textarea id="f-note" name="note" placeholder="Logo printing, gift boxes, delivery to several offices…"></textarea></div>
+          </div>
+        </div>
         <div class="ck__hp" aria-hidden="true"><label>Website<input name="website" tabindex="-1" autocomplete="off"></label></div>
-        <div class="bk-foot"><span class="bk-hint" data-hint aria-live="polite">We reply within one working day.</span><button type="submit" class="btn-pill">Send request</button></div>
+        <span class="bk-hint" data-hint aria-live="polite"></span>
+        <div class="cp-form__foot">
+          <div class="cp-form__bars" aria-hidden="true"><i class="is-on"></i><i></i></div>
+          <span class="cp-form__count" data-step-label>Step 1 of 2</span>
+          <div class="cp-form__btns"><button type="button" class="cp-fbtn cp-fbtn--back" data-back hidden>Back</button><button type="button" class="cp-fbtn" data-next>Continue</button><button type="submit" class="cp-fbtn" data-send hidden>Send request</button></div>
+        </div>
       </div>
       <div class="bk-done" data-done hidden>
         <span class="badge-grad">Request received</span>
@@ -228,7 +256,7 @@
 <script src="js/wu-data.js?v=9ed52186"></script>
 <script src="js/ds-icons.js?v=ab37eba9"></script>
 <script src="js/common.js?v=3e755ac3"></script>
-<script src="js/info.js?v=a097437e"></script>
-<script src="js/corporate.js?v=7a0c443d"></script>
+<script src="js/info.js?v=623b8d06"></script>
+<script src="js/corporate.js?v=15406b8f"></script>
 </body>
 </html>
