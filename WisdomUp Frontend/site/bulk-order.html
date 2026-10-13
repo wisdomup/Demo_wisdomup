@@ -36,72 +36,207 @@
 <link rel="stylesheet" href="css/wu-rail.css?v=7e14a6c3">
 <link rel="stylesheet" href="css/home.css?v=387a2c7e">
 <link rel="stylesheet" href="css/pages.css?v=a5e2d128">
+<link rel="stylesheet" href="css/corporate.css?v=c32e612a">
 <link rel="stylesheet" href="css/info.css?v=4adf166c">
 <link rel="stylesheet" href="css/controls.css?v=a315d52e">
 <link rel="stylesheet" href="css/night.css?v=bbee31e0">
 <link rel="stylesheet" href="css/motion.css?v=faacb267">
 </head>
 <body>
-<div class="page page--bulk">
+<div class="page page--info page--corp page--bulk">
 
   <div class="wu-util"><nav class="utility" aria-label="Utility" id="utility"></nav></div>
   <header class="nav site-nav" id="site-nav"></header>
-  <div class="nav-spacer"></div>
 
-  <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Home</a><span aria-hidden="true">›</span><span aria-current="page">Bulk &amp; Corporate Orders</span></nav>
-
-  <section class="bk-hero">
-    <div class="bk-intro">
-      <div class="eyebrow">WisdomUp Bulk Desk</div>
-      <h1>Wholesale mobile accessories in Pakistan, <b>at scale.</b></h1>
-      <p>Become a WisdomUp distributor, wholesaler or retailer — or, for company gifts, see <a href="corporate.html">Corporate Orders</a>. Send your details and our team will reply on WhatsApp with bulk pricing and next steps.</p>
-      <div class="perks" id="perks"></div>
+  <!-- BULK PAGE (2026-10-14, "make the bulk page inspired by the corporate page"): the corporate page's landing engine (css/corporate.css
+       + js/corporate.js) with the bulk desk's own facts — partner types, partner pricing on WhatsApp within one working day, dispatch
+       from Karachi in 2–3 working days, bulk pricing from 50 units, warranty + a dedicated partner contact. The site nav stays here. -->
+  <section class="cp-intro" id="cp-intro" aria-labelledby="cp-h1">
+    <div class="cp-intro__pin">
+      <picture class="cp-intro__media cp-intro__media--a" aria-hidden="true"><source media="(max-width: 639px)" srcset="img/hero/cdb-18-tall.webp"><img src="img/hero/cdb-18-wide.webp" alt="" fetchpriority="high"></picture>
+      <picture class="cp-intro__media cp-intro__media--b" aria-hidden="true"><source media="(max-width: 639px)" srcset="img/hero/os-6-tall.webp"><img src="img/hero/os-6-wide.webp" alt="" loading="lazy"></picture>
+      <span class="cp-intro__veil" aria-hidden="true"></span>
+      <nav class="cp-crumbs" aria-label="Breadcrumb"><a href="index.html">Home</a><span aria-hidden="true">/</span><span aria-current="page">Bulk Orders</span></nav>
+      <div class="cp-intro__a">
+        <div class="cp-hero__top"><span class="cp-tag cp-tag--dark">WisdomUp Bulk Desk</span>
+        <h1 id="cp-h1">Wholesale mobile accessories in Pakistan, at scale</h1></div>
+        <p class="cp-stat"><b data-cp="count">305</b><span>WisdomUp products across <span data-cp="ranges">8</span> ranges, ready to stock</span></p>
+      </div>
+      <div class="cp-intro__b">
+        <h2 id="cp-band-h">Partner pricing within one working day</h2>
+        <p>Become a WisdomUp distributor, wholesaler or retailer. Send your details and our bulk desk replies on WhatsApp with pricing and next steps.</p>
+        <a class="cp-btn cp-btn--light" href="#quote">Become a partner</a>
+      </div>
+      <span class="cp-intro__cue" aria-hidden="true"></span>
     </div>
+  </section>
 
-    <form class="bk-form" id="bulk-form" novalidate aria-labelledby="bk-form-h">
-      <div id="bk-fill">
-        <div style="display: flex; flex-direction: column; gap: 20px;">
-          <div class="bk-form__top"><img src="img/wu-logo.png" alt="WisdomUp"><span class="badge-grad" id="bk-form-h">Partner inquiry</span></div>
-          <fieldset class="bk-group"><legend>I'm a</legend><div class="bk-chips" id="types" data-single></div></fieldset>
-          <div class="bk-fields">
-            <div class="field"><label for="f-name">Full name<i>*</i></label><input id="f-name" name="name" autocomplete="name" placeholder="Your full name" required></div>
-            <div class="field"><label for="f-phone">WhatsApp number<i>*</i></label><input id="f-phone" name="phone" type="tel" autocomplete="tel" placeholder="+92 300 1234567" required></div>
-            <div class="field"><label for="f-email">Email<i>*</i></label><input id="f-email" name="email" type="email" autocomplete="email" placeholder="name@company.com" required></div>
-            <div class="field"><label for="f-city">City<i>*</i></label><input id="f-city" name="city" autocomplete="address-level2" placeholder="Karachi" required></div>
-          </div>
-          <div class="field"><label for="f-store">Business name or store link</label><input id="f-store" name="store" placeholder="https://…"></div>
-          <fieldset class="bk-group"><legend>Interested in</legend><div class="bk-chips" id="interests"></div></fieldset>
-          <fieldset class="bk-group"><legend>Estimated monthly quantity</legend><div class="bk-chips" id="volumes" data-single></div></fieldset>
-          <div class="field"><label for="f-note">Anything else?</label><textarea id="f-note" name="note" placeholder="Models, branding, delivery timeline…"></textarea></div>
-          <div class="ck__hp" aria-hidden="true"><label>Website<input name="website" tabindex="-1" autocomplete="off"></label></div>
-          <div class="bk-foot"><span class="bk-hint" id="bk-hint" aria-live="polite">Inquiries go straight to our bulk desk.</span><button type="submit" class="btn-pill">Send bulk inquiry</button></div>
+  <section class="cp-sec cp-clients" aria-labelledby="cp-clients-h">
+    <div class="cp-head"><span class="cp-tag" id="cp-clients-tag">Who we supply</span><h2 id="cp-clients-h">One supplier for every counter</h2></div>
+    <div class="cp-clients__track" id="cp-clients" role="list" aria-labelledby="cp-clients-h"></div>
+    <div class="cp-clients__bar" aria-hidden="true"><i></i></div>
+  </section>
+
+  <section class="cp-sec cp-perks" id="cp-perks" aria-labelledby="cp-perks-h">
+    <div class="cp-head"><h2 id="cp-perks-h">Stocked. Priced. Supported.</h2></div>
+    <div class="cp-seg" role="tablist" aria-label="What partners get">
+      <button type="button" role="tab" id="cp-t0" aria-controls="cp-p0" aria-selected="true"><span class="cp-ic" data-icon="grid" data-size="20"></span><span>Wide range</span></button>
+      <button type="button" role="tab" id="cp-t1" aria-controls="cp-p1" aria-selected="false" tabindex="-1"><span class="cp-ic" data-icon="medal" data-size="20"></span><span>Brand-ready</span></button>
+      <button type="button" role="tab" id="cp-t2" aria-controls="cp-p2" aria-selected="false" tabindex="-1"><span class="cp-ic" data-icon="truck" data-size="20"></span><span>Local fulfilment</span></button>
+      <button type="button" role="tab" id="cp-t3" aria-controls="cp-p3" aria-selected="false" tabindex="-1"><span class="cp-ic" data-icon="shield" data-size="20"></span><span>Partner support</span></button>
+    </div>
+    <div class="cp-stage">
+      <div class="cp-panel" role="tabpanel" id="cp-p0" aria-labelledby="cp-t0">
+        <div class="cp-big" aria-hidden="true"><span data-cp="count">305</span> products</div>
+        <div class="cp-mini" aria-hidden="true"><b>Eight ranges</b><div class="cp-mini__row"><span>Audio</span><span>Charging</span><span>Cables</span><span>Car</span><span>Stands</span><span>Computer</span><span>Storage</span><span>Care</span></div><small>Earbuds to car holders, from one supplier</small></div>
+        <p class="cp-cap">Earbuds, handsfree, speakers, creator mics, chargers, cables and more — one partner account.</p>
+      </div>
+      <div class="cp-panel" role="tabpanel" id="cp-p1" aria-labelledby="cp-t1" hidden>
+        <div class="cp-big" aria-hidden="true">WisdomUp</div>
+        <div class="cp-mini" aria-hidden="true"><b>Shelf-ready</b><div class="cp-mini__row"><span>Retail box</span><span>Model code</span><span>Warranty</span></div><small>Every unit arrives in its WisdomUp box</small></div>
+        <p class="cp-cap">Trusted WisdomUp branding on fast-moving accessories.</p>
+      </div>
+      <div class="cp-panel" role="tabpanel" id="cp-p2" aria-labelledby="cp-t2" hidden>
+        <div class="cp-big" aria-hidden="true">2–3 days</div>
+        <div class="cp-mini" aria-hidden="true"><b>Dispatch</b><div class="cp-flow"><span>Karachi</span><i></i><span>Your city</span></div><small>Most cities in Pakistan within a week</small></div>
+        <p class="cp-cap">In-stock orders dispatch from our Karachi warehouse within 2–3 working days.</p>
+      </div>
+      <div class="cp-panel" role="tabpanel" id="cp-p3" aria-labelledby="cp-t3" hidden>
+        <div class="cp-big" aria-hidden="true">one contact</div>
+        <div class="cp-mini" aria-hidden="true"><b>Your partner contact</b><div class="cp-flow"><span>Quote</span><i></i><span>Order</span><i></i><span>Claims</span></div><small>The standard WisdomUp warranty on every unit</small></div>
+        <p class="cp-cap">Warranty-backed products with a dedicated partner contact.</p>
+      </div>
+    </div>
+    <div class="cp-prog" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+  </section>
+
+  <section class="cp-range" id="cp-range" aria-labelledby="cp-range-h">
+    <div class="cp-range__pin">
+    <div class="cp-range__in">
+      <div class="cp-range__side">
+        <h2 class="cp-range__h" id="cp-range-h">Fast movers</h2>
+        <span class="cp-range__rail" aria-hidden="true"><i></i></span>
+        <div class="cp-range__list" role="tablist" aria-label="Product ranges" aria-orientation="vertical">
+          <a class="cp-range__item" role="tab" href="products.html?cat=handsfree" data-type="handsfree" aria-selected="true">Handsfree</a>
+          <a class="cp-range__item" role="tab" href="products.html?cat=earbuds" data-type="earbuds" aria-selected="false" tabindex="-1">Earbuds</a>
+          <a class="cp-range__item" role="tab" href="products.html?cat=charging-cables" data-type="charging-cables" aria-selected="false" tabindex="-1">Charging cables</a>
+          <a class="cp-range__item" role="tab" href="products.html?cat=wall-chargers" data-type="wall-chargers" aria-selected="false" tabindex="-1">Wall chargers</a>
+          <a class="cp-range__item" role="tab" href="products.html?cat=power-banks" data-type="power-banks" aria-selected="false" tabindex="-1">Power banks</a>
+          <a class="cp-range__item" role="tab" href="products.html?cat=car-holders" data-type="car-holders" aria-selected="false" tabindex="-1">Car holders</a>
+          <a class="cp-range__item" role="tab" href="products.html?cat=speakers" data-type="speakers" aria-selected="false" tabindex="-1">Speakers</a>
         </div>
       </div>
-      <div class="bk-done" id="bk-done" hidden>
+      <div class="cp-range__main">
+        <div class="cp-range__panel" id="cp-range-panel" role="tabpanel" aria-label="Handsfree" data-cap="retail"></div>
+        <div class="cp-range__cap"><b id="cp-range-t">Handsfree</b><span>Retail prices shown — partner pricing comes with your quote. <a id="cp-range-all" href="products.html?cat=handsfree">Shop all handsfree ›</a></span></div>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <section class="cp-sec cp-steps" aria-labelledby="cp-steps-h">
+    <div class="cp-head cp-head--left"><h2 id="cp-steps-h">From inquiry to stocked shelves</h2></div>
+    <div class="cp-steps__row">
+      <article class="cp-step cp-step--big">
+        <div class="cp-step__media" aria-hidden="true"><img src="img/p/ts-11-3.jpg" alt="" loading="lazy" style="object-position: 50% 20%;"><span class="cp-bub" style="--x: 6%; --y: 12%">Wholesaler</span><span class="cp-bub" style="--x: 50%; --y: 34%">1,000–5,000 units</span><span class="cp-bub" style="--x: 8%; --y: 72%">Earbuds + chargers</span></div>
+        <div class="cp-step__txt"><span class="cp-step__n">Step 01</span><h3>Tell us about your business</h3><ul><li><span class="cp-ic" data-icon="user" data-size="20"></span>Distributor, wholesaler or retailer</li><li><span class="cp-ic" data-icon="grid" data-size="20"></span>The products you want to carry</li><li><span class="cp-ic" data-icon="truck" data-size="20"></span>Your city and monthly quantity</li></ul></div>
+      </article>
+      <article class="cp-step"><div class="cp-step__vis" aria-hidden="true"><span class="cp-pill"><i></i>Partner quote on WhatsApp</span></div><span class="cp-step__n">Step 02</span><h3>Get partner pricing</h3><p>We reply on WhatsApp within one working day with a tailored quote.</p></article>
+      <article class="cp-step"><div class="cp-step__vis" aria-hidden="true"><span class="cp-switch"><i></i></span></div><span class="cp-step__n">Step 03</span><h3>Receive your stock</h3><p>Confirm the order and we dispatch from Karachi in 2–3 working days.</p></article>
+    </div>
+  </section>
+
+  <section class="cp-resell" aria-labelledby="cp-resell-h">
+    <div class="cp-head"><h2 id="cp-resell-h">Buying gifts for your company?</h2><p>Branded gifts for employees, clients and events live on our Corporate Orders page.</p><a class="cp-btn cp-btn--ink" href="corporate.html">Corporate orders</a></div>
+    <picture class="cp-resell__media" aria-hidden="true"><source media="(max-width: 639px)" srcset="img/hero/tde-18-tall.webp"><img src="img/hero/tde-18-wide.webp" alt="" loading="lazy" style="object-position: 80% 30%;"></picture>
+  </section>
+
+  <section class="cp-contact" id="quote" aria-labelledby="cp-contact-h">
+    <div class="cp-contact__in">
+      <div class="cp-contact__copy">
+        <h2 id="cp-contact-h">Become a WisdomUp partner</h2>
+        <p class="cp-contact__k">What partners get</p>
+        <ul class="cp-list">
+          <li><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>The full range — earbuds, handsfree, speakers, mics and charging</li>
+          <li><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.6 2H13a1 1 0 0 1 1 1v4.4a1 1 0 0 1-.3.7l-5.6 5.6a1 1 0 0 1-1.4 0L2.3 9.3a1 1 0 0 1 0-1.4l5.6-5.6a1 1 0 0 1 .7-.3Z"/><circle cx="10.8" cy="5.2" r=".9"/></svg>Trusted WisdomUp branding on fast-moving accessories</li>
+          <li><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="5.2" r="2.7"/><path d="M2.8 14c.6-2.6 2.7-4.2 5.2-4.2s4.6 1.6 5.2 4.2"/></svg>A dedicated partner contact for quotes, orders and claims</li>
+          <li><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 1.8 13.2 4v3.7c0 3.2-2.2 5.6-5.2 6.5-3-.9-5.2-3.3-5.2-6.5V4L8 1.8Z"/><path d="m5.8 8 1.6 1.6 2.8-3"/></svg>The standard WisdomUp warranty on every unit</li>
+        </ul>
+        <p class="cp-contact__k cp-contact__k--pay">Prefer WhatsApp?</p>
+        <a class="cp-wa" id="bk-wa-direct" href="#" target="_blank" rel="noopener">Message the bulk desk ›</a>
+      </div>
+      <form class="iform cp-form" id="bulk-form" novalidate aria-labelledby="bk-form-h">
+      <div data-fill class="cp-form__fill" id="bk-fill">
+        <div class="cp-form__head"><h3 class="iform__h" id="bk-form-h">Partner inquiry</h3><p class="cp-form__sub">Inquiries go straight to our bulk desk — we reply on WhatsApp within one working day</p></div>
+        <div class="cp-form__step" data-step="1">
+          <div class="cp-form__grid">
+            <div class="field cp-form__full"><label for="f-type">I’m a</label><span class="cp-select"><select id="f-type" name="type"><option>Distributor</option><option>Wholesaler</option><option>Retailer</option><option>Corporate buyer</option></select></span></div>
+            <div class="field" data-err="Full name is required"><label for="f-name">Full name<i>*</i></label><input id="f-name" name="name" type="text" placeholder="Your full name" autocomplete="name" required></div>
+            <div class="field" data-err="Please enter a valid WhatsApp number"><label for="f-phone">WhatsApp number<i>*</i></label><input id="f-phone" name="phone" type="tel" placeholder="+92 300 1234567" autocomplete="tel" required></div>
+            <div class="field" data-err="Please enter a valid email"><label for="f-email">Email<i>*</i></label><input id="f-email" name="email" type="email" placeholder="name@company.com" autocomplete="email" required></div>
+            <div class="field" data-err="City is required"><label for="f-city">City<i>*</i></label><input id="f-city" name="city" type="text" placeholder="Karachi" autocomplete="address-level2" required></div>
+          </div>
+        </div>
+        <div class="cp-form__step" data-step="2" hidden>
+          <div class="cp-form__grid"><div class="field cp-form__full"><label for="f-store">Business name or store link</label><input id="f-store" name="store" placeholder="https://…"></div></div>
+          <fieldset class="bk-group"><legend>Interested in</legend><div class="bk-chips" id="interests"><button type="button" class="chip" aria-pressed="false" data-v="Handsfree">Handsfree</button><button type="button" class="chip" aria-pressed="true" data-v="Earbuds">Earbuds</button><button type="button" class="chip" aria-pressed="false" data-v="Neckbands">Neckbands</button><button type="button" class="chip" aria-pressed="false" data-v="Headphones">Headphones</button><button type="button" class="chip" aria-pressed="false" data-v="Speakers">Speakers</button><button type="button" class="chip" aria-pressed="false" data-v="Microphones">Microphones</button><button type="button" class="chip" aria-pressed="false" data-v="Chargers">Chargers</button><button type="button" class="chip" aria-pressed="false" data-v="Cables">Cables</button><button type="button" class="chip" aria-pressed="false" data-v="Power banks">Power banks</button><button type="button" class="chip" aria-pressed="false" data-v="Car accessories">Car accessories</button></div></fieldset>
+          <fieldset class="bk-group"><legend>Estimated monthly quantity</legend><div class="bk-chips" id="volumes" data-single><button type="button" class="chip" aria-pressed="true" data-v="50–200 units">50–200 units</button><button type="button" class="chip" aria-pressed="false" data-v="200–1,000">200–1,000</button><button type="button" class="chip" aria-pressed="false" data-v="1,000–5,000">1,000–5,000</button><button type="button" class="chip" aria-pressed="false" data-v="5,000+">5,000+</button></div></fieldset>
+          <div class="cp-form__grid"><div class="field cp-form__full"><label for="f-note">Anything else?</label><textarea id="f-note" name="note" placeholder="Models, branding, delivery timeline…"></textarea></div></div>
+        </div>
+        <div class="ck__hp" aria-hidden="true"><label>Website<input name="website" tabindex="-1" autocomplete="off"></label></div>
+        <span class="bk-hint" id="bk-hint" data-hint aria-live="polite"></span>
+        <div class="cp-form__foot">
+          <div class="cp-form__bars" aria-hidden="true"><i class="is-on"></i><i></i></div>
+          <span class="cp-form__count" data-step-label>Step 1 of 2</span>
+          <div class="cp-form__btns"><button type="button" class="cp-fbtn cp-fbtn--back" data-back hidden>Back</button><button type="button" class="cp-fbtn" data-next>Continue</button><button type="submit" class="cp-fbtn" data-send hidden>Send inquiry</button></div>
+        </div>
+      </div>
+      <div class="bk-done" id="bk-done" data-done hidden>
         <span class="badge-grad">Inquiry received</span>
         <h2>Thanks, <b id="bk-first">there.</b></h2>
         <p id="bk-done-text"></p>
-        <a class="btn-buy bk-wa" id="bk-wa" target="_blank" rel="noopener" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.2a9.8 9.8 0 0 0-8.4 14.8L2.3 21.8l4.9-1.3A9.8 9.8 0 1 0 12 2.2zm0 17.8c-1.5 0-3-.4-4.2-1.2l-.3-.2-2.9.8.8-2.8-.2-.3A8 8 0 1 1 12 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8-.2-.1-.4-.1-.5.1l-.8 1c-.1.2-.3.2-.5.1a6.6 6.6 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 0 0-.7.3 2.8 2.8 0 0 0-.9 2.1 4.9 4.9 0 0 0 1 2.6 11.2 11.2 0 0 0 4.3 3.8c1.6.7 2.2.8 3 .6.5-.1 1.4-.6 1.6-1.1.2-.6.2-1 .1-1.1l-.5-.3z"/></svg><span>Send on WhatsApp</span></a>
-        <button type="button" id="bk-reset">Send another inquiry</button>
+        <a class="btn-buy bk-wa" id="bk-wa" target="_blank" rel="noopener" hidden></a>
+        <button type="button" id="bk-reset" data-reset>Send another inquiry</button>
       </div>
     </form>
+    </div>
   </section>
 
-  <section class="bk-range">
-    <div class="eyebrow">What you can stock</div>
-    <h2 class="h-light">The full range, <b>at partner pricing.</b></h2>
+  <section class="cp-sec cp-faq" aria-labelledby="cp-faq-h">
+    <h2 id="cp-faq-h">Bulk questions</h2>
+    <div class="cp-faq__list" data-accordion data-faq-ld>
+      <div class="faq__item">
+        <button type="button" class="faq__q" aria-expanded="false" aria-controls="bfaq-a0"><span>What is the minimum order quantity?</span><span class="cp-pm" aria-hidden="true"></span></button>
+        <div class="faq__a" id="bfaq-a0" hidden><span>Bulk pricing starts at 50 units across any mix of products. Distributor terms start at higher volumes — tell us your estimate and we'll match the right tier.</span></div>
+      </div>
+      <div class="faq__item">
+        <button type="button" class="faq__q" aria-expanded="false" aria-controls="bfaq-a1"><span>How fast can you deliver?</span><span class="cp-pm" aria-hidden="true"></span></button>
+        <div class="faq__a" id="bfaq-a1" hidden><span>In-stock orders dispatch from Karachi within 2–3 working days and reach most cities in Pakistan within a week.</span></div>
+      </div>
+      <div class="faq__item">
+        <button type="button" class="faq__q" aria-expanded="false" aria-controls="bfaq-a2"><span>Do bulk orders carry the same warranty?</span><span class="cp-pm" aria-hidden="true"></span></button>
+        <div class="faq__a" id="bfaq-a2" hidden><span>Every unit carries the standard WisdomUp warranty, and partners get a dedicated contact for claims.</span></div>
+      </div>
+      <div class="faq__item">
+        <button type="button" class="faq__q" aria-expanded="false" aria-controls="bfaq-a3"><span>Can you add our company branding?</span><span class="cp-pm" aria-hidden="true"></span></button>
+        <div class="faq__a" id="bfaq-a3" hidden><span>Yes, for corporate orders we offer custom packaging and engraving on selected models. Lead time depends on quantity.</span></div>
+      </div>
+      <div class="faq__item">
+        <button type="button" class="faq__q" aria-expanded="false" aria-controls="bfaq-a4"><span>Buying gifts for your company, not stock to sell?</span><span class="cp-pm" aria-hidden="true"></span></button>
+        <div class="faq__a" id="bfaq-a4" hidden><span>Use our <a href="corporate.html">Corporate Orders page</a> for branded employee, client and event gifts.</span></div>
+      </div>
+    </div>
+    <p class="cp-faq__more">More answers in the <a href="help.html">Help Center</a>.</p>
   </section>
-  <nav class="bk-cats" id="bk-cats" aria-label="Product categories"></nav>
 
-  <section class="bulk-steps" aria-labelledby="steps-h">
-    <h2 id="steps-h">From inquiry <b>to stocked shelves.</b></h2>
-    <div class="steps" id="steps"></div>
+  <section class="cp-more" aria-labelledby="cp-more-h">
+    <h2 id="cp-more-h">Explore more</h2>
+    <div class="cp-more__chips">
+      <a href="products.html?cat=handsfree">Handsfree</a><a href="products.html?cat=earbuds">Earbuds</a><a href="products.html?cat=headphones">Headphones</a><a href="products.html?cat=speakers">Speakers</a><a href="products.html?cat=charging-cables">Charging cables</a><a href="products.html?cat=wall-chargers">Wall chargers</a><a href="products.html?cat=power-banks">Power banks</a><a href="products.html?cat=car-holders">Car holders</a><a href="products.html">All products</a><a href="corporate.html">Corporate orders</a><a href="creators.html">Creators program</a><a href="where-to-buy.html">Where to buy</a><a href="help.html">Help Center</a>
+    </div>
   </section>
 
-  <section class="split" aria-labelledby="bfaq-h">
-    <h2 class="grad-h" id="bfaq-h">Bulk FAQs</h2>
-    <div><div class="panel-list" id="bulk-faq"></div><p class="meta-line" style="margin: 14px 0 0;">Buying gifts for your company? See <a href="corporate.html">Corporate Orders</a>. More answers in the <a href="help.html">Help Center</a>.</p></div>
-  </section>
+  <div class="cp-float" id="cp-float"><a class="cp-btn cp-btn--ink" href="#quote" tabindex="-1">Become a partner</a></div>
 
   <div class="trust-wrap" id="trust"></div>
   <div class="footer-wrap" id="footer"></div>
@@ -112,7 +247,9 @@
 <script src="js/shop.js?v=7582d314"></script>
 <script src="js/wu-data.js?v=9ed52186"></script>
 <script src="js/ds-icons.js?v=ab37eba9"></script>
-<script src="js/common.js?v=1874419e"></script>
-<script src="js/bulk.js?v=49046da5"></script>
+<script src="js/common.js?v=d16b5fda"></script>
+<script src="js/info.js?v=623b8d06"></script>
+<script src="js/bulk.js?v=394fe45b"></script>
+<script src="js/corporate.js?v=92315014"></script>
 </body>
 </html>

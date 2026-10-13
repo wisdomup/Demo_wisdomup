@@ -1,6 +1,7 @@
-// WisdomUp — the corporate page (corporate.html, 2026-10-14: higgsfield.ai/enterprise's layout rebuilt in our design; see the note in
-// corporate.css). Facts only: the counts and every product, photo and price come from catalog.js (+ the shop.js sale through wu-data);
-// the quote form and the FAQ are the shared ones in info.js.
+// WisdomUp — the landing-page engine shared by the corporate page (corporate.html, 2026-10-14: higgsfield.ai/enterprise's layout rebuilt
+// in our design; see the note in corporate.css) and the bulk page (bulk-order.html, 2026-10-14, "make the bulk page inspired by the
+// corporate page"). Everything is read from the page's own markup; a page can hand its own card row in `window.CP_CARDS` (bulk.js).
+// Facts only: the counts and every product, photo and price come from catalog.js (+ the shop.js sale through wu-data).
 (function () {
   const { D, $, esc, url, photoBg, photoFit, DEPTS } = WU;
   if (!$('cp-perks')) return;
@@ -22,14 +23,14 @@
   ];
   const track = $('cp-clients');
   if (track) {
-    const real = CLIENTS.length > 0;
+    const own = Array.isArray(window.CP_CARDS) && window.CP_CARDS.length, real = !own && CLIENTS.length > 0;
     if (real) { $('cp-clients-tag').textContent = 'Corporate clients'; $('cp-clients-h').textContent = 'Companies already gifting with WisdomUp'; }
-    const cards = (real ? CLIENTS : SECTORS).map(c => {
+    const cards = (own ? window.CP_CARDS : real ? CLIENTS : SECTORS).map(c => {
       const p = c.pid && byId(c.pid);
-      if (!real && !p) return '';
-      const line = real ? c.line : `${p.title} · ${p.priceText}`;
-      const href = real ? (c.href || '#quote') : url.product(p.id);
-      return `<a class="cp-cl" role="listitem" href="${href}" draggable="false"><img src="${c.img}" alt="" loading="lazy" draggable="false" style="object-position: ${c.at || '50% 50%'};"><span class="cp-cl__name">${esc(c.name)}${c.sub ? `<small>${esc(c.sub)}</small>` : ''}</span><span class="cp-cl__txt"><h3>${esc(c.title)}</h3><span>${esc(line)}</span></span></a>`;
+      if (!own && !real && !p) return '';
+      const line = c.line || (p ? `${p.title} · ${p.priceText}` : '');
+      const href = c.href || (p ? url.product(p.id) : '#quote');
+      return `<a class="cp-cl" role="listitem" href="${href}"${c.type ? ` data-type="${esc(c.type)}"` : ''} draggable="false"><img src="${c.img}" alt="" loading="lazy" draggable="false" style="object-position: ${c.at || '50% 50%'};"><span class="cp-cl__name">${esc(c.name)}${c.sub ? `<small>${esc(c.sub)}</small>` : ''}</span><span class="cp-cl__txt"><h3>${esc(c.title)}</h3><span>${esc(line)}</span></span></a>`;
     }).join('');
     track.innerHTML = cards;
     // the progress line under the row: the thumb's width is the share of the row on screen, it moves with the scroll
@@ -67,7 +68,7 @@
 
   /* ---------- the quote form in two steps, like higgsfield's: 1 = who you are + the occasion, 2 = products, quantity, date, notes.
      Continue checks step 1 with info.js's rules (required, a real email, a 10-digit phone); the send itself is info.js's. ---------- */
-  const form = $('corp-form');
+  const form = document.querySelector('form.cp-form');
   if (form && form.querySelector('[data-step="2"]')) {
     const steps = [...form.querySelectorAll('[data-step]')], bars = [...form.querySelectorAll('.cp-form__bars i')];
     const back = form.querySelector('[data-back]'), next = form.querySelector('[data-next]'), send = form.querySelector('[data-send]'), label = form.querySelector('[data-step-label]');
@@ -166,7 +167,8 @@
       panel.innerHTML = all.slice(0, 6).map(tile).join('');
       if (!reduced) panel.classList.add('is-swap');
       const min = all.length ? Math.min(...all.map(p => p.price)) : 0;
-      $('cp-range-t').textContent = all.length ? `${all.length} ${label.toLowerCase()} from ${D.rs(min)}` : label;
+      const retail = panel.dataset.cap === 'retail'; // the bulk page: shop prices, partner pricing comes with the quote
+      $('cp-range-t').textContent = all.length ? `${all.length} ${label.toLowerCase()} · ${retail ? 'retail from' : 'from'} ${D.rs(min)}` : label;
       const link = $('cp-range-all');
       link.href = it.getAttribute('href'); link.textContent = `Shop all ${label.toLowerCase()} ›`;
       if (focus) it.focus();
@@ -262,7 +264,7 @@
 
   /* ---------- floating "Request a quote" (higgsfield's fixed "Contact Sales"): shown once the intro has passed, hidden over the dark
      range stage and from the contact band down ---------- */
-  const flo = $('cp-float'), contact = $('quote');
+  const flo = $('cp-float'), contact = document.querySelector('.cp-contact');
   if (flo && contact) {
     const btn = flo.querySelector('a');
     const place = () => {

@@ -710,7 +710,7 @@
   document.addEventListener('click', e => { if (e.target.closest('[data-act="theme"]')) toggleTheme(); });
   const themeBtn = cls => `<button type="button" class="${cls}" data-act="theme" aria-label="Switch to night mode">${MOON}</button>`;
   const logoImgs = h => `<span class="site-nav__logo" style="height: ${h}px;"><img src="img/wu-logo.png" alt="WisdomUp"><img src="img/wu-logo-white.png" alt="" aria-hidden="true"></span>`;
-  const DARK = '.hero, .pbanner, .loop__slide, .duo__card, .promo, .footer, .pd-stat--dark, .bulk-steps';
+  const DARK = '.hero, .pbanner, .loop__slide, .duo__card, .promo, .footer, .pd-stat--dark, .bulk-steps, .cp-intro, .cp-range, .cp-contact, .cp-faq, .cp-more';
   function renderNav(force) {
     if (!nav) return;
     const w = vw(), wide = w >= 640;

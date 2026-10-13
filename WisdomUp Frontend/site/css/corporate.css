@@ -329,3 +329,18 @@
 .cp-float.is-on { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
 .cp-float .cp-btn { box-shadow: 0 10px 30px rgba(0,0,0,.2), 0 0 0 1.5px rgba(255,255,255,.12); }
 @media (prefers-reduced-motion: reduce) { .cp-float { transition: opacity 1ms; } }
+
+/* ---------- BULK PAGE (bulk-order.html, 2026-10-14, "make the bulk page inspired by the corporate page"): the same engine and styles
+   (`.page--corp .page--bulk`). Unlike the corporate page the site nav stays, floating over the intro photo (the nav tones itself on
+   .cp-intro / .cp-range / dark bands — DARK in common.js), so the breadcrumb and the headline start below it. ---------- */
+.page--bulk .cp-crumbs { top: 136px; }
+.page--bulk .cp-hero__top { max-width: 1040px; } /* the long H1 on two lines */
+.page--bulk .cp-contact h2 { max-width: 680px; }
+.page--bulk .cp-intro__a { padding-top: clamp(180px, 24svh, 220px); }
+@media (max-width: 639px) {
+  .page--bulk .cp-crumbs { top: 66px; }
+  .page--bulk .cp-intro__a { padding-top: 116px; }
+}
+.cp-wa { display: inline-flex; align-items: center; margin-top: 12px; font: 600 15px/20px var(--font); color: #fff; text-decoration: underline; text-decoration-color: rgba(255,255,255,.3); text-underline-offset: 4px; }
+.cp-wa:hover { text-decoration-color: #fff; }
+.page--bulk .cp-form .bk-done .bk-wa { margin-top: 4px; }
