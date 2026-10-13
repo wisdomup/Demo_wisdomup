@@ -56,7 +56,11 @@ button { font-family: inherit; }
    BEFORE a lighter blur, so the page under the rim curves visibly. Each capsule keeps its own tint; --lq-rest = its blur after
    the bend (over a dark banner the nav's drops to 4px, so the photo bends like it would under thick glass). */
 .is-lq { -webkit-backdrop-filter: var(--lq) var(--lq-rest, blur(10px) saturate(190%)) !important; backdrop-filter: var(--lq) var(--lq-rest, blur(10px) saturate(190%)) !important; }
-.site-nav.on-dark { --lq-rest: blur(4px) saturate(190%); }
+/* THICK GLASS on the nav + its twin (2026-10-13, after the Spline pill video — "keep the glow, make the glass intensity like this"):
+   nearly clear (blur 6px on pages, 2px over a banner), the page behind it brighter and more saturated like the video's blobs, a
+   soft DARK BEVEL band just inside the rim (inset shadow) under the specular rim and the glow; the bend itself is liquid(el, {deep}). */
+.site-nav.is-lq, .mfloat .mbar__cap.is-lq { --lq-rest: blur(6px) saturate(200%) brightness(1.06); box-shadow: 0 10px 30px rgba(0,0,0,.16), inset 0 0 14px 3px rgba(0,0,0,.42), inset 0 -14px 30px -16px rgba(226,232,255,.12); }
+.site-nav.is-lq.on-dark { --lq-rest: blur(2px) saturate(220%) brightness(1.12); }
 .pdtabs__in, .toast { --lq-rest: blur(10px) saturate(150%); }
 .buybar { --lq-rest: blur(8px) saturate(160%); }
 .navtip { --lq-rest: blur(6px) saturate(170%); }
@@ -1172,3 +1176,65 @@ body:has(.ckc.is-bar:not([hidden])) .wafab { opacity: 0; pointer-events: none; t
 /* the white logo keeps its edge over light banners (the audit: "the logo is faint on the grey pill") */
 .site-nav img { filter: drop-shadow(0 1px 1.5px rgba(0,0,0,.35)); }
 
+/* ---------- QUALITY BAR (2026-10-13, ronin.pk's "Exceptional Quality Delivered" bar measured and rebuilt — index.html) ----------
+   Ronin at 1440: a 112px pill, 100px corners (clipped), shadow 7.04px 7.82px 51.32px rgba(0,0,0,.07), padding 20px / ~54px, heading
+   Inter 700 ~25px .03em with a 3-stop gradient, items 20px apart = a 76px icon + 3px + a 2-line Inter 500 label (#464646). Ours: the
+   panel is our light panel #F5F6F8 (theirs #F3F2F2), the gradient grey → ink → brand red (theirs slate → purple → red), our own
+   outline + flat-fill SVG icons (ink #1B1B1B, white, red tint #FFEDE7, brand red) moving like their GIFs. */
+.qbar { margin: var(--sec) var(--gutter, 28px) 0; }
+.qbar__in { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 112px; box-sizing: border-box; padding: 20px clamp(20px, 3.75vw, 54px); border-radius: 100px; overflow: hidden; background: #F5F6F8; box-shadow: 7.04px 7.82px 51.32px rgba(0, 0, 0, .07); }
+.qbar__h { margin: 0; padding-top: 4px; font: 700 clamp(20px, 1.73vw, 25px)/1.2 var(--font); letter-spacing: .03em; text-wrap: balance;
+  background: linear-gradient(90deg, #5A5D63, #111 45%, #D91E05 85%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.qbar__h .wu-w { background: inherit; -webkit-background-clip: text; background-clip: text; }
+.qbar__list { list-style: none; margin: 0; padding: 0; display: flex; align-items: center; gap: 20px; }
+.qbar__list a { display: flex; align-items: center; gap: 3px; color: #464646; font: 500 12px/1.4 var(--font); text-decoration: none; white-space: nowrap; }
+.qbar__list a:focus-visible { outline: 2px solid #111; outline-offset: 2px; border-radius: 12px; }
+@media (hover: hover) and (pointer: fine) { .qbar__list a:hover { color: #111; } }
+/* the icons: 2.2px ink outlines; fills white (.f), red tint (.t), brand red (.r) */
+.qb-ic { flex: none; width: 76px; height: 76px; overflow: visible; fill: none; stroke: #1B1B1B; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.qb-ic .f { fill: #fff; } .qb-ic .t { fill: #FFEDE7; } .qb-ic .r { fill: #D91E05; }
+.qb-ic text { fill: #D91E05; stroke: none; font: 800 10px/1 var(--font); letter-spacing: -.02em; }
+.qb-ic .qb-spark { stroke: #D91E05; stroke-width: 1.8; }
+.qb-ic--happy .qb-star { stroke: none; }
+/* motion, like Ronin's GIFs: the truck rolls on the spot (wheels turn, dust drifts back, a spark twinkles); the customer's stars pop
+   one after another while the arms lift; the warranty rosette swings from its top as the check draws in; the Cash-on-Delivery seal
+   wobbles and its ribbon sways. Transforms + opacity only; still for reduced motion. */
+@keyframes qb-roll { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-1.2px); } }
+@keyframes qb-spin { to { transform: rotate(360deg); } }
+@keyframes qb-dust { 0% { transform: translateX(6px); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateX(-6px); opacity: 0; } }
+@keyframes qb-twinkle { 0%, 55%, 100% { transform: scale(0); opacity: 0; } 70% { transform: scale(1.15); opacity: 1; } 85% { transform: scale(1); opacity: 1; } }
+@keyframes qb-pop { 0%, 18% { transform: scale(0); opacity: 0; } 30% { transform: scale(1.2); opacity: 1; } 40%, 78% { transform: scale(1); opacity: 1; } 90%, 100% { transform: scale(0); opacity: 0; } }
+@keyframes qb-arm-l { 0%, 15%, 85%, 100% { transform: rotate(0); } 30%, 70% { transform: rotate(14deg); } }
+@keyframes qb-arm-r { 0%, 15%, 85%, 100% { transform: rotate(0); } 30%, 70% { transform: rotate(-14deg); } }
+@keyframes qb-swing { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-7deg); } 75% { transform: rotate(7deg); } }
+@keyframes qb-check { 0%, 25% { stroke-dashoffset: 14; } 50%, 100% { stroke-dashoffset: 0; } }
+@keyframes qb-wobble { 0%, 100% { transform: rotate(0); } 20% { transform: rotate(-10deg); } 40% { transform: rotate(8deg); } 60% { transform: rotate(-4deg); } 80% { transform: rotate(2deg); } }
+@keyframes qb-sway { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-6deg); } }
+.qb-truck { animation: qb-roll .6s ease-in-out infinite; }
+.qb-wheel { transform-box: fill-box; transform-origin: center; animation: qb-spin .9s linear infinite; }
+.qb-dust circle { animation: qb-dust 1.2s ease-out infinite; } .qb-dust circle + circle { animation-delay: .5s; }
+.qb-spark { transform-box: fill-box; transform-origin: center; animation: qb-twinkle 2.4s ease-in-out infinite; }
+.qb-spark--2 { animation-delay: 1.1s; }
+.qb-star { transform-box: fill-box; transform-origin: center; animation: qb-pop 2.8s ease-in-out infinite; }
+.qb-star--2 { animation-delay: .18s; } .qb-star--3 { animation-delay: .36s; }
+.qb-arm--l { transform-box: view-box; transform-origin: 24.5px 40.5px; animation: qb-arm-l 2.8s ease-in-out infinite; }
+.qb-arm--r { transform-box: view-box; transform-origin: 39.5px 40.5px; animation: qb-arm-r 2.8s ease-in-out infinite; }
+.qb-swing { transform-box: view-box; transform-origin: 32px 6px; animation: qb-swing 3s ease-in-out infinite; }
+.qb-check { stroke-dasharray: 14; animation: qb-check 3s ease-out infinite; }
+.qb-wobble { transform-box: view-box; transform-origin: 32px 25px; animation: qb-wobble 3.2s ease-in-out infinite; }
+.qb-ribbon { transform-box: view-box; transform-origin: 32px 38px; animation: qb-sway 3.2s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .qb-ic, .qb-ic * { animation: none !important; } .qb-ic .qb-star, .qb-ic .qb-spark { opacity: 1; transform: none; } }
+/* narrower screens: heading over the four items, a softer pill */
+@media (max-width: 1199px) {
+  .qbar__in { flex-direction: column; gap: 10px; padding: 22px 24px 18px; border-radius: 48px; }
+  .qbar__h { text-align: center; }
+  .qbar__list { flex-wrap: wrap; justify-content: center; }
+}
+/* phones: four columns, icon over a centred label (Ronin's phone layout) */
+@media (max-width: 639px) {
+  .qbar__in { padding: 18px 10px 14px; border-radius: 28px; gap: 8px; }
+  .qbar__h { font-size: 18px; }
+  .qbar__list { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px; width: 100%; }
+  .qbar__list a { flex-direction: column; gap: 2px; text-align: center; white-space: normal; font-size: 11px; line-height: 1.3; }
+  .qb-ic { width: 50px; height: 50px; }
+}

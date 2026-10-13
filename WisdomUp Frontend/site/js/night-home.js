@@ -124,6 +124,7 @@
         ${head('New Arrivals', `${fresh.length} new launches — the latest Bluetooth 6.0 earbuds, neckbands, party speakers and fast chargers.`, url.filter('new'), 'View all', false, 'nh-new-h')}
         ${grid('new')}
       </section>
+      <div id="nh-qbar"></div>
       ${SERIES.length ? `
       <section aria-label="TS true wireless series">
         <div class="nh-show">
@@ -175,6 +176,9 @@
       pagers[key] = WU.rowPager($(`nh-${key}-grid`), { min: 8, list, card: tile });
       pagers[key].reset();
     });
+    // the quality bar (2026-10-13, ronin.pk's "Exceptional Quality Delivered" rebuilt — index.html): the same section as the day home, right after New Arrivals
+    const qbar = document.querySelector('#day-home .qbar');
+    if (qbar && $('nh-qbar')) $('nh-qbar').replaceWith(qbar.cloneNode(true));
     if (D.faqs && D.faqs.length) mountAccordion($('nh-faq'), D.faqs, { idPrefix: 'nhfaq' });
     mountFan($('nh-fan'));
     setInterval(() => { const el = $('nh-live-cd'); if (el && !host.hidden) el.innerHTML = liveCells(); }, 1000);

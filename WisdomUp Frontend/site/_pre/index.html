@@ -48,11 +48,11 @@
 <link rel="stylesheet" href="css/ds/tokens/base.css?v=8ea7591d">
 <link rel="stylesheet" href="css/ds/styles/components.css?v=0497221e">
 <link rel="stylesheet" href="css/wu-rail.css?v=7e14a6c3">
-<link rel="stylesheet" href="css/home.css?v=0c06f3d0">
+<link rel="stylesheet" href="css/home.css?v=7eac2206">
 <link rel="stylesheet" href="css/pages.css?v=201c89bf">
 <link rel="stylesheet" href="css/info.css?v=4adf166c">
 <link rel="stylesheet" href="css/controls.css?v=a315d52e">
-<link rel="stylesheet" href="css/night.css?v=70ffb09b">
+<link rel="stylesheet" href="css/night.css?v=a635fc30">
 <link rel="stylesheet" href="css/night-home.css?v=a6d34e45">
 <link rel="stylesheet" href="css/motion.css?v=e6edd89f">
 </head>
@@ -549,6 +549,47 @@
           </div>
         </article>
       </div></div></section></div>
+  <!-- QUALITY BAR (2026-10-13, "go to ronin.pk … copy this section's animation, svg and the shadow"): ronin.pk's "Exceptional
+       Quality Delivered" bar MEASURED and rebuilt — a 112px pill (100px corners, overflow clipped), shadow 7.04px 7.82px 51.32px
+       rgba(0,0,0,.07), 20px / ~54px padding, heading left (Inter 700 ~25px, .03em, a three-stop gradient) and four 76px animated
+       icons with a 2-line 500 label on the right. Their icons are animated GIFs (their artwork), so these are our own SVGs drawn in the
+       same outline + flat-fill style with the same motions; colours = ink + brand red (day colour rule); the promises are ours (facts
+       only — no "70M+ customers" / "365 days"). Same spot as Ronin: right after New Arrivals. night-home.js clones it for night. -->
+  <section class="qbar" aria-label="Why shop with WisdomUp">
+    <div class="qbar__in">
+      <p class="qbar__h">Quality, delivered across Pakistan</p>
+      <ul class="qbar__list">
+        <li><a href="shipping.html#charges"><svg class="qb-ic qb-ic--truck" viewBox="0 0 64 64" aria-hidden="true">
+            <g class="qb-dust"><circle class="r" cx="7" cy="44" r="1.6"></circle><circle class="r" cx="4" cy="37" r="1.1"></circle></g>
+            <path class="qb-spark" d="M31 9v4.4M28.8 11.2h4.4"></path>
+            <g class="qb-truck">
+              <path class="f" d="M11 21h25v23H11z"></path><path class="t" d="M19 21h8v7.5l-4-2.4-4 2.4z"></path>
+              <path class="f" d="M36 28.5h10.5l7.5 8.3V44H36z"></path><path d="M39.5 32h5.6l4 4.5h-9.6z"></path><path d="M48.5 40.5h3"></path>
+              <g class="qb-wheel"><circle class="f" cx="20" cy="45.5" r="4.6"></circle><path d="M20 42.4v6.2"></path></g>
+              <g class="qb-wheel"><circle class="f" cx="44" cy="45.5" r="4.6"></circle><path d="M44 42.4v6.2"></path></g>
+            </g>
+          </svg><span>Free delivery<br>from <span data-free-from="">Rs.10,000</span></span></a></li>
+        <li><a href="returns.html"><svg class="qb-ic qb-ic--happy" viewBox="0 0 64 64" aria-hidden="true">
+            <path class="r qb-star qb-star--1" d="M14.0 8.8 L15.1 11.5 L18.0 11.7 L15.8 13.6 L16.5 16.4 L14.0 14.9 L11.5 16.4 L12.2 13.6 L10.0 11.7 L12.9 11.5Z"></path><path class="r qb-star qb-star--2" d="M32.0 2.4 L33.2 5.3 L36.4 5.6 L34.0 7.6 L34.7 10.7 L32.0 9.1 L29.3 10.7 L30.0 7.6 L27.6 5.6 L30.8 5.3Z"></path><path class="r qb-star qb-star--3" d="M50.0 8.8 L51.1 11.5 L54.0 11.7 L51.8 13.6 L52.5 16.4 L50.0 14.9 L47.5 16.4 L48.2 13.6 L46.0 11.7 L48.9 11.5Z"></path>
+            <circle class="f" cx="32" cy="24" r="6.2"></circle><path class="r" d="M32 17.8a6.2 6.2 0 0 1 0 12.4z"></path>
+            <path class="f" d="M24.5 54V40.5q0-4.5 4.5-4.5h6q4.5 0 4.5 4.5V54"></path>
+            <path class="qb-arm qb-arm--l" d="M24.5 40.5 17 44.5 12.5 39.5"></path><path class="qb-arm qb-arm--r" d="M39.5 40.5 47 44.5 51.5 39.5"></path>
+          </svg><span>7-day<br>money-back</span></a></li>
+        <li><a href="warranty.html"><svg class="qb-ic qb-ic--rosette" viewBox="0 0 64 64" aria-hidden="true">
+            <g class="qb-swing">
+              <path class="t" d="M24 36 20 56l6.5-3.6L30 58l3.5-18M40 36l4 20-6.5-3.6L34 58l-3.5-18"></path>
+              <path class="r" d="M32.0 7.0 L35.5 11.0 L40.5 9.3 L41.5 14.5 L46.7 15.5 L45.0 20.5 L49.0 24.0 L45.0 27.5 L46.7 32.5 L41.5 33.5 L40.5 38.7 L35.5 37.0 L32.0 41.0 L28.5 37.0 L23.5 38.7 L22.5 33.5 L17.3 32.5 L19.0 27.5 L15.0 24.0 L19.0 20.5 L17.3 15.5 L22.5 14.5 L23.5 9.3 L28.5 11.0Z"></path><circle class="f" cx="32" cy="24" r="8.6"></circle>
+              <path class="qb-check" d="M27.8 24.3l3 3 5.6-6.2"></path>
+            </g>
+          </svg><span>WisdomUp<br>warranty</span></a></li>
+        <li><a href="shipping.html#payment"><svg class="qb-ic qb-ic--seal" viewBox="0 0 64 64" aria-hidden="true">
+            <path class="qb-spark qb-spark--2" d="M12 14v4.4M9.8 16.2h4.4"></path>
+            <g class="qb-ribbon"><path class="r" d="M26 37 22.5 56l6-3.4L31.5 58 33 40M38 37l3.5 19-6-3.4L32.5 58 31 40"></path></g>
+            <g class="qb-wobble"><path class="f" d="M32.0 10.0A3.2 3.2 0 0 1 37.7 11.1A3.2 3.2 0 0 1 42.6 14.4A3.2 3.2 0 0 1 45.9 19.3A3.2 3.2 0 0 1 47.0 25.0A3.2 3.2 0 0 1 45.9 30.7A3.2 3.2 0 0 1 42.6 35.6A3.2 3.2 0 0 1 37.7 38.9A3.2 3.2 0 0 1 32.0 40.0A3.2 3.2 0 0 1 26.3 38.9A3.2 3.2 0 0 1 21.4 35.6A3.2 3.2 0 0 1 18.1 30.7A3.2 3.2 0 0 1 17.0 25.0A3.2 3.2 0 0 1 18.1 19.3A3.2 3.2 0 0 1 21.4 14.4A3.2 3.2 0 0 1 26.3 11.1A3.2 3.2 0 0 1 32.0 10.0Z"></path><circle class="t" cx="32" cy="25" r="10"></circle><text x="32" y="29.4" text-anchor="middle">Rs</text></g>
+          </svg><span>Cash on<br>Delivery</span></a></li>
+      </ul>
+    </div>
+  </section>
 
   <section class="duo">
     <div class="duo__card duo__card--creator">
@@ -566,7 +607,7 @@
         <h2 class="h-light">Watch it demoed. <b>Add it to cart mid-stream.</b></h2>
         <p class="duo__p">Live-only prices on whatever the host is holding. Next show starts in:</p>
       </div>
-      <div class="countdown" id="countdown" role="timer" aria-label="Time until the next live show"><div class="countdown__cell"><span class="countdown__v">03</span><span class="countdown__l">Days</span></div><div class="countdown__cell"><span class="countdown__v">20</span><span class="countdown__l">Hrs</span></div><div class="countdown__cell"><span class="countdown__v">52</span><span class="countdown__l">Min</span></div><div class="countdown__cell"><span class="countdown__v">51</span><span class="countdown__l">Sec</span></div></div>
+      <div class="countdown" id="countdown" role="timer" aria-label="Time until the next live show"><div class="countdown__cell"><span class="countdown__v">03</span><span class="countdown__l">Days</span></div><div class="countdown__cell"><span class="countdown__v">08</span><span class="countdown__l">Hrs</span></div><div class="countdown__cell"><span class="countdown__v">19</span><span class="countdown__l">Min</span></div><div class="countdown__cell"><span class="countdown__v">24</span><span class="countdown__l">Sec</span></div></div>
       <div class="duo__foot">
         <button type="button" class="btn-pill" id="remind">Remind me</button>
         <span class="duo__note">Fridays · 8 PM PKT · <a class="duo__more" href="live.html">See the show ›</a></span>
@@ -2462,10 +2503,10 @@ support</span></a></div></section></div>
 <script src="js/shop.js?v=7582d314"></script>
 <script src="js/wu-data.js?v=c3758590"></script>
 <script src="js/ds-icons.js?v=ab37eba9"></script>
-<script src="js/common.js?v=a679e4fc"></script>
+<script src="js/common.js?v=1960bdf7"></script>
 <script src="js/posts.js?v=5bc5e04c"></script>
 <script src="js/home.js?v=c9efb8fb"></script>
-<script src="js/night-home.js?v=a8e3acb0"></script>
+<script src="js/night-home.js?v=8fce1f3f"></script>
 
 </body>
 </html>

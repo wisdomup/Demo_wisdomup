@@ -743,7 +743,7 @@
     paintWish();
     paintThemeBtns();
     mountNavEdge();
-    liquid(nav);
+    liquid(nav, { deep: true });
   }
   /* LIQUID GLASS (2026-10-12, "install liquid-glass-js … nav bar": that library bends a one-time html2canvas screenshot of the
      page, which goes stale under our moving banner and is heavy on phones, so the user chose this CSS route). The nav — and its
@@ -759,7 +759,11 @@
   const LQ_OK = !!(navigator.userAgentData && window.CSS && CSS.supports('backdrop-filter', 'url(#a) blur(1px)')) && !matchMedia('(prefers-reduced-transparency: reduce)').matches;
   let lqDefs = null, lqN = 0;
   const lqDone = new WeakSet(); // kept in memory, never in the markup, so a pre-rendered page (tools/build_pages.py) always gets its own lens
-  function liquid(el) {
+  // deep: the THICK glass of the Spline "Which one looks better?" pill (2026-10-13, the user's video: "keep the nav bar glow as it is,
+  // just make the glass intensity as this video") — the bend covers the outer 70% of the pill's half-height, steepening to 36% of the
+  // height at the rim (20px on the 56px nav), so the page bends visibly along the whole edge and wraps round the rounded ends; the
+  // gentle version (a thin strip at the rim, 20%) stays on the other floating capsules. Nav + its filter twin only.
+  function liquid(el, { deep } = {}) {
     if (!el) return;
     if (![...el.children].some(c => c.classList.contains('wu-rim'))) el.insertAdjacentHTML('afterbegin', '<i class="wu-rim" aria-hidden="true"></i>');
     if (!LQ_OK || lqDone.has(el) || !('ResizeObserver' in window)) return;
@@ -777,12 +781,13 @@
       const w = Math.round(el.offsetWidth), h = Math.round(el.offsetHeight);
       if (!w || !h || (w === W && h === H)) return;
       W = w; H = h;
-      const r = h / 2, max = Math.max(5, h * .2), S = max * 2.2; // the deepest pull at the rim (11px on the 56px nav) and the map's range
+      const r = h / 2, max = Math.max(5, h * (deep ? .36 : .2)), S = max * 2.2; // the deepest pull at the rim and the map's range
       cv.width = w; cv.height = h;
       const img = cx.createImageData(w, h), px = img.data;
       for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
         const vx = x + .5 - Math.min(Math.max(x + .5, r), w - r), vy = y + .5 - r, len = Math.hypot(vx, vy) || 1;
-        const t = Math.min(1, len / r), m = max * (1 - Math.sqrt(1 - t * t)); // 0 along the middle, `max` at the rim
+        const t = Math.min(1, len / r); // 0 along the middle … 1 at the rim
+        const m = deep ? max * Math.pow(Math.max(0, (t - .3) / .7), 1.5) : max * (1 - Math.sqrt(1 - t * t)); // deep: a wide bevel; gentle: a lens strip
         const i = (y * w + x) * 4;
         px[i] = Math.round(127.5 - 255 * (vx / len) * m / S); // sample toward the centre: the rim shows the content just inside it, stretched
         px[i + 1] = Math.round(127.5 - 255 * (vy / len) * m / S);
