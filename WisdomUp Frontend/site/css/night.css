@@ -746,3 +746,42 @@ html[data-theme="night"] .nh .qbar { margin: 64px 0 0; }
 
 /* SEARCH PANEL liquid glass (2026-10-13, home.css): the night stage's tint, the hairline ring and the bevel band */
 html[data-theme="night"] .search { background: rgba(21, 24, 27, .74); box-shadow: 0 24px 60px rgba(0, 0, 0, .5), inset 0 0 0 1.5px var(--n-line2), inset 0 0 14px 3px rgba(0, 0, 0, .55); }
+
+/* ===================== GLASS CHIPS (night) =====================
+   2026-10-13, after the night "View all": "add it on Chat on WhatsApp button, also back to top button also the cash on delivery
+   jazzcash easypaisa banktransfer chips also the top chips above the navbar, find all chips and apply this effect on dark theme",
+   then the cart's empty-state rows, "all the chips on search panel" and "run an audit to find chips and update all with this
+   style". The openart.ai "View All" look on every chip in night: white 15% glass (see-through — chips sit on the stage, panels,
+   cards and the nav glass), a 1.5px 135° gradient rim (.55 top-left → .08 / .06 → .4 bottom-right) drawn by `::after` as a masked
+   ring, white type, a soft 0 4px 32px shadow. Sizes and type stay each chip's own (CHIP SIZE rule). The AUDIT (every class with
+   "chip" in the templates + the named controls): .chip (quick chips above the banner, blog / help / bulk / rail / series chips,
+   product section tabs), policy page links, search panel chips (help pages, recent searches, category counts), menu chips, the
+   night home's Explore-the-range chips, product option pickers, card option chips, the All Products filter pills (+ its floating
+   twin), checkout trust chips, the affiliate walkthrough chips, the product page payment chips, the cart's empty-state rows, back
+   to top and the WhatsApp button. NOT: the budget segmented control (a thumb that glides), View all / Shop all (their own rule
+   above), CHOSEN chips (aria-pressed / -selected / -current / -checked, .is-set) — they stay the white pill so the choice shows.
+   Hover = the liquid fill (white rises, ink type); the rim stays on top. Chips whose outline was a BORDER (search chips, option
+   pickers) drop it and get the 1.5px back as padding, so they keep their size — the fill clips anything drawn in a border.
+   The `::after` many chips used as an invisible 40px tap area moves to `::before` on touch screens (no fill there). */
+html[data-theme="night"] { --gc-glass: rgba(255,255,255,.15); --gc-rim: linear-gradient(135deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.08) 40%, rgba(255,255,255,.06) 60%, rgba(255,255,255,.4) 100%); }
+html[data-theme="night"] body :is(.chip, .policy__links a, .search__pages a, .mnav__chip, .nh-chip, .opt-chip, .wpc__optchip, :is(.mbar, .mfloat) .fbtn, .ck__trust li, .afx__chips span, .pays span:not(:first-child), .cartd__links a, .totop, .wafab):not([aria-pressed="true"]):not([aria-selected="true"]):not([aria-current="true"]):not([aria-checked="true"]):not(.is-set) {
+  background: var(--gc-glass); box-shadow: 0 4px 32px rgba(0,0,0,.2); --fill: #fff !important; --fill-text: #0B0B0B !important;
+}
+html[data-theme="night"] body :is(.chip, .policy__links a, .search__pages a, .mnav__chip, .nh-chip, .opt-chip, .wpc__optchip, :is(.mbar, .mfloat) .fbtn, .ck__trust li, .afx__chips span, .pays span:not(:first-child), .cartd__links a, .totop, .wafab):not([aria-pressed="true"]):not([aria-selected="true"]):not([aria-current="true"]):not([aria-checked="true"]):not(.is-set):not(.is-na) { color: #fff; }
+html[data-theme="night"] body :is(.chip, .policy__links a, .search__pages a, .mnav__chip, .nh-chip, .opt-chip, .wpc__optchip, :is(.mbar, .mfloat) .fbtn, .ck__trust li, .afx__chips span, .pays span:not(:first-child), .cartd__links a):not([aria-pressed="true"]):not([aria-selected="true"]):not([aria-current="true"]):not([aria-checked="true"]):not(.is-set) { position: relative; }
+html[data-theme="night"] body :is(.chip, .policy__links a, .search__pages a, .mnav__chip, .nh-chip, .opt-chip, .wpc__optchip, :is(.mbar, .mfloat) .fbtn, .ck__trust li, .afx__chips span, .pays span:not(:first-child), .cartd__links a, .totop, .wafab):not([aria-pressed="true"]):not([aria-selected="true"]):not([aria-current="true"]):not([aria-checked="true"]):not(.is-set)::after {
+  content: ""; position: absolute; inset: 0; z-index: 1; border-radius: inherit; padding: 1.5px; pointer-events: none; background: var(--gc-rim);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+/* outlines that were borders → the rim; the 1.5px goes back into the padding */
+html[data-theme="night"] body .search__pages a:not([aria-pressed="true"]):not([aria-current="true"]) { border-width: 0; padding-inline: calc(var(--chip-pad, 13px) + 1.5px); }
+html[data-theme="night"] body .opt-chip:not([aria-checked="true"]) { border-width: 0; padding-inline: 17.5px; }
+html[data-theme="night"] body .opt-chip.is-na:not([aria-checked="true"])::after { opacity: .4; } /* unavailable: a fainter rim (its dashed border is gone) */
+/* the floating two sit over photos too: the same glass made nearly opaque so the white icon always reads */
+html[data-theme="night"] body :is(.totop, .wafab) { background: rgba(51, 53, 54, .9) !important; box-shadow: 0 4px 32px rgba(0,0,0,.2) !important; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+html[data-theme="night"] body .wafab .wu-rim { display: none; } /* its liquid-glass rim → the gradient rim */
+/* touch screens: the invisible 40px tap area that lived in ::after */
+@media (pointer: coarse) {
+  html[data-theme="night"] body :is(.chip, .policy__links a, .search__pages a, .mnav__chip, :is(.mbar, .mfloat) .fbtn):not(.wu-fill)::before { content: ""; position: absolute; inset: -4px 0; }
+}
