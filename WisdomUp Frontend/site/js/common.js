@@ -1474,7 +1474,11 @@
   // Colours only when the supplier sheet lists them (no invented swatches)
   const colorsOf = p => (p.colors || []).map((c, i) => typeof c === 'string' ? { name: 'Colour ' + (i + 1), hex: c } : c);
   // Studio photo on a background sampled from the photo itself, so landscape packshots blend into portrait frames
-  const photoBg = p => p.bg ? `radial-gradient(110% 80% at 50% 45%, ${p.bg[0]} 0%, ${p.bg[1]} 100%)` : '#F8F9FA';
+  // the owner's studio photos (p.studio, or a variant whose photo path carries set_photo.py's ?v=) sit on their own flat background
+  // colour — the centre-to-edge gradient suits box packshots, but behind a contained studio shot of a dark product (TS-12) it showed
+  // as grey bands above and below the photo (2026-10-14)
+  const isStudio = p => !!p.studio || /[?&]v=/.test(p.img || p.src || p.thumb || '');
+  const photoBg = p => p.bg ? (isStudio(p) ? p.bg[1] : `radial-gradient(110% 80% at 50% 45%, ${p.bg[0]} 0%, ${p.bg[1]} 100%)`) : '#F8F9FA';
   // Packshots show the product on the left and its box on the right: frame the product, unless the shot is very wide
   // A studio cut-out on WHITE (edge colour ≈ white — the owner's own photos, tools/set_photo.py) is shown whole and centred;
   // the supplier packshots keep the product-side crop (2026-10-13)
