@@ -52,6 +52,16 @@
     'Exchange & Refund Policy': url.returns, 'Warranty Policy': url.warranty, 'Privacy Policy': url.privacy, 'Terms of Service': url.terms, 'Shipping Policy': url.shipping, 'Download e-Manual': url.manuals,
   };
   const linkFor = label => LINKS[label] || url.help; // every footer/utility label has a page; unknown labels fall back to Help
+  // CORPORATE OPENS IN A NEW TAB (2026-10-14, "when click on corporate open in new tab"): every link to corporate.html — top bar, menu,
+  // footer, search, home cards, the night home, static page copy — opens it in a new tab. One delegated rule (set on press / focus / click,
+  // before the browser follows the link), so links drawn later are covered too; on the corporate page itself its own links stay in place.
+  const NEW_TAB = /(^|\/)corporate\.html([?#]|$)/;
+  const newTab = e => {
+    const a = e.target && e.target.closest && e.target.closest('a[href]');
+    if (!a || !NEW_TAB.test(a.getAttribute('href') || '') || /(^|\/)corporate\.html$/.test(location.pathname)) return;
+    a.target = '_blank'; a.rel = 'noopener';
+  };
+  ['pointerdown', 'focusin', 'click'].forEach(t => document.addEventListener(t, newTab, true));
   // Marks the footer/utility link for the page you're on (aria-current) so people can see where they are.
   const here = () => location.pathname.split('/').pop() || 'index.html';
   const isHere = href => href.split('#')[0].split('?')[0] === here() && !href.includes('#');
@@ -2225,7 +2235,7 @@
   let menu;
   /* ---------- Motion: quiet scroll reveal (text rises 8px and un-blurs; blocks rise and fade; siblings stagger) ---------- */
   const RV_TEXT = 'h1, h2, h3, .sec-title, .eyebrow, .ihero__lede, .overview__head p, .seo__head p, .mdesc, .pbanner__copy, p, .prose li, blockquote'; // 2026-10-06: every paragraph and sub-heading too (bugatti.store)
-  const RV_BLOCK = '.cp-card, .cp-step, .wpc, .tile, .post, .stat, .pd-stat, .ck__sec, .ord__card, .rv__sum, .rv__item, .faq__item, .seo__card, .duo__card, '
+  const RV_BLOCK = '.cp-step, .wpc, .tile, .post, .stat, .pd-stat, .ck__sec, .ord__card, .rv__sum, .rv__item, .faq__item, .seo__card, .duo__card, '
     + '.promo-band, .loop, .series, .bulk, .pp, .trust__item, .step, .afs__step, .afx, .afw__card, .afhp__row, .afj, .manual, .panel-list, .cta-band, .ck__sumcard, .mgrid__more, .empty, .ord__hero, .track__form, .iform, .bk-form';
   const RV_SKIP = '#site-nav, .mnav, .cartd, .fdrawer, .search, .ckc, .hero, .buybar, .toast, .wu-util, .quick, .visually-hidden, .seo__more, .footer-wrap, label';
   let revealer = null;

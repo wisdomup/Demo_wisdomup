@@ -37,7 +37,7 @@
 <link rel="stylesheet" href="css/home.css?v=387a2c7e">
 <link rel="stylesheet" href="css/pages.css?v=a5e2d128">
 <link rel="stylesheet" href="css/info.css?v=4adf166c">
-<link rel="stylesheet" href="css/corporate.css?v=35570884">
+<link rel="stylesheet" href="css/corporate.css?v=ccbbb7dc">
 <link rel="stylesheet" href="css/controls.css?v=a315d52e">
 <link rel="stylesheet" href="css/night.css?v=bbee31e0">
 <link rel="stylesheet" href="css/motion.css?v=faacb267">
@@ -45,29 +45,30 @@
 <body>
 <div class="page page--info page--corp">
 
-  <div class="wu-util"><nav class="utility" aria-label="Utility" id="utility"></nav></div>
-  <header class="nav site-nav" id="site-nav"></header>
-  <div class="nav-spacer"></div>
 
   <!-- CORPORATE PAGE (2026-10-14): higgsfield.ai/enterprise's LAYOUT rebuilt in our design language — our own copy, photos and
        facts (the corporate page's perks, occasions, steps and FAQs; products and prices from catalog.js). Their text, images,
        client logos and footer are not used. -->
-  <section class="cp-hero" aria-labelledby="cp-h1">
-    <picture class="cp-hero__media" aria-hidden="true"><source media="(max-width: 639px)" srcset="img/hero/tde-18-tall.webp"><img src="img/hero/tde-18-wide.webp" alt="" fetchpriority="high"></picture>
-    <div class="cp-hero__in">
-      <span class="cp-tag cp-tag--dark">Corporate orders</span>
-      <h1 id="cp-h1">Corporate gifts your team will actually use</h1>
-      <p class="cp-stat"><b data-cp="count">305</b><span>WisdomUp products across <span data-cp="ranges">8</span> ranges to build your gift from</span></p>
-    </div>
-  </section>
-  <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Home</a><span aria-hidden="true">›</span><span aria-current="page">Corporate Orders</span></nav>
-
-  <section class="cp-band" aria-labelledby="cp-band-h">
-    <picture class="cp-band__media" aria-hidden="true"><source media="(max-width: 639px)" srcset="img/hero/ts-11anc-tall.webp"><img src="img/hero/ts-11anc-wide.webp" alt="" loading="lazy"></picture>
-    <div class="cp-band__in">
-      <h2 id="cp-band-h">One contact from quote to delivery</h2>
-      <p>Branded WisdomUp earbuds, speakers, mics and chargers for employees, clients and events — with volume pricing, custom packaging and gift-ready boxes.</p>
-      <a class="cp-btn cp-btn--light" href="#quote">Request a quote</a>
+  <!-- INTRO (2026-10-14, "remove the nav bar on the corporate page, make the banner fit to screen and kinetic till the section 'made for
+       teams across Pakistan' comes"): no site nav on this page; one full-screen stage pinned while two messages play over two photos
+       (higgsfield's opening: the headline + the range count, then "One contact from quote to delivery"), then the card row scrolls up. -->
+  <section class="cp-intro" id="cp-intro" aria-labelledby="cp-h1">
+    <div class="cp-intro__pin">
+      <picture class="cp-intro__media cp-intro__media--a" aria-hidden="true"><source media="(max-width: 639px)" srcset="img/hero/tde-18-tall.webp"><img src="img/hero/tde-18-wide.webp" alt="" fetchpriority="high"></picture>
+      <picture class="cp-intro__media cp-intro__media--b" aria-hidden="true"><source media="(max-width: 639px)" srcset="img/hero/ts-11anc-tall.webp"><img src="img/hero/ts-11anc-wide.webp" alt="" loading="lazy"></picture>
+      <span class="cp-intro__veil" aria-hidden="true"></span>
+      <nav class="cp-crumbs" aria-label="Breadcrumb"><a href="index.html">Home</a><span aria-hidden="true">/</span><span aria-current="page">Corporate Orders</span></nav>
+      <div class="cp-intro__a">
+        <div class="cp-hero__top"><span class="cp-tag cp-tag--dark">Corporate orders</span>
+        <h1 id="cp-h1">Corporate gifts your team will actually use</h1></div>
+        <p class="cp-stat"><b data-cp="count">305</b><span>WisdomUp products across <span data-cp="ranges">8</span> ranges to build your gift from</span></p>
+      </div>
+      <div class="cp-intro__b">
+        <h2 id="cp-band-h">One contact from quote to delivery</h2>
+        <p>Branded WisdomUp earbuds, speakers, mics and chargers for employees, clients and events — with volume pricing, custom packaging and gift-ready boxes.</p>
+        <a class="cp-btn cp-btn--light" href="#quote">Request a quote</a>
+      </div>
+      <span class="cp-intro__cue" aria-hidden="true"></span>
     </div>
   </section>
 
@@ -75,17 +76,6 @@
     <div class="cp-head"><span class="cp-tag" id="cp-clients-tag">Who we gift for</span><h2 id="cp-clients-h">Made for teams across Pakistan</h2></div>
     <div class="cp-clients__track" id="cp-clients" role="list" aria-labelledby="cp-clients-h"></div>
     <div class="cp-clients__bar" aria-hidden="true"><i></i></div>
-  </section>
-
-  <section class="cp-sec cp-occ" aria-labelledby="cp-occ-h">
-    <div class="cp-head"><span class="cp-tag">Popular occasions</span><h2 id="cp-occ-h">Made for the moments that matter</h2></div>
-    <div class="cp-occ__row">
-      <a class="cp-card" href="product.html?id=ts-11"><img src="img/p/ts-11-3.jpg" alt="" loading="lazy"><span class="cp-card__txt"><h3>Employee gifts</h3><span>Onboarding kits, work anniversaries and year-end thank-yous.</span></span></a>
-      <a class="cp-card" href="product.html?id=tde-18"><img src="img/hero/tde-18-tall.webp" alt="" loading="lazy"><span class="cp-card__txt"><h3>Client &amp; partner gifts</h3><span>Premium earbuds, headphones and chargers that stay on a client’s desk.</span></span></a>
-      <a class="cp-card" href="product.html?id=os-6"><img src="img/hero/os-6-tall.webp" alt="" loading="lazy"><span class="cp-card__txt"><h3>Events &amp; conferences</h3><span>Giveaways, speaker gifts and lucky-draw prizes.</span></span></a>
-      <a class="cp-card" href="product.html?id=cdb-18"><img src="img/hero/cdb-18-tall.webp" alt="" loading="lazy"><span class="cp-card__txt"><h3>Eid &amp; festive</h3><span>Gift-boxed tech for festive hampers, delivered on time.</span></span></a>
-    </div>
-    <div class="cp-center"><a class="cp-btn cp-btn--ink" href="#quote">Request a quote</a></div>
   </section>
 
   <section class="cp-sec cp-perks" id="cp-perks" aria-labelledby="cp-perks-h">
@@ -119,13 +109,14 @@
       </div>
     </div>
     <div class="cp-prog" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-    <div class="cp-center"><a class="cp-btn cp-btn--ink" href="#quote">Request a quote</a></div>
   </section>
 
-  <section class="cp-range" aria-labelledby="cp-range-h">
+  <section class="cp-range" id="cp-range" aria-labelledby="cp-range-h">
+    <div class="cp-range__pin">
     <div class="cp-range__in">
       <div class="cp-range__side">
         <h2 class="cp-range__h" id="cp-range-h">The range</h2>
+        <span class="cp-range__rail" aria-hidden="true"><i></i></span>
         <div class="cp-range__list" role="tablist" aria-label="Product ranges" aria-orientation="vertical">
           <a class="cp-range__item" role="tab" href="products.html?cat=earbuds" data-type="earbuds" aria-selected="true">Earbuds</a>
           <a class="cp-range__item" role="tab" href="products.html?cat=headphones" data-type="headphones" aria-selected="false" tabindex="-1">Headphones</a>
@@ -140,6 +131,7 @@
         <div class="cp-range__panel" id="cp-range-panel" role="tabpanel" aria-label="Earbuds"></div>
         <div class="cp-range__cap"><b id="cp-range-t">Earbuds</b><span>Every order can carry your packaging, sleeve and card. <a id="cp-range-all" href="products.html?cat=earbuds">Shop all earbuds ›</a></span></div>
       </div>
+    </div>
     </div>
   </section>
 
@@ -246,6 +238,8 @@
     </div>
   </section>
 
+  <div class="cp-float" id="cp-float"><a class="cp-btn cp-btn--ink" href="#quote" tabindex="-1">Request a quote</a></div>
+
   <div class="trust-wrap" id="trust"></div>
   <div class="footer-wrap" id="footer"></div>
   <div class="toast" id="toast" role="status" hidden></div>
@@ -255,8 +249,8 @@
 <script src="js/shop.js?v=7582d314"></script>
 <script src="js/wu-data.js?v=9ed52186"></script>
 <script src="js/ds-icons.js?v=ab37eba9"></script>
-<script src="js/common.js?v=3e755ac3"></script>
+<script src="js/common.js?v=1874419e"></script>
 <script src="js/info.js?v=623b8d06"></script>
-<script src="js/corporate.js?v=15406b8f"></script>
+<script src="js/corporate.js?v=ae3277ab"></script>
 </body>
 </html>

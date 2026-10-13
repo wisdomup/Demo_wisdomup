@@ -171,15 +171,106 @@
       link.href = it.getAttribute('href'); link.textContent = `Shop all ${label.toLowerCase()} ›`;
       if (focus) it.focus();
     };
+    // PINNED (2026-10-14, "add the kinetic effect when I scroll, this sticks until the last section, very smooth"): on screens ≥1024 wide
+    // and ≥640 tall the section is tall and its stage sticky (CSS .is-pin); the scroll position becomes a smoothed position f in
+    // [0, n−1] (a damped follow, so a flick of the wheel glides) — names brighten / nudge with it continuously, the rail fills, and the
+    // panel swaps when f passes a half-way point. Every range gets an equal share of the scroll. Elsewhere: hover / tap / keys as before.
+    const sec = $('cp-range'), rail = sec.querySelector('.cp-range__rail'), n = items.length;
+    let pinned = false, f = 0, ft = 0, raf = 0, last = 0;
+    const pinOk = () => !reduced && innerWidth >= 1024 && innerHeight >= 640;
+    const span = () => Math.max(1, sec.offsetHeight - innerHeight);
+    const posFor = i => sec.getBoundingClientRect().top + scrollY + ((i + .5) / n) * span();
+    const aim = () => { const p = Math.min(1, Math.max(0, -sec.getBoundingClientRect().top / span())); ft = Math.min(n - 1, Math.max(0, p * n - .5)); };
+    const paint = () => {
+      items.forEach((x, i) => { const d = Math.min(1, Math.abs(i - f)); x.style.setProperty('--a', (.32 + .68 * (1 - d)).toFixed(3)); x.style.setProperty('--k', (1 - d).toFixed(3)); });
+      if (rail) rail.style.setProperty('--p', (n > 1 ? f / (n - 1) : 1).toFixed(4));
+      const i = Math.round(f);
+      if (i !== at) choose(i);
+    };
+    const tick = t => {
+      raf = 0;
+      const dt = last ? Math.min(.05, (t - last) / 1000) : 1 / 60; last = t;
+      f += (ft - f) * (1 - Math.exp(-dt * 8));
+      if (Math.abs(ft - f) < .0015) f = ft;
+      paint();
+      if (f !== ft) raf = requestAnimationFrame(tick); else last = 0;
+    };
+    const kick = () => { if (!pinned) return; aim(); if (!raf) raf = requestAnimationFrame(tick); };
+    const layout = () => {
+      const on = pinOk();
+      if (on !== pinned) {
+        pinned = on;
+        sec.classList.toggle('is-pin', on);
+        sec.style.setProperty('--cp-n', n);
+        if (!on) items.forEach(x => { x.style.removeProperty('--a'); x.style.removeProperty('--k'); });
+      }
+      if (pinned) { aim(); f = ft; paint(); }
+    };
+    addEventListener('scroll', kick, { passive: true });
+    addEventListener('resize', layout);
+    const goTo = (i, focus) => {
+      if (pinned) { scrollTo({ top: posFor(i), behavior: reduced ? 'auto' : 'smooth' }); if (focus) items[i].focus({ preventScroll: true }); }
+      else choose(i, focus);
+    };
     items.forEach((it, i) => {
-      it.addEventListener('click', e => { if (e.metaKey || e.ctrlKey || e.shiftKey) return; e.preventDefault(); choose(i); });
-      if (fine) it.addEventListener('pointerenter', () => choose(i));
+      it.addEventListener('click', e => { if (e.metaKey || e.ctrlKey || e.shiftKey) return; e.preventDefault(); goTo(i); });
+      if (fine) it.addEventListener('pointerenter', () => { if (!pinned) choose(i); });
     });
     list.addEventListener('keydown', e => {
       const d = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key];
       if (d == null) return;
-      e.preventDefault(); choose((at + d + items.length) % items.length, true);
+      e.preventDefault(); goTo(Math.min(n - 1, Math.max(0, at + d)), true);
     });
     choose(0);
+    layout();
+  }
+
+  /* ---------- INTRO: the full-screen stage pinned until the card row arrives (CSS .cp-intro). The scroll through the section
+     (0 → 1) is smoothed the same way and drives, with transforms and opacity only: photo A zooms 1 → 1.08 and fades out from .3 to
+     .56, photo B fades in over the same stretch while easing from 1.1 to 1; the headline + count lift 8svh and fade by .3; the
+     second message rises from 6svh and fades in from .4 to .66 (its button is clickable only once it shows). ---------- */
+  const intro = $('cp-intro');
+  if (intro && !reduced) {
+    const A = intro.querySelector('.cp-intro__media--a'), B = intro.querySelector('.cp-intro__media--b');
+    const ca = intro.querySelector('.cp-intro__a'), cb = intro.querySelector('.cp-intro__b'), cue = intro.querySelector('.cp-intro__cue');
+    const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+    const ramp = (x, a, b) => clamp((x - a) / (b - a));
+    const ease = x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+    let q = 0, qt = 0, raf2 = 0, last2 = 0;
+    const aim = () => { const span = Math.max(1, intro.offsetHeight - innerHeight); qt = clamp(-intro.getBoundingClientRect().top / span); };
+    const paint = () => {
+      const fa = ease(ramp(q, .3, .56)), ta = ease(ramp(q, 0, .3)), tb = ease(ramp(q, .4, .66));
+      A.style.transform = `scale(${(1 + .08 * q).toFixed(4)})`; A.style.opacity = (1 - fa).toFixed(3);
+      B.style.transform = `scale(${(1.1 - .1 * ease(ramp(q, .3, 1))).toFixed(4)})`; B.style.opacity = fa.toFixed(3);
+      ca.style.transform = `translateY(${(-8 * ta).toFixed(3)}svh)`; ca.style.opacity = (1 - ta).toFixed(3);
+      cb.style.transform = `translateY(${(6 * (1 - tb)).toFixed(3)}svh)`; cb.style.opacity = tb.toFixed(3);
+      cb.classList.toggle('is-live', tb > .6); ca.style.pointerEvents = ta > .4 ? 'none' : '';
+      if (cue) cue.style.opacity = (1 - ramp(q, 0, .12)).toFixed(3);
+    };
+    const tick = t => {
+      raf2 = 0;
+      const dt = last2 ? Math.min(.05, (t - last2) / 1000) : 1 / 60; last2 = t;
+      q += (qt - q) * (1 - Math.exp(-dt * 9));
+      if (Math.abs(qt - q) < .0008) q = qt;
+      paint();
+      if (q !== qt) raf2 = requestAnimationFrame(tick); else last2 = 0;
+    };
+    addEventListener('scroll', () => { aim(); if (!raf2) raf2 = requestAnimationFrame(tick); }, { passive: true });
+    addEventListener('resize', () => { aim(); q = qt; paint(); });
+    aim(); q = qt; paint();
+  }
+
+  /* ---------- floating "Request a quote" (higgsfield's fixed "Contact Sales"): shown once the intro has passed, hidden over the dark
+     range stage and from the contact band down ---------- */
+  const flo = $('cp-float'), contact = $('quote');
+  if (flo && contact) {
+    const btn = flo.querySelector('a');
+    const place = () => {
+      const past = intro ? intro.getBoundingClientRect().bottom < innerHeight * .5 : scrollY > innerHeight;
+      const rg = $('cp-range'), r = rg && rg.getBoundingClientRect(); // not over the dark range stage (higgsfield's button stays off their dark sections)
+      const on = past && contact.getBoundingClientRect().top > innerHeight - 40 && !(r && r.top < innerHeight - 80 && r.bottom > 80);
+      flo.classList.toggle('is-on', on); btn.tabIndex = on ? 0 : -1;
+    };
+    addEventListener('scroll', place, { passive: true }); addEventListener('resize', place); place();
   }
 })();
