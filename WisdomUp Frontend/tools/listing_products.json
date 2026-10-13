@@ -1,0 +1,15 @@
+{
+  "_about": "Products from the owner's listing sheet 'Wisdomup Products Data for listing Claud.xlsx' that the two supplier quote sheets do not carry (added 2026-10-14, \"also replace these with model numbers if there is no product list create new one\"). tools/build_catalog.py builds each into catalog.js like a supplier product: `price` = the sheet's 'Online Price' column (the regular price; the shop.js sale applies on top, like every product), `specs` = clean technical facts from its 'Technical Specification' row under the site's own labels (no brand, barcode, made-in or marketing words; the driver maker's name left out), `highlights` / `meta` in the builder's own phrasing. The photo must exist as site/img/p/<id>.jpg — put it in with tools/set_photo.py first. tools/check_listing_specs.py checks the price and every number here against the sheet row named in `from`.",
+  "os-1": { "from": "OS-1", "type": "earbuds", "price": 5550, "title": "Open-Ear Wireless Earbuds", "meta": "14.2mm drivers",
+    "highlights": ["14.2mm drivers for full bass", "Open-ear fit — hear traffic and people around you"],
+    "specs": [["Design", "Open-ear"], ["Chipset", "5656C3"], ["Driver", "14.2mm"], ["Earbud battery", "40mAh"], ["Case battery", "300mAh"], ["Certifications", "CE, FCC, RoHS"]] },
+  "os-2": { "from": "OS-2", "type": "earbuds", "price": 6300, "title": "Open-Ear Wireless Earbuds", "meta": "14.2mm drivers",
+    "highlights": ["14.2mm drivers for full bass", "Open-ear fit — hear traffic and people around you"],
+    "specs": [["Design", "Open-ear"], ["Chipset", "5656C2"], ["Driver", "14.2mm"], ["Earbud battery", "50mAh"], ["Case battery", "400mAh"], ["Certifications", "CE, FCC, RoHS"]] },
+  "os-3": { "from": "OS-3", "type": "earbuds", "price": 6750, "title": "Open-Ear Wireless Earbuds", "meta": "14.2mm drivers",
+    "highlights": ["14.2mm drivers for full bass", "30 hours of play with the case", "HD voice microphone for calls", "Open-ear fit — hear traffic and people around you"],
+    "specs": [["Design", "Open-ear"], ["Chipset", "5656C2"], ["Driver", "14.2mm"], ["Earbud battery", "50mAh"], ["Case battery", "400mAh"], ["Total playtime", "30 hours with the case"], ["Calls", "HD voice microphone"], ["Certifications", "CE, FCC, RoHS"]] },
+  "os-4": { "from": "OS-4", "type": "earbuds", "price": 6000, "title": "Open-Ear Wireless Earbuds", "meta": "12mm drivers",
+    "highlights": ["12mm drivers for full bass", "Open-ear fit — hear traffic and people around you"],
+    "specs": [["Design", "Open-ear"], ["Chipset", "5656C3"], ["Driver", "12mm"], ["Earbud battery", "40mAh"], ["Case battery", "300mAh"], ["Certifications", "CE, FCC, RoHS"]] }
+}

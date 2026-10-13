@@ -480,6 +480,8 @@ def main():
             'axes': axes, 'variants': variants if len(variants) > 1 else [],
             'skus': [v['sku'] for v in variants],
         }
+        if lead.get('img') and '?v=' in lead['img']:
+            p['studio'] = True  # the owner's own photo (tools/set_photo.py): shown whole, centred — not the packshot's product-side crop
         # extra gallery photos from tools/set_photo.py (img/p/‹id›-2.jpg, -3 …): shown on the product page after the product's own photo
         extra = []
         for n in range(2, 10):
@@ -491,6 +493,29 @@ def main():
         if extra:
             p['photos'] = extra
         products.append(p)
+
+    # Products only the owner's listing sheet carries (tools/listing_products.json, 2026-10-14 — OS-1 … OS-4): built like a supplier
+    # product with the sheet's online price as the regular price; the photo comes from tools/set_photo.py (img/p/<id>.jpg + .json)
+    extra_products = json.load(open(os.path.join(ROOT, 'tools', 'listing_products.json'), encoding='utf-8'))
+    have = {p['id'] for p in products}
+    for pid, e in extra_products.items():
+        if pid.startswith('_'):
+            continue
+        assert pid not in have, f'{pid} is already built from the supplier sheets — remove it from tools/listing_products.json'
+        mp = os.path.join(IMG_BIG, pid + '.json')
+        assert os.path.exists(mp), f'{pid}: no photo yet — run  python3 tools/set_photo.py {pid} IMAGE'
+        img = json.load(open(mp))
+        q = '?v=' + img['v'] if img.get('v') else ''
+        tl, noun, artk = TYPES[e['type']]
+        code = e['from']
+        products.append({
+            'id': pid, 'code': code, 'title': f"{code} {e['title']}", 'type': e['type'], 'cat': tl,
+            'price': int(e['price']), 'from': False, 'meta': e.get('meta', ''), 'highlights': e.get('highlights', []),
+            'specs': [list(s) for s in e['specs']], 'features': [], 'connectors': [], 'colors': [],
+            'tabs': [], 'ribbon': None, 'year': None, 'art': artk,
+            'src': f'img/p/{pid}.jpg{q}', 'thumb': f'img/p/s/{pid}.jpg{q}', 'bg': [img['mid'], img['edge']], 'ar': round(img['w'] / img['h'], 3),
+            'axes': [], 'variants': [], 'skus': [code], 'studio': True,
+        })
 
     # Specs from the owner's listing sheet (tools/listing_specs.json, curated 2026-10-13 — see tools/check_listing_specs.py):
     # appended after a product's own specs; a label the product already has keeps the supplier-sheet value. On those

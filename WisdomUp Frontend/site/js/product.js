@@ -80,7 +80,7 @@
   const available = (axis, val) => V.some(v => v.attrs[axis] === val && p.axes.every(k => k === axis || v.attrs[k] === V[cur].attrs[k]));
   // the variants' photos, then the owner's extra gallery photos (p.photos — tools/set_photo.py SKU IMAGE N, 2026-10-13)
   const images = V.map(v => v.img).concat(p.photos || []).filter((x, i, a) => x && a.indexOf(x) === i);
-  const studio = !!p.bg && /^#(f[2-9a-f]){3}$/i.test(p.bg[1]); // a studio cut-out on white: thumbnails centred, not product-side
+  const studio = !!p.studio || (!!p.bg && /^#(f[2-9a-f]){3}$/i.test(p.bg[1])); // the owner's studio photo / a cut-out on white: thumbnails centred
 
   // ---- SEO: title, description, canonical address, social preview and structured data for this product ----
   const canon = url.product(p.id);

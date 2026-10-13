@@ -23,9 +23,9 @@ window.WU_STORE = (function () {
     ['ts-11anc', 'New · Noise-cancelling earbuds', 'Silence, on demand.', { wide: 'img/hero/ts-11anc-wide.webp', tall: 'img/hero/ts-11anc-tall.webp', bg: ['#3A0905', '#0A0606'], at: '72% 20%' }],
     ['tde-18', 'Noise-cancelling headphones', 'Your world, on mute.', { wide: 'img/hero/tde-18-wide.webp', tall: 'img/hero/tde-18-tall.webp', bg: ['#B81A04', '#3A0503'], at: '85% 30%', atTall: '52% 50%', tallSize: [1086, 1448] }], // replaced YX-28 (2026-10-11)
     ['os-6', 'New · Open-ear earbuds', 'Hear the city. Keep the music.', { wide: 'img/hero/os-6-wide.webp', tall: 'img/hero/os-6-tall.webp', bg: ['#3A0A08', '#0A0707'], at: '82% 10%', atTall: '50% 42%' }],
-    // OS-4 is NOT in the catalogue (not in the supplier sheets) — the owner's call (2026-10-10, "just add the slide with earbuds filter
-    // link"): an art-only slide whose link is the Earbuds category (`href`) instead of a product page; `label` names it for screen readers
-    ['os-4', 'Open-ear earbuds', '', { wide: 'img/hero/os-4-wide.webp', tall: 'img/hero/os-4-tall.webp', bg: ['#2E0605', '#0A0606'], at: '75% 0%', atTall: '50% 46%', href: 'products.html?cat=earbuds', label: 'OS-4 open-ear earbuds — shop all earbuds' }],
+    // OS-4 was art-only (linked to the Earbuds category) until it reached the catalogue on 2026-10-14 from the owner's listing sheet
+    // (tools/listing_products.json) — it links to its own product page now, like every slide
+    ['os-4', 'Open-ear earbuds', '', { wide: 'img/hero/os-4-wide.webp', tall: 'img/hero/os-4-tall.webp', bg: ['#2E0605', '#0A0606'], at: '75% 0%', atTall: '50% 46%' }],
     ['cdb-18', 'Magnetic wireless power bank', 'Snap on. Power up.', { wide: 'img/hero/cdb-18-wide.webp', tall: 'img/hero/cdb-18-tall.webp', bg: ['#2A0605', '#060606'], at: '90% 30%', atTall: '50% 50%' }], // campaign art (2026-10-11)
   // a 4th item = banner ART for that slide (2026-10-10): `wide` (landscape file, ≥640px) + `tall` (portrait file, phones) + its backdrop `bg`,
   // optional `at` / `atTall` = object-position for each file (defaults 72% 50% / 50% 42%). Choose `at` so the product stays clear of the

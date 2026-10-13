@@ -32,7 +32,33 @@ def sheet_rows(path):
             cells[col] = strings[int(v.group(1))] if (t and t.group(1) == 's' and v) else (html.unescape(v.group(1)) if v else '')
         if cells.get('B'):
             rows[cells['B'].strip().upper()] = (cells.get('I', '') + ' ' + cells.get('H', '') + ' ' + cells.get('F', ''))
+            PRICES[cells['B'].strip().upper()] = cells.get('E', '').strip()
     return rows
+
+
+PRICES = {}  # model → the sheet's 'Online Price' (column E), filled by sheet_rows()
+NEW = os.path.join(ROOT, 'tools', 'listing_products.json')
+
+
+def check_new(rows, products):
+    """tools/listing_products.json: each product's price = the sheet's online price, every spec number/code is in its row."""
+    problems = []
+    entries = {k: v for k, v in json.load(open(NEW, encoding='utf-8')).items() if not k.startswith('_')}
+    for pid, e in entries.items():
+        src = rows.get(e['from'].upper())
+        if src is None:
+            problems.append(f'{pid}: {e["from"]} is not a row of the sheet'); continue
+        if str(e['price']) != re.sub(r'\D', '', PRICES.get(e['from'].upper(), '')):
+            problems.append(f'{pid}: price {e["price"]} ≠ the sheet\'s online price {PRICES.get(e["from"].upper())!r}')
+        if pid not in products:
+            problems.append(f'{pid}: not in catalog.js — run tools/build_catalog.py')
+        flat = re.sub(r'[\s$\\{}]|text', '', src).replace(',', '')
+        for label, value in e['specs']:
+            for t in tokens(value):
+                if t not in src and t not in flat:
+                    problems.append(f'{pid}: "{label}: {value}" — "{t}" not found in {e["from"]}')
+    print(f'{len(entries)} listing-only products checked')
+    return problems
 
 
 def tokens(value):
@@ -70,6 +96,7 @@ def main():
                 if t not in src and t not in flat and t.replace('.', '') not in flat:
                     problems.append(f'{pid}: "{label}: {value}" — "{t}" not found in {"/".join(entry["from"])}')
     print(f'{len(spec) - 1} products, {added} listing specs on the site, {kept} not used because the product already has that label')
+    problems += check_new(rows, products)
     for p in problems:
         print('PROBLEM', p)
     sys.exit(1 if problems else 0)

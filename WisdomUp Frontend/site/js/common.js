@@ -1478,7 +1478,8 @@
   // Packshots show the product on the left and its box on the right: frame the product, unless the shot is very wide
   // A studio cut-out on WHITE (edge colour ≈ white — the owner's own photos, tools/set_photo.py) is shown whole and centred;
   // the supplier packshots keep the product-side crop (2026-10-13)
-  const whiteEdge = p => !!p.bg && /^#(f[2-9a-f]){3}$/i.test(p.bg[1]);
+  // the owner's studio photos (p.studio — set by tools/set_photo.py; some have a faint grey edge) and any white-edged cut-out show whole
+  const whiteEdge = p => !!p.studio || (!!p.bg && /^#(f[2-9a-f]){3}$/i.test(p.bg[1]));
   const photoFit = p => whiteEdge(p) ? 'object-fit: contain; object-position: 50% 50%;' : (p.ar || 1) >= 2.1 ? 'object-fit: contain;' : 'object-fit: cover; object-position: 6% 50%;';
   const seedOf = p => [...p.id].reduce((a, c) => a + c.charCodeAt(0), 0);
   const ratingOf = p => { const rt = p.rating, s = seedOf(p); return typeof rt === 'number' ? (rt >= 5 ? rt - (s % 4) * 0.1 : rt).toFixed(1) : '4.6'; };
