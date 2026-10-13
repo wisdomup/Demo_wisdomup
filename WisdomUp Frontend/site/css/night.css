@@ -785,3 +785,37 @@ html[data-theme="night"] body .wafab .wu-rim { display: none; } /* its liquid-gl
 @media (pointer: coarse) {
   html[data-theme="night"] body :is(.chip, .policy__links a, .search__pages a, .mnav__chip, :is(.mbar, .mfloat) .fbtn):not(.wu-fill)::before { content: ""; position: absolute; inset: -4px 0; }
 }
+
+/* ===================== CORPORATE PAGE (night) =====================
+   corporate.html (2026-10-14, higgsfield.ai/enterprise's layout in our design — see css/corporate.css). The dark bands (hero, band,
+   range, contact, explore) are dark in both themes; here the white sections move onto the stage: white type, panels #15181B, cards
+   #1A1D21, 7% hairlines, the ink CTA turns white; the night `a { red }` rule is overridden for the page's own links. */
+html[data-theme="night"] .page--corp .cp-head h2, html[data-theme="night"] .page--corp .cp-faq h2, html[data-theme="night"] .page--corp .cp-big,
+html[data-theme="night"] .page--corp .cp-step h3, html[data-theme="night"] .page--corp .cp-mini b { color: #fff; }
+html[data-theme="night"] .page--corp :is(.cp-head p, .cp-cap, .cp-step p, .cp-mini small, .cp-faq .faq__a, .cp-faq__more) { color: #9AA0A6; }
+html[data-theme="night"] .page--corp .cp-tag:not(.cp-tag--dark) { background: rgba(255,255,255,.08); color: #fff; }
+html[data-theme="night"] .page--corp a.cp-btn--ink { background: #fff; color: #0B0B0B; }
+html[data-theme="night"] .page--corp a.cp-btn--light { color: #0B0B0B; }
+html[data-theme="night"] .page--corp .cp-seg { background: rgba(255,255,255,.06); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.07); }
+html[data-theme="night"] .page--corp .cp-seg button { color: #C9CDD2; }
+html[data-theme="night"] .page--corp .cp-seg button[aria-selected="true"] { background: #fff; color: #0B0B0B; }
+html[data-theme="night"] .page--corp .cp-mini { background: #15181B; box-shadow: 0 20px 50px rgba(0,0,0,.35), inset 0 0 0 1.5px rgba(255,255,255,.07); }
+html[data-theme="night"] .page--corp :is(.cp-mini__row span, .cp-tiers span) { background: rgba(255,255,255,.06); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.07); color: #fff; }
+html[data-theme="night"] .page--corp .cp-tiers span::before { background: rgba(217,30,5,.34); }
+html[data-theme="night"] .page--corp .cp-flow span { background: #fff; color: #0B0B0B; }
+html[data-theme="night"] .page--corp .cp-prog i { background: rgba(255,255,255,.12); }
+html[data-theme="night"] .page--corp .cp-prog i::after { background: #fff; }
+html[data-theme="night"] .page--corp .cp-range__panel { background: #15181B; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.07); }
+html[data-theme="night"] .page--corp a.cp-tile { background: #1A1D21; color: #fff; }
+html[data-theme="night"] .page--corp a.cp-tile:hover { background: #202328; }
+html[data-theme="night"] .page--corp .cp-tile :is(small, strong s) { color: #9AA0A6; }
+html[data-theme="night"] .page--corp a.cp-range__item { color: rgba(255,255,255,.32); }
+html[data-theme="night"] .page--corp a.cp-range__item:hover { color: rgba(255,255,255,.7); }
+html[data-theme="night"] .page--corp a.cp-range__item[aria-selected="true"] { color: #fff; }
+html[data-theme="night"] .page--corp :is(.cp-range__cap a, .cp-faq__more a, .cp-contact__note a) { color: #fff; }
+html[data-theme="night"] .page--corp a.cp-card { color: #fff; }
+html[data-theme="night"] .page--corp .cp-step { background: #15181B; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.07); }
+html[data-theme="night"] .page--corp .cp-step li { color: #C9CDD2; }
+html[data-theme="night"] .page--corp .cp-pill { background: #1A1D21; box-shadow: 0 10px 28px rgba(0,0,0,.3), inset 0 0 0 1.5px rgba(255,255,255,.07); color: #fff; }
+html[data-theme="night"] .page--corp .cp-faq .faq__q { color: #fff; }
+html[data-theme="night"] .page--corp .cp-more__chips a { color: #fff; }
