@@ -449,7 +449,8 @@ def main():
             img = photo(zips, r, sku) if r['photo'] and not os.environ.get('NOPHOTO') else None
             v = {'sku': r['code'].strip(), 'attrs': {k: v for k, v in a.items() if v}, 'price': pkr(r['price'])}
             if img:
-                v.update({'img': f'img/p/{sku}.jpg', 'thumb': f'img/p/s/{sku}.jpg', 'bg': [img['mid'], img['edge']], 'ar': round(img['w'] / img['h'], 3)})
+                q = '?v=' + img['v'] if img.get('v') else ''  # a photo replaced by tools/set_photo.py carries a version, so browsers refetch it
+                v.update({'img': f'img/p/{sku}.jpg{q}', 'thumb': f'img/p/s/{sku}.jpg{q}', 'bg': [img['mid'], img['edge']], 'ar': round(img['w'] / img['h'], 3)})
             variants.append(v)
             for val in v['attrs'].values():
                 for k in ('USB-C', 'Lightning', 'Micro-USB'):

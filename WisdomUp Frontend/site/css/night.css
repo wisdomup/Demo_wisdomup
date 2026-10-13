@@ -723,3 +723,6 @@ html[data-theme="night"] .qb-ic .t { fill: rgba(217, 30, 5, .28); }
 html[data-theme="night"] .qb-ic text { fill: #FF6A4A; } /* the "Rs" on the seal: the night red-text, readable on the tinted disc */
 html[data-theme="night"] .nh .qbar { margin: 64px 0 0; }
 @media (max-width: 639px) { html[data-theme="night"] .nh .qbar { margin-top: 36px; } }
+
+/* SEARCH PANEL liquid glass (2026-10-13, home.css): the night stage's tint, the hairline ring and the bevel band */
+html[data-theme="night"] .search { background: rgba(21, 24, 27, .74); box-shadow: 0 24px 60px rgba(0, 0, 0, .5), inset 0 0 0 1.5px var(--n-line2), inset 0 0 14px 3px rgba(0, 0, 0, .55); }

@@ -281,7 +281,7 @@ html[data-theme="night"] .scrim.is-anim::before { background: rgba(0,0,0,.6); }
     opacity: 1; overscroll-behavior: contain;
   }
   .scrim.is-anim .search { transform: translate3d(0, 104%, 0); }
-  html[data-theme="night"] .scrim.is-anim .search { box-shadow: inset 0 1.5px 0 var(--n-line2); }
+  html[data-theme="night"] .scrim.is-anim .search { box-shadow: inset 0 1.5px 0 var(--n-line2), inset 0 0 14px 3px rgba(0, 0, 0, .55); } /* + the glass bevel (night.css) */
   .scrim.is-anim.is-open .search { transform: none; }
 }
 /* Menu sub-levels (both themes): a department row pushes its list in from the right (500ms) while the menu slides −30% */

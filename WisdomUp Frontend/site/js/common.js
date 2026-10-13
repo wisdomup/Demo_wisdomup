@@ -763,9 +763,12 @@
   // just make the glass intensity as this video") — the bend covers the outer 70% of the pill's half-height, steepening to 36% of the
   // height at the rim (20px on the 56px nav), so the page bends visibly along the whole edge and wraps round the rounded ends; the
   // gentle version (a thin strip at the rim, 20%) stays on the other floating capsules. Nav + its filter twin only.
-  function liquid(el, { deep } = {}) {
+  // rim: false = no <i class="wu-rim"> child (the SEARCH PANEL scrolls, so a child rim would scroll away — its rim is a box-shadow ring in
+  // home.css instead). The map follows the element's corner radius: a pill bends from its ends, a rounded panel from a 28px band
+  // inside every edge (2026-10-13, "make the search panel also glass liquid same as the nav bar, no glow").
+  function liquid(el, { deep, rim = true } = {}) {
     if (!el) return;
-    if (![...el.children].some(c => c.classList.contains('wu-rim'))) el.insertAdjacentHTML('afterbegin', '<i class="wu-rim" aria-hidden="true"></i>');
+    if (rim && ![...el.children].some(c => c.classList.contains('wu-rim'))) el.insertAdjacentHTML('afterbegin', '<i class="wu-rim" aria-hidden="true"></i>');
     if (!LQ_OK || lqDone.has(el) || !('ResizeObserver' in window)) return;
     lqDone.add(el);
     if (!lqDefs) {
@@ -781,12 +784,14 @@
       const w = Math.round(el.offsetWidth), h = Math.round(el.offsetHeight);
       if (!w || !h || (w === W && h === H)) return;
       W = w; H = h;
-      const r = h / 2, max = Math.max(5, h * (deep ? .36 : .2)), S = max * 2.2; // the deepest pull at the rim and the map's range
+      const R = Math.min(parseFloat(getComputedStyle(el).borderTopLeftRadius) || h / 2, h / 2, w / 2); // the corner radius (a pill: h/2)
+      const B = Math.min(deep ? Math.max(R, 28) : R, h / 2, w / 2);                                   // the bend band inside each edge
+      const max = Math.max(5, deep ? B * .72 : h * .2), S = max * 2.2; // the deepest pull at the rim (20px on the 56px nav) and the map's range
       cv.width = w; cv.height = h;
       const img = cx.createImageData(w, h), px = img.data;
       for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
-        const vx = x + .5 - Math.min(Math.max(x + .5, r), w - r), vy = y + .5 - r, len = Math.hypot(vx, vy) || 1;
-        const t = Math.min(1, len / r); // 0 along the middle … 1 at the rim
+        const vx = x + .5 - Math.min(Math.max(x + .5, B), w - B), vy = y + .5 - Math.min(Math.max(y + .5, B), h - B), len = Math.hypot(vx, vy) || 1;
+        const t = Math.min(1, len / B); // 0 inside the band … 1 at the rim
         const m = deep ? max * Math.pow(Math.max(0, (t - .3) / .7), 1.5) : max * (1 - Math.sqrt(1 - t * t)); // deep: a wide bevel; gentle: a lens strip
         const i = (y * w + x) * 4;
         px[i] = Math.round(127.5 - 255 * (vx / len) * m / S); // sample toward the centre: the rim shows the content just inside it, stretched
@@ -800,7 +805,8 @@
       el.style.setProperty('--lq', `url(#${id})`);
       el.classList.add('is-lq');
     };
-    new ResizeObserver(draw).observe(el);
+    let dT = 0; // a panel whose height changes as you type (search results) redraws once the size has settled
+    new ResizeObserver(() => { clearTimeout(dT); dT = setTimeout(draw, 160); }).observe(el);
     draw();
   }
   // Edge light: one rainbow arc glides clockwise round a pill's 1px edge (the nav, and the stuck filter capsule). Speed, length and colours are copied from
@@ -1372,6 +1378,7 @@
         <div class="search__more"><button type="button" class="btn-pill" aria-label="Show more results" hidden>Show more</button></div>
       </div>`;
     document.body.appendChild(host);
+    liquid(host.querySelector('.search'), { deep: true, rim: false }); // the nav's thick liquid glass, no edge light / glow (2026-10-13)
     const input = host.querySelector('input'), grid = host.querySelector('.search__grid'), label = host.querySelector('.search__label b'), why = host.querySelector('.search__why');
     const pagesEl = host.querySelector('[data-help]'), catsEl = host.querySelector('.search__cats'), recentEl = host.querySelector('.search__recent');
     // Help and company pages are searchable too ("warranty", "return", "track", "bulk"…)
@@ -1469,7 +1476,10 @@
   // Studio photo on a background sampled from the photo itself, so landscape packshots blend into portrait frames
   const photoBg = p => p.bg ? `radial-gradient(110% 80% at 50% 45%, ${p.bg[0]} 0%, ${p.bg[1]} 100%)` : '#F8F9FA';
   // Packshots show the product on the left and its box on the right: frame the product, unless the shot is very wide
-  const photoFit = p => (p.ar || 1) >= 2.1 ? 'object-fit: contain;' : 'object-fit: cover; object-position: 6% 50%;';
+  // A studio cut-out on WHITE (edge colour ≈ white — the owner's own photos, tools/set_photo.py) is shown whole and centred;
+  // the supplier packshots keep the product-side crop (2026-10-13)
+  const whiteEdge = p => !!p.bg && /^#(f[2-9a-f]){3}$/i.test(p.bg[1]);
+  const photoFit = p => whiteEdge(p) ? 'object-fit: contain; object-position: 50% 50%;' : (p.ar || 1) >= 2.1 ? 'object-fit: contain;' : 'object-fit: cover; object-position: 6% 50%;';
   const seedOf = p => [...p.id].reduce((a, c) => a + c.charCodeAt(0), 0);
   const ratingOf = p => { const rt = p.rating, s = seedOf(p); return typeof rt === 'number' ? (rt >= 5 ? rt - (s % 4) * 0.1 : rt).toFixed(1) : '4.6'; };
   const reviewsOf = p => 24 + (seedOf(p) * 37) % 260;
