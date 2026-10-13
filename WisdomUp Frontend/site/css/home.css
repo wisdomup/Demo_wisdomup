@@ -91,7 +91,16 @@ button { font-family: inherit; }
 .site-nav .navbtn--cat > svg { width: 24px; height: 24px; }
 .site-nav__cats { flex: 1; display: flex; justify-content: center; align-items: center; min-width: 0; overflow: hidden; }
 .site-nav__tools { display: flex; align-items: center; gap: 2px; flex: none; }
-.site-nav .navbtn--all { gap: 7px; font-weight: 500; font-size: 14px; background: rgba(226,232,255,.06); border: 1.5px solid rgba(226,232,255,.14); }
+/* SHOP ALL = the night "View all" capsule's look, openart.ai's "View All" (2026-10-13, "now lets put it same on the inner capsule
+   of shop all in the nav bar"; both themes — the nav is the same dark glass in day and night): white 15% glass (see-through, the nav
+   is glass), a 1.5px 135° gradient rim (.55 top-left → .08 / .06 → .4 bottom-right) drawn by `::after` as a masked ring — the
+   border stays transparent so the pill keeps its size — 600 14px/20px type, a soft 0 4px 32px shadow. Size, padding and the grid
+   icon are the nav's own (Nav size rule). Hover: the pill behind the label grows (motion.css) to openart's 20%. */
+.site-nav .navbtn--all { gap: 7px; font-weight: 600; font-size: 14px; line-height: 20px; background: rgba(255,255,255,.15); border: 1.5px solid transparent; box-shadow: 0 4px 32px rgba(0,0,0,.2); }
+.site-nav .navbtn--all::after { content: ""; position: absolute; z-index: 1; inset: -1.5px; border-radius: inherit; padding: 1.5px; pointer-events: none;
+  background: linear-gradient(135deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.08) 40%, rgba(255,255,255,.06) 60%, rgba(255,255,255,.4) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
 .site-nav .navbtn:hover, .site-nav .navbtn[aria-expanded="true"] { background: rgba(255,255,255,.14); }
 /* The icon tools (menu, search, account, wishlist, cart) have no hover effect — on phone and desktop */
 .site-nav .navbtn--util:hover { background: transparent; }

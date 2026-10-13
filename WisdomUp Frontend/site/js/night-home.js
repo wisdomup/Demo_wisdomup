@@ -19,7 +19,7 @@
   const head = (h, sub, href, label = 'View all', center = false, id = '') => `
     <header class="nh-head${center ? ' nh-head--center' : ''}">
       <div><h2 class="nh-h"${id ? ` id="${id}"` : ''}>${esc(h)}</h2>${sub ? `<p class="nh-sub">${esc(sub)}</p>` : ''}</div>
-      ${href ? `<a class="nh-btn" href="${href}">${esc(label)} ↗</a>` : ''}
+      ${href ? `<a class="nh-btn nh-btn--all" href="${href}">${esc(label)}</a>` : ''}
     </header>`;
   const tile = p => `
     <article class="nh-tile${p.soldOut ? ' nh-tile--out' : ''}">

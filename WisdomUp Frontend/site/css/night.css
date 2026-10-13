@@ -68,7 +68,7 @@ html[data-theme="night"] .pdtabs__in { box-shadow: 0 10px 30px rgba(0,0,0,.35) !
 html[data-theme="night"] .buybar { box-shadow: 0 10px 30px rgba(0,0,0,.35) !important; }
 html[data-theme="night"] .toast { background: rgba(244, 245, 246, .84); -webkit-backdrop-filter: blur(18px) saturate(140%); backdrop-filter: blur(18px) saturate(140%); }
 html[data-theme="night"] .wafab { background: rgba(244, 245, 246, .86) !important; box-shadow: none !important; -webkit-backdrop-filter: blur(20px) saturate(140%); backdrop-filter: blur(20px) saturate(140%); } /* liquid glass over the banner: clear enough for the bend to show */
-html[data-theme="night"] .site-nav .navbtn--all { background: rgba(255,255,255,.06); border-color: var(--n-line2); }
+/* the nav's Shop All is the same glass capsule in night (home.css, 2026-10-13) — no night override */
 html[data-theme="night"] .wu-util .utility a { color: var(--n-muted); }
 html[data-theme="night"] .wu-util .utility a:hover, html[data-theme="night"] .wu-util .utility a[aria-current="page"] { color: #fff; }
 
@@ -85,9 +85,29 @@ html[data-theme="night"] .wpc__wish { background: rgba(26, 29, 33, .85); }
 /* ---------- Rails: straight on the stage; uniform header ---------- */
 html[data-theme="night"] :is(.shop-rail, .mgrid-band) { background: transparent; }
 html[data-theme="night"] .shop-rail__title { color: var(--n-text); }
-html[data-theme="night"] .shop-rail__all { background: var(--n-red-soft); color: var(--n-red-text); box-shadow: inset 0 0 0 1.5px var(--n-red-line); border-radius: 999px; }
-html[data-theme="night"] .shop-rail__all:hover { background: rgba(217,30,5,.26); color: #fff; }
-html[data-theme="night"] .shop-rail__all::after { content: " ↗"; }
+/* VIEW ALL / SHOP ALL = openart.ai's "View All" (2026-10-13, "there is view all button make it same on our website view all
+   buttons on dark"; measured on openart.ai/suite/home): a 40px glass capsule — white 15% over the page (here mixed with the
+   stage so the rim can be a gradient border), padding 16px right / 20px left, 8px gap, a soft 0 4px 32px shadow, a 135° rim
+   bright at the top-left (.55) and bottom-right (.4) and faint between (.08 / .06) — 1.5px here (ONE STROKE SIZE; theirs 1px),
+   600 14px/20px white type and a 16px bold ↗ (our own drawing, `--va-arrow`, coloured by the text so it turns with the fill).
+   Night home headings (`.nh-btn--all`, night-home.js) + the night rails' "Shop all" (was a red-tinted capsule). Hover = our
+   liquid fill (white rises, ink type, the rim turns white — motion.css), not openart's 15% → 20% lighten. `body` in the
+   selectors: motion.css loads last and sets its own night hover backgrounds. */
+html[data-theme="night"] body :is(.shop-rail__all, .nh-btn.nh-btn--all) {
+  --va-glass: #333536; --va-glass: color-mix(in srgb, #fff 15%, var(--n-bg, #0F1113));
+  --va-rim: linear-gradient(135deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.08) 40%, rgba(255,255,255,.06) 60%, rgba(255,255,255,.4) 100%);
+  --va-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6.5 17.5 17 7M7 6h10v10'/%3E%3C/svg%3E");
+  display: inline-flex; flex: none; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 14.5px 0 18.5px;
+  border: 1.5px solid transparent; border-radius: 999px;
+  background: linear-gradient(var(--va-glass) 0 0) padding-box, var(--va-rim) border-box;
+  box-shadow: 0 4px 32px rgba(0,0,0,.2); color: #fff; font: 600 14px/20px var(--font); white-space: nowrap;
+}
+html[data-theme="night"] body :is(.shop-rail__all, .nh-btn.nh-btn--all):hover { background: linear-gradient(var(--va-glass) 0 0) padding-box, var(--va-rim) border-box; }
+html[data-theme="night"] body :is(.shop-rail__all, .nh-btn.nh-btn--all).wu-fill { --fill: #fff; --fill-text: #0B0B0B; }
+html[data-theme="night"] body :is(.shop-rail__all, .nh-btn.nh-btn--all)::after {
+  content: ""; flex: none; width: 16px; height: 16px; background: currentColor;
+  -webkit-mask: var(--va-arrow) center / 16px no-repeat; mask: var(--va-arrow) center / 16px no-repeat;
+}
 
 /* ---------- Home: hero, carousels, panels ---------- */
 html[data-theme="night"] .hero { box-shadow: inset 0 0 0 1.5px var(--n-line); } /* same geometry and position as day (shared banner, 2026-10-06) */

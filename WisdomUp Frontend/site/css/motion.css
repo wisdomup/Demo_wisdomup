@@ -180,10 +180,10 @@ html[data-theme="night"] .ckc__btn--line { --fill: #fff; --fill-text: #0B0B0B; }
 /* ---------- Nav: the category pill grows behind the label (scale .6 → 1 + fade) instead of snapping on ---------- */
 .site-nav .navbtn:not(.navbtn--util):not(.site-nav__icon) { position: relative; isolation: isolate; }
 .site-nav .navbtn:not(.navbtn--util):not(.site-nav__icon)::before { content: ""; position: absolute; z-index: -1; inset: 0; border-radius: inherit; background: rgba(255,255,255,.14); opacity: 0; transform: scale(.6); transition: transform var(--m-primary), opacity var(--m-primary); pointer-events: none; }
-.site-nav .navbtn--all::before { background: rgba(255,255,255,.16); }
+.site-nav .navbtn--all.navbtn:not(.navbtn--util):not(.site-nav__icon)::before { background: rgba(255,255,255,.06); } /* over the 15% glass = openart's 20% hover (weight beats the category-pill rule above) */
 @media (hover: hover) and (pointer: fine) {
   .site-nav .navbtn:not(.navbtn--util):hover { background: transparent; }
-  .site-nav .navbtn--all:hover { background: rgba(226,232,255,.06); }
+  .site-nav .navbtn--all.navbtn:not(.navbtn--util):hover { background: rgba(255,255,255,.15); } /* the glass stays; the pill grows on top */
   .site-nav .navbtn:not(.navbtn--util):hover::before, .site-nav .navbtn[aria-expanded="true"]::before { opacity: 1; transform: scale(1); }
 }
 .site-nav .navbtn[aria-expanded="true"] { background: transparent; }
