@@ -1254,6 +1254,29 @@ body:has(.ckc.is-bar:not([hidden])) .wafab { opacity: 0; pointer-events: none; t
 .search { background: rgba(255, 255, 255, .74); -webkit-backdrop-filter: blur(16px) saturate(160%); backdrop-filter: blur(16px) saturate(160%); box-shadow: 0 24px 60px rgba(0, 0, 0, .18), inset 0 0 0 1.5px rgba(255, 255, 255, .8), inset 0 0 14px 3px rgba(0, 0, 0, .08); }
 .search.is-lq { --lq-rest: blur(6px) saturate(200%) brightness(1.06); }
 
+/* SLIDE-IN PANELS in the same liquid glass (2026-10-14, "all the panels which slide in make them liquid glass"): the menu, the filter
+   drawer, the cart drawer + its foot sheets (order note / delivery / gift wrap) and the quick options panel wear the search panel's
+   glass — white .8 over the dimmed page, the deep bend (liquid(el, { deep: true, rim: false }) in common.js / products.js; they
+   scroll inside, so the rim is a box-shadow ring), the soft bevel band and their own drop shadow; NO edge light, NO glow. Inner bands
+   that were solid (the menu's sub-level, the filter and quick-panel feet) are see-through, so the glass reads to every edge, and the
+   menu's pushed list fades out under its sub-level. `body` lifts these over pages.css / motion.css; night at the end of night.css. */
+body :is(.mnav, .fdrawer, .cartd) { background: rgba(255, 255, 255, .8); -webkit-backdrop-filter: blur(16px) saturate(160%); backdrop-filter: blur(16px) saturate(160%); }
+body :is(.mnav, .fdrawer) { box-shadow: 18px 0 40px rgba(0, 0, 0, .18), inset 0 0 0 1.5px rgba(255, 255, 255, .8), inset 0 0 14px 3px rgba(0, 0, 0, .08); }
+body .cartd { box-shadow: -18px 0 40px rgba(0, 0, 0, .18), inset 0 0 0 1.5px rgba(255, 255, 255, .8), inset 0 0 14px 3px rgba(0, 0, 0, .08); }
+body .cartd__sheetbox { background: rgba(255, 255, 255, .86); -webkit-backdrop-filter: blur(16px) saturate(160%); backdrop-filter: blur(16px) saturate(160%); box-shadow: 0 -12px 32px rgba(0, 0, 0, .1), inset 0 0 0 1.5px rgba(255, 255, 255, .8), inset 0 0 14px 3px rgba(0, 0, 0, .08); }
+:is(.mnav, .fdrawer, .cartd).is-lq { --lq-rest: blur(6px) saturate(200%) brightness(1.06); }
+/* a sheet sits on the cart's own content (its foot, the red Check out): frostier, so its text never reads over a pink blur */
+.cartd__sheetbox.is-lq { --lq-rest: blur(20px) saturate(140%) brightness(1.04); }
+/* TEXT ON THE GLASS (day): .8 white (the search panel keeps its .74) + the panels' small greys at #6B6E73 instead of #767B83 keep every
+   line at 3:1 or more even where the page under the glass is black (a dark banner behind the cart: the glass is ~rgb(204) there) */
+html:not([data-theme="night"]) body .cartd :is(.qadd__was, .cline__p s, .cline__a, .cline__pr s, .cline__pr small, .cartd__tab[aria-selected="false"]:not(:hover)) { color: #6B6E73; }
+body :is(.fdrawer__foot, .cartd__foot), body .mnav__sub { background: transparent; }
+body .mnav__body > * { transition: transform var(--m-primary), opacity var(--m-primary); }
+.mnav__body.is-pushed > * { opacity: 0; }
+@media (max-width: 639px) {
+  body :is(.mnav, .fdrawer, .cartd) { box-shadow: 0 -12px 40px rgba(0, 0, 0, .16), inset 0 0 0 1.5px rgba(255, 255, 255, .8), inset 0 0 14px 3px rgba(0, 0, 0, .08); }
+}
+
 /* ---------- COMPACT CART (2026-10-14, "on cart panel view use this layout very compact" — a Baseus-style drawer, overrides the
    bugatti drawer above; scoped to .cartd--b so the quick options panel keeps its own layout): 576px panel (was 460 for a day); header = an outline cart +
    "‹n› items" (20px) with "Recently viewed" as a small text tab beside the × and a hairline under it; the free-delivery line centred

@@ -775,7 +775,10 @@
   // gentle version (a thin strip at the rim, 20%) stays on the other floating capsules. Nav + its filter twin only.
   // rim: false = no <i class="wu-rim"> child (the SEARCH PANEL scrolls, so a child rim would scroll away — its rim is a box-shadow ring in
   // home.css instead). The map follows the element's corner radius: a pill bends from its ends, a rounded panel from a 28px band
-  // inside every edge (2026-10-13, "make the search panel also glass liquid same as the nav bar, no glow").
+  // inside every edge (2026-10-13, "make the search panel also glass liquid same as the nav bar, no glow"). The SLIDE-IN PANELS too
+  // (2026-10-14, "all the panels which slide in make them liquid glass"): the menu, the filter drawer, the cart drawer + its foot sheets
+  // and the quick options panel — rounded on one side only, so the radius is the largest of the four corners (a left drawer's
+  // top-left corner is 0, which used to read as "a pill" and bend the whole panel).
   function liquid(el, { deep, rim = true } = {}) {
     if (!el) return;
     if (rim && ![...el.children].some(c => c.classList.contains('wu-rim'))) el.insertAdjacentHTML('afterbegin', '<i class="wu-rim" aria-hidden="true"></i>');
@@ -794,7 +797,8 @@
       const w = Math.round(el.offsetWidth), h = Math.round(el.offsetHeight);
       if (!w || !h || (w === W && h === H)) return;
       W = w; H = h;
-      const R = Math.min(parseFloat(getComputedStyle(el).borderTopLeftRadius) || h / 2, h / 2, w / 2); // the corner radius (a pill: h/2)
+      const cs = getComputedStyle(el), r0 = Math.max(...['TopLeft', 'TopRight', 'BottomRight', 'BottomLeft'].map(k => parseFloat(cs[`border${k}Radius`]) || 0));
+      const R = Math.min(r0 || h / 2, h / 2, w / 2); // the largest corner radius (a pill: h/2)
       const B = Math.min(deep ? Math.max(R, 28) : R, h / 2, w / 2);                                   // the bend band inside each edge
       const max = Math.max(5, deep ? B * .72 : h * .2), S = max * 2.2; // the deepest pull at the rim (20px on the 56px nav) and the map's range
       cv.width = w; cv.height = h;
@@ -815,8 +819,9 @@
       el.style.setProperty('--lq', `url(#${id})`);
       el.classList.add('is-lq');
     };
-    let dT = 0; // a panel whose height changes as you type (search results) redraws once the size has settled
-    new ResizeObserver(() => { clearTimeout(dT); dT = setTimeout(draw, 160); }).observe(el);
+    let dT = 0; // a panel whose height changes as you type (search results) redraws once the size has settled; the FIRST draw (a
+    // drawer shown for the first time) is at once, so the bend is there while it slides in
+    new ResizeObserver(() => { clearTimeout(dT); if (W) dT = setTimeout(draw, 160); else draw(); }).observe(el);
     draw();
   }
   // Edge light: one rainbow arc glides clockwise round a pill's 1px edge (the nav, and the stuck filter capsule). Speed, length and colours are copied from
@@ -2771,6 +2776,8 @@
       </aside>`;
     document.body.append(...el.children);
     const drawer = $('cartd'), scrim = drawer.previousElementSibling;
+    liquid(drawer, { deep: true, rim: false }); // the search panel's liquid glass on every slide-in (2026-10-14) — and on its foot sheets
+    drawer.querySelectorAll('.cartd__sheetbox').forEach(b => liquid(b, { deep: true, rim: false }));
     let opener = null, sheetOpen = null, sheetT = 0;
     const qtyBtns = l => `<div class="qty qty--s" role="group" aria-label="Quantity for ${esc(l.p.code)}"><button type="button" data-q="-1" data-sku="${esc(l.sku)}" aria-label="Decrease">−</button><output>${l.qty}</output><button type="button" data-q="1" data-sku="${esc(l.sku)}" aria-label="Increase"${l.qty >= SHOP.maxQty ? ' disabled' : ''}>+</button></div>`;
     const media = (p, v, href) => `<a class="cline__img" href="${href}" tabindex="-1" aria-hidden="true" style="background: ${photoBg(v && v.bg ? v : p)};"><img src="${(v && v.thumb) || p.thumb}" alt="" style="${photoFit(v && v.ar ? v : p)}"></a>`;
@@ -2921,6 +2928,7 @@
       </aside>`;
     document.body.append(...el.children);
     const panel = $('qadd'), scrim = panel.previousElementSibling, body = $('qadd-body');
+    liquid(panel, { deep: true, rim: false }); // liquid glass like every slide-in panel (2026-10-14)
     let p = null, V = [], cur = 0, qty = 1, opener = null, hideT = 0, glides = [];
     const values = a => V.map(v => v.attrs[a]).filter((x, i, arr) => x && arr.indexOf(x) === i);
     const pick = (axis, val) => {
@@ -3207,6 +3215,7 @@
       </aside>`;
     document.body.append(...el.children);
     const drawer = $('mnav'), scrim = drawer.previousElementSibling;
+    liquid(drawer, { deep: true, rim: false }); // liquid glass like every slide-in panel (2026-10-14)
     let opener = null, sx = null, dx = 0;
     const setAcc = (h, open) => { const was = h.getAttribute('aria-expanded') === 'true'; h.setAttribute('aria-expanded', open); if (was !== open) slide($(h.getAttribute('aria-controls')), open); else $(h.getAttribute('aria-controls')).hidden = !open; };
     // NIGHT: the bugatti.store menu motion (measured 2026-10-06) — the blocks stagger in (translateX −20px → 0, 600ms

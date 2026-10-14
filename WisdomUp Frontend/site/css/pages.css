@@ -571,6 +571,9 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
 
 /* Product page — studio photo stage, model line, option chips */
 .pdp2__stage--photo img.is-pack { width: 100%; height: 100%; max-height: none; object-fit: contain; filter: none; }
+/* pinned to the square stage: in the stage's auto grid row a PORTRAIT photo (TXD-01 688×1000, CJ-47, CJ-48, EJ-30) took its own
+   height (852px on a 586px stage) and was cut off at the foot instead of shown whole (2026-10-14) */
+.pdp2__stage--photo img.is-pack { position: absolute; inset: 0; }
 /* the owner's extra gallery photos (p.photos — lifestyle shots, often portrait): fill the square stage from the top, so a tall
    photo keeps the face + earbud and trims the foot, the same in every browser (2026-10-13) */
 .pdp2__stage--photo img.is-pack.is-life { position: absolute; inset: 0; object-fit: cover; object-position: 50% 0; }

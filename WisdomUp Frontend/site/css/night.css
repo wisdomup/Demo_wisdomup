@@ -746,6 +746,15 @@ html[data-theme="night"] .nh .qbar { margin: 64px 0 0; }
 
 /* SEARCH PANEL liquid glass (2026-10-13, home.css): the night stage's tint, the hairline ring and the bevel band */
 html[data-theme="night"] .search { background: rgba(21, 24, 27, .74); box-shadow: 0 24px 60px rgba(0, 0, 0, .5), inset 0 0 0 1.5px var(--n-line2), inset 0 0 14px 3px rgba(0, 0, 0, .55); }
+/* SLIDE-IN PANELS liquid glass (2026-10-14, home.css): menu, filters, cart + its sheets, quick options — the search panel's night tint,
+   hairline ring and bevel band; the feet and the menu's sub-level see-through. `body` lifts these over the older night panel rules
+   and motion.css's phone sheets. */
+html[data-theme="night"] body :is(.mnav, .fdrawer, .cartd) { background: rgba(21, 24, 27, .74); }
+html[data-theme="night"] body :is(.mnav, .fdrawer) { box-shadow: 18px 0 40px rgba(0, 0, 0, .5), inset 0 0 0 1.5px var(--n-line2), inset 0 0 14px 3px rgba(0, 0, 0, .55); }
+html[data-theme="night"] body .cartd { box-shadow: -18px 0 40px rgba(0, 0, 0, .5), inset 0 0 0 1.5px var(--n-line2), inset 0 0 14px 3px rgba(0, 0, 0, .55); }
+html[data-theme="night"] body .cartd__sheetbox { background: rgba(21, 24, 27, .86); box-shadow: 0 -12px 32px rgba(0, 0, 0, .45), inset 0 0 0 1.5px var(--n-line2), inset 0 0 14px 3px rgba(0, 0, 0, .55); }
+html[data-theme="night"] body :is(.fdrawer__foot, .cartd__foot, .mnav__sub) { background: transparent; }
+@media (max-width: 639px) { html[data-theme="night"] body :is(.mnav, .fdrawer, .cartd) { box-shadow: 0 -12px 40px rgba(0, 0, 0, .4), inset 0 0 0 1.5px var(--n-line2), inset 0 0 14px 3px rgba(0, 0, 0, .55); } }
 
 /* ===================== GLASS CHIPS (night) =====================
    2026-10-13, after the night "View all": "add it on Chat on WhatsApp button, also back to top button also the cash on delivery

@@ -313,6 +313,7 @@
 
   /* ---------- Filter panel (slides in from the left; accordion sections) ---------- */
   const drawer = $('fdrawer'), scrim = $('fscrim'), openBtn = $('open-filters');
+  WU.liquid(drawer, { deep: true, rim: false }); // liquid glass like every slide-in panel (2026-10-14, common.js liquid())
   let draft = null;
   const copyState = st => ({ ...st, conns: st.conns.slice(), feats: st.feats.slice() });
   const opt = (type, name, value, label, checked, count, extra = '') =>
