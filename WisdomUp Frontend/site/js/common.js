@@ -2717,6 +2717,10 @@
   const NOTE_KEY = 'wu-cart-note', SEEN_KEY = 'wu-seen';
   function mountCart() {
     const el = document.createElement('div');
+    // COMPACT CART (2026-10-14, "on cart panel view use this layout very compact" — a Baseus-style drawer): an outline cart + "‹n› items"
+    // as the header, "Recently viewed" a small text tab beside the ×; each line = photo · name / option / a black SALE tag with the real
+    // saving / stepper + Remove · the line price right-aligned (sale price red, the regular price struck under it)
+    const CART_LINE = '<svg class="cartd__ic" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 3.5h2.3l2.2 11h11.4l2.1-8H6.2"/><circle cx="9.2" cy="19" r="1.4"/><circle cx="16.8" cy="19" r="1.4"/></svg>';
     const sheet = (id, title, body) => `
       <div class="cartd__sheet" id="cartd-s-${id}" hidden>
         <div class="cartd__veil" data-sheet-x></div>
@@ -2732,8 +2736,8 @@
       <aside class="cartd cartd--b" id="cartd" role="dialog" aria-modal="true" aria-label="Cart" hidden>
         <header class="cartd__head">
           <div class="cartd__tabs" role="tablist" aria-label="Cart">
-            <button type="button" class="cartd__tab" role="tab" id="cartd-t-cart" aria-controls="cartd-p-cart" aria-selected="true"><span class="cartd__title">Cart</span><span class="cartd__count" id="cartd-n" hidden></span></button>
-            <button type="button" class="cartd__tab" role="tab" id="cartd-t-seen" aria-controls="cartd-p-seen" aria-selected="false" tabindex="-1"><span class="cartd__title">Recently viewed</span></button>
+            <button type="button" class="cartd__tab cartd__tab--cart" role="tab" id="cartd-t-cart" aria-controls="cartd-p-cart" aria-selected="true">${CART_LINE}<span class="cartd__title" id="cartd-title">Your cart</span><span class="cartd__count" id="cartd-n" hidden></span></button>
+            <button type="button" class="cartd__tab cartd__tab--seen" role="tab" id="cartd-t-seen" aria-controls="cartd-p-seen" aria-selected="false" tabindex="-1"><span class="cartd__title">Recently viewed</span></button>
           </div>
           <button type="button" class="cartd__x mnav__x" aria-label="Close cart">${CLOSE_X}</button>
         </header>
@@ -2783,21 +2787,27 @@
     }
     function paint() {
       const lines = cartLines(), t = cartTotals('standard'), n = cartCount();
-      $('cartd-n').textContent = n; $('cartd-n').hidden = !n;
+      $('cartd-n').textContent = n; $('cartd-n').hidden = true; // the count lives in the title now
+      $('cartd-title').textContent = n ? `${n} ${n === 1 ? 'item' : 'items'}` : 'Your cart';
       $('cartd-t-cart').setAttribute('aria-label', `Cart, ${n} ${n === 1 ? 'item' : 'items'}`);
       const left = SHOP.freeDeliveryFrom - t.subtotal;
       $('cartd-ship').innerHTML = !lines.length ? '' : left > 0
         ? `<p>Spend <b>${esc(D.rs(left))}</b> more for free standard delivery</p><i style="--pct: ${Math.min(100, Math.round(t.subtotal / SHOP.freeDeliveryFrom * 100))}%;"></i>`
         : '<p>You get <b>free standard delivery</b>.</p><i style="--pct: 100%;"></i>';
-      $('cartd-body').innerHTML = lines.length ? lines.map(l => { const href = url.product(l.p.id) + (l.p.variants.length ? '&sku=' + encodeURIComponent(l.sku) : ''); return `
-        <div class="cline">
+      $('cartd-body').innerHTML = lines.length ? lines.map(l => {
+        const href = url.product(l.p.id) + (l.p.variants.length ? '&sku=' + encodeURIComponent(l.sku) : '');
+        // the real sale saving on this line (shop.js sale): the variant's regular price, or the product's when it has no options
+        const was = l.v.was || (!l.p.variants.length ? l.p.was : null), save = was && was > l.price ? (was - l.price) * l.qty : 0;
+        return `
+        <div class="cline cline--c">
           ${media(l.p, l.v, href)}
           <div class="cline__info">
             <a class="cline__t" href="${href}">${esc(l.p.title)}</a>
             ${Object.keys(l.attrs).length ? `<span class="cline__a">${esc(Object.values(l.attrs).join(' · '))}</span>` : ''}
-            <span class="cline__p">${esc(D.rs(l.price))}${l.qty > 1 ? ` <small>× ${l.qty} = ${esc(D.rs(l.total))}</small>` : ''}</span>
+            ${save ? `<span class="cline__tag">${TAG_SVG}<b>Sale (−${esc(D.rs(save))})</b></span>` : ''}
+            <div class="cline__act">${qtyBtns(l)}<button type="button" class="cline__rm" data-rm="${esc(l.sku)}">Remove</button></div>
           </div>
-          <div class="cline__side">${qtyBtns(l)}<button type="button" class="cline__rm" data-rm="${esc(l.sku)}">Remove</button></div>
+          <div class="cline__pr"><b${save ? ' class="is-sale"' : ''}>${esc(D.rs(l.total))}</b>${save ? `<s>${esc(D.rs(was * l.qty))}</s>` : ''}${l.qty > 1 ? `<small>${esc(D.rs(l.price))} each</small>` : ''}</div>
         </div>`; }).join('')
         : `<div class="cartd__empty"><b>Your cart is currently empty.</b><p>Not sure where to start?<br>Try these:</p><ul class="cartd__links">${EMPTY_LINKS.map(([l, h]) => `<li><a href="${h}"><span>${esc(l)}</span>${icon('arrow', 16)}</a></li>`).join('')}</ul></div>`;
       $('cartd-scroll').classList.toggle('is-empty', !lines.length);

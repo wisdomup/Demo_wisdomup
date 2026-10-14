@@ -1253,3 +1253,59 @@ body:has(.ckc.is-bar:not([hidden])) .wafab { opacity: 0; pointer-events: none; t
    ring because the panel scrolls), the soft bevel band, a deep shadow; NO edge light and NO inner glow. Night at the end of night.css. */
 .search { background: rgba(255, 255, 255, .74); -webkit-backdrop-filter: blur(16px) saturate(160%); backdrop-filter: blur(16px) saturate(160%); box-shadow: 0 24px 60px rgba(0, 0, 0, .18), inset 0 0 0 1.5px rgba(255, 255, 255, .8), inset 0 0 14px 3px rgba(0, 0, 0, .08); }
 .search.is-lq { --lq-rest: blur(6px) saturate(200%) brightness(1.06); }
+
+/* ---------- COMPACT CART (2026-10-14, "on cart panel view use this layout very compact" — a Baseus-style drawer, overrides the
+   bugatti drawer above; scoped to .cartd--b so the quick options panel keeps its own layout): 460px panel; header = an outline cart +
+   "‹n› items" (20px) with "Recently viewed" as a small text tab beside the × and a hairline under it; the free-delivery line centred
+   over a 10px bar; lines = 88px photo · name (2 lines, 400 15px) / option (grey) / a black SALE label with the real saving / stepper +
+   Remove · the line price right-aligned (sale price red, the regular price struck under it, "Rs.x each" when more than one). The foot
+   keeps its tools, creator code, subtotal and buttons, just tighter. ---------- */
+@media (min-width: 640px) { .cartd.cartd--b { width: min(460px, 100vw); border-radius: 24px 0 0 24px; } }
+.cartd--b .cartd__head { align-items: center; gap: 16px; padding: 18px 20px 16px 24px; box-shadow: inset 0 -1.5px 0 #E3E4E6; }
+.cartd--b .cartd__tabs { flex: 1; display: flex; flex-wrap: nowrap; align-items: center; justify-content: space-between; gap: 12px; }
+.cartd--b .cartd__tab { align-items: center; gap: 12px; opacity: 1; color: #767B83; transition: color 300ms ease; }
+.cartd--b .cartd__tab[aria-selected="true"] { color: #0B0B0B; }
+.cartd--b .cartd__tab--cart .cartd__title { font: 700 20px/1.2 var(--font); letter-spacing: -.01em; }
+.cartd--b .cartd__tab--seen { padding: 4px 0; background: linear-gradient(currentColor, currentColor) 0 100% / 0 1.5px no-repeat; transition: color 300ms ease, background-size 500ms cubic-bezier(.3,1,.3,1); }
+.cartd--b .cartd__tab--seen .cartd__title { font: 500 13px/1.2 var(--font); letter-spacing: 0; }
+@media (hover: hover) and (pointer: fine) { .cartd--b .cartd__tab--seen:hover { color: #0B0B0B; background-size: 100% 1.5px; } }
+.cartd__ic { flex: none; }
+.cartd--b .cartd__scroll { gap: 20px; padding: 16px 24px 24px; }
+.cartd--b .cartd__ship { text-align: center; }
+.cartd--b .cartd__ship p { margin: 0 0 10px; font: 400 15px/1.3 var(--font); }
+.cartd--b .cartd__ship i { height: 10px; }
+.cartd--b .cartd__body { gap: 20px; }
+.cartd--b .cline { grid-template-columns: 88px minmax(0, 1fr) auto; gap: 16px; padding: 0; border: 0; }
+.cartd--b .cline + .cline { padding-top: 0; border-top: 0; }
+.cartd--b .cline__img { width: 88px; height: 88px; }
+.cartd--b .cline--c .cline__info { align-self: start; gap: 6px; }
+.cartd--b .cline--c .cline__t { font: 400 15px/1.35 var(--font); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.cartd--b .cline--c .cline__a { font: 400 13px/1.3 var(--font); color: #767B83; }
+.cline__tag { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; height: 24px; margin-top: 2px; padding: 0 9px; border-radius: 4px; background: #0B0B0B; color: #fff; font: 600 11px/1 var(--font); letter-spacing: .05em; text-transform: uppercase; white-space: nowrap; }
+.cline__tag svg { flex: none; width: 13px; height: 13px; }
+.cline__tag b { font-weight: 600; }
+.cline__act { display: flex; align-items: center; gap: 16px; margin-top: 4px; }
+.cline__pr { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; text-align: right; white-space: nowrap; }
+.cline__pr b { font: 600 15px/1.35 var(--font); color: #0B0B0B; }
+.cline__pr b.is-sale { color: #D91E05; }
+.cline__pr s { font: 400 13px/1.3 var(--font); color: #767B83; }
+.cline__pr small { font: 400 12px/1.3 var(--font); color: #767B83; }
+.cartd--b .cartd__tools { padding: 12px 0; }
+.cartd--b .cartd__sum { gap: 14px; padding: 16px 24px calc(16px + env(safe-area-inset-bottom)); }
+.cartd--b .cartd__taxnote { font-size: 13px; }
+.cartd--b .cartd__totals span { font-size: 13px; }
+.cartd--b .cartd__totals b { font-size: 19px; }
+.cartd--b .cartd__btns { gap: 10px; }
+.cartd--b .cartd__btns .cartd__go, .cartd--b .cartd__btns .cartd__more { height: 44px; font-size: 14px; }
+.cartd--b .cartd__sheethead { padding: 22px 24px 10px; }
+.cartd--b .cartd__sheetbody { padding: 10px 24px calc(28px + env(safe-area-inset-bottom)); }
+.cartd--b .cartd__empty b { font-size: 24px; }
+@media (max-width: 639px) {
+  .cartd--b .cartd__head { padding: 16px 14px 14px 18px; }
+  .cartd--b .cartd__scroll { gap: 18px; padding: 14px 16px 20px; }
+  .cartd--b .cline { grid-template-columns: 76px minmax(0, 1fr) auto; gap: 12px; }
+  .cartd--b .cline__img { width: 76px; height: 76px; }
+  .cartd--b .cline--c .cline__t { font-size: 14px; }
+  .cline__act { gap: 12px; }
+  .cartd--b .cartd__sum { padding-left: 16px; padding-right: 16px; }
+}
