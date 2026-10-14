@@ -521,13 +521,15 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
 }
 /* Phones (<600px), both themes — PRODUCT CARDS IN TWO COLUMNS BY DEFAULT (rule of 2026-10-07): rails show 2.2 cards (wu-rail.css),
    so a rail card is ~156px wide — it gets the same compact card as the All Products 2-per-row grid above */
+/* … except the day home's New Arrivals + Best Sellers rails, which show 1.4 cards (~280px) on phones (2026-10-14, wu-rail.css): they keep
+   the full card body (spec trio, option chips, full CTA). */
 @media (max-width: 599px) {
-  .wu-rail .wpc__row { flex-wrap: wrap; row-gap: 6px; }
-  .wu-rail .wpc__foot .wpc__cta { height: 32px; padding: 0 10px; gap: 5px; font-size: 12px; }
-  .wu-rail .wpc__foot .wpc__cta svg { width: 14px; height: 14px; }
-  .wu-rail .wpc__foot .wpc__cta::after { inset: -7px; } /* keeps a ~44px tap area */
-  .wu-rail .wpc__specs, .wu-rail .wpc__optlabel, .wu-rail .wpc__optchips { display: none; }
-  .wu-rail .wpc__opts { display: block; }
+  .wu-rail:not(:is(#rail-new, #rail-best) .wu-rail) .wpc__row { flex-wrap: wrap; row-gap: 6px; }
+  .wu-rail:not(:is(#rail-new, #rail-best) .wu-rail) .wpc__foot .wpc__cta { height: 32px; padding: 0 10px; gap: 5px; font-size: 12px; }
+  .wu-rail:not(:is(#rail-new, #rail-best) .wu-rail) .wpc__foot .wpc__cta svg { width: 14px; height: 14px; }
+  .wu-rail:not(:is(#rail-new, #rail-best) .wu-rail) .wpc__foot .wpc__cta::after { inset: -7px; } /* keeps a ~44px tap area */
+  .wu-rail:not(:is(#rail-new, #rail-best) .wu-rail) :is(.wpc__specs, .wpc__optlabel, .wpc__optchips) { display: none; }
+  .wu-rail:not(:is(#rail-new, #rail-best) .wu-rail) .wpc__opts { display: block; }
 }
 @media (prefers-reduced-motion: reduce) { .fdrawer, .fscrim { transition: none; } }
 

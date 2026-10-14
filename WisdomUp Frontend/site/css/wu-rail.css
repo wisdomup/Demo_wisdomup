@@ -13,3 +13,7 @@
 @media (max-width: 1023px) { .wu-rail { --n: 3.2; --gaps: 3; } }
 @media (max-width: 767px) { .wu-rail { --n: 2.2; --gaps: 2; } }
 @media (max-width: 599px) { .wu-rail { --n: 2.2; --gaps: 2; --g: 10px; } } /* 10px = the All Products 2-per-row grid's gap */
+/* APPROVED EXCEPTION (2026-10-14, "on mobile view adjust the product cards of New Arrivals and Best Sellers by 1.4, Shop by Budget stays
+   same, just on white theme"): on phones the day home's New Arrivals and Best Sellers rails show 1.4 cards (one big card + a peek of the
+   next); Shop by Budget and every other rail keep 2.2. The id selectors outrank .wu-rail inside the same media query. */
+@media (max-width: 599px) { html:not([data-theme="night"]) :is(#rail-new, #rail-best) .wu-rail { --n: 1.4; --gaps: 1; } }
