@@ -344,3 +344,16 @@
 .cp-wa { display: inline-flex; align-items: center; margin-top: 12px; font: 600 15px/20px var(--font); color: #fff; text-decoration: underline; text-decoration-color: rgba(255,255,255,.3); text-underline-offset: 4px; }
 .cp-wa:hover { text-decoration-color: #fff; }
 .page--bulk .cp-form .bk-done .bk-wa { margin-top: 4px; }
+
+/* no "Why WisdomUp" strip on these landing pages (2026-10-14): the explore band meets the footer directly, no white gap between */
+.page--corp .footer-wrap { margin-top: 0; }
+
+/* BULK: no white strip above the photo (2026-10-14, "remove the image gap top of the page"): the utility link row lies ON the intro
+   photo (absolute, transparent) instead of above it, in light type — the current page white + bold, "Live Shopping" keeps its red;
+   the photo starts at the very top. `html body` so the night link colours (night.css loads later) don't win. Phones hide the row anyway. */
+.page--bulk .wu-util { position: absolute; top: 0; left: 0; right: 0; z-index: 5; }
+html body .page--bulk .wu-util .utility a:not(.gold) { color: rgba(255,255,255,.62); }
+html body .page--bulk .wu-util .utility a:not(.gold):hover, html body .page--bulk .wu-util .utility a[aria-current="page"] { color: #fff; }
+/* the breadcrumb on the photo keeps its quiet white in night too (night.css's blanket `a { red }` loads later) */
+html body .cp-crumbs a { color: rgba(255,255,255,.55); }
+html body .cp-crumbs a:hover { color: #fff; }
