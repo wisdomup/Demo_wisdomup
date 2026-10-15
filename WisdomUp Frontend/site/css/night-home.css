@@ -131,7 +131,7 @@
 .nh-show__thumbs::-webkit-scrollbar { display: none; }
 .nh-show__thumb { flex: none; width: 96px; padding: 0; border: 0; border-radius: 10px; overflow: hidden; background: var(--card); color: #fff; box-shadow: inset 0 0 0 1.5px var(--line); cursor: pointer; font: 600 11px/1 var(--font); transition: box-shadow 160ms var(--ease); }
 .nh-show__thumb img { width: 100%; aspect-ratio: 1; object-fit: cover; }
-.nh-show__thumb span { display: block; padding: 7px 4px; text-align: center; }
+.nh-show__thumb span { display: block; padding: 7px 4px; text-align: center; background: var(--card, #1A1D21); color: #fff; } /* own dark strip: the button carries the photo's (often white) backdrop, which put the white code on white */
 .nh-show__thumb[aria-pressed="true"] { box-shadow: inset 0 0 0 1.5px #fff; }
 @media (max-width: 1023px) { .nh-show { grid-template-columns: 1fr; } .nh-show__media { order: -1; } }
 

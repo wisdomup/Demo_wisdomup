@@ -1341,3 +1341,5 @@ body .mnav__body > * { transition: transform var(--m-primary), opacity var(--m-p
    #E3E4E6 on the stepper); now all four take the same soft line in ink — 1.5px black 14% — so they read as one family on the white glass.
    Hover is unchanged (the liquid fill turns the stroke to the fill colour). */
 html:not([data-theme="night"]) .cartd--b :is(.cartd__x, .cartd__sx, .qty, .cartd__more) { border: 1.5px solid rgba(11, 11, 11, .14); box-shadow: none; }
+/* card glow layer (night only, openart.ai's bento cards — see night.css "OPENART CARD GLOW"); never shown in day */
+.wpc__glow { display: none; }

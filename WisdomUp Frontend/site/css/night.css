@@ -850,3 +850,71 @@ html[data-theme="night"] .cline__pr :is(s, small), html[data-theme="night"] .car
 html[data-theme="night"] body .msort__sheet { background: rgba(255, 255, 255, .86); box-shadow: inset 0 0 14px 3px rgba(0, 0, 0, .08); }
 html[data-theme="night"] body .msort__panel { filter: none; }
 html[data-theme="night"] body .msort__panel.is-open { box-shadow: 0 18px 40px rgba(0, 0, 0, .55); }
+/* OPENART CARD GLOW (2026-10-16, branch night-glass-cards — openart.ai/suite/home's category cards measured: the card is the page
+   colour #090A0A with a 1px rgba(211,237,248,.11) hairline + a 1px top light rgba(217,237,254,.15); behind everything its OWN picture,
+   cover, scale 1.1, blur(40px), under a black 55% veil — so each card takes a soft tint of its product; the media sits in a glass frame
+   (6px, white-blue 4% → 8% top to bottom, 0 8px 64px rgba(0,0,0,.25)) with 1px lights top (.25) and bottom (.15)). Ours: the card's
+   thumbnail is the glow; studio photos are mostly white, so the veil is a little deeper (.62) to keep the card dark; 1.5px lines. */
+html[data-theme="night"] .wpc__card { background: #090A0A; overflow: hidden; isolation: isolate;
+  box-shadow: inset 0 0 0 1.5px rgba(211, 237, 248, .11), inset 0 1.5px 0 rgba(217, 237, 254, .15); }
+html[data-theme="night"] .wpc:hover .wpc__card { box-shadow: inset 0 0 0 1.5px rgba(211, 237, 248, .18), inset 0 1.5px 0 rgba(217, 237, 254, .22); }
+html[data-theme="night"] .wpc__glow { display: block; position: absolute; inset: 0; z-index: -1; pointer-events: none; border-radius: inherit; overflow: hidden; }
+html[data-theme="night"] .wpc__glow img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.1); filter: blur(40px) saturate(1.3); }
+html[data-theme="night"] .wpc__glow::after { content: ""; position: absolute; inset: 0; background: linear-gradient(rgba(0, 0, 0, .5), rgba(0, 0, 0, .62) 45%, rgba(0, 0, 0, .8) 70%); } /* deeper where the text sits: grey type stays ≥ 3:1 even over a white photo */
+html[data-theme="night"] .wpc__media { box-shadow: 0 0 0 6px rgba(214, 225, 255, .06), 0 8px 64px rgba(0, 0, 0, .25); margin: 6px 6px 0; }
+html[data-theme="night"] .wpc__media::after { content: ""; position: absolute; inset: 0; z-index: 2; border-radius: inherit; pointer-events: none;
+  box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, .25), inset 0 -1.5px 0 rgba(255, 255, 255, .15); }
+/* OPENART STROKES (same day, "also add a thinhair glow stroke" + "same as openart" — measured on openart.ai/suite/home): AT REST the
+   card's edge is openart's — a 1px hairline rgba(211,237,248,.11) + a 1px top light rgba(217,237,254,.15) (inset shadows) — and the
+   photo frame keeps its 1.5px lights top .25 / bottom .15. ON HOVER openart lights a 2px 150° gradient ring round the photo frame
+   (pale pink → their brand pink, opacity 200ms ease-out); ours runs pale red → the night brand red. Openart's 1px / 2px widths are
+   kept on purpose (an exception to ONE STROKE SIZE for these cards, the owner asked for openart's look). The ring is the card's
+   ::before, placed on the frame: frame = the card's padding box (2.326cqw in) and the media's height + its 6px frame on each side. */
+html[data-theme="night"] .wpc__card { box-shadow: inset 0 0 0 1px rgba(211, 237, 248, .11), inset 0 1px 0 rgba(217, 237, 254, .15); }
+html[data-theme="night"] .wpc:hover .wpc__card { box-shadow: inset 0 0 0 1px rgba(211, 237, 248, .11), inset 0 1px 0 rgba(217, 237, 254, .15); }
+html[data-theme="night"] .wpc__card::before { content: ""; position: absolute; z-index: 3; pointer-events: none;
+  left: 2.326cqw; right: 2.326cqw; top: 2.326cqw; height: calc((100cqw - 4.652cqw - 12px) * 484 / 410 + 12px);
+  border-radius: calc(12px + 6px); padding: 2px; box-sizing: border-box;
+  background: linear-gradient(150deg, #FFD0C7 0%, var(--n-red, #E8321A) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box exclude, linear-gradient(#fff 0 0);
+  opacity: 0; transition: opacity 200ms ease-out; }
+@media (hover: hover) and (pointer: fine) { html[data-theme="night"] .wpc:hover .wpc__card::before { opacity: 1; } }
+/* WHY WISDOMUP STRIP, OPENART SKIN (2026-10-16, branch night-glass-cards, "also match this with same effect as Openart"): openart's
+   card — page-dark #090A0A, a 1px hairline rgba(211,237,248,.11) + a 1px top light rgba(217,237,254,.15) — and, standing in for
+   their blurred photo glow (the strip has no photo), a soft blurred tint of our brand red + a cool light, under the same dark veil;
+   each icon sits in a small glass well with openart's frame lights (top .25 / bottom .15). */
+html[data-theme="night"] .trust { position: relative; isolation: isolate; overflow: hidden; background: #090A0A;
+  box-shadow: inset 0 0 0 1px rgba(211, 237, 248, .11), inset 0 1px 0 rgba(217, 237, 254, .15); }
+html[data-theme="night"] .trust::before { content: ""; position: absolute; inset: -20%; z-index: -1; pointer-events: none;
+  background: radial-gradient(40% 90% at 12% 50%, rgba(217, 30, 5, .55), transparent 70%), radial-gradient(45% 100% at 78% 40%, rgba(214, 225, 255, .22), transparent 70%);
+  filter: blur(40px); opacity: .45; }
+html[data-theme="night"] .trust__item svg { box-sizing: content-box; padding: 8px; border-radius: 50%;
+  background: linear-gradient(rgba(214, 225, 255, .04), rgba(214, 225, 255, .08));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), inset 0 -1px 0 rgba(255, 255, 255, .15), 0 8px 32px rgba(0, 0, 0, .25); }
+/* POLICY CONTENTS: the chosen entry (2026-10-16, the owner's screenshot "Where we deliver" — light grey on the white pill): two wide
+   night text rules (the muted-text :is() lists above) outranked `.toc a[aria-current]`, so its ink type turned #C9CDD2 on white. */
+html[data-theme="night"] body .toc a[aria-current="true"] { color: #0B0B0B; }
+/* OPENART TILE STROKE (2026-10-16, "openart.ai/suite/inspire/feed/ads — copy the cards stroke and apply on product cards and pages like
+   help, shipping, contact us … not corporate and bulk orders", all screen sizes): measured on that feed, every tile is a glass panel
+   with NO side border — a faint fill (white-blue 4% → 8%, top to bottom) on the dark stage, a 1px light along the TOP (white .25) and
+   a 1px light along the BOTTOM (white .15), a deep soft shadow 0 8px 64px rgba(0,0,0,.25), 16px corners; on hover a 2px 150° gradient
+   ring fades in (200ms) — theirs pink, ours pale red → brand red. The info pages' cards and panels take it (their 1.5px border stays
+   in the box, transparent, so nothing moves); corporate + bulk (.page--corp) keep their own skin; mouse-only hover. */
+html[data-theme="night"] body .page:not(.page--corp) :is(.tile, .stat, .contact-card, .panel-list, .iform, .callout, .kv, .toc, .manual, .track__form, .cr-tier, .cr-calc, .cr-fact, .cr-pick, .cr-terms) {
+  border-color: transparent !important; border-radius: 16px;
+  background: linear-gradient(rgba(214, 225, 255, .04), rgba(214, 225, 255, .08)), var(--n-bg, #0F1113) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), inset 0 -1px 0 rgba(255, 255, 255, .15), 0 8px 64px rgba(0, 0, 0, .25) !important; }
+html[data-theme="night"] body .page:not(.page--corp) .cr-tier--top { background: linear-gradient(rgba(214, 225, 255, .08), rgba(214, 225, 255, .14)), #0B0B0B !important; }
+html[data-theme="night"] body .page:not(.page--corp) :is(a.tile, a.cr-pick, .contact-card) { position: relative; } /* only the ring hosts — the contents list (.toc) stays sticky */
+html[data-theme="night"] body .page:not(.page--corp) :is(a.tile, a.cr-pick, .contact-card)::after { content: ""; position: absolute; inset: -1.5px; z-index: 2; pointer-events: none;
+  border-radius: inherit; padding: 2px; background: linear-gradient(150deg, #FFD0C7 0%, var(--n-red, #D91E05) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box exclude, linear-gradient(#fff 0 0); opacity: 0; transition: opacity 200ms ease-out; }
+@media (hover: hover) and (pointer: fine) {
+  html[data-theme="night"] body .page:not(.page--corp) :is(a.tile, a.cr-pick, .contact-card):hover::after { opacity: 1; }
+  html[data-theme="night"] body .page:not(.page--corp) a.tile:hover { transform: translateY(-2px); }
+}
+/* product cards: the same tile stroke at the card's edge (top .25 / bottom .15 + the deep shadow) instead of the hairline */
+html[data-theme="night"] .wpc__card, html[data-theme="night"] .wpc:hover .wpc__card {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), inset 0 -1px 0 rgba(255, 255, 255, .15), 0 8px 64px rgba(0, 0, 0, .25); }

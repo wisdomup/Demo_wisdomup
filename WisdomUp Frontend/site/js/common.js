@@ -1541,6 +1541,7 @@
     return `
       <div class="wpc${off ? ' wpc--off' : ''}" data-pid="${p.id}">
         <article class="wpc__card">
+          ${p.thumb ? `<span class="wpc__glow" aria-hidden="true"><img src="${p.thumb}" alt="" loading="lazy" decoding="async"></span>` : ''}
           <a class="wpc__media" href="${href}" tabindex="-1" aria-hidden="true" style="background: ${photoBg(p)};">
             ${media}
             ${badge ? `<span class="wpc__badge">${esc(badge)}</span>` : ''}
