@@ -316,6 +316,6 @@
     paint();
   })();
 
-  /* ---------- FAQ ---------- */
-  mountAccordion($('faq-list'), D.faqs, { idPrefix: 'faq' });
+  /* ---------- FAQ: removed from the day home 2026-10-16 (the Help Center keeps the questions) ---------- */
+  if ($('faq-list')) mountAccordion($('faq-list'), D.faqs, { idPrefix: 'faq' });
 })();

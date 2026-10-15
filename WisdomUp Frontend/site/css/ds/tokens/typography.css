@@ -2,6 +2,7 @@
 :root {
   --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   --font-display: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; /* 2026-10-09: big numbers and codes are Inter too (F1 store: one family) */
+  --font-h1: "Space Grotesk", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; /* 2026-10-16: every H1 = higgsfield.ai's heading face */
   --fw-h1: 700; --fw-h2: 700; --fw-h3: 600; /* heading weights measured on f1store.formula1.com: H1 700, H2 600-700, no lighter or heavier headings */
   --fs-utility: 14px; /* @kind font */   --fw-utility: 500; /* @kind font */
   --fs-cat: 15px; /* @kind font */       --fw-cat: 500; /* @kind font */
@@ -24,3 +25,9 @@
   --text-card-title: 700 var(--fs-card-title)/1.2 var(--font); /* @kind font */
   --text-body-font: 400 var(--fs-body)/1.5 var(--font); /* @kind font */
 }
+
+/* H1 FACE (2026-10-16, "replace wisdomup H1 font with this all over the website" — higgsfield.ai's Space Grotesk, measured on
+   higgsfield.ai/mixed-media-community: 700): every H1 on every page, both themes; sizes, weights, case and spacing stay each page's own.
+   !important because many H1 classes set the family through the `font` shorthand. Space Grotesk tops out at 700, so the 800 bold
+   half of the light + bold H1s renders at 700. */
+h1, h1 * { font-family: var(--font-h1) !important; }
