@@ -1296,7 +1296,7 @@ body .mnav__body > * { transition: transform var(--m-primary), opacity var(--m-p
 .cartd--b .cartd__scroll { gap: 20px; padding: 16px 24px 24px; }
 .cartd--b .cartd__ship { text-align: center; }
 .cartd--b .cartd__ship p { margin: 0 0 10px; font: 400 15px/1.3 var(--font); }
-.cartd--b .cartd__ship i { height: 10px; }
+.cartd--b .cartd__ship i { height: 5px; } /* half of the compact cart's 10px bar (2026-10-16, "make that loading bar 50% in height") */
 .cartd--b .cartd__body { gap: 20px; }
 .cartd--b .cline { grid-template-columns: 88px minmax(0, 1fr) auto; gap: 16px; padding: 0; border: 0; }
 .cartd--b .cline + .cline { padding-top: 0; border-top: 0; }
@@ -1332,3 +1332,10 @@ body .mnav__body > * { transition: transform var(--m-primary), opacity var(--m-p
   .cline__act { gap: 12px; }
   .cartd--b .cartd__sum { padding-left: 16px; padding-right: 16px; }
 }
+
+/* CART PANEL CAPSULES, DAY = NIGHT'S STROKE (2026-10-16, "add the same stroke on the capsule of white theme on cart panel as the dark
+   theme capsules have"): in night the cart's capsules (close ×, the sheets' ×, the quantity stepper, Continue shopping) share ONE soft
+   hairline — 1.5px white 14% over the dark glass. Day had three different lines (ink #0B0B0B on the ×, #1B1B1B on Continue shopping,
+   #E3E4E6 on the stepper); now all four take the same soft line in ink — 1.5px black 14% — so they read as one family on the white glass.
+   Hover is unchanged (the liquid fill turns the stroke to the fill colour). */
+html:not([data-theme="night"]) .cartd--b :is(.cartd__x, .cartd__sx, .qty, .cartd__more) { border: 1.5px solid rgba(11, 11, 11, .14); box-shadow: none; }
