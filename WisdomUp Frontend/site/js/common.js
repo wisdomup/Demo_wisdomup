@@ -1958,6 +1958,7 @@
   function mountModeMenu(box) {
     if (!box) return;
     const btn = box.querySelector('.msort__btn'), panel = box.querySelector('.msort__panel'), list = box.querySelector('.msort__list');
+    liquid(panel.querySelector('.msort__sheet'), { deep: true, rim: false }); // the nav's liquid glass on the open menu (2026-10-16)
     const opts = [...list.querySelectorAll('.msort__opt')];
     let active = 0, closing = 0;
     const isOpen = () => !panel.hidden && panel.classList.contains('is-open');

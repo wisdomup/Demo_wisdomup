@@ -220,6 +220,7 @@
   // exactly over the button (--sb-w / --sb-h) and its clip-path grows to the full panel in 500ms on the hover curve;
   // "Sort Featured" fades out, "SORT BY" fades in, the dot becomes a round ×, the options fade in 50ms apart.
   const sortPanel = $('msort-panel');
+  WU.liquid(sortPanel.querySelector('.msort__sheet'), { deep: true, rim: false }); // the nav's liquid glass on the open sort panel (2026-10-16)
   const sortOpen = () => !sortPanel.hidden && sortPanel.classList.contains('is-open');
   let sortClosing = 0;
   function openSort() {
