@@ -33,7 +33,10 @@ def border_edge(big):
         subprocess.run(['sips', '-s', 'format', 'bmp', '-z', '60', '60', big, '--out', bmp], check=True, capture_output=True)
         px, w, h = bmp_px(bmp)
         ring = [px(x, 0) for x in range(w)] + [px(x, h - 1) for x in range(w)] + [px(0, y) for y in range(1, h - 1)] + [px(w - 1, y) for y in range(1, h - 1)]
-    return hexc([sum(c[i] for c in ring) / len(ring) for i in range(3)])
+    # the MEDIAN per channel, not the average (2026-10-15): where the product itself reaches the border (CDB-21's strap and body)
+    # the average came out #F9F9F9 on a pure-white photo and showed as faint grey side bands on the product page; the median is
+    # the colour most of the border really is, so the product touching part of it no longer tints the bands
+    return hexc([sorted(c[i] for c in ring)[len(ring) // 2] for i in range(3)])
 
 
 def reedge():
