@@ -316,18 +316,25 @@
   const drawer = $('fdrawer'), scrim = $('fscrim'), openBtn = $('open-filters');
   WU.liquid(drawer, { deep: true, rim: false }); // liquid glass like every slide-in panel (2026-10-14, common.js liquid())
   let draft = null;
+  const openDepts = new Set(); // departments whose types are unfolded in the Category list
   const copyState = st => ({ ...st, conns: st.conns.slice(), feats: st.feats.slice() });
   const opt = (type, name, value, label, checked, count, extra = '') =>
-    `<label class="fopt${count === 0 && !checked ? ' is-empty' : ''}"><input type="${type}" name="${name}" value="${value}"${checked ? ' checked' : ''}><i aria-hidden="true"></i>${extra}<span>${esc(label)}</span>${count != null ? `<small>${count}</small>` : ''}</label>`;
+    `<label class="fopt${count === 0 && !checked ? ' is-empty' : ''}"><input type="${type}" name="${name}" value="${value}"${checked ? ' checked' : ''}><i aria-hidden="true"></i>${extra}<span>${esc(label)}</span></label>`; // no counts on the rows (2026-10-16, "remove the numbering") — an option with no results is still dimmed
   // Facet counts: how many products you'd get if this option were chosen, keeping every other choice.
   const countWith = patch => matching({ ...draft, ...patch }).length;
   function paintDrawer() {
     $('f-show').innerHTML = opt('radio', 'f-show', '', 'All products', !draft.filter, countWith({ filter: null }))
       + Object.entries(FILTERS).map(([k, f]) => opt('radio', 'f-show', k, f.label, draft.filter === k, countWith({ filter: k }))).join('');
     // Category: departments with their types indented beneath (one choice)
+    // Each department folds (2026-10-16, "these filters are so spread … click to expand or close the sub filters"): its "All ‹dept›"
+    // row + a round chevron; the types sit in a panel that opens only for the department you choose, or when you open it yourself
     $('f-cats').innerHTML = opt('radio', 'f-cat', '', 'All categories', !draft.cat && !draft.dept, countWith({ cat: null, dept: null }))
-      + DEPTS.map(d => `<div class="fopt-group">${opt('radio', 'f-cat', 'd:' + d.id, 'All ' + d.label.toLowerCase(), draft.dept === d.id && !draft.cat, countWith({ dept: d.id, cat: null }))}`
-        + d.types.filter(t => CATS.includes(t)).map(t => opt('radio', 'f-cat', 't:' + t, typeLabel(t), draft.cat === t && draft.catDept === d.id, countWith({ cat: t, dept: null }))).join('') + '</div>').join('');
+      + DEPTS.map(d => {
+        const open = openDepts.has(d.id), pid = 'fsub-' + d.id;
+        return `<div class="fopt-group${open ? ' is-open' : ''}" data-dept="${d.id}" data-label="${esc(d.label)}"><div class="fopt-head">${opt('radio', 'f-cat', 'd:' + d.id, 'All ' + d.label.toLowerCase(), draft.dept === d.id && !draft.cat, countWith({ dept: d.id, cat: null }))}`
+          + `<button type="button" class="fopt-tog" aria-expanded="${open}" aria-controls="${pid}" aria-label="${open ? 'Hide' : 'Show'} ${esc(d.label)} types"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M5.5 9l6.5 6.5L18.5 9" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>`
+          + `<div class="fopt-sub" id="${pid}"${open ? '' : ' hidden'}>` + d.types.filter(t => CATS.includes(t)).map(t => opt('radio', 'f-cat', 't:' + t, typeLabel(t), draft.cat === t && draft.catDept === d.id, countWith({ cat: t, dept: null }))).join('') + '</div></div>';
+      }).join('');
     $('f-price').innerHTML = opt('radio', 'f-price', '', 'Any price', !draft.price, countWith({ price: null }))
       + Object.entries(PRICES).map(([k, pr]) => opt('radio', 'f-price', k, pr.label, draft.price === k, countWith({ price: k }))).join('');
     $('f-conn').innerHTML = CONNS.map(k => opt('checkbox', 'f-conn', k, k === 'Lightning' ? 'Lightning (iPhone)' : k, draft.conns.includes(k), countWith({ conns: [k] }))).join('');
@@ -348,6 +355,15 @@
   }
   const setSection = (sec, open) => { const h = sec.querySelector('.facc__h'); const was = h.getAttribute('aria-expanded') === 'true'; h.setAttribute('aria-expanded', open); if (was !== open) WU.slide(sec.querySelector('.facc__p'), open); else sec.querySelector('.facc__p').hidden = !open; };
   drawer.addEventListener('click', e => {
+    const tog = e.target.closest('.fopt-tog');
+    if (tog) { // fold / unfold one department's types (250ms, the accordion motion)
+      const g = tog.closest('.fopt-group'), open = tog.getAttribute('aria-expanded') !== 'true', name = g.dataset.label;
+      open ? openDepts.add(g.dataset.dept) : openDepts.delete(g.dataset.dept);
+      tog.setAttribute('aria-expanded', open); tog.setAttribute('aria-label', (open ? 'Hide ' : 'Show ') + name + ' types');
+      g.classList.toggle('is-open', open);
+      WU.slide(g.querySelector('.fopt-sub'), open);
+      return;
+    }
     const h = e.target.closest('.facc__h');
     if (h) setSection(h.closest('.facc'), h.getAttribute('aria-expanded') !== 'true');
   });
@@ -355,6 +371,8 @@
   function openDrawer(section) {
     draft = copyState(state);
     draft.catDept = state.cat ? (deptOf(state.cat) || {}).id : null;
+    openDepts.clear(); // only the department of the current choice starts open
+    if (draft.dept || draft.catDept) openDepts.add(draft.dept || draft.catDept);
     paintDrawer();
     drawer.querySelectorAll('.facc').forEach(s => setSection(s, s.id === section));
     lastFocus = document.activeElement;
@@ -387,6 +405,7 @@
       draft.cat = value.startsWith('t:') ? value.slice(2) : null;
       // A type can sit in two departments (e.g. car chargers): remember which row was ticked
       draft.catDept = draft.cat ? e.target.closest('.fopt-group').querySelector('input').value.slice(2) : null;
+      if (draft.dept) openDepts.add(draft.dept); // choosing "All ‹dept›" unfolds its types
     }
     if (name === 'f-price') draft.price = value || null;
     if (name === 'f-sort') draft.sort = value;

@@ -560,9 +560,18 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
 }
 
 /* Filter panel — category options grouped by department (types indented under "All audio") */
-.fopt-group { padding: 4px 0 8px; border-top: 1.5px solid #E3E7EA; }
-.fopt-group .fopt:first-child span { font-weight: 700; }
-.fopt-group .fopt:not(:first-child) { padding-left: 32px; min-height: 40px; font-size: 15px; }
+/* departments fold (2026-10-16): head row = "All ‹dept›" + count + a 34px round chevron (the small-tool size, a circle like every
+   control); the types unfold beneath with the accordion motion (WU.slide, 250ms); the chevron turns 180° */
+.fopt-group { padding: 2px 0; border-top: 1.5px solid #E3E7EA; }
+.fopt-head { display: flex; align-items: center; gap: 10px; }
+.fopt-head .fopt { flex: 1; min-width: 0; }
+.fopt-head .fopt span { font-weight: 700; }
+.fopt-sub { padding-bottom: 8px; }
+.fopt-sub .fopt { padding-left: 32px; min-height: 40px; font-size: 15px; }
+.fopt-tog { flex: none; width: 34px; height: 34px; padding: 0; display: grid; place-items: center; border-radius: 50%; border: 1.5px solid rgba(11, 11, 11, .14); background: transparent; color: #0B0B0B; cursor: pointer; }
+.fopt-tog svg { transition: transform 250ms cubic-bezier(.3, 1, .3, 1); }
+.fopt-tog[aria-expanded="true"] svg { transform: rotate(180deg); }
+.fopt-tog:focus-visible { outline: 2px solid #111; outline-offset: 2px; }
 
 /* Show more under the product grid */
 .mgrid__more { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 28px 0 8px; }

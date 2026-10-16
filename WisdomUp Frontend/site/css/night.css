@@ -918,3 +918,6 @@ html[data-theme="night"] body .page:not(.page--corp) :is(a.tile, a.cr-pick, .con
 /* product cards: the same tile stroke at the card's edge (top .25 / bottom .15 + the deep shadow) instead of the hairline */
 html[data-theme="night"] .wpc__card, html[data-theme="night"] .wpc:hover .wpc__card {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), inset 0 -1px 0 rgba(255, 255, 255, .15), 0 8px 64px rgba(0, 0, 0, .25); }
+/* filter panel: department fold toggles (pages.css .fopt-tog) */
+html[data-theme="night"] .fopt-tog { border-color: var(--n-line2); color: #fff; }
+html[data-theme="night"] .fopt-tog:focus-visible { outline-color: #fff; }
