@@ -35,10 +35,10 @@
 }
 .btn-buy svg, .btn-pill svg, .btn-navy svg, .btn-outline svg { width: 20px; height: 20px; flex: none; }
 .btn-cart { margin-top: 0; box-shadow: inset 0 0 0 1.5px var(--chip-line-hover); }
-.btn-cart .plus { width: 20px; height: 20px; font-size: 15px; }
+.btn-cart .plus { width: 20px; height: 20px; font-size: 16px; }
 .btn-outline, .seo__toggle { border-width: 1.5px; }
 .hero__cta { min-width: 0; }
-.hero__cta .btn-buy { padding: 0 20px 0 14px; }
+.hero__cta .btn-buy { padding: 0 16px 0 16px; }
 .pp__cta b { font-weight: 800; margin: 0; }
 .pp__cta svg { width: 16px; height: 16px; }
 .fdrawer__apply { width: 100%; }
@@ -66,8 +66,8 @@
 .pdtabs .chip[aria-current="true"] { background: #fff; box-shadow: var(--shadow-soft); }
 /* Filter pills: outlined, navy when a filter is set */
 .fbtn { gap: var(--gap-2); border-width: 1.5px; border-color: var(--ctl-ink); color: var(--ctl-ink); }
-.fbtn:not(.fbtn--dd) { padding: 0 var(--ctl-pad) 0 11px; }
-.fbtn--dd { gap: 6px; padding: 0 var(--ctl-pad); }
+.fbtn:not(.fbtn--dd) { padding: 0 var(--ctl-pad) 0 12px; }
+.fbtn--dd { gap: 8px; padding: 0 var(--ctl-pad); }
 .fbtn--dd.is-set { background: var(--ctl-ink); border-color: var(--ctl-ink); }
 .fbtn svg { width: 18px; height: 18px; }
 .search__pages a { border-width: 1.5px; }
@@ -76,7 +76,7 @@
 .opt-chip.is-na[aria-checked="true"] { color: #fff; }
 
 /* Small chips (compact menu) — the nav's 34px tool size */
-.mnav__chip { height: var(--ctl-s); padding: 0 14px; font: 600 13px/1 var(--font); letter-spacing: var(--ctl-track); background: var(--chip-bg); box-shadow: inset 0 0 0 1.5px var(--chip-line); color: var(--ctl-ink); }
+.mnav__chip { height: var(--ctl-s); padding: 0 16px; font: 600 14px/1 var(--font); letter-spacing: var(--ctl-track); background: var(--chip-bg); box-shadow: inset 0 0 0 1.5px var(--chip-line); color: var(--ctl-ink); }
 
 /* ---------- Icon buttons — 40px circles (arrows, wishlist, back to top) ---------- */
 .hero__arrow, .loop__btn, .pdp2__chev, .totop {
@@ -97,17 +97,17 @@
 .shop-rail__step svg { width: 18px; height: 18px; }
 .fdrawer__x, .mnav__x { border-width: 1.5px; }
 .fdrawer__x svg, .mnav__x svg { width: 14px; height: 14px; }
-.search__close { font-size: 22px; line-height: 1; }
+.search__close { font-size: 24px; line-height: 1; }
 
 /* ---------- Quantity stepper — one 40px pill ---------- */
 .qty { height: var(--ctl); border-radius: 999px; }
-.qty button { width: var(--ctl); height: var(--ctl); font-size: 18px; }
-.qty output { min-width: 28px; font: 700 15px/1 var(--font); }
+.qty button { width: var(--ctl); height: var(--ctl); font-size: 16px; }
+.qty output { min-width: 28px; font: 700 16px/1 var(--font); }
 
 /* ---------- Bars — 56px (40px control + 8px padding), like the nav pill ---------- */
 .search__field { height: var(--bar); }
 .hsearch { height: var(--bar); }
-.newsletter, .footer-wrap .newsletter { height: var(--bar); padding: 0 var(--gap-2) 0 20px; }
+.newsletter, .footer-wrap .newsletter { height: var(--bar); padding: 0 var(--gap-2) 0 16px; }
 .newsletter button, .footer-wrap .newsletter button { width: var(--ctl); height: var(--ctl); }
 
 /* ---------- Gaps: 4px tight groups · 8px chip rows · 11px between groups ---------- */
@@ -118,10 +118,10 @@
 .duo__foot, .bk-foot, .bulk__cta { gap: var(--gap-3); }
 .mcount { font: 500 14px/1.3 var(--font); }
 .msort__btn { height: var(--ctl); font: 500 14px/1 var(--font); }
-.mnav__quick { gap: 6px; }
+.mnav__quick { gap: 8px; }
 @media (max-width: 639px) {
   /* Phones use the same 40px controls (the phone nav buttons are 40px too) */
-  .pdtabs .chip, .bk-chips .chip, .series .chip { height: var(--ctl); padding: 0 14px; font-size: 14px; }
+  .pdtabs .chip, .bk-chips .chip, .series .chip { height: var(--ctl); padding: 0 16px; font-size: 14px; }
   .series__btns .btn-buy, .series__btns .btn-cart, .buybar .btn-buy { height: var(--ctl); font-size: 14px; }
   .loop__btn { width: var(--ctl); height: var(--ctl); }
 }
@@ -158,7 +158,7 @@ button.link-arrow { height: var(--ctl); padding: 0; border: 0; background: none;
    Glass: blurred, translucent fill with a light gradient edge (Ronin's is dark-on-dark; ours is light for light pages). */
 .buybar {
   width: 400px; max-width: calc(100% - 38px); height: 68px; box-sizing: border-box; bottom: 20px;
-  gap: var(--gap-3); padding: 8px 11px 8px 8px; border: 0; border-radius: 999px;
+  gap: var(--gap-3); padding: 8px 12px 8px 8px; border: 0; border-radius: 999px;
   background: rgba(255, 255, 255, .58);
   backdrop-filter: blur(16px) saturate(160%); -webkit-backdrop-filter: blur(16px) saturate(160%);
   box-shadow: 0 4px 20px rgba(70, 70, 70, .15), inset 0 0 0 1.5px rgba(255, 255, 255, .7);
@@ -180,7 +180,7 @@ button.link-arrow { height: var(--ctl); padding: 0; border: 0; background: none;
 }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .buybar { background: rgba(255, 255, 255, .94); } }
 .buybar__t small { font: 500 12px/1 var(--font); color: var(--muted); letter-spacing: 0; }
-.pd-stat__v { font-size: clamp(24px, 2.3vw, 40px); overflow-wrap: anywhere; } /* long values (18,000mAh, Warranty) fit their card */
+.pd-stat__v { font-size: clamp(24px, 4.3vw, 44px); overflow-wrap: anywhere; } /* long values (18,000mAh, Warranty) fit their card */
 /* Glass opacity matched exactly to ronin.pk's sticky add-to-cart: no solid fill, a faint white→blue gradient
    (18% → 5% → 8% blue → 3%) over a 16px blur, no rim line, shadow 0 4px 20px rgba(70,70,70,.15). */
 .buybar {
@@ -195,14 +195,14 @@ button.link-arrow { height: var(--ctl); padding: 0; border: 0; background: none;
    Applies to every chip: home quick chips, product section tabs, series chips, form choice chips,
    Help topic chips, policy link chips, search page chips and the menu's quick chips.
    Buttons, filter pills and product option pickers stay 40px. */
-:root { --chip: 32px; --chip-pad: 13px; --chip-font: 600 12px/1 var(--font); }
+:root { --chip: 32px; --chip-pad: 12px; --chip-font: 600 12px/1 var(--font); }
 .chip, .quick .chip, .series .chip, .pdtabs .chip, .bk-chips .chip, .policy__links a, .search__pages a, .mnav__chip {
   height: var(--chip); padding: 0 var(--chip-pad); font: var(--chip-font); letter-spacing: var(--ctl-track);
 }
 /* Quick chips: the product photo shrinks with the chip (32px → 26px, 3px inside the pill) */
-.quick .chip { padding: 0 var(--chip-pad) 0 3px; }
+.quick .chip { padding: 0 var(--chip-pad) 0 4px; }
 .quick__art { width: 26px; height: 26px; }
-.quick__in { gap: 6px; }
+.quick__in { gap: 8px; }
 /* The chip strip above the hero hugs the smaller chips (8px shorter; the hero itself is unchanged) */
 .quick { height: 64px; }
 @media (max-width: 639px) { .quick { height: 56px; } }
@@ -210,3 +210,6 @@ button.link-arrow { height: var(--ctl); padding: 0; border: 0; background: none;
 /* Smaller chips keep a comfortable 40px tap area */
 .chip, .policy__links a, .search__pages a, .mnav__chip { position: relative; }
 .chip::after, .policy__links a::after, .search__pages a::after, .mnav__chip::after { content: ""; position: absolute; inset: -4px 0; }
+/* strokes + paddings pass (2026-10-16): no browser-default 1px 6px on the bare buttons inside capsules; list indents on the scale */
+.newsletter button, .qty button { padding: 0; }
+.seo__card ul, .seo__card ol { padding-left: 16px; }

@@ -12,7 +12,7 @@
   --panel: #000; --card: #1C1E20; --card-hi: #24272A; --line: rgba(255,255,255,.07); --line2: rgba(255,255,255,.12);
   --text: #fff; --text2: #C9CDD2; --muted: #898A8B; --red: #D91E05; --red-hi: #F0300F; --red-t: #FF6A4A; --red-10: rgba(217,30,5,.12); --red-24: rgba(217,30,5,.26);
   --ease: cubic-bezier(.2,.7,.2,1);
-  box-sizing: border-box; margin: 0; padding: 0 var(--gutter, 28px) 64px; /* side edges line up with the shared hero banner at every width */ color: var(--text); font-family: var(--font); }
+  box-sizing: border-box; margin: 0; padding: 0 var(--gutter, 32px) 48px; /* side edges line up with the shared hero banner at every width */ color: var(--text); font-family: var(--font); }
 .nh *, .nh *::before, .nh *::after { box-sizing: border-box; }
 .nh > section { margin-top: 64px; }
 .nh > .nh-stripwrap { margin-top: 24px; } /* first block under the shared hero banner */
@@ -22,19 +22,19 @@
 
 /* ---------- Section header ---------- */
 .nh-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
-.nh-h { margin: 0; font: 700 clamp(22px, 2.1vw, 27px)/1.15 var(--font); letter-spacing: -.04em; text-transform: uppercase; color: var(--text); }
+.nh-h { margin: 0; font: 700 clamp(24px, 2.73vw, 28px)/1.15 var(--font); letter-spacing: -.04em; text-transform: uppercase; color: var(--text); }
 .nh-sub { margin: 6px 0 0; font: 400 14px/1.45 var(--font); color: var(--muted); max-width: 70ch; }
 .nh-head--center { flex-direction: column; align-items: center; text-align: center; }
 
 /* ---------- Buttons ---------- */
-.nh-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 40px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--red-10); color: var(--red-t); font: 600 14px/1 var(--font); white-space: nowrap; cursor: pointer; transition: background-color 160ms var(--ease), color 160ms var(--ease); }
+.nh-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--red-10); color: var(--red-t); font: 600 14px/1 var(--font); white-space: nowrap; cursor: pointer; transition: background-color 160ms var(--ease), color 160ms var(--ease); }
 .nh-btn:hover { background: var(--red-24); color: #fff; }
 .nh-btn--primary { height: 48px; padding: 0 24px; border-radius: 999px; background: var(--red); color: #fff; font-size: 16px; }
 .nh-btn--primary:hover { background: var(--red-hi); color: #fff; }
 .nh-btn--ghost { background: rgba(255,255,255,.06); color: #fff; box-shadow: inset 0 0 0 1.5px var(--line2); }
 .nh-btn--ghost:hover { background: rgba(255,255,255,.12); color: #fff; }
 .nh-btn--lg { height: 48px; padding: 0 24px; border-radius: 999px; font-size: 16px; }
-.nh-tag { display: inline-flex; align-items: center; height: 24px; padding: 0 9px; border-radius: 6px; background: var(--red-24); color: #fff; font: 700 11px/1 var(--font); letter-spacing: .06em; text-transform: uppercase; }
+.nh-tag { display: inline-flex; align-items: center; height: 24px; padding: 0 8px; border-radius: 8px; background: var(--red-24); color: #fff; font: 700 12px/1 var(--font); letter-spacing: .06em; text-transform: uppercase; }
 .nh-tag--grey { background: rgba(255,255,255,.1); }
 .nh-tile__tag:not(.nh-tag--grey) { background: var(--red); } /* on a light product photo the see-through red tag fell to ~2.5:1 — solid, like the night card tags */
 
@@ -42,7 +42,7 @@
 
 /* ---------- Promise strip ---------- */
 .nh-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gap); }
-.nh-strip a { display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 10px 14px; border-radius: var(--r-tile); background: var(--card); box-shadow: inset 0 0 0 1.5px var(--line); font: 500 13px/1.3 var(--font); color: var(--text); transition: background-color 160ms var(--ease); }
+.nh-strip a { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 12px 16px; border-radius: var(--r-tile); background: var(--card); box-shadow: inset 0 0 0 1.5px var(--line); font: 500 14px/1.3 var(--font); color: var(--text); transition: background-color 160ms var(--ease); }
 .nh-strip a:hover { background: var(--card-hi); }
 .nh-strip svg { width: 22px; height: 22px; flex: none; color: var(--red-t); }
 @media (max-width: 767px) { .nh-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
@@ -52,26 +52,26 @@
 /* Live card (redesigned 2026-10-07, "make it beautiful"): a stage-lit black panel — red light from the top-right, a glass countdown
    to Friday 8 PM PKT, a sound-wave strip breathing along the foot (still for reduced motion). Laid out by its OWN width (container
    query): ≥880px = copy + buttons left, countdown right; narrower (beside the tiles, tablets, phones) = one column. */
-.nh-live { container: nh-live / inline-size; position: relative; overflow: hidden; isolation: isolate; display: flex; flex-direction: column; gap: 28px; min-height: 320px; padding: 24px clamp(20px, 2.6vw, 32px) 30px; border-radius: var(--r-panel);
+.nh-live { container: nh-live / inline-size; position: relative; overflow: hidden; isolation: isolate; display: flex; flex-direction: column; gap: 32px; min-height: 320px; padding: 24px clamp(16px, 2.6vw, 32px) 32px; border-radius: var(--r-panel);
   background: radial-gradient(70% 95% at 100% 0%, rgba(217,30,5,.46) 0%, rgba(217,30,5,.14) 40%, rgba(217,30,5,0) 68%),
     radial-gradient(55% 70% at 0% 100%, rgba(255,106,74,.10) 0%, rgba(255,106,74,0) 62%), linear-gradient(180deg, #0B0B0C 0%, #000 100%);
   box-shadow: inset 0 0 0 1.5px var(--line); }
 .nh-live > :not(.nh-live__eq) { position: relative; z-index: 1; }
 .nh-live__top { display: flex; align-items: center; justify-content: space-between; gap: 8px 12px; flex-wrap: wrap; }
-.nh-live__badge { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 14px 0 12px; border-radius: 999px; background: var(--red); color: #fff; font: 700 12px/1 var(--font); letter-spacing: .1em; text-transform: uppercase; }
+.nh-live__badge { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 16px 0 12px; border-radius: 999px; background: var(--red); color: #fff; font: 700 12px/1 var(--font); letter-spacing: .1em; text-transform: uppercase; }
 .nh-live__badge i { width: 8px; height: 8px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,.3); }
-.nh-live__when { font: 600 13px/1 var(--font); letter-spacing: .02em; color: var(--text2); }
-.nh-live__body { display: grid; gap: 22px; margin-top: auto; }
-.nh-live__h { margin: 0; font: 700 clamp(34px, 9cqw, 64px)/.95 var(--font); letter-spacing: -.045em; text-transform: uppercase; }
-.nh-live__p { margin: 12px 0 0; max-width: 40ch; font: 400 15px/1.5 var(--font); color: var(--text2); }
-.nh-live__k { display: block; margin-bottom: 10px; font: 600 11px/1 var(--font); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.nh-live__when { font: 600 14px/1 var(--font); letter-spacing: .02em; color: var(--text2); }
+.nh-live__body { display: grid; gap: 24px; margin-top: auto; }
+.nh-live__h { margin: 0; font: 700 clamp(28px, 9cqw, 64px)/.95 var(--font); letter-spacing: -.045em; text-transform: uppercase; }
+.nh-live__p { margin: 12px 0 0; max-width: 40ch; font: 400 16px/1.5 var(--font); color: var(--text2); }
+.nh-live__k { display: block; margin-bottom: 10px; font: 600 12px/1 var(--font); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
 .nh-live__cells { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-.nh-live__cell { display: flex; flex-direction: column; align-items: center; gap: 7px; padding: 14px 4px 12px; border-radius: 16px; background: rgba(22,22,24,.55); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.09); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
-.nh-live__cell b { font: 700 clamp(26px, 6.4cqw, 48px)/1 var(--font); letter-spacing: -.03em; font-variant-numeric: tabular-nums; color: #fff; }
-.nh-live__cell small { font: 600 10px/1 var(--font); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
-.nh-live__row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.nh-live__cell { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 16px 4px 12px; border-radius: 16px; background: rgba(22,22,24,.55); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.09); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+.nh-live__cell b { font: 700 clamp(28px, 6.4cqw, 44px)/1 var(--font); letter-spacing: -.03em; font-variant-numeric: tabular-nums; color: #fff; }
+.nh-live__cell small { font: 600 12px/1 var(--font); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.nh-live__row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
 .nh-live .nh-btn--ghost { background: rgba(22,22,24,.55); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); } /* glass over the wave */
-.nh-live__eq { position: absolute; z-index: 0; left: 0; right: 0; bottom: 0; height: 48%; display: flex; align-items: flex-end; justify-content: space-between; gap: 3px; padding: 0 20px; opacity: .55; pointer-events: none;
+.nh-live__eq { position: absolute; z-index: 0; left: 0; right: 0; bottom: 0; height: 48%; display: flex; align-items: flex-end; justify-content: space-between; gap: 3px; padding: 0 16px; opacity: .55; pointer-events: none;
   -webkit-mask-image: linear-gradient(to top, #000 0%, rgba(0,0,0,.5) 50%, transparent 100%), linear-gradient(90deg, transparent 0%, #000 16%, #000 84%, transparent 100%); -webkit-mask-composite: source-in;
   mask-image: linear-gradient(to top, #000 0%, rgba(0,0,0,.5) 50%, transparent 100%), linear-gradient(90deg, transparent 0%, #000 16%, #000 84%, transparent 100%); mask-composite: intersect; }
 .nh-live__eq i { flex: 1 1 0; min-width: 2px; max-width: 6px; border-radius: 999px; background: linear-gradient(to top, var(--red) 0%, rgba(255,106,74,.55) 100%); transform-origin: 50% 100%; transform: scaleY(.62); }
@@ -79,17 +79,17 @@
 @keyframes nh-eq { from { transform: scaleY(.26); } to { transform: scaleY(1); } }
 @container nh-live (max-width: 459px) { .nh-live__row > a { flex: 1 1 100%; } } /* phones: two equal full-width buttons, not a ragged wrap */
 @container nh-live (min-width: 880px) {
-  .nh-live__body { grid-template-columns: minmax(0, 1fr) minmax(300px, 400px); grid-template-areas: "copy clock" "row clock"; align-items: end; gap: 22px 40px; }
+  .nh-live__body { grid-template-columns: minmax(0, 1fr) minmax(300px, 400px); grid-template-areas: "copy clock" "row clock"; align-items: end; gap: 24px 32px; }
   .nh-live__copy { grid-area: copy; } .nh-live__clock { grid-area: clock; } .nh-live__row { grid-area: row; }
-  .nh-live__cell b { font-size: 40px; }
+  .nh-live__cell b { font-size: 44px; }
 }
 .nh-feats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: var(--gap); }
-.nh-feat { display: flex; flex-direction: column; gap: 10px; min-height: 150px; padding: 14px; border-radius: var(--r-tile); background: var(--card); box-shadow: inset 0 0 0 1.5px var(--line); transition: background-color 160ms var(--ease); }
+.nh-feat { display: flex; flex-direction: column; gap: 12px; min-height: 150px; padding: 16px; border-radius: var(--r-tile); background: var(--card); box-shadow: inset 0 0 0 1.5px var(--line); transition: background-color 160ms var(--ease); }
 .nh-feat:hover { background: var(--card-hi); }
 .nh-feat__ic { width: 36px; height: 36px; border-radius: 8px; overflow: hidden; background: #2A2F35; }
 .nh-feat__ic img { width: 100%; height: 100%; }
-.nh-feat__t { font: 600 15px/1.2 var(--font); }
-.nh-feat__s { margin-top: auto; font: 400 13px/1.4 var(--font); color: var(--muted); }
+.nh-feat__t { font: 600 16px/1.2 var(--font); }
+.nh-feat__s { margin-top: auto; font: 400 14px/1.4 var(--font); color: var(--muted); }
 @media (max-width: 1023px) { .nh-promo { grid-template-columns: 1fr; } .nh-live { min-height: 0; } }
 @media (max-width: 639px) { .nh-feats { display: none; } } /* phones: no department tiles under the Live card (2026-10-11, "remove these from the mobile view on dark theme") — the menu and the chip cloud below still list every department */
 
@@ -110,40 +110,40 @@
 .nh-tile__add:hover { background: var(--red-hi); }
 .nh-tile__add:active { transform: translateY(-100%) scale(.96); }
 @media (hover: hover) { .nh-tile__add { opacity: 0; } .nh-tile:hover .nh-tile__add, .nh-tile__add:focus-visible { opacity: 1; } }
-.nh-tile__cap { display: flex; flex-direction: column; gap: 3px; padding: 10px 12px 12px; }
-.nh-tile__p { font: 700 15px/1 var(--font); color: var(--text); }
+.nh-tile__cap { display: flex; flex-direction: column; gap: 3px; padding: 12px 12px 12px; }
+.nh-tile__p { font: 700 16px/1 var(--font); color: var(--text); }
 .nh-tile__was { margin-left: 4px; font: 500 12px/1 var(--font); color: var(--muted); text-decoration: line-through; }
-.nh-tile__n { font: 400 13px/1.35 var(--font); color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.nh-tile__n { font: 400 14px/1.35 var(--font); color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .nh-tile--out .nh-tile__img img { opacity: .55; }
-@media (max-width: 639px) { .nh-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .nh-tile__cap { padding: 8px 10px 10px; } }
+@media (max-width: 639px) { .nh-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .nh-tile__cap { padding: 8px 12px 12px; } }
 
 /* ---------- Showpiece panel (black, hairline, big headline, product media, thumbnail row) ---------- */
-.nh-show { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 24px; align-items: center; padding: clamp(20px, 3vw, 40px); border-radius: var(--r-panel); background: var(--panel); box-shadow: inset 0 0 0 1.5px var(--line); }
-.nh-show__copy { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
-.nh-show__h { margin: 0; font: 700 clamp(40px, 5.4vw, 76px)/.95 var(--font); letter-spacing: -.04em; text-transform: uppercase; }
+.nh-show { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 24px; align-items: center; padding: clamp(16px, 3vw, 32px); border-radius: var(--r-panel); background: var(--panel); box-shadow: inset 0 0 0 1.5px var(--line); }
+.nh-show__copy { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
+.nh-show__h { margin: 0; font: 700 clamp(44px, 7.42vw, 76px)/.95 var(--font); letter-spacing: -.04em; text-transform: uppercase; }
 .nh-show__t { margin: 0; font: 500 16px/1.4 var(--font); color: var(--text2); }
 .nh-show__meta { margin: 0; font: 400 14px/1.5 var(--font); color: var(--muted); }
 .nh-show__price { margin: 4px 0 0; font: 700 28px/1 var(--font); }
-.nh-show__btns { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+.nh-show__btns { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 6px; }
 .nh-show__media { position: relative; aspect-ratio: 4 / 3; border-radius: var(--r-card); overflow: hidden; box-shadow: inset 0 0 0 1.5px var(--line); }
 .nh-show__media img { width: 100%; height: 100%; }
 .nh-show__thumbs { grid-column: 1 / -1; display: flex; gap: 8px; margin-top: 4px; overflow-x: auto; scrollbar-width: none; }
 .nh-show__thumbs::-webkit-scrollbar { display: none; }
-.nh-show__thumb { flex: none; width: 96px; padding: 0; border: 0; border-radius: 10px; overflow: hidden; background: var(--card); color: #fff; box-shadow: inset 0 0 0 1.5px var(--line); cursor: pointer; font: 600 11px/1 var(--font); transition: box-shadow 160ms var(--ease); }
+.nh-show__thumb { flex: none; width: 96px; padding: 0; border: 0; border-radius: 12px; overflow: hidden; background: var(--card); color: #fff; box-shadow: inset 0 0 0 1.5px var(--line); cursor: pointer; font: 600 12px/1 var(--font); transition: box-shadow 160ms var(--ease); }
 .nh-show__thumb img { width: 100%; aspect-ratio: 1; object-fit: cover; }
-.nh-show__thumb span { display: block; padding: 7px 4px; text-align: center; background: var(--card, #1A1D21); color: #fff; } /* own dark strip: the button carries the photo's (often white) backdrop, which put the white code on white */
+.nh-show__thumb span { display: block; padding: 8px 4px; text-align: center; background: var(--card, #1A1D21); color: #fff; } /* own dark strip: the button carries the photo's (often white) backdrop, which put the white code on white */
 .nh-show__thumb[aria-pressed="true"] { box-shadow: inset 0 0 0 1.5px #fff; }
 @media (max-width: 1023px) { .nh-show { grid-template-columns: 1fr; } .nh-show__media { order: -1; } }
 
 /* ---------- Glow panel (centred headline, red glow, floating mini cards) ---------- */
-.nh-glow { position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; gap: 14px; padding: clamp(44px, 7vw, 96px) 24px; border-radius: var(--r-panel); background: var(--panel); box-shadow: inset 0 0 0 1.5px var(--line); text-align: center; }
+.nh-glow { position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; gap: 16px; padding: clamp(48px, 7vw, 96px) 24px; border-radius: var(--r-panel); background: var(--panel); box-shadow: inset 0 0 0 1.5px var(--line); text-align: center; }
 .nh-glow::before { content: ""; position: absolute; left: 50%; bottom: -35%; width: 76%; height: 80%; transform: translateX(-50%); background: radial-gradient(50% 50% at 50% 50%, rgba(217,30,5,.7) 0%, rgba(217,30,5,0) 70%); filter: blur(24px); pointer-events: none; }
 .nh-glow > * { position: relative; }
-.nh-glow__h { margin: 0; font: 700 clamp(30px, 4.2vw, 58px)/1 var(--font); letter-spacing: -.04em; text-transform: uppercase; }
-.nh-glow__p { margin: 0; max-width: 46ch; font: 400 15px/1.5 var(--font); color: var(--text2); }
-.nh-glow__card { position: absolute; z-index: 1; display: flex; align-items: center; gap: 10px; width: 196px; padding: 8px; border-radius: 12px; background: var(--card); box-shadow: inset 0 0 0 1.5px var(--line2); font: 600 12px/1.3 var(--font); text-align: left; }
+.nh-glow__h { margin: 0; font: 700 clamp(28px, 5.66vw, 58px)/1 var(--font); letter-spacing: -.04em; text-transform: uppercase; }
+.nh-glow__p { margin: 0; max-width: 46ch; font: 400 16px/1.5 var(--font); color: var(--text2); }
+.nh-glow__card { position: absolute; z-index: 1; display: flex; align-items: center; gap: 12px; width: 196px; padding: 8px; border-radius: 12px; background: var(--card); box-shadow: inset 0 0 0 1.5px var(--line2); font: 600 12px/1.3 var(--font); text-align: left; }
 .nh-glow__card img { width: 48px; height: 48px; border-radius: 8px; object-fit: cover; flex: none; }
-.nh-glow__card small { display: block; font: 500 11px/1.3 var(--font); color: var(--muted); }
+.nh-glow__card small { display: block; font: 500 12px/1.3 var(--font); color: var(--muted); }
 .nh-glow__card--a { left: 6%; top: 16%; transform: rotate(-4deg); }
 .nh-glow__card--b { right: 6%; bottom: 16%; transform: rotate(4deg); }
 @media (max-width: 1023px) { .nh-glow__card { display: none; } }
@@ -165,16 +165,16 @@
 @media (max-width: 639px) {
   .nh-seg { width: 100%; }
   .nh-seg button { flex-direction: column; gap: 3px; padding: 0 4px; }
-  .nh-seg__k { font: 600 10px/1 var(--font); letter-spacing: .08em; text-transform: uppercase; }
+  .nh-seg__k { font: 600 12px/1 var(--font); letter-spacing: .08em; text-transform: uppercase; }
   .nh-seg__v { font-size: 14px; line-height: 1; }
 }
 
 /* ---------- Fanned tile strip panel ---------- */
-.nh-fan { position: relative; overflow: hidden; overflow: clip; display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 44px 24px 36px; border-radius: var(--r-panel); background: var(--panel); box-shadow: inset 0 0 0 1.5px var(--line); text-align: center; }
+.nh-fan { position: relative; overflow: hidden; overflow: clip; display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 48px 24px 32px; border-radius: var(--r-panel); background: var(--panel); box-shadow: inset 0 0 0 1.5px var(--line); text-align: center; }
 .nh-fan::before { content: ""; position: absolute; left: 50%; top: 40%; width: 60%; height: 70%; transform: translateX(-50%); background: radial-gradient(50% 50% at 50% 50%, rgba(217,30,5,.35) 0%, rgba(217,30,5,0) 70%); filter: blur(30px); pointer-events: none; }
 .nh-fan > * { position: relative; }
-.nh-fan__h { margin: 0; font: 700 clamp(28px, 3.6vw, 48px)/1 var(--font); letter-spacing: -.04em; text-transform: uppercase; }
-.nh-fan__p { margin: 0; max-width: 48ch; font: 400 15px/1.5 var(--font); color: var(--text2); }
+.nh-fan__h { margin: 0; font: 700 clamp(28px, 4.3vw, 44px)/1 var(--font); letter-spacing: -.04em; text-transform: uppercase; }
+.nh-fan__p { margin: 0; max-width: 48ch; font: 400 16px/1.5 var(--font); color: var(--text2); }
 /* coverflow carousel (2026-10-07): the tiles are placed by mountFan() in night-home.js — transforms glide 1000ms on the reveal curve */
 .nh-fan__row { --fan-w: clamp(88px, 11vw, 150px); position: relative; width: calc(100% + 48px); margin: 8px -24px 4px; height: calc(var(--fan-w) * 1.25 * 1.1 + 12px); perspective: 1000px; touch-action: pan-y; -webkit-user-select: none; user-select: none; cursor: grab; overflow: hidden; }
 .nh-fan__row.is-drag { cursor: grabbing; }
@@ -188,7 +188,7 @@
 
 /* ---------- Chip cloud ---------- */
 .nh-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
-.nh-chip { display: inline-flex; align-items: center; height: var(--chip, 32px); padding: 0 var(--chip-pad, 13px); border-radius: 999px; background: var(--card); color: #DADDE1; font: var(--chip-font, 600 12px/1 var(--font)); letter-spacing: var(--ctl-track, .01em); /* the day chip size (controls.css) */ box-shadow: inset 0 0 0 1.5px var(--line); transition: background-color 160ms var(--ease), color 160ms var(--ease); }
+.nh-chip { display: inline-flex; align-items: center; height: var(--chip, 32px); padding: 0 var(--chip-pad, 12px); border-radius: 999px; background: var(--card); color: #DADDE1; font: var(--chip-font, 600 12px/1 var(--font)); letter-spacing: var(--ctl-track, .01em); /* the day chip size (controls.css) */ box-shadow: inset 0 0 0 1.5px var(--line); transition: background-color 160ms var(--ease), color 160ms var(--ease); }
 .nh-chip--dept { color: #fff; font-weight: 600; }
 .nh-chip:hover { background: var(--card-hi); color: #fff; }
 

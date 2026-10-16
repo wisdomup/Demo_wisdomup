@@ -97,7 +97,7 @@ html[data-theme="night"] body :is(.shop-rail__all, .nh-btn.nh-btn--all) {
   --va-glass: #333536; --va-glass: color-mix(in srgb, #fff 15%, var(--n-bg, #0F1113));
   --va-rim: linear-gradient(135deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.08) 40%, rgba(255,255,255,.06) 60%, rgba(255,255,255,.4) 100%);
   --va-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6.5 17.5 17 7M7 6h10v10'/%3E%3C/svg%3E");
-  display: inline-flex; flex: none; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 14.5px 0 18.5px;
+  display: inline-flex; flex: none; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 16px 0 16px;
   border: 1.5px solid transparent; border-radius: 999px;
   background: linear-gradient(var(--va-glass) 0 0) padding-box, var(--va-rim) border-box;
   box-shadow: 0 4px 32px rgba(0,0,0,.2); color: #fff; font: 600 14px/20px var(--font); white-space: nowrap;
@@ -112,15 +112,15 @@ html[data-theme="night"] body :is(.shop-rail__all, .nh-btn.nh-btn--all)::after {
 /* ---------- Home: hero, carousels, panels ---------- */
 html[data-theme="night"] .hero { box-shadow: inset 0 0 0 1.5px var(--n-line); } /* same geometry and position as day (shared banner, 2026-10-06) */
 html[data-theme="night"] .hero__sub { color: var(--n-muted); }
-html[data-theme="night"] .loop__slide { border-radius: 24px; background: linear-gradient(120deg, #1E2226, #0F1113) !important; box-shadow: inset 0 0 0 1.5px var(--n-line); }
-html[data-theme="night"] .feat__slide { border-radius: 24px; box-shadow: inset 0 0 0 1.5px var(--n-line); }
-html[data-theme="night"] .promo { background: var(--n-card) !important; border-radius: 24px; box-shadow: inset 0 0 0 1.5px var(--n-line); }
-html[data-theme="night"] .duo__card { border-radius: 24px; background: var(--n-bg2) !important; box-shadow: inset 0 0 0 1.5px var(--n-line); }
+html[data-theme="night"] .loop__slide { border-radius: 16px; background: linear-gradient(120deg, #1E2226, #0F1113) !important; box-shadow: inset 0 0 0 1.5px var(--n-line); }
+html[data-theme="night"] .feat__slide { border-radius: 16px; box-shadow: inset 0 0 0 1.5px var(--n-line); }
+html[data-theme="night"] .promo { background: var(--n-card) !important; border-radius: 16px; box-shadow: inset 0 0 0 1.5px var(--n-line); }
+html[data-theme="night"] .duo__card { border-radius: 16px; background: var(--n-bg2) !important; box-shadow: inset 0 0 0 1.5px var(--n-line); }
 html[data-theme="night"] .duo__card--live { background: radial-gradient(70% 90% at 100% 100%, rgba(217,30,5,.35) 0%, rgba(217,30,5,0) 60%), var(--n-bg2) !important; }
-html[data-theme="night"] .series { background: var(--n-bg2); border-radius: 24px; box-shadow: inset 0 0 0 1.5px var(--n-line); }
+html[data-theme="night"] .series { background: var(--n-bg2); border-radius: 16px; box-shadow: inset 0 0 0 1.5px var(--n-line); }
 html[data-theme="night"] :is(.series__code, .series__title, .series__now) { color: #fff; }
 html[data-theme="night"] :is(.series__meta, .series__was) { color: var(--n-muted); }
-html[data-theme="night"] .pp__card { background: var(--n-bg2); border-radius: 24px; box-shadow: inset 0 0 0 1.5px var(--n-line); }
+html[data-theme="night"] .pp__card { background: var(--n-bg2); border-radius: 16px; box-shadow: inset 0 0 0 1.5px var(--n-line); }
 html[data-theme="night"] .pp__h { color: #fff; }
 html[data-theme="night"] :is(.pp__sub, .pp__note) { color: var(--n-muted); }
 html[data-theme="night"] .bulk__h { color: #fff; }
@@ -139,7 +139,7 @@ html[data-theme="night"] .hero__bar { border-top-color: rgba(255, 255, 255, .14)
 html[data-theme="night"] .hero.is-light .hero__bar { border-top-color: rgba(11, 11, 11, .16); }
 html[data-theme="night"] .hero.is-light .hero__bar .hero__arrow, html[data-theme="night"] .hero.is-light .dot { color: #0B0B0B; }
 /* FAQ + SEO blocks */
-html[data-theme="night"] :is(.faq__list, .seo__card, .panel-list) { background: var(--n-bg2); border-color: var(--n-line); border-radius: 24px; box-shadow: none; }
+html[data-theme="night"] :is(.faq__list, .seo__card, .panel-list) { background: var(--n-bg2); border-color: var(--n-line); border-radius: 16px; box-shadow: none; }
 html[data-theme="night"] .faq__item { border-color: var(--n-line); }
 html[data-theme="night"] :is(.faq__q, .manual__q b) { color: var(--n-text); }
 html[data-theme="night"] :is(.faq__a, .faq__intro, .faq__p, .faq__contact, .faq__chev, .manual__q small) { color: var(--n-muted); }
@@ -196,7 +196,7 @@ html[data-theme="night"] .fopt input:checked ~ span { color: #fff; }
 html[data-theme="night"] .fdrawer__apply:disabled { background: var(--n-raise2); color: var(--n-muted); }
 html[data-theme="night"] :is(.seo-lite h2, .seo-lite__h) { color: var(--n-text); }
 html[data-theme="night"] .seo-lite p { color: var(--n-muted); }
-html[data-theme="night"] .pbanner { box-shadow: inset 0 0 0 1.5px var(--n-line); border-radius: 24px; }
+html[data-theme="night"] .pbanner { box-shadow: inset 0 0 0 1.5px var(--n-line); border-radius: 16px; }
 
 /* ---------- Product page + other pages: a safe dark base (refined later) ---------- */
 html[data-theme="night"] :is(.pdp2__title, .pdp2__now, .pdp2__label, .pdp2__kicker b, .pd-stat__v, .highlights, .spec-table, .rv__avg b, .rv__item header b, .ck__h, .ck__sec h2, .ck__sumhead h2, .ck__total, .ord__hero h1, .ord__card h2, .ihero h1, .tile b, .post__body h3, .article__head h1, .prose h2, .prose h3, .prose strong, .contact-card b, .track__head b, .timeline b, .iform__h, .stat b, .quote-band p, .cta-band h2) { color: var(--n-text); }
@@ -243,7 +243,7 @@ html[data-theme="night"] .offer { border-color: var(--n-line); }
 /* ---------- Menu panel in night: the Higgsfield rules applied (2026-10-06) — stage #0F1113, black promo panel with one red
    glow, 8px chips, rounded-square icon tiles, hairline separators, dark+hairline round tools and footer buttons, white logo ---------- */
 html[data-theme="night"] .mnav { background: var(--n-bg); color: var(--n-text); box-shadow: inset -1.5px 0 0 var(--n-line2); border-radius: 0 16px 16px 0; }
-html[data-theme="night"] .mnav__head { border-bottom-color: var(--n-line); padding: 10px 12px 10px 16px; }
+html[data-theme="night"] .mnav__head { border-bottom-color: var(--n-line); padding: 12px 12px 12px 16px; }
 html[data-theme="night"] .mnav__logo img { filter: brightness(0) invert(1); }
 html[data-theme="night"] :is(.mnav__x, .mnav__theme) { border: 1.5px solid var(--n-line2); background: var(--n-raise); color: #fff; box-shadow: none; }
 html[data-theme="night"] :is(.mnav__x, .mnav__theme):hover { background: var(--n-raise2); }
@@ -420,7 +420,7 @@ html[data-theme="night"] :is(.ckc__btn, .ckc__more, .ckc__switch):focus-visible 
    raised #1E2226; type white / #C9CDD2 / #9AA0A6; ONE accent = brand red (Buy, New tags, the offer, icon details,
    stat glows); green only for "In stock"; gold only for review stars. Colours and surfaces only — no layout change.
    ========================================================================== */
-html[data-theme="night"] { --pd-panel: linear-gradient(180deg, rgba(255,255,255,.028) 0%, rgba(255,255,255,0) 42%), var(--n-bg2); --pd-edge: inset 0 1px 0 rgba(255,255,255,.045); }
+html[data-theme="night"] { --pd-panel: linear-gradient(180deg, rgba(255,255,255,.028) 0%, rgba(255,255,255,0) 42%), var(--n-bg2); --pd-edge: inset 0 1.5px 0 rgba(255,255,255,.045); }
 /* every info panel on the page shares one surface */
 html[data-theme="night"] :is(.pdp2 .offer, .pdp2 .gift, .pdp2 .highlights, #spec-list, .rv__sum, #pd-faq-list) { background: var(--pd-panel); }
 html[data-theme="night"] :is(.pdp2 .offer, .pdp2 .highlights, #spec-list, .rv__sum) { box-shadow: var(--pd-edge), inset 0 0 0 1.5px var(--n-line); }
@@ -434,7 +434,7 @@ html[data-theme="night"] .offer__head span { background: var(--n-red); color: #f
 
 /* Assurance trio: the day icons (dark-grey truck, multicolour medal, teal triangle) redrawn as white line icons with one
    red detail, each on a soft round well */
-html[data-theme="night"] .assure__i svg { width: 22px; height: 22px; padding: 9px; box-sizing: content-box; border-radius: 999px; color: #fff; background: radial-gradient(100% 100% at 30% 20%, rgba(255,255,255,.09), rgba(255,255,255,.02)); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.10); }
+html[data-theme="night"] .assure__i svg { width: 22px; height: 22px; padding: 8px; box-sizing: content-box; border-radius: 999px; color: #fff; background: radial-gradient(100% 100% at 30% 20%, rgba(255,255,255,.09), rgba(255,255,255,.02)); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.10); }
 html[data-theme="night"] .assure__i svg :is(g, rect, path, circle) { stroke: currentColor; stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; }
 html[data-theme="night"] .assure__i svg g { fill: none; }
 html[data-theme="night"] .assure__i[href*="shipping"] svg circle { fill: var(--n-bg2); stroke: var(--n-red-text); }
@@ -532,7 +532,7 @@ html[data-theme="night"] :is(.bban__card, .bban__arrow):focus-visible { outline-
 
 /* CART DRAWER (bugatti.store layout, 2026-10-07) — night: white type, white-7% hairlines, a faint lighter band, dark sheets. The blanket
    night link red must not reach the cart's links. */
-@media (min-width: 640px) { html[data-theme="night"] .cartd.cartd--b { border-radius: 34px 0 0 34px; } }
+@media (min-width: 640px) { html[data-theme="night"] .cartd.cartd--b { border-radius: 16px 0 0 16px; } }
 html[data-theme="night"] .cartd--b :is(.cartd__tab, .cartd__totals b, .cline__t, .cline__p, .cartd__tools button, .cartd__sheethead, .cartd__facts b, .cartd__facts em, .cartd__empty b, .cline__rm) { color: var(--n-text) !important; }
 html[data-theme="night"] .cartd--b :is(.cartd__ship p, .cartd__taxnote, .cartd__totals span, .cartd__lbl, .cartd__facts span, .cartd__fine, .cartd__empty p) { color: var(--n-text2) !important; }
 html[data-theme="night"] .cartd--b .cartd__ship b { color: #fff !important; }
@@ -784,8 +784,8 @@ html[data-theme="night"] body :is(.chip, .policy__links a, .search__pages a, .mn
   mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
 }
 /* outlines that were borders → the rim; the 1.5px goes back into the padding */
-html[data-theme="night"] body .search__pages a:not([aria-pressed="true"]):not([aria-current="true"]) { border-width: 0; padding-inline: calc(var(--chip-pad, 13px) + 1.5px); }
-html[data-theme="night"] body .opt-chip:not([aria-checked="true"]) { border-width: 0; padding-inline: 17.5px; }
+html[data-theme="night"] body .search__pages a:not([aria-pressed="true"]):not([aria-current="true"]) { border-width: 0; padding-inline: calc(var(--chip-pad, 12px) + 1.5px); }
+html[data-theme="night"] body .opt-chip:not([aria-checked="true"]) { border-width: 0; padding-inline: 16px; }
 html[data-theme="night"] body .opt-chip.is-na:not([aria-checked="true"])::after { opacity: .4; } /* unavailable: a fainter rim (its dashed border is gone) */
 /* the floating two sit over photos too: the same glass made nearly opaque so the white icon always reads */
 html[data-theme="night"] body :is(.totop, .wafab) { background: rgba(51, 53, 54, .9) !important; box-shadow: 0 4px 32px rgba(0,0,0,.2) !important; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
@@ -870,11 +870,11 @@ html[data-theme="night"] .wpc__media::after { content: ""; position: absolute; i
    (pale pink → their brand pink, opacity 200ms ease-out); ours runs pale red → the night brand red. Openart's 1px / 2px widths are
    kept on purpose (an exception to ONE STROKE SIZE for these cards, the owner asked for openart's look). The ring is the card's
    ::before, placed on the frame: frame = the card's padding box (2.326cqw in) and the media's height + its 6px frame on each side. */
-html[data-theme="night"] .wpc__card { box-shadow: inset 0 0 0 1px rgba(211, 237, 248, .11), inset 0 1px 0 rgba(217, 237, 254, .15); }
-html[data-theme="night"] .wpc:hover .wpc__card { box-shadow: inset 0 0 0 1px rgba(211, 237, 248, .11), inset 0 1px 0 rgba(217, 237, 254, .15); }
+html[data-theme="night"] .wpc__card { box-shadow: inset 0 0 0 1.5px rgba(211, 237, 248, .11), inset 0 1.5px 0 rgba(217, 237, 254, .15); }
+html[data-theme="night"] .wpc:hover .wpc__card { box-shadow: inset 0 0 0 1.5px rgba(211, 237, 248, .11), inset 0 1.5px 0 rgba(217, 237, 254, .15); }
 html[data-theme="night"] .wpc__card::before { content: ""; position: absolute; z-index: 3; pointer-events: none;
   left: 2.326cqw; right: 2.326cqw; top: 2.326cqw; height: calc((100cqw - 4.652cqw - 12px) * 484 / 410 + 12px);
-  border-radius: calc(12px + 6px); padding: 2px; box-sizing: border-box;
+  border-radius: calc(12px + 8px); padding: 1.5px; box-sizing: border-box;
   background: linear-gradient(150deg, #FFD0C7 0%, var(--n-red, #E8321A) 100%);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor;
   mask: linear-gradient(#fff 0 0) content-box exclude, linear-gradient(#fff 0 0);
@@ -885,13 +885,13 @@ html[data-theme="night"] .wpc__card::before { content: ""; position: absolute; z
    their blurred photo glow (the strip has no photo), a soft blurred tint of our brand red + a cool light, under the same dark veil;
    each icon sits in a small glass well with openart's frame lights (top .25 / bottom .15). */
 html[data-theme="night"] .trust { position: relative; isolation: isolate; overflow: hidden; background: #090A0A;
-  box-shadow: inset 0 0 0 1px rgba(211, 237, 248, .11), inset 0 1px 0 rgba(217, 237, 254, .15); }
+  box-shadow: inset 0 0 0 1.5px rgba(211, 237, 248, .11), inset 0 1.5px 0 rgba(217, 237, 254, .15); }
 html[data-theme="night"] .trust::before { content: ""; position: absolute; inset: -20%; z-index: -1; pointer-events: none;
   background: radial-gradient(40% 90% at 12% 50%, rgba(217, 30, 5, .55), transparent 70%), radial-gradient(45% 100% at 78% 40%, rgba(214, 225, 255, .22), transparent 70%);
   filter: blur(40px); opacity: .45; }
 html[data-theme="night"] .trust__item svg { box-sizing: content-box; padding: 8px; border-radius: 50%;
   background: linear-gradient(rgba(214, 225, 255, .04), rgba(214, 225, 255, .08));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), inset 0 -1px 0 rgba(255, 255, 255, .15), 0 8px 32px rgba(0, 0, 0, .25); }
+  box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, .25), inset 0 -1.5px 0 rgba(255, 255, 255, .15), 0 8px 32px rgba(0, 0, 0, .25); }
 /* POLICY CONTENTS: the chosen entry (2026-10-16, the owner's screenshot "Where we deliver" — light grey on the white pill): two wide
    night text rules (the muted-text :is() lists above) outranked `.toc a[aria-current]`, so its ink type turned #C9CDD2 on white. */
 html[data-theme="night"] body .toc a[aria-current="true"] { color: #0B0B0B; }
@@ -904,11 +904,11 @@ html[data-theme="night"] body .toc a[aria-current="true"] { color: #0B0B0B; }
 html[data-theme="night"] body .page:not(.page--corp) :is(.tile, .stat, .contact-card, .panel-list, .iform, .callout, .kv, .toc, .manual, .track__form, .cr-tier, .cr-calc, .cr-fact, .cr-pick, .cr-terms) {
   border-color: transparent !important; border-radius: 16px;
   background: linear-gradient(rgba(214, 225, 255, .04), rgba(214, 225, 255, .08)), var(--n-bg, #0F1113) !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), inset 0 -1px 0 rgba(255, 255, 255, .15), 0 8px 64px rgba(0, 0, 0, .25) !important; }
+  box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, .25), inset 0 -1.5px 0 rgba(255, 255, 255, .15), 0 8px 64px rgba(0, 0, 0, .25) !important; }
 html[data-theme="night"] body .page:not(.page--corp) .cr-tier--top { background: linear-gradient(rgba(214, 225, 255, .08), rgba(214, 225, 255, .14)), #0B0B0B !important; }
 html[data-theme="night"] body .page:not(.page--corp) :is(a.tile, a.cr-pick, .contact-card) { position: relative; } /* only the ring hosts — the contents list (.toc) stays sticky */
 html[data-theme="night"] body .page:not(.page--corp) :is(a.tile, a.cr-pick, .contact-card)::after { content: ""; position: absolute; inset: -1.5px; z-index: 2; pointer-events: none;
-  border-radius: inherit; padding: 2px; background: linear-gradient(150deg, #FFD0C7 0%, var(--n-red, #D91E05) 100%);
+  border-radius: inherit; padding: 1.5px; background: linear-gradient(150deg, #FFD0C7 0%, var(--n-red, #D91E05) 100%);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor;
   mask: linear-gradient(#fff 0 0) content-box exclude, linear-gradient(#fff 0 0); opacity: 0; transition: opacity 200ms ease-out; }
 @media (hover: hover) and (pointer: fine) {
@@ -917,12 +917,12 @@ html[data-theme="night"] body .page:not(.page--corp) :is(a.tile, a.cr-pick, .con
 }
 /* product cards: the same tile stroke at the card's edge (top .25 / bottom .15 + the deep shadow) instead of the hairline */
 html[data-theme="night"] .wpc__card, html[data-theme="night"] .wpc:hover .wpc__card {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), inset 0 -1px 0 rgba(255, 255, 255, .15), 0 8px 64px rgba(0, 0, 0, .25); }
+  box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, .25), inset 0 -1.5px 0 rgba(255, 255, 255, .15), 0 8px 64px rgba(0, 0, 0, .25); }
 /* filter panel: department fold toggles (pages.css .fopt-tog) */
 html[data-theme="night"] .fopt-tog { border-color: var(--n-line2); color: #fff; }
 html[data-theme="night"] .fopt-tog:focus-visible { outline-color: #fff; }
 /* filter panel = the cart panel's design (pages.css "FILTER PANEL = THE CART PANEL'S DESIGN"): night lines, × and text tab */
-@media (min-width: 640px) { html[data-theme="night"] body .fdrawer { border-radius: 0 24px 24px 0; } }
+@media (min-width: 640px) { html[data-theme="night"] body .fdrawer { border-radius: 0 16px 16px 0; } }
 html[data-theme="night"] body .fdrawer__head { border-bottom: 0; box-shadow: inset 0 -1.5px 0 var(--n-line); }
 html[data-theme="night"] body .fdrawer__foot { border-top: 0; box-shadow: inset 0 1.5px 0 var(--n-line); }
 html[data-theme="night"] .fdrawer__ic { color: #fff; }
@@ -953,10 +953,10 @@ html[data-theme="night"] .wpc__card::before { inset: 0; left: 0; right: 0; top: 
 html[data-theme="night"] body :is(.nh-feat, .nh-tile, .nh-glow__card, #night-home .panel-list, .panel-list, .post, .ck__sec, .ck__sumcard, .step, .empty, .rv__sum, .offer, .assure, .highlights):not(.page--corp *) {
   border-color: transparent !important;
   background: linear-gradient(rgba(214, 225, 255, .04), rgba(214, 225, 255, .08)), var(--n-bg, #0F1113) !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), inset 0 -1px 0 rgba(255, 255, 255, .15), 0 8px 64px rgba(0, 0, 0, .25) !important; }
+  box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, .25), inset 0 -1.5px 0 rgba(255, 255, 255, .15), 0 8px 64px rgba(0, 0, 0, .25) !important; }
 html[data-theme="night"] body :is(.pd-stat, .nh-fan__tile, .nh-show__media, .bban__card, .pdp2__stage):not(.page--corp *) {
   border-color: transparent !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), inset 0 -1px 0 rgba(255, 255, 255, .15), 0 8px 64px rgba(0, 0, 0, .25) !important; }
+  box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, .25), inset 0 -1.5px 0 rgba(255, 255, 255, .15), 0 8px 64px rgba(0, 0, 0, .25) !important; }
 html[data-theme="night"] body :is(.ihero, .quote-band, .cta-band, .afb, .afs, .afx, .afj, .nh-live, .nh-show, .nh-glow, .nh-fan, .bulk-steps, .cr-facts):not(.page--corp *):not(.page--corp) {
   border-color: transparent !important;
-  box-shadow: inset 0 0 0 1px rgba(211, 237, 248, .11), inset 0 1px 0 rgba(217, 237, 254, .15) !important; }
+  box-shadow: inset 0 0 0 1.5px rgba(211, 237, 248, .11), inset 0 1.5px 0 rgba(217, 237, 254, .15) !important; }

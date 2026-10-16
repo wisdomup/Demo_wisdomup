@@ -18,15 +18,15 @@
   /* Geometry */
   --slant: 15deg; /* @kind other */
   --promo-skew: -2.5deg; /* @kind other */
-  --gutter: 28px;
-  --gap-panel: 20px;
+  --gutter: 32px; /* higgsfield.ai: md:px-8 (compact pass 2026-10-16; was 28) */
+  --gap-panel: 16px;
   --nav-h: 56px;
   --nav-inset: 20px;
   --cat-size: 94px;
   --swatch: 62px;
   --thumb: 92px;
-  --rail-gap: 22px;
-  --grid-row-gap: 72px;
+  --rail-gap: 16px;
+  --grid-row-gap: 48px;
 
   /* Pagination */
   --dot: 10px;
@@ -37,7 +37,7 @@
 
   /* Elevation — soft, wide, low-opacity */
   --shadow-nav: 0 10px 24px rgba(0, 0, 0, 0.08);
-  --shadow-float: 0 14px 34px rgba(0, 0, 0, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  --shadow-float: 0 14px 34px rgba(0, 0, 0, 0.07), inset 0 1.5px 0 rgba(255, 255, 255, 0.9);
   --shadow-soft: 0 6px 18px rgba(0, 0, 0, 0.06);
   --shadow-icon: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.28));
   --shadow-product: drop-shadow(0 18px 18px rgba(0, 0, 0, 0.14));

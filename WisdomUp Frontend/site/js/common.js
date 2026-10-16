@@ -721,7 +721,7 @@
     if (mode === navMode && !force) return;
     navMode = mode;
     Object.assign(nav.style, wide
-      ? { left: 'calc(var(--gutter, 28px) + 20px)', right: 'calc(var(--gutter, 28px) + 20px)', height: '56px', padding: '0 22px 0 28px', gap: '11px' }
+      ? { left: 'calc(var(--gutter, 28px) + 20px)', right: 'calc(var(--gutter, 28px) + 20px)', height: '56px', padding: '0 24px 0 32px', gap: '12px' }
       : { left: 'calc(var(--gutter, 16px) + 10px)', right: 'calc(var(--gutter, 16px) + 10px)', height: '43px', padding: '0 4px', gap: '0px' });
     if (wide) {
       nav.innerHTML = `
@@ -730,7 +730,7 @@
           ${NAV_CATS.slice(0, count).map(c => `<a class="navbtn navbtn--cat" href="${catHref(c.type)}" aria-label="${c.label}" data-type="${c.type}"${navOn(c.type) ? ' aria-current="true" aria-expanded="true"' : ''}>${navSvg(c.d, c.s, c.w, 24)}<span>${c.label}</span></a>`).join('')}
         </nav>
         <div class="site-nav__tools">
-          <a class="navbtn navbtn--all" href="${url.products}" style="padding: 0 16px 0 11px; margin-right: 6px;">${navSvg(P_GRID, '', 2.2, 22)}<span>Shop All</span></a>
+          <a class="navbtn navbtn--all" href="${url.products}" style="padding: 0 16px 0 12px; margin-right: 8px;">${navSvg(P_GRID, '', 2.2, 22)}<span>Shop All</span></a>
           ${themeBtn('navbtn navbtn--util')}
           <button type="button" class="navbtn navbtn--util" data-act="search" aria-label="Search">${navSvg('', P_SEARCH, 2.2, 22)}</button>
           <button type="button" class="navbtn navbtn--util" data-act="account" aria-label="Account">${navSvg(P_USER, '', 2.2, 22)}</button>
