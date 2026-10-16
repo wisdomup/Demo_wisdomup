@@ -56,24 +56,25 @@ def parse(t, code):
     t = norm(t)
     s = {}
     s['bt'] = grab(r'(?:蓝牙(?:版本|规格)?|bluetooth(?:\s*version)?|BT版本|BT version)[^\n\d]{0,24}?(\d\.\d)', t)
-    pm = re.search(r'(?:使用时间|播放时间|播放时长|工作时间|play(?:able)?\s*time)[^\d\n]{0,26}?(\d+(?:\.\d+)?(?:\s*[-–]\s*\d+(?:\.\d+)?)?)\s*(?:个)?\s*(小时|hours?|h\b|H\b|分钟|min)', t, re.I)
+    pm = re.search(r'(?:使用时间|播放时间|播放时长|工作时间|play(?:able)?\s*time|working\s*time)[^\d\n]{0,26}?(\d+(?:\.\d+)?(?:\s*[-–]\s*\d+(?:\.\d+)?)?)\s*(?:个)?\s*(小时|hours?|h\b|H\b|分钟|min)', t, re.I)
     if pm:
         s['play'] = (pm.group(1).replace(' ', '') + ' minutes') if pm.group(2) in ('分钟', 'min') else hours(pm.group(1))
     s['standby'] = hours(grab(r'(?:待机时间|standby time)[^\d\n]{0,20}?(\d+)\s*(?:个)?\s*(?:小时|hours?|h\b|H\b)', t))
     cm = re.search(r'(?:充电时间|充电时长|charging time)[^\d\n<≤]{0,20}?([<≤]?)\s*(\d+(?:\.\d+)?(?:\s*[-–]\s*\d+(?:\.\d+)?)?)\s*(?:个)?\s*(小时|hours?|h\b|H\b)', t, re.I)
     if cm:
-        s['charge'] = ('Under ' if cm.group(1) else '') + hours(cm.group(2))
+        h = hours(cm.group(2))  # "≤8-10 hours" reads "Up to 8–10 hours", never "Under 8–10 hours" (2026-10-17)
+        s['charge'] = (('Up to ' if '–' in h or '-' in h else 'Under ') if cm.group(1) else '') + h
     s['bud_batt'] = grab(r'耳机电池[^\d\n]{0,6}(\d+)\s*m?ah', t) or grab(r'电池\s*:\s*(\d+)\s*\+\s*\d+\s*m?ah', t)
     s['case_batt'] = grab(r'(?:充电仓电池|充电盒电池)[^\d\n]{0,6}(\d+)\s*m?ah', t) or grab(r'电池\s*:\s*\d+\s*\+\s*(\d+)\s*m?ah', t)
-    bm = re.search(r'(?:电池容量|电池规格/battery|电池|battery capacity|headphone battery|battery|容量)[^\d\n]{0,30}?(\d[\d,]*)\s*(?:mAh|mah|MAH|MA\b|毫安|Ma\b)\s*(\*\s*\d+)?', t, re.I)
+    bm = re.search(r'(?:电池容量|电池规格/battery|电池|battery capacity|headphone battery|battery|容量)[^\d\n]{0,30}?(?:1[48]\d{3}\s+)?(\d[\d,]*)\s*(?:mAh|mah|MAH|MA\b|毫安|Ma\b)\s*(\*\s*\d+)?', t, re.I)
     if bm:
         mult = bm.group(2).replace('*', '').strip() if bm.group(2) else None
         val = int(bm.group(1).replace(',', ''))
         s['battery'] = f'{mult} × {val:,}mAh' if mult and mult != '1' else f'{val:,}mAh'
     s['driver'] = grab(r'(?:喇叭(?:尺寸|规格)?|扬声器(?:直径|尺寸)?|speakers?(?:\s*size)?|喇叭规格/speaker)[^\d\n]{0,16}?(\d+(?:\.\d+)?)\s*(?:mm|毫米)', t)
-    rm = re.search(r'(?:蓝牙距离|传输距离|传输范围|连接距离|connection distance|transmission (?:range|distance)|bluetooth transmission distance|距离)[^\d\n]{0,30}?(\d+(?:\s*[-–]\s*\d+)?)\s*(?:米|m\b|M\b|M-)', t, re.I)
-    if rm:
-        s['range'] = rm.group(1).replace(' ', '').replace('-', '–') + 'm'
+    rm = re.search(r'(?:蓝牙距离|传输距离|传输范围|连接距离|connection distance|transmission (?:range|distance)|bluetooth transmission distance|距离)[^\d\n]{0,30}?(\d+(?:\s*[mM米]?\s*[-–]\s*\d+)?)\s*(?:米|m\b|M\b|M-)', t, re.I)
+    if rm:  # "10M-15M" is a range too (TDE-22 read as 10m while its highlight said 10–15m — fixed 2026-10-17)
+        s['range'] = re.sub(r'[mM米\s]', '', rm.group(1)).replace('-', '–') + 'm'
     wm = re.findall(r'(?:最大功率|额定功率|输出功率|功率|power)[^\d\n]{0,14}?(\d+(?:\.\d+)?)\s*W\b', t, re.I)
     if wm:
         s['watts'] = max(float(x) for x in wm)
@@ -524,18 +525,18 @@ def main():
         })
 
     # Specs from the owner's listing sheet (tools/listing_specs.json, curated 2026-10-13 — see tools/check_listing_specs.py):
-    # appended after a product's own specs; a label the product already has keeps the supplier-sheet value. On those
-    # products, same-label duplicates from the supplier rules (e.g. car chargers' two "Input" rows) collapse to the fuller one;
+    # appended after a product's own specs; a label the product already has keeps the supplier-sheet value. On EVERY
+    # product, same-label duplicates from the supplier rules (e.g. car chargers' two "Input" rows) collapse to the fuller one;
     # products the listing sheet doesn't cover are left exactly as the supplier sheets make them.
     listing = json.load(open(os.path.join(ROOT, 'tools', 'listing_specs.json'), encoding='utf-8'))
     for p in products:
-        if p['id'] not in listing:
-            continue
         merged = {}
         for k, v in p['specs']:
             if k not in merged or len(v) > len(merged[k]):
                 merged[k] = v
-        p['specs'] = [[k, merged[k]] for k in dict.fromkeys(k for k, _ in p['specs'])]
+        p['specs'] = [[k, merged[k]] for k in dict.fromkeys(k for k, _ in p['specs'])]  # every product (2026-10-17: CC-01/09/11/12/13/16 showed "Input" twice)
+        if p['id'] not in listing:
+            continue
         n = 0
         for k, v in (listing.get(p['id']) or {}).get('add', []):
             if k not in merged:

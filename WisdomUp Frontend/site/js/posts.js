@@ -19,7 +19,7 @@ window.WU_POSTS = [
       <h2>What to check before you buy</h2>
       <ul>
         <li><strong>Bluetooth version.</strong> Every TS model with a USB-C case, from the TS-8 to the TS-13, runs Bluetooth 6.0 for a stable link to your phone.</li>
-        <li><strong>Battery.</strong> The TS-2, TS-3, TS-4 and TS-5 are rated for about 20 hours of music with the case and recharge in under 2.5 hours. The newer TS models list their cells instead: 30mAh in each earbud and a 250–300mAh case.</li>
+        <li><strong>Battery.</strong> The TS-2, TS-3, TS-4 and TS-5 are rated for about 20 hours of music (30 hours with the case) and recharge in under 2.5 hours. The newer TS models list their cells instead: 30mAh in each earbud and a 250–300mAh case; the TS-8, TS-9, TS-10 and TS-11 are rated for 30 hours with the case.</li>
         <li><strong>Fit.</strong> TS earbuds sit inside the ear and seal it, which blocks more outside noise and gives fuller bass. If you ride a bike or walk busy roads, open-ear OS earbuds let you hear traffic — the OS-6 is {price:os-6}.</li>
         <li><strong>Noise cancelling.</strong> Active noise cancelling (ANC) uses tiny microphones to cancel steady noise such as engines and fans. In the WisdomUp range only the TS-11ANC has it, at {price:ts-11anc}.</li>
       </ul>
