@@ -2261,7 +2261,10 @@
   const FILL_SEL = '.btn-pill, .btn-buy, .btn-navy, .btn-outline, .btn-cart, .shop-rail__all, .loop__cta, .pp__cta, .seo__toggle, .fdrawer__apply, .ck__place, .cartd__go, .mnav__foot a, .nh-btn, .totop, .quick .chip, .wpc__cta, .ckc__btn, .msort__btn';
   const MAG_SEL = '.loop__btn, .feat__btn, .news__arrow, .bban__arrow, .shop-rail__step, .hero__arrow, .pdp2__chev, .wpc__wish, .pdp2__wish, .totop, .mnav__x, .cartd__x, .fdrawer__x, .mnav__theme, .nh-tile__add, .mnav__back';
   const X_SEL = '.mnav__x, .cartd__x, .fdrawer__x';
-  const SD_CLIP = '.promo, .bulk, .duo__card, .cta-band, .quote-band, .pp__card, .nh-show, .nh-glow, .feat__slide, .news__card'; // .nh-live left out (2026-10-17): the Live card sits still, no clip wipe
+  // NO CUT-OFF MOTION (2026-10-17, "remove all cut off motions where it shows cut off"): the scroll-driven clip-path wipe on banners and panels
+  // (promo, bulk, duo, cta-band, quote-band, printing, TS showpiece, creator glow, feature + news cards, the Live card) is retired — the list
+  // matches nothing, so those surfaces take the normal fade-up like every other block
+  const SD_CLIP = ':not(*)';
   const GRID_SEL = '.wu-rail > *, .mgrid > *, .nh-grid > *, .bgrid > *';
   const ZOOM_SEL = '.promo img, .feat__slide img, .feat__slide video, .pp__card img';
   const fine = () => matchMedia('(hover: hover) and (pointer: fine)').matches;
@@ -2321,8 +2324,7 @@
   // A heading whose text is written after load (the All Products title) pours in the same way
   function revealWords(el) {
     if (!el || reduced() || !document.documentElement.classList.contains('wu-motion')) return;
-    el.setAttribute('data-rv', 'words'); el.classList.remove('is-in');
-    splitWords(el);
+    el.setAttribute('data-rv', 'up'); el.classList.remove('is-in'); // whole-heading fade, no word masks (2026-10-17)
     requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('is-in')));
   }
 
@@ -2473,10 +2475,10 @@
         if (cs.webkitBackgroundClip === 'text' || cs.backgroundClip === 'text') {
           // a gradient that is really one colour (the heading token since the 2026-10-06 colour scheme) can split: paint it flat
           const stops = (cs.backgroundImage.match(/rgba?\([^)]+\)/g) || []);
-          if (stops.length && stops.every(c => c === stops[0])) { el.classList.add('wu-flat'); return 'words'; }
+          if (stops.length && stops.every(c => c === stops[0])) { el.classList.add('wu-flat'); return 'up'; }
           return 'up-large'; // a real multi-colour gradient (gold names) moves as one piece
         }
-        return 'words';
+        return 'up'; // headings fade up whole — the word-by-word rise from behind a mask showed words cut off mid-way (2026-10-17)
       }
       return 'up';
     };
