@@ -121,7 +121,7 @@
         </div>
       </section>
       <section aria-labelledby="nh-new-h">
-        ${head('New Arrivals', `${fresh.length} new launches — the latest Bluetooth 6.0 earbuds, neckbands, party speakers and fast chargers.`, url.filter('new'), 'View all', false, 'nh-new-h')}
+        ${head('New Arrivals', '', url.filter('new'), 'View all', false, 'nh-new-h')}
         ${grid('new')}
       </section>
       <div id="nh-qbar"></div>
@@ -134,7 +134,7 @@
         </div>
       </section>` : ''}
       <section aria-labelledby="nh-best-h">
-        ${head('Best Sellers', 'What customers buy most, plus the chargers, cables and power banks everyone needs.', url.filter('best'), 'View all', false, 'nh-best-h')}
+        ${head('Best Sellers', '', url.filter('best'), 'View all', false, 'nh-best-h')}
         ${grid('best')}
       </section>
       ${MICS.length ? `

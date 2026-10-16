@@ -1379,3 +1379,6 @@ html[data-theme="night"] .wpc__card::before { border-radius: 16px; }
 .loop__sub { font-size: clamp(14px, 3.4cqw, 16px); }
 .loop__title { font-size: min(9cqw, 44px); }
 .loop__tag { font-size: 14px; }
+/* the About WisdomUp intro sits inside the fold-out now (2026-10-17): same centred reading text, 16px above the cards */
+.seo__intro { max-width: 820px; margin: 0 auto 16px; text-align: center; display: grid; gap: 12px; }
+.seo__intro p { margin: 0; }
