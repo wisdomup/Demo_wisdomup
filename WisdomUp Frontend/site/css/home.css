@@ -932,7 +932,7 @@ body:has(.buybar.is-on) .totop { bottom: calc(96px + env(safe-area-inset-bottom)
 /* Small quantity stepper (34px) for compact lists */
 .qty--s { height: var(--ctl-s, 34px); border-radius: 999px; }
 .qty--s button { width: var(--ctl-s, 34px); height: var(--ctl-s, 34px); font-size: 16px; }
-.qty--s button:disabled { color: #C2C6CC; cursor: not-allowed; }
+.qty--s button:disabled { color: #8A9097; cursor: not-allowed; } /* was #C2C6CC (1.7:1 on the glass); 2026-10-16 ≥ 3:1 — still clearly lighter than the live + */
 .qty--s output { min-width: 22px; font: 700 14px/1 var(--font); }
 .cartd__empty { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 48px 12px; text-align: center; color: #1B1B1B; }
 .cartd__empty b { font: 800 18px/1.2 var(--font); }
@@ -1343,3 +1343,25 @@ body .mnav__body > * { transition: transform var(--m-primary), opacity var(--m-p
 html:not([data-theme="night"]) .cartd--b :is(.cartd__x, .cartd__sx, .qty, .cartd__more) { border: 1.5px solid rgba(11, 11, 11, .14); box-shadow: none; }
 /* card glow layer (night only, openart.ai's bento cards — see night.css "OPENART CARD GLOW"); never shown in day */
 .wpc__glow { display: none; }
+/* HOVER GRADIENT RING, DAY (2026-10-16, "make the same hover stroke on day time with better color gradient with some red in it"): the
+   night card's 2px 150° ring round the whole card, faded in over 200ms on mouse hover — in day a warm run that reads on white: soft
+   coral at the top-left → the brand red → a deep red at the bottom-right (a pale start like night's would vanish on the white card). */
+html:not([data-theme="night"]) .wpc__card::before { content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none; border-radius: inherit; padding: 2px; box-sizing: border-box;
+  background: linear-gradient(150deg, #FF9A85 0%, #D91E05 52%, #7A1003 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box exclude, linear-gradient(#fff 0 0);
+  opacity: 0; transition: opacity 200ms ease-out; }
+@media (hover: hover) and (pointer: fine) { html:not([data-theme="night"]) .wpc:hover .wpc__card::before { opacity: 1; } }
+/* HOME CONSISTENCY PASS (2026-10-16, "check the homepage background colours of each section so the shadows and all the sections have a
+   consistency"; measured at 1280 + 390 — before: three light greys (#F5F6F8 rails/quality bar, #E9E9E9 printing, a #F7F8F8 → #C9CDCD
+   gradient on the TS series), card corners 20 / 24 / 28px, six photo-frame shadows and five photo corners). ONE system now:
+   · light panels = #F5F6F8 (rails, quality bar, Personalized printing, TS series);
+   · banners keep clamp(24px, 6vw, 40px) (hero, Live + creator duo, TS series, printing); every carousel / content card = clamp(18px, 2vw, 24px)
+     (loop slides, promo cards, Built-around-your-day, news, the About cards);
+   · framed product photos = 16px corners and ONE shadow per surface: on dark slides 0 24px 40px rgba(0,0,0,.4), on light panels
+     0 18px 36px rgba(0,0,0,.18). The quality bar keeps its ronin.pk shadow (copied on request). */
+.pp__card, .series { background: #F5F6F8; }
+.loop__slide, .promo, .feat__slide, .news__card, .seo__card { border-radius: clamp(18px, 2vw, 24px); }
+.loop__ph, .promo__ph, .duo__ph, .news__ph img { border-radius: 16px; box-shadow: 0 24px 40px rgba(0, 0, 0, .4); }
+.series__ph, .feat__ph img { border-radius: 16px; box-shadow: 0 18px 36px rgba(0, 0, 0, .18); }
+@media (max-width: 639px) { .loop__slide, .promo, .feat__slide, .news__card, .seo__card { border-radius: 18px; } }

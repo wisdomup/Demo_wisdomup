@@ -878,3 +878,30 @@ body .msort__title { color: #6B6E73; }
    48px / 56px with 8px / 12px padding); every screen size. The liquid lens + edge light redraw to the new size by themselves. */
 body .mbar .mbar__cap, body .mfloat .mbar__cap, body .pdtabs__in { padding: 4px; }
 body :is(.mbar, .mfloat) .mbar__pills { padding: 4px; margin: -4px; } /* the pills' breathing room follows the ring, so nothing pokes out */
+/* FILTER PANEL = THE CART PANEL'S DESIGN (2026-10-16, "copy the same panel design of cart to filters"; the compact cart in home.css):
+   576px wide with 24px outer corners (mirrored — it slides from the left), the cart's header — an outline icon + a 20px/700 title, the
+   "Clear all" link as the cart's small 13px text tab (grey, ink on hover with the underline drawing in) beside a 34px round × with the
+   soft 1.5px ink-14% line — a hairline under it, the cart's 24px side padding, and its foot: one 44px RED primary capsule like
+   "Check out". Phones keep the bottom sheet (motion.css). */
+@media (min-width: 640px) { body .fdrawer { width: min(576px, 100vw); border-radius: 0 24px 24px 0; } }
+body .fdrawer__head { gap: 12px; padding: 18px 20px 16px 24px; border-bottom: 0; box-shadow: inset 0 -1.5px 0 #E3E4E6; }
+.fdrawer__ic { flex: none; color: #0B0B0B; }
+body .fdrawer__head h2 { font: 700 20px/1.2 var(--font); letter-spacing: -.01em; }
+body .fdrawer__clear { height: auto; padding: 4px 0; margin-right: 4px; font: 500 13px/1.2 var(--font); color: #767B83; text-decoration: none;
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1.5px no-repeat; transition: color 300ms ease, background-size 500ms cubic-bezier(.3,1,.3,1); }
+@media (hover: hover) and (pointer: fine) { body .fdrawer__clear:hover { color: #0B0B0B; background-size: 100% 1.5px; } }
+body .fdrawer__x { width: 34px; height: 34px; border: 1.5px solid rgba(11, 11, 11, .14); }
+body .fdrawer__x svg { width: 16px; height: 16px; }
+body .fdrawer__body { padding: 4px 24px 24px; }
+body .fdrawer__foot { padding: 16px 24px calc(16px + env(safe-area-inset-bottom)); border-top: 0; box-shadow: inset 0 1.5px 0 #E3E4E6; }
+body .fdrawer__apply { height: 44px; font: 600 14px/1 var(--font); background: #D91E05; }
+body .fdrawer__apply:disabled { background: #9AA0A6; }
+@media (max-width: 639px) {
+  body .fdrawer__head { padding: 26px 14px 14px 18px; }
+  body .fdrawer__body { padding: 4px 16px 20px; }
+  body .fdrawer__foot { padding-left: 16px; padding-right: 16px; }
+}
+html:not([data-theme="night"]) body .fdrawer__apply { --fill: #fff; --fill-text: #D91E05; } /* hovers like the red Check out */
+@media (hover: hover) and (pointer: fine) { html:not([data-theme="night"]) body .fdrawer__apply:not(:disabled):hover { background: #D91E05; box-shadow: 0 0 0 1.5px #D91E05; } }
+/* text on the light glass (2026-10-16): with a dark page behind it the day glass is ≈rgb(204), so the panel greys use #6B6E73 (≥ 3:1) */
+html:not([data-theme="night"]) body .fdrawer__clear { color: #6B6E73; }

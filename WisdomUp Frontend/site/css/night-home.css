@@ -9,7 +9,7 @@
      black showpiece panels with a glow; a segmented control; a fanned tile strip; a chip cloud; red footer
    ========================================================================== */
 .nh { --g: 16px; --gap: 8px; --r-tile: 12px; --r-card: 16px; --r-panel: 24px;
-  --panel: #000; --card: #1C1E20; --card-hi: #24272A; --line: rgba(255,255,255,.06); --line2: rgba(255,255,255,.12);
+  --panel: #000; --card: #1C1E20; --card-hi: #24272A; --line: rgba(255,255,255,.07); --line2: rgba(255,255,255,.12);
   --text: #fff; --text2: #C9CDD2; --muted: #898A8B; --red: #D91E05; --red-hi: #F0300F; --red-t: #FF6A4A; --red-10: rgba(217,30,5,.12); --red-24: rgba(217,30,5,.26);
   --ease: cubic-bezier(.2,.7,.2,1);
   box-sizing: border-box; margin: 0; padding: 0 var(--gutter, 28px) 64px; /* side edges line up with the shared hero banner at every width */ color: var(--text); font-family: var(--font); }
