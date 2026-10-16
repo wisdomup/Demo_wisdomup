@@ -864,3 +864,8 @@ body .msort__sheet::before { content: ""; display: block; position: absolute; in
   background: linear-gradient(118deg, rgba(11,11,11,.62) 0%, rgba(11,11,11,.2) 8%, rgba(11,11,11,.1) 38%, rgba(11,11,11,.1) 64%, rgba(11,11,11,.2) 92%, rgba(11,11,11,.5) 100%);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#fff 0 0) content-box exclude, linear-gradient(#fff 0 0); }
 body .msort__title { color: #6B6E73; }
+/* COMPACT CAPSULES (2026-10-16, "decrease the gap between the chips and the capsule, compact it"): the All Products filter capsule
+   (in the page and its floating twin) and the product page section tabs hug their 32px chips with a 4px ring — 40px bars (were
+   48px / 56px with 8px / 12px padding); every screen size. The liquid lens + edge light redraw to the new size by themselves. */
+body .mbar .mbar__cap, body .mfloat .mbar__cap, body .pdtabs__in { padding: 4px; }
+body :is(.mbar, .mfloat) .mbar__pills { padding: 4px; margin: -4px; } /* the pills' breathing room follows the ring, so nothing pokes out */
