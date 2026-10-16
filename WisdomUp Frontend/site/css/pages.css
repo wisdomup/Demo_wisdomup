@@ -956,3 +956,67 @@ html:not([data-theme="night"]) body .ccard { box-shadow: 0 0 22px rgba(16, 24, 4
    all round (top, bottom and right) */
 body .search > * { flex: none; }
 body .search .search__field { padding-right: 11px; }
+
+/* PRODUCT PAGE ORDER (2026-10-17, the owner's order): photo → six thumbnails across → title → five stars + review count → tag line →
+   price → options → quantity → Add to cart → a line → "You may also need" → the rest (gift, offer, delivery trio, highlights, payment,
+   breadcrumb). No "Order on WhatsApp" button (the floating WhatsApp button still carries the product). */
+.pdp2 .thumbs { display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - 5 * 8px) / 6); gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 2px; }
+.pdp2 .thumb { width: auto; height: auto; aspect-ratio: 1; scroll-snap-align: start; }
+@media (max-width: 639px) { .pdp2 .thumb { width: auto; height: auto; } }
+.pdp2__head { display: flex; flex-direction: column; gap: 8px; }
+.pdp2__stars { gap: 8px; color: #3D3F44 !important; }
+.pdp2__stars svg { width: 16px !important; height: 16px !important; }
+.pdp2__stars span { font: 500 14px/1 var(--font); }
+.pdp2__stars b { color: #0B0B0B; }
+.buybox--stack { flex-direction: column; align-items: flex-start; gap: 12px; }
+.buybox--stack .buybox__row { display: flex; align-items: center; gap: 12px; width: 100%; }
+.buybox--stack .pdp2__add { flex: 1; min-width: 0; }
+.pd-also { display: flex; flex-direction: column; gap: 12px; }
+.pd-also__h { margin: 0; font: 700 16px/1.3 var(--font); color: #111; }
+.pd-also__list { display: flex; flex-direction: column; gap: 8px; }
+.pd-also__card { display: grid; grid-template-columns: 64px minmax(0, 1fr) 34px; align-items: center; gap: 12px; padding: 8px 12px 8px 8px; border: 1.5px solid #ECEDEF; border-radius: var(--r-box, 16px); background: #fff; }
+.pd-also__img { display: block; width: 64px; height: 64px; border-radius: 12px; overflow: hidden; }
+.pd-also__img img { display: block; width: 100%; height: 100%; }
+.pd-also__t { display: flex; flex-direction: column; gap: 4px; min-width: 0; color: #1B1B1B; text-decoration: none; }
+.pd-also__t span { font: 500 14px/1.35 var(--font); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.pd-also__t b { font: 700 14px/1 var(--font); color: #0B0B0B; }
+.pd-also__t s { margin-left: 4px; font-weight: 500; color: #767B83; }
+.pd-also__t:hover span { text-decoration: underline; text-underline-offset: 3px; }
+.pd-also__add { width: 34px; height: 34px; padding: 0; border: 0; border-radius: 50%; background: #0B0B0B; color: #fff; display: grid; place-items: center; cursor: pointer; transition: background-color 300ms cubic-bezier(.7,0,.3,1); }
+.pd-also__add:hover { background: #D91E05; }
+.pd-also__add:focus-visible { outline: 2px solid #111; outline-offset: 2px; }
+/* thumbnails: every one the same square, its photo cropped to the centre (a portrait lifestyle shot no longer stretches its tile);
+   a slider of six across — past six it scrolls sideways with snap, and arrows show on screens with a mouse */
+.pdp2 .thumbs-wrap { position: relative; }
+.pdp2 .thumb { position: relative; overflow: hidden; }
+.pdp2 .thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; border-radius: inherit; }
+.pdp2 .thumbs__nav { position: absolute; top: 50%; z-index: 2; width: 34px; height: 34px; margin-top: -17px; padding: 0; border: 0; border-radius: 50%; background: rgba(255,255,255,.92); color: #111; box-shadow: 0 2px 8px rgba(0,0,0,.16); display: none; place-items: center; cursor: pointer; }
+.pdp2 .thumbs__nav--prev { left: -8px; } .pdp2 .thumbs__nav--next { right: -8px; }
+@media (hover: hover) and (pointer: fine) { .pdp2 .thumbs__nav { display: grid; } }
+/* MOMAX ORDER (2026-10-17, "review momax.net for the product page order and try to match, keep our design language"): a "Quantity"
+   label beside the stepper; "You may also need" + "Add an accessory in one tap"; then Key features → the free-shipping offer →
+   ONE list of rows (Delivery · Returns & support · Warranty · Secure payment, each a link with a chevron — momax's info rows in our
+   panel language: 16px box, 1.5px hairlines) → gift wrap. The three assurance tiles and the payment chips became those rows. */
+.buybox__qty { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; }
+.buybox__qty > span { font: 500 14px/1 var(--font); color: #6B6E73; }
+.pd-also__top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.pd-also__top > span { font: 400 12px/1.3 var(--font); color: #767B83; text-align: right; }
+.pd-rows { display: flex; flex-direction: column; border: 1.5px solid #ECEDEF; border-radius: var(--r-box, 16px); background: #fff; overflow: hidden; }
+.pd-row { display: grid; grid-template-columns: 22px minmax(0, 1fr) 16px; align-items: center; gap: 12px; padding: 12px 16px; color: #1B1B1B; text-decoration: none; }
+.pd-row + .pd-row { box-shadow: inset 0 1.5px 0 #ECEDEF; }
+.pd-row > svg:first-child { color: #1B1B1B; }
+.pd-row > svg:last-child:not(:first-child) { color: #767B83; transition: transform 300ms cubic-bezier(.3,1,.3,1); }
+.pd-row span { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.pd-row b { font: 600 14px/1.3 var(--font); }
+.pd-row small { font: 400 12px/1.4 var(--font); color: #6B6E73; }
+a.pd-row:hover { background: #F5F6F8; color: #1B1B1B; }
+a.pd-row:hover > svg:last-child { transform: translateX(4px); }
+.pd-row svg :is(path, rect, circle, g) { stroke-width: 1.5; }
+/* row icons = the assurance tiles' drawing: 1.5px ink lines, one red detail (no teal / orange) */
+.pd-row > svg:first-child :is(g, rect, path, circle) { stroke: currentColor; stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; }
+.pd-row > svg:first-child g { fill: none; }
+.pd-row[href*="shipping"] > svg:first-child circle { fill: #fff; stroke: #D91E05; }
+.pd-row[href*="warranty"] > svg:first-child path, .pd-row[href*="warranty"] > svg:first-child circle:first-of-type { fill: none; }
+.pd-row[href*="warranty"] > svg:first-child circle:last-of-type { fill: #D91E05; stroke: none; }
+.pd-row[href*="returns"] > svg:first-child path { fill: none; stroke: #D91E05; }
+.pd-row > svg:first-child path[stroke="#D91E05"] { stroke: #D91E05; }

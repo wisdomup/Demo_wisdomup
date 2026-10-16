@@ -45,7 +45,7 @@
   };
   const parts = p.meta.split('|').map(s => s.trim()).filter(Boolean);
   const head = HEADLINES[dept.id];
-  const DESC = `${p.title}${p.highlights.length ? ' — ' + p.highlights.slice(0, 3).join(', ').replace(/^./, c => c.toLowerCase()) : ''}. ${LEDE[dept.id]}`;
+  const DESC = `${p.title}${p.highlights.length ? ' — ' + p.highlights.slice(0, 3).join(', ').replace(/^[A-Z](?=[a-z])/, c => /^(Bluetooth|Lightning|Android|Type-C|Jieli|MagSafe)\b/.test(p.highlights[0]) ? c : c.toLowerCase()) : ''}. ${LEDE[dept.id]}`; // names stay capitalised ("Bluetooth 6.0", 2026-10-17)
   const STAT_BG = [
     { cls: 'pd-stat--dark', bg: 'radial-gradient(90% 120% at 70% 40%, #3a3531 0%, #151312 60%, #0d0c0b 100%)', fg: '#fff' },
     { cls: '', bg: 'linear-gradient(135deg, #F5F6F8 0%, #E6E8EC 100%)', fg: '#1B1B1B' }, // day scheme: neutral, no light blue
@@ -111,9 +111,32 @@
   });
   WU.px('ViewContent', WU.pxItem(p, V[cur].sku));
 
+  // YOU MAY ALSO NEED (2026-10-17): up to four real products that go with this one — one per companion type, best sellers / new
+  // first, then the lowest price; "+" adds it (a product with options opens the quick options panel)
+  const COMPANION = {
+    earbuds: ['charging-cables', 'wall-chargers', 'power-banks', 'car-chargers'], neckbands: ['charging-cables', 'wall-chargers', 'power-banks', 'earbuds'],
+    headphones: ['charging-cables', 'wall-chargers', 'adapters', 'power-banks'], handsfree: ['adapters', 'charging-cables', 'wall-chargers', 'earbuds'],
+    speakers: ['charging-cables', 'power-banks', 'audio-cables', 'wall-chargers'], microphones: ['charging-cables', 'selfie-sticks', 'stands', 'power-banks'],
+    'wall-chargers': ['charging-cables', 'power-banks', 'wireless-chargers', 'car-chargers'], 'power-banks': ['charging-cables', 'wall-chargers', 'car-chargers', 'wireless-chargers'],
+    'wireless-chargers': ['wall-chargers', 'charging-cables', 'power-banks', 'stands'], 'car-chargers': ['car-holders', 'charging-cables', 'car-bluetooth', 'power-banks'],
+    'power-strips': ['wall-chargers', 'charging-cables', 'power-banks', 'wireless-chargers'], 'charging-cables': ['wall-chargers', 'power-banks', 'car-chargers', 'adapters'],
+    'audio-cables': ['bt-receivers', 'adapters', 'speakers', 'handsfree'], adapters: ['charging-cables', 'handsfree', 'card-readers', 'wall-chargers'],
+    hdmi: ['adapters', 'charging-cables', 'wall-chargers', 'usb-drives'], 'bt-receivers': ['audio-cables', 'car-chargers', 'car-holders', 'charging-cables'],
+    'car-holders': ['car-chargers', 'charging-cables', 'car-bluetooth', 'wireless-chargers'], 'car-bluetooth': ['car-holders', 'charging-cables', 'car-chargers', 'audio-cables'],
+    stands: ['wireless-chargers', 'charging-cables', 'wall-chargers', 'earbuds'], 'bike-mounts': ['power-banks', 'charging-cables', 'car-holders', 'earbuds'],
+    'selfie-sticks': ['microphones', 'power-banks', 'stands', 'charging-cables'], keyboards: ['mice', 'mouse-pads', 'usb-drives', 'adapters'],
+    mice: ['mouse-pads', 'keyboards', 'usb-drives', 'adapters'], 'mouse-pads': ['mice', 'keyboards', 'usb-drives', 'stands'],
+    'memory-cards': ['card-readers', 'usb-drives', 'adapters', 'selfie-sticks'], 'usb-drives': ['card-readers', 'memory-cards', 'adapters', 'hdmi'],
+    'card-readers': ['memory-cards', 'usb-drives', 'adapters', 'charging-cables'], shavers: ['clippers', 'wall-chargers', 'charging-cables', 'power-banks'],
+    clippers: ['shavers', 'wall-chargers', 'charging-cables', 'power-banks'],
+  };
+  const rankAlso = x => (x.tabs.includes('best') ? 0 : x.tabs.includes('new') ? 1 : 2) * 1e7 + x.price;
+  const ALSO = (COMPANION[p.type] || dept.types.filter(t => t !== p.type)).map(t => D.products.filter(x => x.type === t && !x.soldOut && x.thumb).sort((a, b) => rankAlso(a) - rankAlso(b))[0]).filter(Boolean).slice(0, 4);
+
   /* ---------- Markup ---------- */
   const colours = colorsOf(p);
   $('pd').innerHTML = `
+
     <nav class="crumbs" aria-label="Breadcrumb"><a href="${url.home}">Home</a><span aria-hidden="true">›</span><a href="${url.dept(dept.id)}">${esc(dept.label)}</a><span aria-hidden="true">›</span><a href="${url.cat(p.type)}">${esc(typeLabel(p.type))}</a><span aria-hidden="true">›</span><span aria-current="page">${esc(p.code)}</span></nav>
 
     <section class="pdp2" aria-label="Product">
@@ -124,42 +147,47 @@
           ${images.length > 1 ? `<button type="button" class="pdp2__chev pdp2__chev--prev" data-img="-1" aria-label="Previous image">${icon('chev-l', 22)}</button>
           <button type="button" class="pdp2__chev pdp2__chev--next" data-img="1" aria-label="Next image">${icon('chev-r', 22)}</button>` : ''}
         </div>
-        ${images.length > 1 ? `<div class="thumbs" id="thumbs">${images.map((im, i) => `<button type="button" class="thumb" data-i="${i}" aria-current="${im === V[cur].img}" aria-label="Photo ${i + 1}"><img src="${im.replace('img/p/', 'img/p/s/')}" alt="" style="width: 100%; height: 100%; object-fit: cover; object-position: ${(p.photos || []).includes(im) ? '50% 0' : studio ? '50% 50%' : '6% 50%'}; border-radius: inherit;"></button>`).join('')}</div>` : ''}
+        ${images.length > 1 ? `<div class="thumbs-wrap">${images.length > 6 ? `<button type="button" class="thumbs__nav thumbs__nav--prev" data-tscroll="-1" aria-label="Previous photos">${icon('chev-l', 18)}</button>` : ''}<div class="thumbs" id="thumbs">${images.map((im, i) => `<button type="button" class="thumb" data-i="${i}" aria-current="${im === V[cur].img}" aria-label="Photo ${i + 1}"><img src="${im.replace('img/p/', 'img/p/s/')}" alt="" loading="lazy"></button>`).join('')}</div>${images.length > 6 ? `<button type="button" class="thumbs__nav thumbs__nav--next" data-tscroll="1" aria-label="More photos">${icon('chev-r', 18)}</button>` : ''}</div>` : ''}
       </div>
 
       <div class="pdp2__info">
-        <div style="display: flex; flex-direction: column; gap: 12px;">
-          <div class="pdp2__kicker"><a href="${url.cat(p.type)}">${esc(typeLabel(p.type))}</a><span>Model <b id="pd-sku">${esc(V[cur].sku)}</b></span><span id="pd-rate"></span></div>
+        <div class="pdp2__head">
           <h1 class="pdp2__title">${esc(p.title)}</h1>
+          <div id="pd-rate"></div>
           <p class="pdp2__desc">${esc(DESC)}</p>
         </div>
         <div style="display: flex; flex-direction: column; gap: 8px;">
           <div class="pdp2__price"><span class="pdp2__now" id="pd-price">${esc(V[cur].priceText)}</span><s class="pdp2__was" id="pd-was">${esc(V[cur].wasText || '')}</s><span class="pdp2__off" id="pd-off">${V[cur].off ? V[cur].off + '% off' : ''}</span></div>
           <span class="pdp2__stock">Inclusive of all taxes · ${p.soldOut ? '<b style="color: #B42318;">Sold out</b> — back soon' : '<b>In stock</b>, ships in 24 hours'}</span>
         </div>
-        ${p.axes.length || colours.length > 1 ? '<div class="pdp2__rule"></div>' : ''}
         ${p.axes.map(a => `<div class="pdp2__opt" data-axis="${esc(a)}">
           <div class="pdp2__label">${esc(a)}: <span data-cur>${esc(V[cur].attrs[a])}</span>${AXIS_HINT[a] ? `<small>${esc(AXIS_HINT[a])}</small>` : ''}</div>
           <div class="opt-chips" role="radiogroup" aria-label="${esc(a)}">${values(a).map(val => `<button type="button" class="opt-chip" role="radio" data-val="${esc(val)}" aria-checked="${V[cur].attrs[a] === val}">${esc(val)}</button>`).join('')}</div>
         </div>`).join('')}
         ${colours.length > 1 ? `<div class="pdp2__opt"><div class="pdp2__label">Colours: <span>${esc(colours.map(c => c.name).join(', '))}</span><small>Tell us your colour on WhatsApp after ordering</small></div>
           <div class="sw-dots">${colours.map(c => `<i title="${esc(c.name)}" style="background: ${c.hex};"></i>`).join('')}</div></div>` : ''}
-        <div class="buybox" id="buybox">
-          <div class="qty" role="group" aria-label="Quantity"><button type="button" data-q="-1" aria-label="Decrease quantity">−</button><output id="qty" aria-live="polite">1</output><button type="button" data-q="1" aria-label="Increase quantity">+</button></div>
-          <button type="button" class="pdp2__add" data-add${p.soldOut ? ' disabled' : ''}>${icon('cart', 20)}<span>${p.soldOut ? 'Sold out' : 'Add to cart'}</span></button>
-          ${WU.wishBtn(p, 'pdp2__wish')}
+        <div class="buybox buybox--stack" id="buybox">
+          <div class="buybox__qty"><span id="qty-l">Quantity</span><div class="qty" role="group" aria-labelledby="qty-l"><button type="button" data-q="-1" aria-label="Decrease quantity">−</button><output id="qty" aria-live="polite">1</output><button type="button" data-q="1" aria-label="Increase quantity">+</button></div></div>
+          <div class="buybox__row"><button type="button" class="pdp2__add" data-add${p.soldOut ? ' disabled' : ''}>${icon('cart', 20)}<span>${p.soldOut ? 'Sold out' : 'Add to cart'}</span></button>
+          ${WU.wishBtn(p, 'pdp2__wish')}</div>
         </div>
-        ${WU.SHOP.whatsapp && !p.soldOut ? `<a class="pdp2__wa" id="pd-wa" target="_blank" rel="noopener">${WU.wa ? WU.wa.svg : ''}<span>Order on WhatsApp</span></a>` : ''}
-        ${WU.ref && WU.ref.me() && (WU.SHOP.creators || {}).on ? `<div class="pd-crlink"><span>${WU.ref.TAG}Creator <b>${esc(WU.ref.me().code)}</b> · your link to this product</span><button type="button" class="btn-outline" data-crlink>Copy link</button></div>` : ''}
-        <label class="gift" style="cursor: pointer;"><input type="checkbox" id="gift" style="accent-color: var(--focus); width: 18px; height: 18px;"><span>Add gift wrapping @ <b>${esc(WU.D.rs(WU.SHOP.giftWrap))}</b></span></label>
+        <div class="pdp2__rule" role="separator"></div>
+        ${ALSO.length ? `<section class="pd-also" aria-labelledby="pd-also-h"><div class="pd-also__top"><h2 class="pd-also__h" id="pd-also-h">You may also need</h2><span>Add an accessory in one tap</span></div><div class="pd-also__list">${ALSO.map(x => `
+          <div class="pd-also__card">
+            <a class="pd-also__img" href="${url.product(x.id)}" tabindex="-1" aria-hidden="true" style="background: ${photoBg(x)};"><img src="${x.thumb}" alt="" loading="lazy" style="${WU.photoFit(x)}"></a>
+            <a class="pd-also__t" href="${url.product(x.id)}"><span>${esc(x.title)}</span><b>${esc(x.priceText)}${x.wasText ? ` <s>${esc(x.wasText)}</s>` : ''}</b></a>
+            <button type="button" class="pd-also__add" data-also="${esc(x.id)}" data-no-fill aria-label="${(x.variants || []).length > 1 ? 'Choose options for' : 'Add to cart:'} ${esc(x.title)}"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+          </div>`).join('')}</div></section>` : ''}
+        ${p.highlights.length ? `<div class="highlights"><div class="eyebrow" style="display: block;">Key features</div>${p.highlights.map(t => `<div><i></i><span><strong>${esc(t)}</strong></span></div>`).join('')}</div>` : ''}
         <div class="offer"><div class="offer__head">Free shipping on this order<span>%</span></div><div class="offer__body"><span id="offer-text"></span><a href="${url.shipping}" style="white-space: nowrap; margin-left: 12px;">Details ›</a></div></div>
-        <div class="assure">
-          <a class="assure__i" href="${url.shipping}">${icon('truck', 28)}<b>Fast delivery</b><span>3–5 working days</span></a>
-          <a class="assure__i" href="${url.warranty}">${icon('medal', 28)}<b>Warranty</b><span>Brand warranty</span></a>
-          <a class="assure__i" href="${url.returns}">${icon('shield', 28)}<b>Easy returns</b><span>7-day money-back</span></a>
+        <div class="pd-rows" role="list" aria-label="Delivery, returns, warranty and payment">
+          <a class="pd-row" role="listitem" href="${url.shipping}">${icon('truck', 22)}<span><b>Delivery</b><small>Standard ${esc(WU.SHOP.delivery.standard.eta)} · express ${esc(WU.SHOP.delivery.express.eta)}, to every city in Pakistan</small></span>${icon('chev-r', 16)}</a>
+          <a class="pd-row" role="listitem" href="${url.returns}">${icon('shield', 22)}<span><b>Returns &amp; support</b><small>7-day money-back guarantee · help Mon–Sun</small></span>${icon('chev-r', 16)}</a>
+          <a class="pd-row" role="listitem" href="${url.warranty}">${icon('medal', 22)}<span><b>Warranty</b><small>WisdomUp brand warranty</small></span>${icon('chev-r', 16)}</a>
+          <div class="pd-row" role="listitem"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18"/><path d="M7 15h4" stroke="#D91E05"/></svg><span><b>Secure payment</b><small>Cash on Delivery, JazzCash, EasyPaisa or bank transfer</small></span></div>
         </div>
-        ${p.highlights.length ? `<div class="highlights"><div class="eyebrow" style="display: block;">Key highlights</div>${p.highlights.map(t => `<div><i></i><span><strong>${esc(t)}</strong></span></div>`).join('')}</div>` : ''}
-        <div class="pays"><span style="padding: 0; background: none; color: var(--muted); font-weight: 500;">Secure checkout</span>${['Cash on Delivery', 'JazzCash', 'EasyPaisa', 'Bank transfer'].map(m => `<span>${m}</span>`).join('')}</div>
+        <label class="gift" style="cursor: pointer;"><input type="checkbox" id="gift" style="accent-color: var(--focus); width: 18px; height: 18px;"><span>Add gift wrapping @ <b>${esc(WU.D.rs(WU.SHOP.giftWrap))}</b></span></label>
+        ${WU.ref && WU.ref.me() && (WU.SHOP.creators || {}).on ? `<div class="pd-crlink"><span>${WU.ref.TAG}Creator <b>${esc(WU.ref.me().code)}</b> · your link to this product</span><button type="button" class="btn-outline" data-crlink>Copy link</button></div>` : ''}
       </div>
     </section>
 
@@ -224,6 +252,8 @@
     $('stage-img').src = src;
     $('stage-img').classList.toggle('is-life', (p.photos || []).includes(src)); // owner's extra photos fill the square from the top
     document.querySelectorAll('#thumbs .thumb').forEach((t, i) => t.setAttribute('aria-current', images[i] === src));
+    const on = document.querySelector('#thumbs .thumb[aria-current="true"]');
+    if (on) { const t = $('thumbs'), l = on.offsetLeft - t.offsetLeft; if (l < t.scrollLeft || l + on.offsetWidth > t.scrollLeft + t.clientWidth) t.scrollTo({ left: l, behavior: 'smooth' }); }
   }
   // ORDER ON WHATSAPP (2026-10-10, from the audit): the message names the product, option, quantity, price and link; the floating
   // WhatsApp button carries the same message on this page
@@ -240,7 +270,6 @@
     if (i < 0 || (i === cur && push)) return;
     cur = i;
     const v = V[cur];
-    $('pd-sku').textContent = v.sku;
     $('pd-price').textContent = v.priceText;
     $('pd-was').textContent = v.wasText || '';
     $('pd-off').textContent = v.off ? v.off + '% off' : '';
@@ -281,6 +310,8 @@
     if (Math.abs(dx) > 40) goImage((images.indexOf($('stage-img').getAttribute('src')) + (dx < 0 ? 1 : -1) + images.length) % images.length);
     gx = null;
   });
+  // THUMBNAIL SLIDER (2026-10-17): six across; past six the row slides — arrows page it, the chosen one is kept in view
+  document.querySelectorAll('[data-tscroll]').forEach(b => b.addEventListener('click', () => { const t = $('thumbs'); t.scrollBy({ left: +b.dataset.tscroll * t.clientWidth, behavior: 'smooth' }); }));
   if ($('thumbs')) $('thumbs').addEventListener('click', e => {
     const b = e.target.closest('.thumb');
     if (b) goImage(+b.dataset.i);
@@ -300,6 +331,8 @@
     // Add to cart (the ONE main action since 2026-10-06 — "Buy Now" was removed): the chosen option and quantity go in and the
     // cart panel opens, with its Checkout button
     if (e.target.closest('[data-add]') && !p.soldOut) add(p.id, qty, V[cur].sku, { open: true });
+    const also = e.target.closest('[data-also]');
+    if (also) WU.quickAdd(also.dataset.also, also);
     if (e.target.closest('#pd-wa')) WU.px('Contact', { content_name: 'Order on WhatsApp', content_ids: [V[cur].sku] });
     // Creators signed in on this device: copy this product (and the chosen option) with their code
     if (e.target.closest('[data-crlink]')) {
@@ -320,7 +353,9 @@
   const contact = WU.store.get('wu-ck-contact', {}) || {};
   function paintReviews() {
     const sum = R.summary(p.id), list = R.list(p.id).filter(r => !rvStar || r.rating === rvStar).sort(SORTERS[rvSort]);
-    $('pd-rate').innerHTML = sum.count ? `<a class="pdp2__rate" href="#pd-reviews" data-jump>${stars(sum.avg, 15)}<b>${sum.avg.toFixed(1)}</b> · ${sum.count} review${sum.count > 1 ? 's' : ''}</a>` : `<a class="pdp2__rate pdp2__rate--none" href="#pd-reviews" data-jump>${WU.STAR_OUTLINE}<b>0.0</b> · No reviews yet</a>`;
+    // the stars row under the title (2026-10-17, the owner: "5 stars all filled, 0 reviews if there's no review"): five filled stars
+    // and "0 reviews" until the first review; then the real average and count
+    $('pd-rate').innerHTML = `<a class="pdp2__rate pdp2__stars" href="#pd-reviews" data-jump>${stars(sum.count ? sum.avg : 5, 16)}<span>${sum.count ? `<b>${sum.avg.toFixed(1)}</b> · ` : ''}${sum.count} review${sum.count === 1 ? '' : 's'}</span></a>`;
     $('rv').innerHTML = `
       <div class="rv__sum">
         ${sum.count ? `<div class="rv__avg"><b>${sum.avg.toFixed(1)}</b><span class="rv__stars">${stars(sum.avg, 20)}</span><small>Based on ${sum.count} review${sum.count > 1 ? 's' : ''}</small></div>
