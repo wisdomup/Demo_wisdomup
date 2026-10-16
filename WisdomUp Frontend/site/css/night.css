@@ -941,4 +941,22 @@ html[data-theme="night"] .wpc__card::before { height: calc((100cqw - 4.652cqw) *
 html[data-theme="night"] .wpc__card::before { inset: 0; left: 0; right: 0; top: 0; height: auto; border-radius: inherit; }
 /* night home FAQ (2026-10-16 consistency pass): the info pages' openart tile stroke had reached it through `.page .panel-list`; on the
    night home it takes the home's own panel skin (the night card + the 7% line) like every panel around it */
-html[data-theme="night"] body .page:not(.page--corp) #night-home .panel-list { background: #1C1E20 !important; box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .07) !important; }
+/* (superseded the same day by the OPENART STROKE ON EVERY CARD block below — the FAQ takes the openart tile like every card) */
+/* OPENART STROKE ON EVERY CARD + PANEL (2026-10-16, "match the cards and placeholders stroke of openart.ai/suite/inspire/feed … search
+   through pages and check where there is a card, add the stroke effect same as Openart"; night, every page except corporate + bulk;
+   found by a crawl of 22 pages at 1280). openart has TWO edges and so do we:
+   · TILES / CARDS = the feed tile — faint glass fill (white-blue 4% → 8%), 1px light along the TOP (white .25) and the BOTTOM (.15),
+     the deep soft shadow 0 8px 64px rgba(0,0,0,.25), no side border;
+   · SECTION PANELS = the feed's container — a 1px hairline rgba(211,237,248,.11) + a 1px top light rgba(217,237,254,.15), the panel keeps
+     its own fill (dark panels, banners, gradients).
+   1.5px borders on these surfaces go transparent (no layout shift). */
+html[data-theme="night"] body :is(.nh-feat, .nh-tile, .nh-glow__card, #night-home .panel-list, .panel-list, .post, .ck__sec, .ck__sumcard, .step, .empty, .rv__sum, .offer, .assure, .highlights):not(.page--corp *) {
+  border-color: transparent !important;
+  background: linear-gradient(rgba(214, 225, 255, .04), rgba(214, 225, 255, .08)), var(--n-bg, #0F1113) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), inset 0 -1px 0 rgba(255, 255, 255, .15), 0 8px 64px rgba(0, 0, 0, .25) !important; }
+html[data-theme="night"] body :is(.pd-stat, .nh-fan__tile, .nh-show__media, .bban__card, .pdp2__stage):not(.page--corp *) {
+  border-color: transparent !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), inset 0 -1px 0 rgba(255, 255, 255, .15), 0 8px 64px rgba(0, 0, 0, .25) !important; }
+html[data-theme="night"] body :is(.ihero, .quote-band, .cta-band, .afb, .afs, .afx, .afj, .nh-live, .nh-show, .nh-glow, .nh-fan, .bulk-steps, .cr-facts):not(.page--corp *):not(.page--corp) {
+  border-color: transparent !important;
+  box-shadow: inset 0 0 0 1px rgba(211, 237, 248, .11), inset 0 1px 0 rgba(217, 237, 254, .15) !important; }
