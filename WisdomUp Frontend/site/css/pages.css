@@ -951,3 +951,8 @@ html:not([data-theme="night"]) .ccard__cat { color: #6B6E73; }
 body .ccard, html[data-theme="night"] body .ccard { box-shadow: none; }
 html:not([data-theme="night"]) body .ccard { box-shadow: 0 0 22px rgba(16, 24, 40, .06), 0 2px 7px rgba(16, 24, 40, .05); }
 .ccard__glass { -webkit-backdrop-filter: none; backdrop-filter: none; }
+/* search field keeps its 56px (2026-10-17, "fix this close button"): in the panel's flex column the field shrank to its content (34px),
+   so the 34px × filled it and its ring pressed on the field's edge. Nothing in the column shrinks now, and the × sits with the same 11px
+   all round (top, bottom and right) */
+body .search > * { flex: none; }
+body .search .search__field { padding-right: 11px; }

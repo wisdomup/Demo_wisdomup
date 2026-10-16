@@ -203,3 +203,4 @@ html[data-theme="night"] .nh .nh-btn:hover { color: #fff; }
 html[data-theme="night"] .nh :is(.nh-btn--primary, .nh-btn--ghost, .nh-btn--primary:hover, .nh-btn--ghost:hover, .nh-strip a, .nh-feat, .nh-live, .nh-trio__item, .nh-tile__cap, .nh-glow__card, .nh-fan__tile) { color: var(--text); }
 html[data-theme="night"] .nh .nh-chip { color: #DADDE1; }
 html[data-theme="night"] .nh .nh-chip--dept, html[data-theme="night"] .nh .nh-chip:hover { color: #fff; }
+.nh > section:first-child { margin-top: 44px; } /* banner → Live card 30% tighter (2026-10-17: 64 → 44); the other sections stay 64 apart */

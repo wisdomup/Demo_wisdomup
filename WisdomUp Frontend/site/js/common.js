@@ -1432,7 +1432,7 @@
           </span>
         </a>`;
     // results come in WHOLE rows (the FULL ROWS rule): two rows (phones: four rows of two), "Show ‹n› more" until every match is out, then "Show less"
-    const pager = rowPager(grid, { min: 8, list: () => lastHits, card, btn: host.querySelector('.search__more button'), after: n => { label.textContent = heading(n); } });
+    const pager = rowPager(grid, { min: 8, step: 24, plain: true, list: () => lastHits, card, btn: host.querySelector('.search__more button'), after: n => { label.textContent = heading(n); } }); // each Show more adds 24 tiles, the button never names a count (2026-10-17)
     const paint = () => {
       const raw = input.value.trim(), q = raw.toLowerCase();
       const pages = q.length > 1 ? PAGES.filter(([t, , k]) => (t + ' ' + k).toLowerCase().split(/\s+/).some(w => w.startsWith(q) || q.split(/\s+/).some(x => x.length > 2 && w.startsWith(x)))).slice(0, 4) : [];
@@ -2255,13 +2255,13 @@
   const RV_TEXT = 'h1, h2, h3, .sec-title, .eyebrow, .ihero__lede, .overview__head p, .seo__head p, .mdesc, .pbanner__copy, p, .prose li, blockquote'; // 2026-10-06: every paragraph and sub-heading too (bugatti.store)
   const RV_BLOCK = '.cp-step, .wpc, .tile, .post, .stat, .pd-stat, .ck__sec, .ord__card, .rv__sum, .rv__item, .faq__item, .seo__card, .duo__card, '
     + '.promo-band, .loop, .series, .bulk, .pp, .trust__item, .step, .afs__step, .afx, .afw__card, .afhp__row, .afj, .manual, .panel-list, .cta-band, .ck__sumcard, .mgrid__more, .empty, .ord__hero, .track__form, .iform, .bk-form';
-  const RV_SKIP = '#site-nav, .mnav, .cartd, .fdrawer, .search, .ckc, .hero, .buybar, .toast, .wu-util, .quick, .visually-hidden, .seo__more, .footer-wrap, label';
+  const RV_SKIP = '#site-nav, .mnav, .cartd, .fdrawer, .search, .ckc, .hero, .buybar, .toast, .wu-util, .quick, .visually-hidden, .seo__more, .footer-wrap, label, .nh-live'; // .nh-live: no word / fade reveal either (2026-10-17, "remove the motion of this WisdomUp Live section")
   let revealer = null;
   // ---------- Motion engine (MOTION-REPORT.md, approved 2026-10-06): reveals, grid staggers, scroll-driven curtain/clip, liquid fills, magnets ----------
   const FILL_SEL = '.btn-pill, .btn-buy, .btn-navy, .btn-outline, .btn-cart, .shop-rail__all, .loop__cta, .pp__cta, .seo__toggle, .fdrawer__apply, .ck__place, .cartd__go, .mnav__foot a, .nh-btn, .totop, .quick .chip, .wpc__cta, .ckc__btn, .msort__btn';
   const MAG_SEL = '.loop__btn, .feat__btn, .news__arrow, .bban__arrow, .shop-rail__step, .hero__arrow, .pdp2__chev, .wpc__wish, .pdp2__wish, .totop, .mnav__x, .cartd__x, .fdrawer__x, .mnav__theme, .nh-tile__add, .mnav__back';
   const X_SEL = '.mnav__x, .cartd__x, .fdrawer__x';
-  const SD_CLIP = '.promo, .bulk, .duo__card, .cta-band, .quote-band, .pp__card, .nh-show, .nh-glow, .nh-live, .feat__slide, .news__card';
+  const SD_CLIP = '.promo, .bulk, .duo__card, .cta-band, .quote-band, .pp__card, .nh-show, .nh-glow, .feat__slide, .news__card'; // .nh-live left out (2026-10-17): the Live card sits still, no clip wipe
   const GRID_SEL = '.wu-rail > *, .mgrid > *, .nh-grid > *, .bgrid > *';
   const ZOOM_SEL = '.promo img, .feat__slide img, .feat__slide video, .pp__card img';
   const fine = () => matchMedia('(hover: hover) and (pointer: fine)').matches;
@@ -2367,12 +2367,14 @@
     return !t || t === 'none' || t.includes('(') ? 0 : t.trim().split(/\s+/).filter(v => parseFloat(v) > 0).length; // auto-fit's collapsed (0px) tracks are not columns
   };
   const fullRowCount = (g, n) => { const c = gridCols(g); return c && n > c ? n - n % c : n; };
-  function rowPager(grid, { min = 8, list, card, btn, after }) {
+  function rowPager(grid, { min = 8, list, card, btn, after, step, plain }) {
     // list(): the whole list; card(item): its markup; btn: the Show more / Show less button; after(n, total, per): page extras
+    // step: how many each "Show more" adds (rounded up to whole rows; default one page); plain: the button says just "Show more" (no count)
     let pages = 1, cols = gridCols(grid), shown = -1;
     const per = () => { if (!cols) cols = gridCols(grid); return cols ? cols * Math.max(2, Math.ceil(min / cols)) : min; }; // a grid that was hidden (search) is measured when it first paints
     const paint = () => {
-      const items = list(), total = items.length, n = Math.min(total, pages * per());
+      const add = () => step ? (cols ? cols * Math.ceil(step / cols) : step) : per();
+      const items = list(), total = items.length, n = Math.min(total, per() + (pages - 1) * add());
       if (shown < 0) grid.innerHTML = items.slice(0, n).map(card).join('');
       else if (n > shown) grid.insertAdjacentHTML('beforeend', items.slice(shown, n).map(card).join(''));
       else while (grid.children.length > n) grid.lastElementChild.remove();
@@ -2380,7 +2382,7 @@
       if (btn) {
         const all = n >= total;
         btn.hidden = total <= per();
-        btn.textContent = all ? 'Show less' : `Show ${Math.min(per(), total - n)} more`;
+        btn.textContent = all ? 'Show less' : plain ? 'Show more' : `Show ${Math.min(add(), total - n)} more`;
         btn.setAttribute('aria-expanded', String(all && pages > 1));
       }
       paintWish();
