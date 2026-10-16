@@ -5,7 +5,7 @@ body { margin: 0; background: #fff; color: #464646; font-family: var(--font, Int
 a { color: #111; text-decoration: none; }
 a:hover { color: #1B3FA0; }
 button { font-family: inherit; }
-:root { --muted: #6B6E73; --muted-strong: #4A4D52; --sec: 64px; /* higgsfield.ai: sections 64px apart, 40px on phones (2026-10-16 tighten pass; was clamp(48px, 5vw, 72px)) */ --content-max: 1680px; }
+:root { --photo-cut: #F5F6F8; /* the light grey panel behind a transparent product cut-out (2026-10-17) */ --muted: #6B6E73; --muted-strong: #4A4D52; --sec: 64px; /* higgsfield.ai: sections 64px apart, 40px on phones (2026-10-16 tighten pass; was clamp(48px, 5vw, 72px)) */ --content-max: 1680px; }
 /* DAY COLOUR SCHEME (2026-10-06, taken from f1store.formula1.com — "it matches our red"): white page, #242424 body text, near-black
    headings, light panels #F5F6F8, hairlines, and ONE accent = brand red #D91E05. No navy, no blue, no aqua, no cream. These override
    the design-system tokens (css/ds/tokens/colors.css); night.css re-points them under html[data-theme="night"]. */
@@ -1382,3 +1382,18 @@ html[data-theme="night"] .wpc__card::before { border-radius: 16px; }
 /* the About WisdomUp intro sits inside the fold-out now (2026-10-17): same centred reading text, 16px above the cards */
 .seo__intro { max-width: 820px; margin: 0 auto 16px; text-align: center; display: grid; gap: 12px; }
 .seo__intro p { margin: 0; }
+
+/* TRANSPARENT CUT-OUTS (2026-10-17, "use no background products png … keep the grey card around all of them"): the owner's photos
+   are WebP with their transparency (img/p/*.webp). Where the photo used to be a framed white box ON a grey card (the "Built around
+   your day" cards, the TS-series showpiece) the inner box goes — the product stands on the card itself with a soft shadow of its
+   own shape; on the dark story cards (news, blog) the cut-out keeps a grey card of its own (--photo-cut) so it never floats on a
+   rectangle of shadow. */
+.feat__ph img[src*=".webp"] { border-radius: 0 !important; box-shadow: none !important; filter: drop-shadow(0 16px 24px rgba(0, 0, 0, .14)); }
+.series__ph.is-cut { background: transparent !important; box-shadow: none !important; border-radius: 0 !important; }
+.series__ph.is-cut img { filter: drop-shadow(0 16px 24px rgba(0, 0, 0, .14)); }
+.news__ph img[src*=".webp"], .bban__ph img[src*=".webp"], .bcard__ph img[src*=".webp"] { background: var(--photo-cut); }
+
+/* PRODUCT CARDS: WHITE UNDER THE CUT-OUT (2026-10-17, "on the products card fill the placeholder colour with white and the top layer
+   is the product png"): a transparent product photo sits on a white placeholder on every product card (and the night home tiles),
+   both themes; other surfaces keep the grey --photo-cut */
+.wpc__media, .nh-tile__img { --photo-cut: #fff; }

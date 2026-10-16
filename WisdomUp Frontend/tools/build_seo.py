@@ -218,7 +218,7 @@ def sitemap():
     for p in CATALOG['products']:
         by_type.setdefault(p['type'], []).append([p['id'], p.get('price'), p.get('was'), p.get('soldOut')])
     urls += [(f'products.html?cat={t}', '0.8', 'daily', [], dated('c:' + t, by_type.get(t, []))) for t in seen]
-    urls += [(f'product.html?id={p["id"]}', '0.7', 'weekly', [p['src']] if p.get('src') else [], dated('p:' + p['id'], {k: v for k, v in p.items() if k not in ('bg', 'ar')})) for p in CATALOG['products']]
+    urls += [(f'product.html?id={p["id"]}', '0.7', 'weekly', [p['src'].replace('.webp', '.jpg')] if p.get('src') else [], dated('p:' + p['id'], {k: v for k, v in p.items() if k not in ('bg', 'ar')})) for p in CATALOG['products']]
     urls += [(p['path'], '0.5', 'monthly', [], file_date(n)) for n, p in PAGES.items() if p.get('index', True) and not p.get('dynamic') and n not in ('index.html', 'products.html')]
     json.dump(fps, open(fp_path, 'w', encoding='utf-8'), indent=0, sort_keys=True)
     src = {p['id']: p.get('src') for p in CATALOG['products']}

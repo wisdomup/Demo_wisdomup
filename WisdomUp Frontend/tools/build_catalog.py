@@ -450,7 +450,10 @@ def main():
             v = {'sku': r['code'].strip(), 'attrs': {k: v for k, v in a.items() if v}, 'price': pkr(r['price'])}
             if img:
                 q = '?v=' + img['v'] if img.get('v') else ''  # a photo replaced by tools/set_photo.py carries a version, so browsers refetch it
-                v.update({'img': f'img/p/{sku}.jpg{q}', 'thumb': f'img/p/s/{sku}.jpg{q}', 'bg': [img['mid'], img['edge']], 'ar': round(img['w'] / img['h'], 3)})
+                x = 'webp' if img.get('cut') else 'jpg'  # a transparent cut-out (set_photo.py) is served as WebP with its alpha
+                v.update({'img': f'img/p/{sku}.{x}{q}', 'thumb': f'img/p/s/{sku}.{x}{q}', 'bg': [img['mid'], img['edge']], 'ar': round(img['w'] / img['h'], 3)})
+                if img.get('cut'):
+                    v['cut'] = True
             variants.append(v)
             for val in v['attrs'].values():
                 for k in ('USB-C', 'Lightning', 'Micro-USB'):
@@ -481,7 +484,9 @@ def main():
             'skus': [v['sku'] for v in variants],
         }
         if lead.get('img') and '?v=' in lead['img']:
-            p['studio'] = True  # the owner's own photo (tools/set_photo.py): shown whole, centred — not the packshot's product-side crop
+            p['studio'] = True  # the owner's own photo
+            if lead.get('cut'):
+                p['cut'] = True  # transparent: the page's grey panel shows through (common.js photoBg) (tools/set_photo.py): shown whole, centred — not the packshot's product-side crop
         # extra gallery photos from tools/set_photo.py (img/p/‹id›-2.jpg, -3 …): shown on the product page after the product's own photo
         extra = []
         for n in range(2, 10):
@@ -489,7 +494,7 @@ def main():
             if not os.path.exists(mp):
                 break
             m = json.load(open(mp))
-            extra.append(f'img/p/{p["id"]}-{n}.jpg' + ('?v=' + m['v'] if m.get('v') else ''))
+            extra.append(f'img/p/{p["id"]}-{n}.' + ('webp' if m.get('cut') else 'jpg') + ('?v=' + m['v'] if m.get('v') else ''))
         if extra:
             p['photos'] = extra
         products.append(p)
@@ -506,6 +511,7 @@ def main():
         assert os.path.exists(mp), f'{pid}: no photo yet — run  python3 tools/set_photo.py {pid} IMAGE'
         img = json.load(open(mp))
         q = '?v=' + img['v'] if img.get('v') else ''
+        x = 'webp' if img.get('cut') else 'jpg'
         tl, noun, artk = TYPES[e['type']]
         code = e['from']
         products.append({
@@ -513,8 +519,8 @@ def main():
             'price': int(e['price']), 'from': False, 'meta': e.get('meta', ''), 'highlights': e.get('highlights', []),
             'specs': [list(s) for s in e['specs']], 'features': [], 'connectors': [], 'colors': [],
             'tabs': [], 'ribbon': None, 'year': None, 'art': artk,
-            'src': f'img/p/{pid}.jpg{q}', 'thumb': f'img/p/s/{pid}.jpg{q}', 'bg': [img['mid'], img['edge']], 'ar': round(img['w'] / img['h'], 3),
-            'axes': [], 'variants': [], 'skus': [code], 'studio': True,
+            'src': f'img/p/{pid}.{x}{q}', 'thumb': f'img/p/s/{pid}.{x}{q}', 'bg': [img['mid'], img['edge']], 'ar': round(img['w'] / img['h'], 3),
+            'axes': [], 'variants': [], 'skus': [code], 'studio': True, **({'cut': True} if img.get('cut') else {}),
         })
 
     # Specs from the owner's listing sheet (tools/listing_specs.json, curated 2026-10-13 — see tools/check_listing_specs.py):

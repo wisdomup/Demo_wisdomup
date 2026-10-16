@@ -131,6 +131,9 @@
      so the demo and local copies point search engines at the real site. ---------- */
   const SITE = String(SHOP.siteUrl || location.origin + '/').replace(/\/?$/, '/');
   const abs = path => new URL(path || '', SITE).href;
+  // link previews and search engines get the JPG-on-white twin of a transparent product cut-out (WhatsApp / Facebook show
+  // transparency as black); the page itself shows the transparent WebP (2026-10-17)
+  const flatImg = path => String(path || '').replace(/(img\/p\/(?:s\/)?[^/?]+)\.webp/, '$1.jpg');
   const YEAR = new Date().getFullYear();
   const clip = (t, n) => { t = String(t || '').replace(/\s+/g, ' ').trim(); return t.length <= n ? t : t.slice(0, t.lastIndexOf(' ', n - 1)).replace(/[\s,;:—–-]+$/, '') + '…'; };
   function seo({ title, description, path, image, type = 'website', noindex = false, ld, extra = {} } = {}) {
@@ -149,7 +152,7 @@
     meta('og:locale', 'en_PK', true);
     if (title) { meta('og:title', title.replace(/\s*\|\s*WisdomUp.*$/, ''), true); meta('twitter:title', title.replace(/\s*\|\s*WisdomUp.*$/, '')); }
     if (description) { meta('og:description', clip(description, 200), true); meta('twitter:description', clip(description, 200)); }
-    const img = abs(image || 'img/og-default.jpg');
+    const img = abs(flatImg(image) || 'img/og-default.jpg');
     meta('og:image', img, true);
     meta('twitter:image', img);
     meta('twitter:card', 'summary_large_image');
@@ -1500,7 +1503,9 @@
   // colour — the centre-to-edge gradient suits box packshots, but behind a contained studio shot of a dark product (TS-12) it showed
   // as grey bands above and below the photo (2026-10-14)
   const isStudio = p => !!p.studio || /[?&]v=/.test(p.img || p.src || p.thumb || '');
-  const photoBg = p => p.bg ? (isStudio(p) ? p.bg[1] : `radial-gradient(110% 80% at 50% 45%, ${p.bg[0]} 0%, ${p.bg[1]} 100%)`) : '#F8F9FA';
+  // TRANSPARENT CUT-OUTS (2026-10-17, "do not add the white background with them … keep the grey card around all of them"): the
+  // owner's photos keep their transparency (WebP), so the product sits straight on the light grey panel (night: a soft glass tint)
+  const photoBg = p => p.cut ? 'var(--photo-cut)' : p.bg ? (isStudio(p) ? p.bg[1] : `radial-gradient(110% 80% at 50% 45%, ${p.bg[0]} 0%, ${p.bg[1]} 100%)`) : '#F8F9FA';
   // Packshots show the product on the left and its box on the right: frame the product, unless the shot is very wide
   // A studio cut-out on WHITE (edge colour ≈ white — the owner's own photos, tools/set_photo.py) is shown whole and centred;
   // the supplier packshots keep the product-side crop (2026-10-13)
@@ -3366,6 +3371,6 @@
     live: { next: nextLive, parts: liveParts, remind: liveReminder }, fillPrices, // the on-device interest model (personalised suggestions)
     search: { run: q => runSearch(q) }, // the search engine (tools/search_eval.js scores it against tools/search_eval.json)
     ref: { get: () => ref, apply: applyRef, clear: clearRef, api: crApi, norm: codeNorm, pctOf, TAG: TAG_SVG, me: () => store.get(ME_KEY, null), setMe: v => { if (v) store.set(ME_KEY, v); else try { localStorage.removeItem(ME_KEY); } catch (e) { /* storage unavailable */ } } },
-    seo, abs, clip, ldCrumbs, ldFaq, px, pxItem, YEAR, SITE,
+    seo, abs, flatImg, clip, ldCrumbs, ldFaq, px, pxItem, YEAR, SITE,
   };
 })();

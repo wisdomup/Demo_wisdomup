@@ -5,6 +5,8 @@ usage:  python3 tools/set_photo.py SKU IMAGE      (SKU as in site/img/p, e.g. ts
         python3 tools/set_photo.py SKU IMAGE N    (N = 2, 3 … an EXTRA gallery photo for the product page: SKU-N.jpg;
                                                   build_catalog.py lists them as p.photos, product.js shows them after the
                                                   product's own photo with thumbnails and arrows)
+A cut-out with a transparent background (clear corners) is ALSO written as site/img/p/SKU.webp + s/SKU.webp with its
+transparency kept, and the site uses those (`cut` in the .json) — never flattened onto white.
 Writes site/img/p/SKU.jpg (1000px, like build_catalog.py's photo()), site/img/p/s/SKU.jpg (480px) and SKU.json (edge / centre
 colours, size, and `v` = the file's md5[:8]) — build_catalog.py reads that cache instead of the supplier sheet's photo, and puts
 `?v=` on the paths so browsers that cached the old photo (img/* is cached a week) fetch the new one. Then run
@@ -51,6 +53,31 @@ def reedge():
         print(f'{name[:-5]:12} {old} → {info["edge"]}')
 
 
+def corners_clear(image):
+    """True when the image is a cut-out: it has an alpha channel and at least three of its four corners are transparent."""
+    if 'yes' not in subprocess.run(['sips', '-g', 'hasAlpha', image], capture_output=True, text=True).stdout:
+        return False
+    with tempfile.TemporaryDirectory() as tmp:
+        src, pam = image, os.path.join(tmp, 'a.pam')
+        if not image.lower().endswith('.webp'):
+            src = os.path.join(tmp, 'a.webp')
+            subprocess.run(['cwebp', '-quiet', '-lossless', image, '-o', src], check=True, capture_output=True)
+        subprocess.run(['dwebp', '-quiet', src, '-pam', '-o', pam], check=True, capture_output=True)
+        d = open(pam, 'rb').read(); i = d.index(b'ENDHDR\n') + 7
+        g = dict(l.split(' ', 1) for l in d[:i].decode().splitlines() if ' ' in l)
+        w, h = int(g['WIDTH']), int(g['HEIGHT'])
+        return sum(d[i + (y * w + x) * 4 + 3] < 10 for x, y in ((0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1))) >= 3  # SJX-59's cable runs off one corner
+
+
+def cut_webp(image, out, size, q):
+    """A transparent WebP no longer than `size` on its long side (never upscaled)."""
+    dims = subprocess.run(['sips', '-g', 'pixelWidth', '-g', 'pixelHeight', image], capture_output=True, text=True).stdout
+    w, h = int(grab(r'pixelWidth: (\d+)', dims)), int(grab(r'pixelHeight: (\d+)', dims))
+    rs = [] if max(w, h) <= size else ['-resize', str(size), '0'] if w >= h else ['-resize', '0', str(size)]
+    subprocess.run(['cwebp', '-quiet', '-q', str(q), '-alpha_q', '100', '-exact', *rs, image, '-o', out], check=True, capture_output=True)
+    return out
+
+
 def main(sku, image, n=None):
     if n:
         assert n.isdigit() and int(n) >= 2, 'the extra photo number must be 2 or more (1 is the product photo itself)'
@@ -68,6 +95,12 @@ def main(sku, image, n=None):
     dims = subprocess.run(['sips', '-g', 'pixelWidth', '-g', 'pixelHeight', big], capture_output=True, text=True).stdout
     info = {'edge': border_edge(big), 'mid': hexc(avg(mid)), 'w': int(grab(r'pixelWidth: (\d+)', dims)), 'h': int(grab(r'pixelHeight: (\d+)', dims)),
             'v': hashlib.md5(open(big, 'rb').read()).hexdigest()[:8]}
+    # TRANSPARENT CUT-OUTS (2026-10-17, "all the png images I uploaded had no background … do not add the white background"):
+    # a photo with clear corners is also saved as a transparent WebP (img/p/SKU.webp + s/SKU.webp) and the site shows that one,
+    # on the page's own grey panel; the JPG on white stays for link previews (WhatsApp / Facebook can't show transparency)
+    if corners_clear(image):
+        wb, ws = cut_webp(image, big[:-4] + '.webp', 1000, 80), cut_webp(image, small[:-4] + '.webp', 480, 78)
+        info.update({'cut': True, 'v': hashlib.md5(open(wb, 'rb').read()).hexdigest()[:8]})
     json.dump(info, open(meta_path, 'w'))
     print(sku, info, f'{os.path.getsize(big) // 1024} KB + {os.path.getsize(small) // 1024} KB')
 

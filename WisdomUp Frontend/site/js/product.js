@@ -67,7 +67,7 @@
   ]);
 
   /* ---------- Variants ---------- */
-  const V = p.variants.length ? p.variants : [{ sku: p.code, attrs: {}, price: p.price, priceText: WU.D.rs(p.price), was: p.was, wasText: p.wasText, off: p.off, img: p.src, thumb: p.thumb, bg: p.bg, ar: p.ar }];
+  const V = p.variants.length ? p.variants : [{ sku: p.code, attrs: {}, price: p.price, priceText: WU.D.rs(p.price), was: p.was, wasText: p.wasText, off: p.off, img: p.src, thumb: p.thumb, bg: p.bg, ar: p.ar, cut: p.cut }];
   let cur = Math.max(0, V.findIndex(v => v.sku === q.get('sku')));
   const AXIS_HINT = { Plug: 'EU 2-pin fits most sockets in Pakistan', Cable: 'Cable included in the box' };
   const values = a => V.map(v => v.attrs[a]).filter((x, i, arr) => x && arr.indexOf(x) === i);
@@ -102,7 +102,7 @@
     extra: { 'product:brand': 'WisdomUp', 'product:price:amount': V[cur].price, 'product:price:currency': 'PKR', 'product:availability': p.soldOut ? 'out of stock' : 'in stock', 'product:condition': 'new', 'product:retailer_item_id': V[cur].sku },
     ld: [
       { '@context': 'https://schema.org', '@type': 'Product', name: `WisdomUp ${p.title}`, sku: V[cur].sku, mpn: p.code, brand: { '@type': 'Brand', name: 'WisdomUp' },
-        image: images.map(i => WU.abs(i)), description: DESC, category: p.cat, url: WU.abs(canon),
+        image: images.map(i => WU.abs(WU.flatImg(i))), description: DESC, category: p.cat, url: WU.abs(canon),
         offers: V.length > 1
           ? { '@type': 'AggregateOffer', lowPrice: Math.min(...V.map(v => v.price)), highPrice: Math.max(...V.map(v => v.price)), offerCount: V.length, ...offerBase }
           : { '@type': 'Offer', price: V[0].price, ...offerBase } },
@@ -199,7 +199,7 @@
     <div class="rail-wrap" id="related"></div>
 
     <div class="buybar" id="buybar" aria-hidden="true">
-      <div class="buybar__art" style="background: ${photoBg(p)};"><img id="bb-img" src="${V[cur].thumb || p.thumb}" alt="" style="width: 100%; height: 100%; object-fit: cover; object-position: 6% 50%;"></div>
+      <div class="buybar__art" style="background: ${photoBg(p)};"><img id="bb-img" src="${V[cur].thumb || p.thumb}" alt="" style="width: 100%; height: 100%; ${studio ? 'object-fit: contain;' : 'object-fit: cover; object-position: 6% 50%;'}"></div>
       <div class="buybar__txt"><span class="buybar__t">${esc(p.code)} <small>${esc(typeLabel(p.type))}</small></span><span class="buybar__p"><b id="bb-price">${esc(V[cur].priceText)}</b></span></div>
       <button type="button" class="pdp2__add buybar__add" data-add tabindex="-1"${p.soldOut ? ' disabled' : ''}>${icon('cart', 18)}<span>${p.soldOut ? 'Sold out' : 'Add to cart'}</span></button>
     </div>`;

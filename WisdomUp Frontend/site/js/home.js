@@ -4,7 +4,8 @@
 
   // Studio photo (catalogue thumb) framed on a background sampled from the photo
   const WIDE = 'object-fit: cover; object-position: 50% 50%;'; // landscape frames show the whole packshot
-  const photo = (p, cls = '', big = false, fit) => p ? `<span class="ph ${cls}" style="background: ${WU.photoBg(p)};"><img src="${big ? p.src : p.thumb}" alt="" loading="lazy" style="${fit || WU.photoFit(p)}"></span>` : '';
+  // a transparent cut-out is never cropped (contain) and carries .is-cut so a frame that sits on a grey card can drop its own box
+  const photo = (p, cls = '', big = false, fit) => p ? `<span class="ph ${cls}${p.cut ? ' is-cut' : ''}" style="background: ${WU.photoBg(p)};"><img src="${big ? p.src : p.thumb}" alt="" loading="lazy" style="${(p.cut ? '' : fit) || WU.photoFit(p)}"></span>` : '';
   const P = id => D.byId(id);
   // Quick chips → a department, a product type or a filter on the All Products page (photo = representative product)
   const CHIPS = [ // exactly 10, in this order and with these labels (user's list, 2026-10-06)

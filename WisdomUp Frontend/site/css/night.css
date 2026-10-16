@@ -420,7 +420,7 @@ html[data-theme="night"] :is(.ckc__btn, .ckc__more, .ckc__switch):focus-visible 
    raised #1E2226; type white / #C9CDD2 / #9AA0A6; ONE accent = brand red (Buy, New tags, the offer, icon details,
    stat glows); green only for "In stock"; gold only for review stars. Colours and surfaces only — no layout change.
    ========================================================================== */
-html[data-theme="night"] { --pd-panel: linear-gradient(180deg, rgba(255,255,255,.028) 0%, rgba(255,255,255,0) 42%), var(--n-bg2); --pd-edge: inset 0 1.5px 0 rgba(255,255,255,.045); }
+html[data-theme="night"] { --photo-cut: rgba(255,255,255,.06); /* a soft glass tint behind a transparent cut-out (2026-10-17) */ --pd-panel: linear-gradient(180deg, rgba(255,255,255,.028) 0%, rgba(255,255,255,0) 42%), var(--n-bg2); --pd-edge: inset 0 1.5px 0 rgba(255,255,255,.045); }
 /* every info panel on the page shares one surface */
 html[data-theme="night"] :is(.pdp2 .offer, .pdp2 .gift, .pdp2 .highlights, #spec-list, .rv__sum, #pd-faq-list) { background: var(--pd-panel); }
 html[data-theme="night"] :is(.pdp2 .offer, .pdp2 .highlights, #spec-list, .rv__sum) { box-shadow: var(--pd-edge), inset 0 0 0 1.5px var(--n-line); }
