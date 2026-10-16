@@ -960,3 +960,11 @@ html[data-theme="night"] body :is(.pd-stat, .nh-fan__tile, .nh-show__media, .bba
 html[data-theme="night"] body :is(.ihero, .quote-band, .cta-band, .afb, .afs, .afx, .afj, .nh-live, .nh-show, .nh-glow, .nh-fan, .bulk-steps, .cr-facts):not(.page--corp *):not(.page--corp) {
   border-color: transparent !important;
   box-shadow: inset 0 0 0 1.5px rgba(211, 237, 248, .11), inset 0 1.5px 0 rgba(217, 237, 254, .15) !important; }
+/* search cards = openart tiles (pages.css): the night card/ring rules above must not add a second surface */
+html[data-theme="night"] body .ccard { background: #0F1113; box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, .25), inset 0 -1.5px 0 rgba(255, 255, 255, .15); }
+html[data-theme="night"] body .ccard .ccard__media { background: var(--n-raise); }
+/* corners = the scale in night too (2026-10-16, "match the search tiles with the product card corners"): card 16, photo 12 — the NO INNER
+   FRAME rule above had left the night photo at 3.721cqw (≈ 14px) */
+html[data-theme="night"] .wpc__media { border-radius: 12px; }
+/* search tiles: no inset lights (2026-10-16, "why do I see the white very thin edges on the search panel product cards") */
+html[data-theme="night"] body .ccard { box-shadow: none; }

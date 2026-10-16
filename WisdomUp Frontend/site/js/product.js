@@ -163,6 +163,7 @@
       </div>
     </section>
 
+    <div class="pdtabs-scope"><!-- the sticky tabs ride only as far as their sections (2026-10-16: they used to stay pinned over the rails and the footer) -->
     <div class="pdtabs" id="pdtabs" data-sticky-offset data-priority-bar><nav class="pdtabs__in" aria-label="Product sections">
       ${[['pd-overview', 'Overview'], ['pd-specs', 'Specs'], ['pd-reviews', 'Reviews'], ['pd-faqs', 'FAQs']].map(([h, l], i) => `<a class="chip" href="#${h}" data-jump aria-current="${i === 0}">${l}</a>`).join('')}
     </nav></div>
@@ -186,6 +187,7 @@
       <h2 class="grad-h" id="fq-h">FAQs</h2>
       <div><div class="panel-list" id="pd-faq-list"></div><p class="meta-line" style="margin: 14px 0 0;">More answers in the <a href="${url.help}">Help Center</a> · <a href="${url.manuals}">e-Manuals</a></p></div>
     </section>
+    </div>
 
     <!-- Price and delivery summary in plain words (what people search: "<product> price in Pakistan") -->
     <section class="seo-lite pd-seo" aria-labelledby="pk-h">

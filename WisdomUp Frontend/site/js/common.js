@@ -1418,11 +1418,18 @@
     ];
     const BG = D.media;
     let lastHits = [], lastKey = '', heading = () => '';
+    // SEARCH CARDS = OPENART'S TILES (2026-10-16, "show the openart ui for products in the search panel … only write the names of the
+    // products"; measured on openart.ai/suite/home: a 16px tile, the photo itself blurred behind a dark glass rgba(0,0,0,.45) + 10px blur
+    // with 4px of room, the media 4:3 with 12px corners, a 32px label row (the name; openart puts an icon before it — removed the same day, "remove the icons before the product titles"; `typeIcon()` kept for reuse), inset top/bottom lights; openart's "New" pill on the photo was dropped — "remove the chips of any sort"). The CATEGORY (small, muted) over the MODEL (bold) — "category name and the model"; no name, no spec line, no price.
+    const DEPT_ICON = { audio: 'Earbuds', charging: 'Chargers', cables: 'Cables', car: 'Car', computer: 'Computer', storage: 'Storage', care: 'Grooming' };
+    const typeIcon = p => { const d = DEPTS.find(x => x.types.includes(p.type)); const n = d && NAV_CATS.find(x => x.label === DEPT_ICON[d.id]); return n ? `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${n.d}" fill="currentColor" fill-rule="evenodd"/><path d="${n.s}" fill="none" stroke="currentColor" stroke-width="${n.w}" stroke-linecap="round" stroke-linejoin="round"/></svg>` : ''; };
     const card = (p, i) => `
-        <a class="ccard" href="${url.product(p.id)}" data-pid="${p.id}">
-          <div class="ccard__media" style="background: ${p.thumb ? photoBg(p) : BG[i % BG.length]};">${p.thumb ? `<img src="${p.thumb}" alt="${esc(p.title)}" loading="lazy" style="width: 100%; height: 100%; ${photoFit(p)}">` : art(p.art, { alt: p.title, style: 'width: 100%; height: 100%;' })}${p.ribbon || p.cat ? `<div class="ccard__tag"><span>${esc(p.ribbon || p.cat)}</span></div>` : ''}</div>
-          <div class="ccard__body"><div class="ccard__title">${esc(code(p))}</div><p class="ccard__meta">${esc(p.meta)}</p></div>
-          <div class="ccard__foot"><span class="ccard__price">${esc(p.priceText)}</span>${p.wasText ? `<s class="ccard__was">${esc(p.wasText)}</s>` : ''}</div>
+        <a class="ccard" href="${url.product(p.id)}" data-pid="${p.id}" aria-label="${esc(p.title)}">
+          ${p.thumb ? `<span class="ccard__bg" aria-hidden="true"><img src="${p.thumb}" alt="" loading="lazy" decoding="async"></span>` : ''}
+          <span class="ccard__glass">
+            <span class="ccard__media" style="background: ${p.thumb ? photoBg(p) : BG[i % BG.length]};">${p.thumb ? `<img src="${p.thumb}" alt="" loading="lazy" style="${photoFit(p)}">` : art(p.art, { alt: '', style: 'width: 100%; height: 100%;' })}</span>
+            <span class="ccard__label"><span class="ccard__cat">${esc(p.cat)}</span><span class="ccard__name">${esc(code(p))}</span></span>
+          </span>
         </a>`;
     // results come in WHOLE rows (the FULL ROWS rule): two rows (phones: four rows of two), "Show ‹n› more" until every match is out, then "Show less"
     const pager = rowPager(grid, { min: 8, list: () => lastHits, card, btn: host.querySelector('.search__more button'), after: n => { label.textContent = heading(n); } });
@@ -2115,7 +2122,11 @@
     // height, vh) — and sits at y = 0 once revealed, so it grows downward like any accordion. Works at any height (a
     // footer taller than the screen reveals its top R px first). Clipped by the wrap; off for reduced motion.
     const fixed = el.querySelector('.footer-fixed');
-    const canReveal = () => !reduced() && window.CSS && CSS.supports('clip-path', 'inset(0)');
+    // NOT on touch screens (2026-10-16, the owner's iPhone recording: the red footer vanished, then came back pushed down with a gap
+    // above it): iOS Safari's toolbar collapses and expands WHILE scrolling, so innerHeight and the scrollport change mid-reveal and
+    // both the view-timeline range and the JS maths place the footer wrong. Phones and tablets get the plain in-flow footer.
+    const coarse = matchMedia('(pointer: coarse)');
+    const canReveal = () => !reduced() && !coarse.matches && window.CSS && CSS.supports('clip-path', 'inset(0)');
     // Where the browser can run scroll-driven CSS animations (Chrome/Android 115+, Safari 26+) the same y is drawn by the
     // compositor (view timeline on the wrap, range "entry 0 → entry R", R in --ft-r) — no scroll script, no lag. Else JS.
     const sda = !!(window.CSS && CSS.supports('animation-timeline: view()') && CSS.supports('animation-range: entry 0px entry 10px'));
