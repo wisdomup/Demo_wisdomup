@@ -190,7 +190,7 @@ a.ccard:hover .ccard__title { text-decoration: underline; text-underline-offset:
 .buybar__p s { font: 500 14px/1 var(--font); color: var(--muted); }
 .buybar .btn-buy { flex: none; width: auto; height: 48px; padding: 0 24px; border-radius: 999px; font-size: 16px; }
 .toast--top { bottom: auto; top: 96px; }
-@media (max-width: 899px) { .pdp2__gallery { position: static; } }
+@media (max-width: 999px) { .pdp2__gallery { position: static; } } /* the grid only goes two-column from ~983px (auto-fit, 440px columns + gap): at 900–982 the page was one column with a STICKY photo, so the details scrolled over it (2026-10-17, "the single page product is crooked") */
 @media (max-width: 639px) {
   .pdp2 { margin-top: 16px; gap: 24px; }
   .pdp2__stage { border-radius: 16px; }
@@ -1021,3 +1021,10 @@ a.pd-row:hover > svg:last-child { transform: translateX(4px); }
 .pd-row[href*="returns"] > svg:first-child path { fill: none; stroke: #D91E05; }
 .pd-row > svg:first-child path[stroke="#D91E05"] { stroke: #D91E05; }
 
+
+/* SEARCH PANEL CORNERS = CONCENTRIC, LIKE THE macOS WINDOW (2026-10-17, the owner's soft macOS window image: "I want the same rounder
+   corner for the search panel"). Measured on that image: the window's corner (≈256px) ≈ the inner capsule's radius (171) + its inset
+   (96) — the corner follows the capsule inside it. Ours: the search field is a 56px capsule (radius 28) set 16px in, so the panel's
+   corner is 28 + 16 = 44px (was 16). Phones: the bottom sheet's two top corners take the same 44px. Both themes. */
+html body .scrim .search, html body .search { border-radius: 44px; }
+@media (max-width: 639px) { html body .scrim.is-anim .search, html body .scrim .search, html body .search { border-radius: 44px 44px 0 0 !important; } }
