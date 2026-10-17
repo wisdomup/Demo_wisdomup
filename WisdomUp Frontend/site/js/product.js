@@ -171,7 +171,6 @@
           <div class="buybox__row"><button type="button" class="pdp2__add" data-add${p.soldOut ? ' disabled' : ''}>${icon('cart', 20)}<span>${p.soldOut ? 'Sold out' : 'Add to cart'}</span></button>
           ${WU.wishBtn(p, 'pdp2__wish')}</div>
         </div>
-        <div class="pdp2__rule" role="separator"></div>
         ${ALSO.length ? `<section class="pd-also" aria-labelledby="pd-also-h"><div class="pd-also__top"><h2 class="pd-also__h" id="pd-also-h">You may also need</h2><span>Add an accessory in one tap</span></div><div class="pd-also__list">${ALSO.map(x => `
           <div class="pd-also__card">
             <a class="pd-also__img" href="${url.product(x.id)}" tabindex="-1" aria-hidden="true" style="background: ${photoBg(x)};"><img src="${x.thumb}" alt="" loading="lazy" style="${WU.photoFit(x)}"></a>

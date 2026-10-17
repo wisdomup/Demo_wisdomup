@@ -717,21 +717,22 @@
   function renderNav(force) {
     if (!nav) return;
     const w = vw(), wide = w >= 640;
-    // Category icons that fit beside the logo and tools (each ~46px + 4px gap)
-    const count = w >= 1240 ? NAV_CATS.length : w >= 1120 ? 11 : w >= 1000 ? 9 : w >= 880 ? 6 : w >= 760 ? 4 : 0;
-    const gap = 4;
-    const mode = wide ? 'w' + count + '-' + gap : 'n';
+    // NO CATEGORY ICONS IN THE NAV (2026-10-17, the owner: "remove these icons from the nav bar all over the website (do not remove
+    // the burger button from mobile or tab view)"): the wide nav is logo · Shop All · tools; tablets (640–1023px) get the phone nav's
+    // layout (burger · centred logo · search, wishlist, cart — the owner's iPad screenshot, "on ipad follow this") inside the tablet's
+    // 56px bar; desktops have no burger (Shop All + search lead on). NAV_CATS stays — the menu, the search tiles and the department
+    // icons still draw from it.
+    const tab = w < 1024;
+    const mode = wide ? 'w' + (tab ? 't' : 'd') : 'n';
     if (mode === navMode && !force) return;
     navMode = mode;
     Object.assign(nav.style, wide
-      ? { left: 'calc(var(--gutter, 28px) + 20px)', right: 'calc(var(--gutter, 28px) + 20px)', height: '56px', padding: '0 24px 0 32px', gap: '12px' }
+      ? { left: 'calc(var(--gutter, 28px) + 20px)', right: 'calc(var(--gutter, 28px) + 20px)', height: '56px', padding: tab ? '0 8px' : '0 24px 0 32px', gap: tab ? '0px' : '12px' }
       : { left: 'calc(var(--gutter, 16px) + 10px)', right: 'calc(var(--gutter, 16px) + 10px)', height: '43px', padding: '0 4px', gap: '0px' });
-    if (wide) {
+    if (wide && !tab) {
       nav.innerHTML = `
         <a href="${url.home}" aria-label="WisdomUp home" style="display: flex; align-items: center; flex: none;">${logoImgs(30)}</a>
-        <nav class="site-nav__cats" aria-label="Categories" style="gap: ${gap}px;">
-          ${NAV_CATS.slice(0, count).map(c => `<a class="navbtn navbtn--cat" href="${catHref(c.type)}" aria-label="${c.label}" data-type="${c.type}"${navOn(c.type) ? ' aria-current="true" aria-expanded="true"' : ''}>${navSvg(c.d, c.s, c.w, 24)}<span>${c.label}</span></a>`).join('')}
-        </nav>
+        <span class="site-nav__cats" aria-hidden="true"></span>
         <div class="site-nav__tools">
           <a class="navbtn navbtn--all" href="${url.products}" style="padding: 0 16px 0 12px; margin-right: 8px;">${navSvg(P_GRID, '', 2.2, 22)}<span>Shop All</span></a>
           ${themeBtn('navbtn navbtn--util')}
@@ -744,7 +745,7 @@
       nav.innerHTML = `
         <div class="site-nav__narrow">
           <button type="button" class="site-nav__icon" data-act="menu" aria-label="Menu" aria-haspopup="dialog" aria-controls="mnav" aria-expanded="false" style="justify-self: start;"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M4 6.5h16M4 12h16M4 17.5h16"></path></svg></button>
-          <a href="${url.home}" aria-label="WisdomUp home" style="display: flex; align-items: center; justify-content: center;">${logoImgs(26)}</a>
+          <a href="${url.home}" aria-label="WisdomUp home" style="display: flex; align-items: center; justify-content: center;">${logoImgs(wide ? 30 : 26)}</a>
           <div style="justify-self: end; display: flex; align-items: center; gap: 2px;">
             <button type="button" class="site-nav__icon" data-act="search" aria-label="Search"><svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="${P_SEARCH}"></path></svg></button>
             <a class="site-nav__icon" href="${url.wishlist}" aria-label="Wishlist" style="position: relative;"><svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true" fill="none" stroke="#fff" stroke-width="2.1" stroke-linejoin="round"><path d="${P_HEART}"></path></svg><b class="site-nav__badge site-nav__wbadge" hidden></b></a>

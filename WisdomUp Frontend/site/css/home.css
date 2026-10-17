@@ -1397,3 +1397,28 @@ html[data-theme="night"] .wpc__card::before { border-radius: 16px; }
    is the product png"): a transparent product photo sits on a white placeholder on every product card (and the night home tiles),
    both themes; other surfaces keep the grey --photo-cut */
 .wpc__media, .nh-tile__img { --photo-cut: #fff; }
+
+/* EMPTY CART — CONTROL CENTER HAIRLINE GLOW (2026-10-17, day only, the owner's iPhone Control Center screenshot: "on day theme,
+   when the cart is empty, mimic the hairline glow on the cart panel"): the empty-state capsule rows read as iOS control tiles —
+   a frosted glass fill, a soft inner light, and a 1.5px white rim that catches the light at the top-left and the bottom-right
+   (a masked 135° ring, `::after`, so the liquid-fill hover in `::before` is untouched), held off the white glass by a faint ink
+   hairline outside it. Night keeps its glass chips. */
+html:not([data-theme="night"]) .cartd--b .cartd__links a {
+  position: relative; isolation: isolate;
+  background: linear-gradient(180deg, rgba(222,224,228,.62) 0%, rgba(206,209,214,.5) 100%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%); backdrop-filter: blur(12px) saturate(160%);
+  box-shadow: 0 0 0 1.5px rgba(11,11,11,.05), inset 0 2px 10px rgba(255,255,255,.55), inset 0 -6px 14px rgba(11,11,11,.04), 0 8px 24px rgba(11,11,11,.07);
+}
+html:not([data-theme="night"]) .cartd--b .cartd__links a::after {
+  content: ""; position: absolute; inset: 0; z-index: 2; border-radius: inherit; padding: 1.5px; pointer-events: none;
+  background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,.35) 26%, rgba(255,255,255,.08) 50%, rgba(255,255,255,.35) 74%, rgba(255,255,255,.95) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+@media (hover: hover) and (pointer: fine) { html:not([data-theme="night"]) .cartd--b .cartd__links a:hover { background: linear-gradient(180deg, rgba(230,232,235,.72) 0%, rgba(214,217,221,.6) 100%); } }
+
+/* FILTER + MENU = THE SEARCH PANEL'S GLASS (2026-10-17, "match the liquid glass effect on the filter panel and burger panel same as
+   our search bar panel"): in day the filter drawer and the burger menu take the search panel's exact fill — white .74 (they were
+   .8, a flatter, greyer glass) — over the same .45 dim, with the same deep bend, blur 6px + saturate 200% + brightness 1.06, 1.5px
+   ring and bevel. (A .94 "white panels" pass the same day was undone for this.) Night unchanged. */
+html:not([data-theme="night"]) body :is(.mnav, .fdrawer) { background: rgba(255, 255, 255, .74); }
