@@ -1702,8 +1702,10 @@ body.sf-menu-open .wafab { opacity: 0 !important; pointer-events: none !importan
    both themes; off for reduced motion. */
 .site-nav .navbtn--all { position: relative; isolation: isolate; }
 .site-nav .navbtn__flare { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; z-index: 2; }
-.site-nav .navbtn__flare::before { content: ""; position: absolute; top: -20%; bottom: -20%; left: 0; width: 70%;
-  background: linear-gradient(110deg, transparent 28%, rgba(255,255,255,.14) 40%, rgba(255,255,255,.7) 50%, rgba(255,255,255,.14) 60%, transparent 72%);
-  transform: translateX(-110%); animation: wu-flare 3.9s cubic-bezier(.45,0,.25,1) 3s infinite; }
-@keyframes wu-flare { 0% { transform: translateX(-110%); } 23% { transform: translateX(160%); } 100% { transform: translateX(160%); } }
+.site-nav .navbtn__flare::before { content: ""; position: absolute; top: -20%; bottom: -20%; left: 0; width: 90%;
+  background: linear-gradient(110deg, transparent 20%, rgba(255,255,255,.06) 35%, rgba(255,255,255,.3) 50%, rgba(255,255,255,.06) 65%, transparent 80%);
+  transform: translateX(-110%); animation: wu-flare 4.8s cubic-bezier(.4,0,.6,1) 3s infinite; }
+@keyframes wu-flare { 0% { transform: translateX(-110%); } 37.5% { transform: translateX(130%); } 100% { transform: translateX(130%); } }
+/* SUBTLER (same day, "make it subtle, it's too fast and harsh"): peak white .7 → .3 over a wider, softer band, and the sweep 900ms → 1.8s
+   with an even ease-in-out; the 3s rest stays (one pass every 4.8s). */
 @media (prefers-reduced-motion: reduce) { .site-nav .navbtn__flare { display: none; } }
