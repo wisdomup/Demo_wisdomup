@@ -489,15 +489,18 @@ def main():
             if lead.get('cut'):
                 p['cut'] = True  # transparent: the page's grey panel shows through (common.js photoBg) (tools/set_photo.py): shown whole, centred — not the packshot's product-side crop
         # extra gallery photos from tools/set_photo.py (img/p/‹id›-2.jpg, -3 …): shown on the product page after the product's own photo
-        extra = []
+        extra, extra_at = [], []
         for n in range(2, 10):
             mp = os.path.join(IMG_BIG, f'{p["id"]}-{n}.json')
             if not os.path.exists(mp):
                 break
             m = json.load(open(mp))
             extra.append(f'img/p/{p["id"]}-{n}.' + ('webp' if m.get('cut') else 'jpg') + ('?v=' + m['v'] if m.get('v') else ''))
+            extra_at.append(m.get('at', ''))  # the photo's own crop on the square stage ("x% y%", set in its .json; default: from the top)
         if extra:
             p['photos'] = extra
+            if any(extra_at):
+                p['photosAt'] = extra_at
         products.append(p)
 
     # Products only the owner's listing sheet carries (tools/listing_products.json, 2026-10-14 — OS-1 … OS-4): built like a supplier

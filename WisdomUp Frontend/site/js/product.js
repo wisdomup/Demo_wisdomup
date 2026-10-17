@@ -249,7 +249,9 @@
     const v = V.find(x => x.img === src) || V[cur];
     $('stage').style.background = photoBg(v);
     $('stage-img').src = src;
-    $('stage-img').classList.toggle('is-life', (p.photos || []).includes(src)); // owner's extra photos fill the square from the top
+    const life = (p.photos || []).indexOf(src);
+    $('stage-img').classList.toggle('is-life', life > -1); // owner's extra photos fill the square from the top …
+    $('stage-img').style.objectPosition = (life > -1 && p.photosAt && p.photosAt[life]) || ''; // … or from their own crop (photosAt, 2026-10-18: JP-04's keyboard sits mid-photo)
     document.querySelectorAll('#thumbs .thumb').forEach((t, i) => t.setAttribute('aria-current', images[i] === src));
     const on = document.querySelector('#thumbs .thumb[aria-current="true"]');
     if (on) { const t = $('thumbs'), l = on.offsetLeft - t.offsetLeft; if (l < t.scrollLeft || l + on.offsetWidth > t.scrollLeft + t.clientWidth) t.scrollTo({ left: l, behavior: 'smooth' }); }
