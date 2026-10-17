@@ -1741,3 +1741,28 @@ html body :is(.search__close, .msort__x, .cartd__x, .cartd__sx, .mnav__x, .fdraw
 }
 @media (max-width: 639px) and (min-height: 541px) { .hero { height: clamp(531px, 91.08svh, 759px); min-height: 0; } }
 @media (max-height: 540px) and (orientation: landscape) { .hero { height: calc(100svh - 24px); min-height: 320px; } }
+
+/* LOOP CARD WITH A CAMPAIGN PHOTO (2026-10-18, the owner's CDB-18 car photo — 1383 × 1137, the card's own 1076 : 884 shape): the photo
+   fills the whole card (`.loop__bg`, cover) in place of the framed product tile; a soft shade from the top-left keeps the white copy
+   readable over the sky; the copy column is narrower so it stays in the sky beside the product. Phones / tablets (portrait cards)
+   crop around the product (`--at-tall`). Both themes (the card is the same in night). */
+.loop__bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: var(--at, 50% 50%); pointer-events: none; }
+@media (max-width: 1023px) { .loop__bg { object-position: var(--at-tall, 50% 50%); } }
+.loop__slide--img .loop__shade { background: linear-gradient(115deg, rgba(8, 14, 34, .55) 0%, rgba(8, 14, 34, .22) 34%, rgba(8, 14, 34, 0) 52%); }
+@media (min-width: 1024px) {
+  /* the product stands from ~35% of the photo's width, so the copy keeps to the sky on the left third */
+  .loop__slide--img .loop__copy { right: 60%; }
+  .loop__slide--img .loop__kicker { font-size: max(12px, 2cqw); letter-spacing: .12em; }
+  .loop__slide--img .loop__title { font-size: 6.4cqw; }
+  .loop__slide--img .loop__sub { max-width: 27cqw; font-size: max(14px, 2.6cqw); }
+}
+/* PORTRAIT CARDS (phones / tablets, 2026-10-18 "adjust the text on mobile view, trim a bit or reposition"): the photo fills the
+   lower two-thirds of the card and fades into the card's own sky navy (the photo's top colour, set as the card background in
+   home.js) so the kicker, title and Shop button sit on clear sky above the product; the subtitle is trimmed here. */
+@media (max-width: 1023px) {
+  .loop__slide--img .loop__bg { inset: auto 0 0 0; height: 66%; -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 24%); mask-image: linear-gradient(180deg, transparent 0, #000 24%); }
+  .loop__slide--img .loop__copy { right: 6.7cqw; }
+  .loop__slide--img .loop__title { font-size: 9cqw; }
+  .loop__slide--img .loop__sub { display: none; }
+  .loop__slide--img .loop__shade { display: none; }
+}
