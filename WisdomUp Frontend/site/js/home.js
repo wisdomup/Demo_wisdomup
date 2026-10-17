@@ -34,6 +34,9 @@
     // img = a full-card campaign photo (the card's own 1076 : 884 shape) in place of the framed product tile (2026-10-18, the owner's CDB-18 car photo)
     { id: 'cdb-18', img: 'img/loop/cdb-18-car.webp', imgSize: [1383, 1137], at: '50% 50%', atTall: '57% 50%', kicker: 'Magnetic power bank · CDB-18', title: 'Snap on. Power up.', sub: '15W magnetic wireless charging with a built-in watch charger.', tag: 'Power Banks', bg: '#10284F' },
     { id: 'txd-01', img: 'img/loop/txd-01-lava.webp', imgSize: [1384, 1136], at: '50% 50%', atTall: '55% 50%', compact: true, shade: 'linear-gradient(110deg, rgba(8, 2, 1, .72) 0%, rgba(8, 2, 1, .4) 32%, rgba(8, 2, 1, 0) 52%)', kicker: 'Electric shaver · TXD-01', title: 'A closer, cleaner shave.', sub: 'Five stainless steel blades and 100+ minutes per charge.', tag: 'Grooming', bg: '#0B0302' },
+    // side = a PORTRAIT photo (2026-10-18, the owner's JP-04 photo, 1122 × 1402): on wide screens it fills the card's right 60% at its own
+    // shape and fades into the card's dark brown on the left, where the copy sits; portrait cards (phones / tablets) use the usual layout
+    { id: 'jp-04', img: 'img/loop/jp-04-rgb.webp', imgSize: [1122, 1402], at: '50% 50%', atTall: '50% 54%', side: true, kicker: 'RGB keyboard & mouse · JP-04', title: 'Light up every key.', sub: 'A backlit keyboard and mouse set on 1.5m USB cables.', tag: 'Keyboards', bg: 'linear-gradient(180deg, #2C0B06 0%, #1A0604 100%)' },
   ].filter(s => P(s.id)).map(s => ({ ...s, ctaLabel: `Shop ${P(s.id).code} · ${P(s.id).priceText}`, ctaCode: `Shop ${P(s.id).code}`, ctaPrice: ` · ${P(s.id).priceText}` }));
   const TAG_SVG = '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M1 2.2V7.4c0 .4.2.8.5 1.1l6.9 6.9a1.5 1.5 0 0 0 2.1 0l4.9-4.9a1.5 1.5 0 0 0 0-2.1L8.5 1.5A1.6 1.6 0 0 0 7.4 1H2.2C1.5 1 1 1.5 1 2.2Zm3.5 1.3a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4Z"></path></svg>';
 
@@ -67,7 +70,7 @@
     root.innerHTML = `
       <div class="loop__track">
         ${[0, 1, 2].flatMap(c => LOOP.map(s => `
-          <article class="loop__slide${s.img ? ' loop__slide--img' : ''}${s.compact ? ' loop__slide--compact' : ''}${s.tight ? ' loop__slide--tight' : ''}" style="background: ${s.bg};${s.shade ? ` --loop-shade: ${s.shade};` : ''}"${c !== 1 ? ' aria-hidden="true"' : ''}>
+          <article class="loop__slide${s.img ? ' loop__slide--img' : ''}${s.compact ? ' loop__slide--compact' : ''}${s.tight ? ' loop__slide--tight' : ''}${s.side ? ' loop__slide--side' : ''}" style="background: ${s.bg};${s.shade ? ` --loop-shade: ${s.shade};` : ''}"${c !== 1 ? ' aria-hidden="true"' : ''}>
             ${s.img ? `<img class="loop__bg" src="${s.img}" alt="" width="${s.imgSize[0]}" height="${s.imgSize[1]}" loading="lazy" decoding="async" style="--at: ${s.at || '50% 50%'}; --at-tall: ${s.atTall || s.at || '50% 50%'};">` : ''}
             <div class="loop__shade"></div>
             <div class="loop__copy">

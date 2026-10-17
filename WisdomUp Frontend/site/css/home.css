@@ -1792,3 +1792,19 @@ html body :is(.search__close, .msort__x, .cartd__x, .cartd__sx, .mnav__x, .fdraw
     .loop__slide--compact .loop__cta { min-height: 32px; height: 7cqw; padding: 0 max(12px, 3cqw); font-size: max(12px, 2.6cqw); }
   }
 }
+
+/* SIDE PHOTO CARD (2026-10-18, the owner's JP-04 keyboard photo — PORTRAIT, 1122 × 1402, so it cannot fill a landscape card without
+   covering the copy): on wide screens the photo takes the card's right 60% at its own shape (cover in a box of almost the same
+   ratio) and fades into the card's dark brown over its left 22%; the copy keeps to the left 34%, with the price-less Shop button
+   scaled with the card so it ends before the keyboard. Phones / tablets: the usual portrait photo-card layout. */
+@media (min-width: 1024px) {
+  .loop__slide--side .loop__bg { inset: 0 0 0 38%; width: 62%; height: 100%; -webkit-mask-image: linear-gradient(90deg, transparent 0, rgba(0,0,0,.35) 14%, rgba(0,0,0,.8) 26%, #000 36%); mask-image: linear-gradient(90deg, transparent 0, rgba(0,0,0,.35) 14%, rgba(0,0,0,.8) 26%, #000 36%); }
+  /* the photo's peach glow continues into the card from the bottom, so the fade has no edge */
+  .loop__slide--side { background: radial-gradient(48% 58% at 50% 104%, rgba(236, 150, 82, .9) 0%, rgba(214, 104, 52, .45) 45%, rgba(214, 104, 52, 0) 100%), linear-gradient(180deg, #2C0B06 0%, #1A0604 100%) !important; }
+  .loop__slide--side .loop__shade { display: none; }
+  .loop__slide--side .loop__copy { right: 60%; }
+  .loop__slide--side .loop__title { font-size: 5.4cqw; }
+  .loop__slide--side .loop__sub { max-width: 30cqw; font-size: max(14px, 2.6cqw); }
+  .loop__slide--side .loop__cta-p { display: none; }
+  .loop__slide--side .loop__cta { min-height: 32px; height: 7cqw; padding: 0 max(12px, 3cqw); font-size: max(12px, 2.6cqw); }
+}
