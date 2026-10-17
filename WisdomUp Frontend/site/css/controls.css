@@ -213,3 +213,10 @@ button.link-arrow { height: var(--ctl); padding: 0; border: 0; background: none;
 /* strokes + paddings pass (2026-10-16): no browser-default 1px 6px on the bare buttons inside capsules; list indents on the scale */
 .newsletter button, .qty button { padding: 0; }
 .seo__card ul, .seo__card ol { padding-left: 16px; }
+
+/* NO SCROLL BARS ANYWHERE (2026-10-17, "remove the scroll bar from everywhere, just keep it applicable, don't show the bar"; it began
+   with the search panel): every scrolling box — the page itself, panels, drawers, the menu, the cart, rails, chip rows, fields —
+   still scrolls by wheel, trackpad, touch, keys and drag; only the bar is hidden, in both themes. !important beats the older
+   `scrollbar-width: thin` on the cart list and the night menu. */
+html, body, * { scrollbar-width: none !important; -ms-overflow-style: none; }
+::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
