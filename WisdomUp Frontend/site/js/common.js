@@ -738,7 +738,7 @@
         <a href="${url.home}" aria-label="WisdomUp home" style="display: flex; align-items: center; flex: none;">${logoImgs(30)}</a>
         <span class="site-nav__cats" aria-hidden="true"></span>
         <div class="site-nav__tools">
-          <a class="navbtn navbtn--all" href="${url.products}" style="padding: 0 16px 0 12px; margin-right: 8px;">${navSvg(P_GRID, '', 2.2, 22)}<span>Shop All</span></a>
+          <a class="navbtn navbtn--all" href="${url.products}" style="padding: 0 16px 0 12px; margin-right: 8px;">${navSvg(P_GRID, '', 2.2, 22)}<span>Shop All</span><i class="navbtn__flare" aria-hidden="true"></i></a>
           ${themeBtn('navbtn navbtn--util')}
           <button type="button" class="navbtn navbtn--util" data-act="search" aria-label="Search">${navSvg('', P_SEARCH, 2.2, 22)}</button>
           <button type="button" class="navbtn navbtn--util" data-act="account" aria-label="Account">${navSvg(P_USER, '', 2.2, 22)}</button>

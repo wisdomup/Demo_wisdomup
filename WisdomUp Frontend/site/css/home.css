@@ -1695,3 +1695,15 @@ body.sf-menu-open .wafab { opacity: 0 !important; pointer-events: none !importan
   .promo__chip:nth-child(n + 2) { display: none; } /* one chip fits the narrow copy column */
   .promo__ph { width: 42%; right: 4%; top: -28px; aspect-ratio: 4 / 5; }
 }
+
+/* SHOP ALL FLARE (2026-10-17, "add a flare passing at a 70° angle on the Shop All button after 3 secs"): a soft white streak, tilted
+   70° from the horizontal (a 110° gradient), sweeps across the nav's Shop All capsule in 900ms, then rests 3s, and repeats; the first
+   pass comes 3s after the page opens. Its own clipped layer (`.navbtn__flare`, added in renderNav()), transform only, no clicks,
+   both themes; off for reduced motion. */
+.site-nav .navbtn--all { position: relative; isolation: isolate; }
+.site-nav .navbtn__flare { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; z-index: 2; }
+.site-nav .navbtn__flare::before { content: ""; position: absolute; top: -20%; bottom: -20%; left: 0; width: 70%;
+  background: linear-gradient(110deg, transparent 28%, rgba(255,255,255,.14) 40%, rgba(255,255,255,.7) 50%, rgba(255,255,255,.14) 60%, transparent 72%);
+  transform: translateX(-110%); animation: wu-flare 3.9s cubic-bezier(.45,0,.25,1) 3s infinite; }
+@keyframes wu-flare { 0% { transform: translateX(-110%); } 23% { transform: translateX(160%); } 100% { transform: translateX(160%); } }
+@media (prefers-reduced-motion: reduce) { .site-nav .navbtn__flare { display: none; } }
