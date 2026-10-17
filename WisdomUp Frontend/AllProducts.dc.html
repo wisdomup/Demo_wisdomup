@@ -8,6 +8,7 @@
 <body>
 <x-dc>
 <helmet>
+  <link rel="stylesheet" href="wu-rail.css">
   <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/fonts.css">
   <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/colors.css">
   <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/typography.css">
@@ -36,17 +37,7 @@
   <dc-import name="SiteNav" start-top="{{ 64 }}" active="{{ navActive }}" bag-count="{{ bagCount }}" on-category="{{ onNav }}" on-shop-all="{{ clearCat }}" on-search="{{ openSearch }}" hint-size="100%,0px"></dc-import>
   <dc-import name="LifestyleHero" slides="{{ heroSlides }}" autoplay="{{ 5000 }}" on-cta="{{ onHeroCta }}" style="display: block; height: 560px;" hint-size="100%,560px"></dc-import>
 
-  <section style="margin: 72px var(--gutter, 28px) 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr)); gap: 40px; align-items: end;">
-    <div style="display: flex; flex-direction: column; gap: 20px;">
-      <div style="display: flex; gap: 8px; font: 500 14px/1 var(--font); color: #8B96A9;">
-        <span>Home</span><span>›</span><span style="color: #464646;">All Products</span>
-      </div>
-      <h1 style="margin: 0; font: 300 clamp(40px, 5.2vw, 64px)/1.04 var(--font); letter-spacing: -.02em; color: #464646;">Every WisdomUp. <span style="font-weight: 800;">One page.</span></h1>
-    </div>
-    <p style="margin: 0; font: 400 17px/1.6 var(--font); color: #464646; max-width: 460px; text-wrap: pretty;">Earbuds, neckbands, speakers, creator mics and charging — warranty-backed and shipped across Pakistan. Jump to a category or scroll the lot.</p>
-  </section>
-
-  <div id="jumpbar" style="position: sticky; top: {{ barTop }}px; transition: top 320ms cubic-bezier(.2,.7,.2,1); z-index: 5; margin: 48px var(--gutter, 28px) 0; padding: 10px; border-radius: 28px; background: rgba(208,212,212,.62); backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%); box-shadow: 0 10px 24px rgba(0,0,0,.08); display: flex; flex-wrap: wrap; align-items: center; gap: 8px;">
+  <div id="jumpbar" style="position: sticky; top: {{ barTop }}px; transition: top 320ms cubic-bezier(.2,.7,.2,1); z-index: 5; margin: 50px var(--gutter, 28px) 0; padding: 10px; border-radius: 28px; background: rgba(208,212,212,.62); backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%); box-shadow: 0 10px 24px rgba(0,0,0,.08); display: flex; flex-wrap: wrap; align-items: center; gap: 8px;">
     <sc-for list="{{ filters }}" as="f" hint-placeholder-count="6">
       <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Chip" active="{{ f.active }}" on-click="{{ f.pick }}" hint-size="110px,43px">{{ f.label }}</x-import>
     </sc-for>
@@ -68,9 +59,9 @@
       <div style="margin: 0 var(--gutter, 28px); display: flex; align-items: baseline; gap: 16px;">
         <h2 style="margin: 0; font: 800 clamp(30px, 3.6vw, 44px)/1.1 var(--font); letter-spacing: -.01em; text-transform: uppercase; background: var(--grad-heading); -webkit-background-clip: text; background-clip: text; color: transparent;">{{ g.label }}</h2>
       </div>
-      <div style="display: grid; grid-template-columns: repeat(auto-fill, 430px); justify-content: center; column-gap: 20px; row-gap: 48px; margin: 0 var(--gutter, 28px); padding: 28px 0 0;">
+      <div class="wu-rail" style="display: grid; grid-template-columns: {{ rg.cols }}; grid-auto-flow: {{ rg.flow }}; grid-auto-columns: {{ rg.auto }}; column-gap: {{ rg.gap }}; row-gap: 48px; overflow-x: {{ rg.ov }}; scroll-snap-type: {{ rg.snap }}; scroll-padding-left: var(--gutter, 28px); scrollbar-width: none; margin: 0 {{ rg.mx }}; padding: 28px {{ rg.px }} 0;">
         <sc-for list="{{ g.items }}" as="p" hint-placeholder-count="4">
-          <div style="min-width: 0;">
+          <div style="min-width: 0; scroll-snap-align: start;">
             <dc-import name="WUProductCard" slot-id="{{ p.id }}" title="{{ p.title }}" price="{{ p.priceText }}" badge="{{ p.tag }}" rating="{{ p.rating }}" colors="{{ p.colors }}" art="{{ p.art }}" src="{{ p.src }}" src2="{{ p.src2 }}" cta-label="{{ p.cta }}" disabled="{{ p.soldOut }}" on-buy="{{ p.buy }}" style="display: block;" hint-size="430px,720px"></dc-import>
           </div>
         </sc-for>
@@ -110,8 +101,10 @@ const slug = s => 'cat-' + s.toLowerCase();
 const barBottom = () => { const el = document.getElementById('jumpbar'); return el ? el.getBoundingClientRect().bottom + 24 : 220; };
 
 class Component extends DCLogic {
-  state = { navHidden: false, active: 'Earbuds', sort: 'featured', bag: 0, toast: '', searchOpen: false, query: '' };
+  state = { vw: typeof window !== 'undefined' ? window.innerWidth : 1440, navHidden: false, active: 'Earbuds', sort: 'featured', bag: 0, toast: '', searchOpen: false, query: '' };
   componentDidMount() {
+    this._vwR = () => { if (window.innerWidth !== this.state.vw) this.setState({ vw: window.innerWidth }); }; window.addEventListener('resize', this._vwR);
+    
     if (!window.WU_STORE) this._p = setInterval(() => { if (window.WU_STORE) { clearInterval(this._p); this.forceUpdate(); } }, 50);
     this._spy = () => {
       let cur = GROUPS[0];
@@ -122,7 +115,7 @@ class Component extends DCLogic {
     this._nav = e => this.setState({ navHidden: e.detail.hidden });
     window.addEventListener('wu-nav', this._nav);
   }
-  componentWillUnmount() { clearInterval(this._p); clearTimeout(this._t); window.removeEventListener('scroll', this._spy); window.removeEventListener('wu-nav', this._nav); }
+  componentWillUnmount() { window.removeEventListener('resize', this._vwR); clearInterval(this._p); clearTimeout(this._t); window.removeEventListener('scroll', this._spy); window.removeEventListener('wu-nav', this._nav); }
   add(id) {
     const p = window.WU_STORE.byId(id);
     clearTimeout(this._t);
@@ -138,7 +131,11 @@ class Component extends DCLogic {
   }
   renderVals() {
     const D = window.WU_STORE;
-    if (!D) return {};
+    const rgv = {
+      rg: (() => { const w = this.state.vw, n = w >= 1024 ? 4.2 : w >= 768 ? 3.2 : w >= 600 ? 2.2 : 1.2, g = w >= 600 ? 20 : 12;
+        return { cols: 'none', flow: 'column', auto: 'calc((100% + var(--gutter, 28px) - ' + (Math.ceil(n) - 1) * g + 'px) / ' + n + ')', gap: g + 'px', ov: 'auto', snap: 'x mandatory', mx: '0px', px: 'var(--gutter, 28px)' }; })(),
+    };
+    if (!D) return rgv
     const { active, sort, bag, toast, searchOpen, query } = this.state;
     const order = list => {
       const l = list.slice();
@@ -157,6 +154,7 @@ class Component extends DCLogic {
       return { label: g, anchor: slug(g), num: String(i + 1).padStart(2, '0'), countText: items.length + (items.length === 1 ? ' product' : ' products'), items: items.map(card) };
     }).filter(g => g.items.length);
     return {
+      ...rgv,
       utility: D.utility, bagCount: bag, trust: D.trust, footer: D.footer,
       navActive: active,
       onNav: x => GROUPS.includes(x.label) && this.jump(x.label),

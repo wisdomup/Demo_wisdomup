@@ -55,6 +55,6 @@ window.WU_SHOP = {
     "bank": { "label": "Bank transfer", "note": "Transfer the total to our bank account, then share the receipt on WhatsApp.", "bank": "", "accountTitle": "", "iban": "" }
   },
   "whatsapp": "923279800153",
-  "social": { "instagram": "", "youtube": "", "facebook": "", "x": "" },
+  "social": { "instagram": "https://www.instagram.com/wisdomup.pk/", "youtube": "https://www.youtube.com/@wisdomupofficial", "facebook": "https://www.facebook.com/wisdomup.pk/", "x": "" },
   "statuses": ["new", "confirmed", "paid", "shipped", "delivered", "cancelled"]
 };

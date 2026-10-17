@@ -8,6 +8,7 @@
 <body>
 <x-dc>
 <helmet>
+  <link rel="stylesheet" href="wu-rail.css">
   <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/fonts.css">
   <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/colors.css">
   <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/typography.css">
@@ -75,9 +76,9 @@
     <dc-import name="ShopRail" title="" items="{{ railProducts }}" tone="none" style="display: block; padding-top: 16px;" hint-size="100%,780px"></dc-import>
   </sc-if>
   <sc-if value="{{ isGrid }}" hint-placeholder-val="{{ false }}">
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, 430px); justify-content: center; column-gap: 20px; row-gap: 32px; margin: 0 var(--gutter, 28px); padding: 16px 20px 0;">
+    <div class="wu-rail" style="display: grid; grid-template-columns: {{ rg.cols }}; grid-auto-flow: {{ rg.flow }}; grid-auto-columns: {{ rg.auto }}; column-gap: {{ rg.gap }}; row-gap: 32px; overflow-x: {{ rg.ov }}; scroll-snap-type: {{ rg.snap }}; scroll-padding-left: var(--gutter, 28px); scrollbar-width: none; margin: 0 {{ rg.mx }}; padding: 16px {{ rg.px }} 0;">
       <sc-for list="{{ railProducts }}" as="p" hint-placeholder-count="4">
-        <dc-import name="WUProductCard" slot-id="{{ p.id }}" title="{{ p.title }}" price="{{ p.priceText }}" badge="{{ p.ribbon }}" rating="{{ p.rating }}" colors="{{ p.colors }}" art="{{ p.art }}" on-buy="{{ p.buy }}" style="display: block;" hint-size="430px,720px"></dc-import>
+        <dc-import name="WUProductCard" slot-id="{{ p.id }}" title="{{ p.title }}" price="{{ p.priceText }}" badge="{{ p.ribbon }}" rating="{{ p.rating }}" colors="{{ p.colors }}" art="{{ p.art }}" src="{{ p.src }}" on-buy="{{ p.buy }}" style="display: block;" hint-size="430px,720px"></dc-import>
       </sc-for>
     </div>
   </sc-if>
@@ -178,9 +179,11 @@ const BEST = [
 ];
 
 class Component extends DCLogic {
-  state = { tab: 'new', cat: null, bag: 0, best: 0, faq: 0, searchOpen: false, query: '', toast: '' };
-  componentDidMount() { if (!window.WU_STORE) this._p = setInterval(() => { if (window.WU_STORE) { clearInterval(this._p); this.forceUpdate(); } }, 50); }
-  componentWillUnmount() { clearTimeout(this._t); clearInterval(this._p); }
+  state = { vw: typeof window !== 'undefined' ? window.innerWidth : 1440, tab: 'new', cat: null, bag: 0, best: 0, faq: 0, searchOpen: false, query: '', toast: '' };
+  componentDidMount() {
+    this._vwR = () => { if (window.innerWidth !== this.state.vw) this.setState({ vw: window.innerWidth }); }; window.addEventListener('resize', this._vwR);
+     if (!window.WU_STORE) this._p = setInterval(() => { if (window.WU_STORE) { clearInterval(this._p); this.forceUpdate(); } }, 50); }
+  componentWillUnmount() { window.removeEventListener('resize', this._vwR); clearTimeout(this._t); clearInterval(this._p); }
   add(id) {
     const p = window.WU_STORE && window.WU_STORE.byId(id);
     if (!p) return;
@@ -196,7 +199,11 @@ class Component extends DCLogic {
 
   renderVals() {
     const D = window.WU_STORE;
-    if (!D) return {};
+    const rgv = {
+      rg: (() => { const w = this.state.vw, n = w >= 1024 ? 4.2 : w >= 768 ? 3.2 : w >= 600 ? 2.2 : 1.2, g = w >= 600 ? 20 : 12;
+        return { cols: 'none', flow: 'column', auto: 'calc((100% + var(--gutter, 28px) - ' + (Math.ceil(n) - 1) * g + 'px) / ' + n + ')', gap: g + 'px', ov: 'auto', snap: 'x mandatory', mx: '0px', px: 'var(--gutter, 28px)' }; })(),
+    };
+    if (!D) return rgv
     const { tab, cat, bag, best, faq, searchOpen, query, toast } = this.state;
     const layout = this.props.productLayout ?? 'rail';
     const catMatch = p => p.cat === cat || (cat === 'Wireless Chargers' && p.cat === 'Chargers' && p.id.startsWith('cj')) || (cat === 'Car Chargers' && p.id.startsWith('cc'));
@@ -208,6 +215,7 @@ class Component extends DCLogic {
     const results = (q ? D.products.filter(p => (p.title + ' ' + p.meta + ' ' + p.cat).toLowerCase().includes(q)) : D.products.slice(0, 4))
       .slice(0, 8).map((p, i) => ({ ...withBuy(p), tag: p.ribbon || p.cat, short: p.title.split(' ')[0], bg: D.media[i % 4] }));
     return {
+      ...rgv,
       showUtility: this.props.showUtility ?? true,
       autoplay: (this.props.heroAutoplay ?? true) ? 5000 : false,
       utility: D.utility,

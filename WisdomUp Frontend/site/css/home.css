@@ -1593,6 +1593,105 @@ html[data-theme="night"] .footer--mx .footer__pays li.footer__logo { background:
 @media (max-width: 767px) {
   .footer--mx .footer__bar { flex-direction: initial; }
 }
-@media (max-width: 379px) { /* very narrow phones: the legal links drop under © on their own line, still right-aligned */
-  .footer--mx .footer__bar { grid-template-columns: minmax(0, 1fr); grid-template-areas: "pay" "legal" "copy"; }
+@media (max-width: 419px) { /* narrow phones keep © | legal on one row: 12px type, links 8px apart */
+  .footer--mx .sf__copy, .footer-wrap .footer--mx .footer__legal a { font-size: 12px; }
+  .footer--mx .footer__legal { gap: 4px 8px; }
+  .footer--mx .footer__bar { column-gap: 12px; }
+}
+
+/* MOMAX FOOTER — PC SIZE (2026-10-17, "expand the footer, same size and padding as momax.net's footer on PC"; measured on momax.net
+   at 1440 with its reveals finished): 1200px box at 120, 48px top / 52px bottom padding; headline box 48px at the top, the line
+   24px under it in a 44px two-line slot, the 44px field 24px on (y 188), the social links 32px on (y 264); the link heads at 48;
+   32px on, the signature row 140px tall (the 636px wordmark, the tagline 40px to its right, centred); 40px on, the bar (24px top
+   padding, the logos + Display mode at ~y 563), 52px under the last row. Type keeps the visual sizes set earlier the same day. */
+@media (min-width: 1024px) {
+  .footer-wrap .footer.footer--mx { padding-top: 48px; }
+  .footer--mx .footer__main { padding-bottom: 32px; }
+  .footer--mx .footer__title { line-height: 48px; margin: 0; }
+  .footer--mx .footer__nl-msg { margin-top: 24px; line-height: 22px; min-height: 44px; }
+  .footer-wrap .footer--mx .newsletter--mx { margin-top: 24px; height: 44px; padding-left: 16px; }
+  .footer-wrap .footer--mx .newsletter--mx button { height: 36px; }
+  .footer--mx .footer__lead .footer__social { margin-top: 32px; }
+  .footer--mx .footer__sig { min-height: 140px; gap: 40px; padding-bottom: 40px; }
+  .footer-wrap .footer--mx .footer__mark { flex: 0 1 636px; }
+  .footer--mx .footer__bar { padding: 24px 0 52px; }
+}
+@media (min-width: 1024px) {
+  .footer-wrap .footer--mx .footer__lead .ft__soc { line-height: 23px; } /* momax's 23px social rows (63px block) */
+  .footer--mx .footer__sig { min-height: 0; padding: 0; margin-bottom: 40px; }
+  .footer-wrap .footer--mx .footer__mark { padding: 20px 0; } /* a 140px row like momax's logo, the wordmark centred in it */
+}
+/* ONE ROW AT EVERY WIDTH (2026-10-17, "when the screen width decreases you can squeeze the Display mode button a bit to still keep this
+   structure"): the logos + Display mode never wrap — the logo strip may shrink (each logo down to 22px) and, on phones, the capsule
+   compacts (32px tall, 12px type, 10px sides) */
+.footer--mx .footer__payrow { flex-wrap: nowrap; }
+.footer--mx .footer__pays { flex: 0 1 auto; min-width: 0; flex-wrap: nowrap; }
+.footer--mx .footer__pays li.footer__logo { flex: 0 1 32px; min-width: 22px; height: auto; aspect-ratio: 1; }
+.footer--mx .footer__payrow .sf__mode { flex: none; }
+@media (max-width: 639px) {
+  .footer--mx .footer__pays { gap: 2px; }
+  .footer-wrap .footer--mx .sf__mode .msort__btn { height: 32px; min-height: 32px; padding: 0 10px 0 12px; font-size: 12px; gap: 6px; }
+}
+/* Display mode one notch smaller (2026-10-17, "shrink the Display mode button a bit notch"): 34px / 13px (was 40 / 14), phones 28px /
+   12px (was 32); the morphing panel takes its size from the button, so it follows */
+.footer-wrap .footer--mx .sf__mode .msort__btn { height: 34px; min-height: 34px; padding: 0 12px 0 14px; font-size: 13px; }
+@media (max-width: 639px) { .footer-wrap .footer--mx .sf__mode .msort__btn { height: 28px; min-height: 28px; padding: 0 8px 0 10px; font-size: 12px; } }
+.footer--mx .sf__copy { white-space: nowrap; } /* "© 2026 WisdomUp" never breaks */
+/* © + legal links 20% smaller (2026-10-17, "the size of the © 2026 WisdomUp and the terms can go down by 20%"): 12px → 9.6px, every
+   width — the owner's call below the 12px floor of the scale */
+.footer--mx .sf__copy, .footer-wrap .footer--mx .footer__legal a { font-size: 9.6px !important; line-height: 14px !important; }
+/* EVEN SPACE ROUND THE WORDMARK (2026-10-17, "the gap above the WISDOMUP typeface looks awkward"): the wordmark file is cropped tight
+   to its letters (957×133, was 150 with blank rows), and on phones the gap above it is one 32px step from the last accordion line
+   (main padding 0 + the row's 32), with 24px below to the social icons — it was 64px + the blank rows above vs 24 below */
+@media (max-width: 767px) {
+  .footer--mx .footer__main { padding-bottom: 0; }
+  .footer--mx .footer__sig { padding: 32px 0 24px; gap: 24px; }
+}
+@media (min-width: 1024px) { .footer-wrap .footer--mx .footer__mark { padding: 26px 0; } } /* the tight 957×133 wordmark at 636px is 88px tall: 26px each side keeps momax's 140px row */
+/* SOCIAL LINKS HOVER (2026-10-17, "when hover on social media icons they turn red as our colour scheme red, remove underline hover"):
+   day = brand red #D91E05 (icon + name), no underline-draw; night (the footer itself is red) = full white, no underline */
+.footer-wrap .footer--mx a.ft__soc, .footer-wrap .footer--mx a.ft__soc:hover { background-image: none !important; text-decoration: none !important; transition: color 300ms cubic-bezier(.7, 0, .3, 1); }
+.footer-wrap .footer--mx a.ft__soc:hover { color: #D91E05 !important; }
+html[data-theme="night"] .footer-wrap .footer--mx a.ft__soc:hover { color: #fff !important; }
+/* © … × Lightspeed (2026-10-17): the credit link wears the © line's own type and colour; the underline draws on hover */
+.footer-wrap .footer--mx .sf__copy a.sf__credit { padding: 0; font: inherit !important; color: inherit; }
+.footer-wrap .footer--mx .sf__copy a.sf__credit:hover { color: #000; }
+html[data-theme="night"] .footer-wrap .footer--mx .sf__copy a.sf__credit:hover { color: #fff; }
+.footer-wrap .footer--mx .sf__copy a.sf__credit { display: inline !important; white-space: nowrap; } .footer--mx .sf__copy { white-space: nowrap !important; } /* "© … WisdomUp × Lightspeed" stays on ONE line, in the same row as the legal links */
+/* the © line keeps its natural width (it never wraps); the legal links take the rest, right-aligned. Under 360px (320 phones) both drop
+   to 8.6px and the gaps tighten so the row still fits on one line */
+.footer--mx .footer__bar { grid-template-columns: auto minmax(0, 1fr); }
+@media (max-width: 359px) {
+  .footer--mx .sf__copy, .footer-wrap .footer--mx .footer__legal a { font-size: 8.6px !important; }
+  .footer--mx .footer__legal { gap: 4px; }
+  .footer--mx .footer__bar { column-gap: 8px; }
+}
+/* the floating WhatsApp button steps aside while the footer's Display mode menu is open, like back-to-top (2026-10-17, "fix this
+   overlap": it sat over the open panel's options) */
+body.sf-menu-open .wafab { opacity: 0 !important; pointer-events: none !important; transition: opacity 300ms ease; }
+/* the closed Display mode button no longer shows through the open panel's glass (2026-10-17, "fix this underneath button stroke"):
+   while the menu is open the button (its 1.5px stroke, label and dot) fades out; on close it fades back in as the panel folds onto it */
+.sf__mode .msort__btn { transition: opacity 250ms ease 300ms; }
+.sf__mode .msort__btn[aria-expanded="true"] { opacity: 0; transition: opacity 150ms ease; }
+.footer-wrap .sf__mode .msort__btn[aria-expanded="true"] { opacity: 0 !important; transition: opacity 150ms ease !important; }
+.footer-wrap .sf__mode .msort__btn[aria-expanded="false"] { transition: opacity 250ms ease 300ms, color 500ms cubic-bezier(.3, 1, .3, 1) 100ms, box-shadow 500ms cubic-bezier(.3, 1, .3, 1), border-color 500ms cubic-bezier(.3, 1, .3, 1) 100ms !important; }
+
+/* "CHARGE IT, PLAY IT" ON PHONES = RONIN'S STRUCTURE (2026-10-17, "this part was inspired by ronin.pk — follow it on phone view same as
+   ronin, not the shape, just the structure"; ronin.pk's tilted product banner measured at 375: ONE landscape card per view on the
+   20px gutter, 335×200 ≈ 1.68:1, the copy on the LEFT — kicker capsule, the big model name, spec chips — and the product on the RIGHT
+   breaking out over the top edge; the next card waits off-screen). Ours keeps its own shape (the tilt, 16px corners, the framed
+   photo tile) and colours; the long product title is left off the phone card (the code, price and chips carry it, like ronin's). */
+@media (max-width: 639px) {
+  .promo-band__clip { padding: 40px 8px 12px; }
+  .promo { min-height: 0; aspect-ratio: 1.68 / 1; display: flex; align-items: center; }
+  .promo__inner { width: 100%; padding: 20px 46% 20px 16px; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+  .promo__kicker { max-width: 100%; padding: 4px 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 11px !important; }
+  .promo__name { margin: 2px 0 0; font-size: 32px; line-height: 1; }
+  .promo__meta { margin: 0; gap: 0; }
+  .promo__title { display: none; }
+  .promo__price { font-size: 14px; }
+  .promo__chips { gap: 4px; flex-wrap: nowrap; }
+  .promo__chip { padding: 6px 10px; font-size: 11px !important; white-space: nowrap; }
+  .promo__chip:nth-child(n + 2) { display: none; } /* one chip fits the narrow copy column */
+  .promo__ph { width: 42%; right: 4%; top: -28px; aspect-ratio: 4 / 5; }
 }

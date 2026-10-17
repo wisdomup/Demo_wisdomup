@@ -2075,13 +2075,13 @@
             </div>
           </div>
           <div class="footer__sig">
-            <a class="footer__mark" href="${url.home}" aria-label="WisdomUp home"><img src="img/wu-wordmark.png" alt="WisdomUp" width="957" height="150"><img src="img/wu-wordmark-white.png" alt="" aria-hidden="true" width="957" height="150"></a>
+            <a class="footer__mark" href="${url.home}" aria-label="WisdomUp home"><img src="img/wu-wordmark.png" alt="WisdomUp" width="957" height="133"><img src="img/wu-wordmark-white.png" alt="" aria-hidden="true" width="957" height="133"></a>
             <p class="footer__tag">Delivered across Pakistan</p>
             ${socialList.replace('aria-label="WisdomUp on social media"', 'aria-label="WisdomUp on social media (icons)"')}
           </div>
           <div class="footer__bar">
             <div class="footer__barl">
-              <p class="sf__copy">© ${YEAR} WisdomUp</p>
+              <p class="sf__copy">© ${YEAR} WisdomUp × <a class="sf__credit" href="https://lightspeed.pk" target="_blank" rel="noopener">Lightspeed</a></p>
               <nav class="footer__legal" aria-label="Legal"><a href="${url.terms}">Terms</a><a href="${url.privacy}">Privacy</a><a href="#cookie-preferences">Cookies</a><a href="sitemap.html">Sitemap</a></nav>
             </div>
             <div class="footer__payrow"><ul class="footer__pays" aria-label="Ways to pay">${PAY_LOGOS.map(([f, n]) => `<li class="footer__logo"><img src="img/pay/${f}.png" alt="${n}" title="${n}" width="100" height="100" loading="lazy"></li>`).join('')}</ul>
@@ -2634,6 +2634,18 @@
       });
     };
     mark(document.body);
+    // KINETIC FOOTER ON TOUCH SCREENS (2026-10-17, "the kinetic effect we made for the footer is not working on mobile"): the slide-up
+    // parallax reveal stays desktop-only (canReveal — iOS Safari's toolbar resizes the screen mid-scroll and once dropped the footer
+    // with a black gap, 2026-10-16), so phones and tablets get the momax footer reveal instead: its parts rise into place one after
+    // another through the same queue as the rest of the page — newsletter pieces, each link group, the wordmark, the social row, the
+    // bar. They stay in the flow (transform + opacity only), so the toolbar cannot break them.
+    if (matchMedia('(pointer: coarse)').matches) {
+      document.querySelectorAll('.footer--mx :is(.footer__title, .footer__nl-msg, .newsletter--mx, .ft__group, .footer__mark, .footer__sig .footer__social, .footer__payrow, .sf__copy, .footer__legal)').forEach(el => {
+        if (el.hasAttribute('data-rv')) return;
+        el.setAttribute('data-rv', 'up');
+        revealer.observe(el);
+      });
+    }
     // Safety net: also reveal by position on scroll/resize, so content can never stay invisible
     // (e.g. embedded previews where the browser doesn't report visibility)
     let tick = 0;

@@ -2,7 +2,7 @@
 window.WU_STORE = (function () {
   const P = (id, title, cat, price, was, meta, art, extra) => Object.assign({ id, title, cat, price, was, meta, art, rating: null, colors: [] }, extra || {});
   const products = [
-    P('os4', 'OS-4 Open Stereo Earbuds', 'Earbuds', 6000, 6500, '40+ Hrs Battery | RGB Lights | IPX7', 'buds', { ribbon: 'Newly launched', rating: 5, colors: ['#1b1b1b'], tabs: ['new', 'best'] }),
+    P('os4', 'OS-4 Open Stereo Earbuds', 'Earbuds', 6000, 6500, '40+ Hrs Battery | RGB Lights | IPX7', 'buds', { ribbon: 'Newly launched', rating: 5, colors: ['#1b1b1b'], tabs: ['new', 'best'], src: 'img/os4-hero.avif' }),
     P('os5', 'OS-5 Open Stereo Earbuds', 'Earbuds', 5800, 5999, 'Open-ear Fit | ENC Mic | Bluetooth 5.4', 'buds', { ribbon: 'Newly launched', rating: 5, colors: ['#EDE6DA'], tabs: ['new', 'trend'] }),
     P('ts10', 'TS-10 True Wireless Earbuds', 'Earbuds', 4800, 5500, 'ANC | 30 Hrs Playback | Touch Control', 'buds', { rating: 5, colors: ['#F2F2F2'], tabs: ['new', 'best'] }),
     P('mkf02', 'MKF-02 Wireless Mic', 'Microphones', 3750, null, 'Dual Mic | Noise Reduction | Type-C + Lightning', 'speaker', { ribbon: 'Creator pick', colors: ['#1b1b1b'], tabs: ['new', 'trend'] }),
@@ -55,7 +55,7 @@ window.WU_STORE = (function () {
     contact: { phone: '+92 327 9800153', email: 'support@wisdomup.pk', hours: 'Mon–Sun, 10 AM – 6 PM' },
     lifestyle: [
       { slotId: 'hero-thunder', pid: 'thunder', kicker: 'Sales live · Party speaker', name: 'THUNDER PRO', line: 'RGB LED Lights | Custom EQ | IPX6', ctaLabel: 'Shop now · Rs.12,995', src: 'img/hero-slide-web.png', hint: 'Lifestyle photo — friends at a party with Thunder Pro' },
-      { slotId: 'hero-os4', pid: 'os4', kicker: 'Newly launched · Open stereo', name: 'OS-4', line: '40+ Hrs Battery | RGB Lights | IPX7', ctaLabel: 'Shop now · Rs.6,000', hint: 'Lifestyle photo — runner wearing OS-4 outdoors' },
+      { slotId: 'hero-os4', pid: 'os4', kicker: 'Newly launched · Open stereo', name: 'OS-4', line: '40+ Hrs Battery | RGB Lights | IPX7', ctaLabel: 'Shop now · Rs.6,000', src: 'img/os4-hero.avif', hint: 'Lifestyle photo — runner wearing OS-4 outdoors' },
       { slotId: 'hero-ts10', pid: 'ts10', kicker: 'Active noise cancelling', name: 'TS-10', line: 'ANC | 30 Hrs Playback | Touch Control', ctaLabel: 'Shop now · Rs.4,800', hint: 'Lifestyle photo — commuter wearing TS-10' },
       { slotId: 'hero-mkf02', pid: 'mkf02', kicker: 'Creator pick · Wireless mic', name: 'MKF-02', line: 'Dual Mic | Noise Reduction | Type-C + Lightning', ctaLabel: 'Shop now · Rs.3,750', hint: 'Lifestyle photo — creator filming with MKF-02' },
       { slotId: 'hero-cj45', pid: 'cj45', kicker: '3-in-1 stand · 15W', name: 'CJ-45', line: '15W Wireless | 3-in-1 Stand', ctaLabel: 'Shop now · Rs.9,000', hint: 'Lifestyle photo — desk setup charging on CJ-45' },

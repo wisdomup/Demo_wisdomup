@@ -8,6 +8,7 @@
 <body>
 <x-dc>
 <helmet>
+  <link rel="stylesheet" href="wu-rail.css">
   <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/fonts.css">
   <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/colors.css">
   <link rel="stylesheet" href="_ds/wisdomup-design-system-ba770b81-2303-4bcc-8590-becfff5c0eff/tokens/typography.css">
@@ -20,7 +21,7 @@
     a:hover { color: #1B3FA0; }
   </style>
 </helmet>
-<section style="display: flex; flex-direction: column; gap: 20px; padding: 28px 0 32px; box-sizing: border-box; background: {{ bandBg }};">
+<section style="display: flex; flex-direction: column; gap: 40px; padding: 28px 0 32px; box-sizing: border-box; background: {{ bandBg }};">
   <div style="margin: 0 var(--gutter, 28px); display: flex; align-items: flex-start; gap: 20px; flex-wrap: wrap;">
     <h2 class="sec-title" style="margin: 0; flex: 1; min-width: 0; font-size: clamp(30px, 3.2vw, 48px); font-weight: 800; line-height: 1; letter-spacing: -.01em;">{{ title }}</h2>
     <div style="display: flex; align-items: center; gap: 10px;">
@@ -33,10 +34,10 @@
       </button>
     </div>
   </div>
-  <div ref="{{ trackRef }}" onScroll="{{ onScroll }}" style="display: grid; grid-auto-flow: column; grid-auto-columns: 430px; gap: 20px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-left: var(--gutter, 28px); padding: 0 var(--gutter, 28px); scrollbar-width: none; scroll-behavior: smooth;">
+  <div class="wu-rail" ref="{{ trackRef }}" onScroll="{{ onScroll }}" style="display: grid; grid-auto-flow: column; grid-auto-columns: {{ colW }}; gap: {{ gapPx }}px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-left: var(--gutter, 28px); padding: 0 var(--gutter, 28px); scrollbar-width: none; scroll-behavior: smooth;">
     <sc-for list="{{ items }}" as="p" hint-placeholder-count="5">
       <div style="scroll-snap-align: start; min-width: 0;">
-        <dc-import name="WUProductCard" slot-id="{{ p.id }}" title="{{ p.title }}" price="{{ p.priceText }}" badge="{{ p.ribbon }}" rating="{{ p.rating }}" colors="{{ p.colors }}" art="{{ p.art }}" src="{{ p.src }}" src2="{{ p.src2 }}" cta-label="{{ p.cta }}" disabled="{{ p.soldOut }}" on-buy="{{ p.buy }}" on-open="{{ p.open }}" style="display: block;" hint-size="430px,720px"></dc-import>
+        <dc-import name="WUProductCard" slot-id="{{ p.id }}" title="{{ p.title }}" price="{{ p.priceText }}" badge="{{ p.ribbon }}" rating="{{ p.rating }}" colors="{{ p.colors }}" art="{{ p.art }}" src="{{ p.src }}" src2="{{ p.src2 }}" cta-label="{{ p.cta }}" disabled="{{ p.soldOut }}" on-buy="{{ p.buy }}" on-open="{{ p.open }}" style="display: block;" hint-size="100%,560px"></dc-import>
       </div>
     </sc-for>
   </div>
@@ -44,9 +45,9 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:680},&quot;title&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;New Arrivals&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;items&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;Product[]&quot;},&quot;tone&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;grey&quot;,&quot;ice&quot;,&quot;cream&quot;,&quot;none&quot;],&quot;default&quot;:&quot;grey&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;onViewAll&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(e) =&gt; void&quot;}}">
 class Component extends DCLogic {
-  state = { atStart: true, atEnd: false };
+  state = { atStart: true, atEnd: false, vw: typeof window !== 'undefined' ? window.innerWidth : 1440 };
   trackRef = React.createRef();
-  componentDidMount() { this.sync(); this._r = () => this.sync(); window.addEventListener('resize', this._r); }
+  componentDidMount() { this.sync(); this._r = () => { this.sync(); if (window.innerWidth !== this.state.vw) this.setState({ vw: window.innerWidth }); }; window.addEventListener('resize', this._r); }
   componentWillUnmount() { window.removeEventListener('resize', this._r); }
   sync() {
     const t = this.trackRef.current; if (!t) return;
@@ -65,6 +66,8 @@ class Component extends DCLogic {
       bandBg: ({ grey: 'var(--aqua-band, #CEECF2)', ice: '#E9F3FC', cream: 'var(--cream, #FBF4E4)', none: 'transparent' })[p.tone || 'grey'],
       items: (p.items || (window.WU_STORE ? window.WU_STORE.products.slice(0, 8) : [])).map(x => Object.assign({ cta: x.soldOut ? 'Sold out' : 'Add to cart' }, x)),
       trackRef: this.trackRef,
+      ...(() => { const w = this.state.vw, n = w >= 1024 ? 4.2 : w >= 768 ? 3.2 : w >= 600 ? 2.2 : 1.2, g = w >= 600 ? 20 : 12;
+        return { gapPx: g, colW: 'calc((100% + var(--gutter, 28px) - ' + (Math.ceil(n) - 1) * g + 'px) / ' + n + ')' }; })(),
       onScroll: () => this.sync(),
       prev: () => this.step(-1),
       next: () => this.step(1),

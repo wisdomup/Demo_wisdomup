@@ -265,12 +265,14 @@
       </div>`)).join('');
     $('promo-dots').innerHTML = `<div class="dots on-light-dots" role="tablist" aria-label="Slides" style="position: static;">${PROMOS.map((_, i) => `<button type="button" class="dot" role="tab" aria-label="Slide ${i + 1}"></button>`).join('')}</div>`;
     const dots = $('promo-dots').querySelectorAll('.dot');
-    const promoW = () => { const w = vw(), per = w < 640 ? 1 : w < 1024 ? 2 : 3; return per === 1 ? '100%' : `calc((100% - ${(per - 1) * 20}px) / ${per})`; };
+    // the step = the track's REAL CSS gap (it was a fixed 20px while the CSS gap is 16px, so every slide drifted 4px and the card ended cut off)
+    const gapPx = () => parseFloat(getComputedStyle(track).columnGap) || 16;
+    const promoW = () => { const w = vw(), per = w < 640 ? 1 : w < 1024 ? 2 : 3; return per === 1 ? '100%' : `calc((100% - ${(per - 1) * gapPx()}px) / ${per})`; };
     const paint = anim => {
       const W = promoW();
       band.style.setProperty('--promo-w', W);
       track.style.transition = anim ? SLIDE_T : 'none';
-      track.style.transform = `translateX(calc(${-idx} * (${W} + 20px)))`;
+      track.style.transform = `translateX(calc(${-idx} * (${W} + ${gapPx()}px)))`;
       const a = idx % n;
       dots.forEach((d, i) => d.setAttribute('aria-selected', i === a));
     };
@@ -290,6 +292,42 @@
     });
     band.addEventListener('mouseenter', () => { hover = true; });
     band.addEventListener('mouseleave', () => { hover = false; });
+    // SWIPE / DRAG (2026-10-17, "this part is not a slider with touch"): the cards follow a finger (or a mouse drag) like the hero —
+    // let go past 15% of a card or with a quick flick and it moves one card that way, else it springs back (600ms); a drag never
+    // opens a card; autoplay waits while you hold it. touch-action: pan-y keeps vertical page scrolling native.
+    const view = track.parentElement;
+    view.style.touchAction = 'pan-y';
+    let sx = null, sy = 0, dx = 0, t0 = 0, axis = null, dragged = false, lastDrag = 0;
+    const cardW = () => (track.firstElementChild ? track.firstElementChild.getBoundingClientRect().width : view.clientWidth) + 20;
+    view.addEventListener('pointerdown', e => {
+      if (e.button !== 0) return;
+      sx = e.clientX; sy = e.clientY; dx = 0; t0 = performance.now(); axis = null; dragged = false; hover = true;
+    });
+    window.addEventListener('pointermove', e => {
+      if (sx == null) return;
+      const mx = e.clientX - sx, my = e.clientY - sy;
+      if (!axis) { if (Math.abs(mx) < 6 && Math.abs(my) < 6) return; axis = Math.abs(mx) > Math.abs(my) ? 'x' : 'y'; }
+      if (axis !== 'x') return;
+      dragged = true; dx = mx;
+      const W = promoW();
+      track.style.transition = 'none';
+      track.style.transform = `translateX(calc(${-idx} * (${W} + ${gapPx()}px) + ${dx}px))`;
+    }, { passive: true });
+    const release = () => {
+      if (sx == null) return;
+      const flick = Math.abs(dx) / Math.max(1, performance.now() - t0) > .5;
+      if (dragged) {
+        lastDrag = performance.now();
+        if (Math.abs(dx) > cardW() * .15 || (flick && Math.abs(dx) > 20)) idx += dx < 0 ? 1 : -1;
+        track.style.transition = '';
+        paint(true);
+      }
+      sx = null; hover = band.matches(':hover'); // a mouse still over the band keeps autoplay paused
+    };
+    window.addEventListener('pointerup', release);
+    window.addEventListener('pointercancel', release);
+    view.addEventListener('click', e => { if (performance.now() - lastDrag < 300) { e.preventDefault(); e.stopPropagation(); } }, true); // a drag never opens a card
+    view.addEventListener('dragstart', e => e.preventDefault()); // links and images must not start a native drag
     setInterval(() => { if (!hover && !reduced()) { idx++; paint(true); } }, 6000);
     window.addEventListener('resize', () => paint(false));
     paint(false);

@@ -20,14 +20,15 @@
   <style>
     a { color: #2350C8; text-decoration: none; }
     a:hover { color: #1B3FA0; }
+    @media (max-width: 639px) { .wu-hero-arrow, .wu-hero-copy, .wu-hero-scrim { display: none !important; } }
   </style>
 </helmet>
-<section aria-roledescription="carousel" onMouseEnter="{{ pause }}" onMouseLeave="{{ resume }}" style="position: relative; height: 100%; min-height: 460px; margin: 0 var(--gutter, 28px); border-radius: 40px; overflow: hidden; background: #151312;">
+<section aria-roledescription="carousel" onMouseEnter="{{ pause }}" onMouseLeave="{{ resume }}" style="position: relative; height: 100%; min-height: 460px; margin: 0 var(--gutter, 28px); border-radius: clamp(24px, 6vw, 40px); overflow: hidden; background: #151312;">
   <sc-for list="{{ slides }}" as="s" hint-placeholder-count="1">
     <div style="position: absolute; inset: 0; opacity: {{ s.op }}; z-index: {{ s.z }}; pointer-events: {{ s.pe }}; transition: opacity 640ms cubic-bezier(.2,.7,.2,1);">
       <image-slot id="{{ s.slotId }}" shape="rect" src="{{ s.src }}" placeholder="{{ s.hint }}"></image-slot>
-      <div style="position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgba(13,12,11,.82) 0%, rgba(13,12,11,.45) 38%, rgba(13,12,11,0) 66%), linear-gradient(0deg, rgba(13,12,11,.55) 0%, rgba(13,12,11,0) 40%);"></div>
-      <div style="position: absolute; left: clamp(22px, 5vw, 64px); right: clamp(22px, 5vw, 64px); bottom: clamp(56px, 9vh, 96px); max-width: 620px; display: flex; flex-direction: column; gap: 18px; pointer-events: none;">
+      <div class="wu-hero-scrim" style="position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgba(13,12,11,.82) 0%, rgba(13,12,11,.45) 38%, rgba(13,12,11,0) 66%), linear-gradient(0deg, rgba(13,12,11,.55) 0%, rgba(13,12,11,0) 40%);"></div>
+      <div class="wu-hero-copy" style="position: absolute; left: clamp(22px, 5vw, 64px); right: clamp(22px, 5vw, 64px); bottom: clamp(56px, 9vh, 96px); max-width: 620px; display: flex; flex-direction: column; gap: 18px; pointer-events: none;">
         <div style="font: 600 13px/1 var(--font); letter-spacing: .24em; text-transform: uppercase; color: #D8D2CC;">{{ s.kicker }}</div>
         <div style="font: 400 clamp(48px, 7vw, 96px)/1 var(--font-display); background: var(--grad-gold); -webkit-background-clip: text; background-clip: text; color: transparent;">{{ s.name }}</div>
         <div style="font: 500 16px/1.5 var(--font); color: #fff; text-wrap: pretty;">{{ s.line }}</div>
@@ -37,6 +38,12 @@
       </div>
     </div>
   </sc-for>
+  <button class="wu-hero-arrow" aria-label="Previous slide" onClick="{{ prev }}" style="position: absolute; top: 50%; left: 20px; z-index: 3; width: 50px; height: 50px; margin-top: -25px; padding: 0; border: 0; border-radius: 50%; background: rgba(225,220,216,.78); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); color: #4A4A4A; display: grid; place-items: center; cursor: pointer; transition: background-color 180ms ease, transform 220ms cubic-bezier(.2,.7,.2,1);" style-hover="background: rgba(240,237,234,.92); transform: scale(1.06);" style-active="transform: scale(.96);">
+    <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path stroke-width="1.6" d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+  </button>
+  <button class="wu-hero-arrow" aria-label="Next slide" onClick="{{ next }}" style="position: absolute; top: 50%; right: 20px; z-index: 3; width: 50px; height: 50px; margin-top: -25px; padding: 0; border: 0; border-radius: 50%; background: rgba(225,220,216,.78); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); color: #4A4A4A; display: grid; place-items: center; cursor: pointer; transition: background-color 180ms ease, transform 220ms cubic-bezier(.2,.7,.2,1);" style-hover="background: rgba(240,237,234,.92); transform: scale(1.06);" style-active="transform: scale(.96);">
+    <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path stroke-width="1.6" d="M9.5 6l6 6-6 6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+  </button>
   <div style="position: absolute; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 3; height: 10px; width: 160px;">
     <x-import component-from-global-scope="WisdomupDesignSystem_ba770b.Dots" static="{{ true }}" count="{{ count }}" active="{{ active }}" on-change="{{ setI }}" hint-size="120px,10px" style="display: flex; justify-content: center;"></x-import>
   </div>
@@ -70,6 +77,8 @@ class Component extends DCLogic {
       count: list.length,
       active: i,
       setI: v => this.setState({ i: v }),
+      prev: () => this.setState({ i: (i - 1 + list.length) % list.length }),
+      next: () => this.setState({ i: (i + 1) % list.length }),
       pause: () => { this._hover = true; },
       resume: () => { this._hover = false; },
     };
