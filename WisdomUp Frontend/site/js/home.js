@@ -112,11 +112,18 @@
     root.addEventListener('touchend', e => { if (sx == null) return; const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1); sx = null; });
     paint(false);
     paintToggle();
-    return { st, go, paint };
+    return { st, go, paint, root };
   });
+  // SMOOTH TOUCH (2026-10-18): a loop only autoplays while it is on screen — three off-screen tracks gliding at once every 5s used
+  // to land in the middle of a phone scroll
+  const onScreen = new WeakMap();
+  if (window.IntersectionObserver) {
+    const io = new IntersectionObserver(es => es.forEach(e => onScreen.set(e.target, e.isIntersecting)), { rootMargin: '100px 0px' });
+    loops.forEach(l => io.observe(l.root));
+  }
   setInterval(() => {
     if (document.hidden || reduced()) return;
-    loops.forEach(l => { if (l.st.play) l.go(1); });
+    loops.forEach(l => { if (l.st.play && onScreen.get(l.root) !== false) l.go(1); });
   }, 5000);
   let lastW = vw();
   window.addEventListener('resize', () => { if (vw() !== lastW) { lastW = vw(); loops.forEach(l => l.paint(false)); } });

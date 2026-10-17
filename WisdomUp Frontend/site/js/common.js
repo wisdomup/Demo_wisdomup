@@ -872,7 +872,10 @@
       if (!g) { host.insertAdjacentHTML('afterbegin', '<span class="wu-glow" aria-hidden="true"><i><b></b></i></span>'); g = host.firstElementChild; }
       gl = g.querySelector('b');
     }
-    edges.set(host, { el, on, gl });
+    const rec = { el, on, gl, w: host.offsetWidth, h: host.offsetHeight };
+    // SMOOTH TOUCH (2026-10-18): size from a ResizeObserver — reading offsetWidth/Height every frame forced a layout per frame
+    if (window.ResizeObserver) new ResizeObserver(([e]) => { const b = e.borderBoxSize && e.borderBoxSize[0]; rec.w = b ? b.inlineSize : host.offsetWidth; rec.h = b ? b.blockSize : host.offsetHeight; }).observe(host);
+    edges.set(host, rec);
   }
   const mountNavEdge = () => addEdge(nav, () => !navHidden, { glow: true });
   function runEdges() {
@@ -925,10 +928,11 @@
         pos += vel * h;
       }
       const lap = (pos % 1 + 1) % 1;
-      edges.forEach(({ el, on, gl }, host) => {
+      edges.forEach((rec, host) => {
+        const { el, on, gl } = rec;
         if (!host.isConnected || !el.isConnected) { edges.delete(host); return; }
         if (!on()) return;
-        const w = host.offsetWidth, h = host.offsetHeight;
+        const w = window.ResizeObserver ? rec.w : host.offsetWidth, h = window.ResizeObserver ? rec.h : host.offsetHeight;
         if (w && h) paint(el, w, h, lap, gl && gl.isConnected ? gl : null);
       });
       requestAnimationFrame(step);
@@ -945,7 +949,13 @@
       a.setAttribute('aria-expanded', on);
     });
   }
+  let toneAt = 0, toneT = 0;
   function toneNav() {
+    // SMOOTH TOUCH (2026-10-18): the hit test (elementsFromPoint) forces a layout — at most every 120ms while scrolling, plus once
+    // after the scroll settles so the final tone is always right
+    const now = performance.now();
+    if (now - toneAt < 120) { clearTimeout(toneT); toneT = setTimeout(toneNav, 140); return; }
+    toneAt = now;
     const logo = nav && nav.querySelector('.site-nav__logo');
     if (!logo) return;
     // Sample at the nav's resting spot (ignores the hide/show translate mid-transition).
@@ -2466,6 +2476,21 @@
   // on the scrim, on a panel's header, or past the end of a panel's list moved the page underneath. While the page is locked, every
   // touchmove is checked: it may only scroll a box that can still scroll that way (the panel's list, a sideways chip row, a field);
   // otherwise it is cancelled, so it never reaches the page. Panel scrollers also get overscroll-behavior: contain (controls.css).
+  // SMOOTH TOUCH (2026-10-18): looping decorative animations pause while their section is off screen. The quality bar's SVG icons
+  // (truck, stars, rosette, seal) animate parts INSIDE an SVG, which the browser cannot hand to the GPU — they forced a style +
+  // layout pass on EVERY frame of the whole page, even far below the screen. Same for the chip marquee, the Live pulse, the night
+  // Live sound bars and the Shop All flare. They resume the moment they scroll back in (a 200px margin, so you never see a pause).
+  const IDLE_SEL = '.qbar, .wu-util, .hero-stack .quick, .live-pill, .nh-live, .site-nav .navbtn--all';
+  function pauseOffscreen() {
+    if (!window.IntersectionObserver) return;
+    const io = new IntersectionObserver(es => es.forEach(e => e.target.classList.toggle('wu-idle', !e.isIntersecting)), { rootMargin: '200px 0px' });
+    const seen = new WeakSet();
+    const scan = () => document.querySelectorAll(IDLE_SEL).forEach(el => { if (!seen.has(el)) { seen.add(el); io.observe(el); } });
+    scan();
+    new MutationObserver(() => { clearTimeout(scan.t); scan.t = setTimeout(scan, 300); }).observe(document.body, { childList: true, subtree: true });
+    // a hidden tab pauses everything (the browser throttles timers, but CSS animations would keep the GPU busy)
+    document.addEventListener('visibilitychange', () => document.documentElement.classList.toggle('wu-hidden-tab', document.hidden));
+  }
   function guardPanelScroll() {
     let x0 = 0, y0 = 0;
     const can = (el, dx, dy) => {
@@ -2483,14 +2508,28 @@
       }
       return false;
     };
-    document.addEventListener('touchstart', e => { const t = e.touches[0]; if (t) { x0 = t.clientX; y0 = t.clientY; } }, { passive: true });
-    document.addEventListener('touchmove', e => {
-      if (document.documentElement.style.overflow !== 'hidden' || e.touches.length > 1) return;
+    const start = e => { const t = e.touches[0]; if (t) { x0 = t.clientX; y0 = t.clientY; } };
+    const move = e => {
+      if (e.touches.length > 1) return;
       const t = e.touches[0], dx = t.clientX - x0, dy = t.clientY - y0;
       if (e.target.closest && e.target.closest('input[type="range"], textarea, select')) return;
       x0 = t.clientX; y0 = t.clientY;                                                            // judge each step, not the whole swipe
       if (!can(e.target, dx, dy) && e.cancelable) e.preventDefault();
-    }, { passive: false });
+    };
+    // SMOOTH TOUCH (2026-10-18): the blocking (non-passive) listener is attached ONLY while a panel locks the page. Left on the whole
+    // document it made the phone wait for this script before every touch scroll, on every page. The page itself also stops
+    // overscrolling while locked, so a swipe that reaches the end of a panel's list can never carry the page with it.
+    let armed = false;
+    const arm = () => {
+      const on = document.documentElement.style.overflow === 'hidden';
+      if (on === armed) return;
+      armed = on;
+      document.documentElement.classList.toggle('wu-locked', on);
+      if (on) { document.addEventListener('touchstart', start, { passive: true }); document.addEventListener('touchmove', move, { passive: false }); }
+      else { document.removeEventListener('touchstart', start); document.removeEventListener('touchmove', move); }
+    };
+    new MutationObserver(arm).observe(document.documentElement, { attributes: true, attributeFilter: ['style'] });
+    arm();
   }
 
   // SMOOTH WHEEL SCROLL (2026-10-17, from momax.net's momax-home-scroll.js, read and rebuilt): on DESKTOPS with a mouse (≥1200px,
@@ -2693,7 +2732,16 @@
       rvSched();
       drive();
     };
-    const soon = () => { if (!tick) tick = requestAnimationFrame(sweep); };
+    // SMOOTH TOUCH (2026-10-18): the safety net measured every unrevealed block on EVERY scroll frame (~4,000 rect reads a second
+    // on the home page). The IntersectionObserver reveals things as they arrive; this net now runs at most every 250ms and once
+    // more after the scroll stops. The footer curtain (drive) still follows every frame — it is one measurement.
+    let sweptAt = 0, sweepT = 0, driveRaf = 0;
+    const soon = () => {
+      if (!driveRaf) driveRaf = requestAnimationFrame(() => { driveRaf = 0; drive(); });
+      clearTimeout(sweepT);
+      const wait = Math.max(0, 250 - (performance.now() - sweptAt));
+      sweepT = setTimeout(() => { if (!tick) tick = requestAnimationFrame(() => { sweptAt = performance.now(); sweep(); }); }, wait || 0);
+    };
     window.addEventListener('scroll', soon, { passive: true });
     window.addEventListener('resize', soon);
     document.addEventListener('scroll', soon, { passive: true, capture: true }); // horizontal rails
@@ -2850,6 +2898,7 @@
     initMotion();
     initSmoothWheel();
     guardPanelScroll();
+    pauseOffscreen();
     mountToTop();
     mountWhatsApp();
     mountNavTips();
@@ -2867,7 +2916,9 @@
       if (a.dataset.act === 'account') toast('Accounts are coming soon');
     });
     window.addEventListener('resize', () => { renderNav(); placeNav(); });
-    window.addEventListener('scroll', placeNav, { passive: true });
+    // SMOOTH TOUCH (2026-10-18): one placement per frame, not one per scroll event (each forced a layout)
+    let navRaf = 0;
+    window.addEventListener('scroll', () => { if (!navRaf) navRaf = requestAnimationFrame(() => { navRaf = 0; placeNav(); }); }, { passive: true });
     placeNav();
   }
 

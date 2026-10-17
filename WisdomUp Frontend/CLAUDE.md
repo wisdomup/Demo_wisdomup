@@ -174,6 +174,23 @@
   - (4) PHOTO HOVER ZOOM is momax's gentler 1.04 (was 1.05) on product cards, night tiles, story / blog / creator cards.
   - NOT adopted: momax's full → compact header morph (our liquid-glass pill already is the compact form).
   - Checked in headless Chrome at 1440 with a 16ms frame clock (the pane throttles frames when it is off screen). One 800px wheel turn glides 0 → 283 → 466 → 584 → … → 800 in ~650ms. Reveals: the scrolled-past cards at once, then on-screen blocks one by one, left before right, ~170ms apart.
+- SMOOTH TOUCH AUDIT (2026-10-18, "run an audit and make the touch smooth on all pages, nav bar, footer, floating panels and other animated elements … smooth like butter"). MEASURED with a CDP harness: headless Chrome as a phone (390×844, DPR 3, touch, Android UA), CPU slowed 4×, synthesized touch flings, every frame's time recorded, plus layout / style counts and a call-site probe on layout reads.
+  - Findings → fixes, all in common.js / home.js / controls.css:
+    - (1) the panel guard's BLOCKING touchmove listener was on the whole document, so every touch scroll on every page waited for scripts → it is attached only while a panel locks the page (`html.wu-locked`, MutationObserver on <html> style). While locked the page has `overscroll-behavior: none` and the scrim `touch-action: none`.
+    - (2) the reveal safety net (`sweep`) measured every unrevealed block on EVERY scroll frame (39,925 rect reads in 10s on the home page) → it runs at most every 250ms + once after the scroll stops. The IntersectionObserver does the real work; the footer curtain (`drive`, one read) still follows every frame.
+    - (3) the nav edge light read the pill's size every frame → a ResizeObserver supplies it.
+    - (4) `placeNav` ran on every scroll EVENT → once per frame (rAF), and its hit test (`toneNav`, elementsFromPoint) at most every 120ms plus once after the scroll settles.
+    - (5) the quality bar's SVG icons forced a style + layout pass on every frame of the whole page, even off screen → `pauseOffscreen()`: looping decorations pause while their section is off screen (200px margin) — `.qbar, .wu-util, .hero-stack .quick, .live-pill, .nh-live, .site-nav .navbtn--all` (`.wu-idle`) — and every animation pauses in a hidden tab (`html.wu-hidden-tab`).
+    - (6) the three home loop carousels autoplayed off screen → they only advance while on screen.
+    - (7) loop / promo / news tracks keep their own GPU layer (`will-change: transform`).
+    - (8) taps: no grey tap flash (`-webkit-tap-highlight-color: transparent`), and `touch-action: manipulation` on buttons / tabs / chips / checkboxes so a quick double tap (quantity +) never zooms the page on iPhone.
+  - RESULT (old vs new, alternating runs on the same machine load):
+    - home: janky frames (> 25ms) 8.5–9.3% → 4.6–7.1%, 54–55 → 56–57 fps, layouts per 10s scroll ~545 → ~160, main-thread time −18%.
+    - night home 3.2 → 1.7%; product 0.4 → 0.2–0.3%; All Products 0.3 → 0.2%.
+    - search / menu / cart / filter panels: 60 fps, 0–0.8% jank, and the page behind does not move.
+  - What is left on the day home is raster cost spread over its image-heavy sections (no single cause).
+  - Checked: no reveal left stuck at any depth, the quality bar animates on screen and pauses off it, nav tone + edge light still work.
+  - Re-run the harness after any heavy home change (kept in the session scratchpad as touchperf.mjs; rebuild it from this note if needed).
 - NOT done (deliberately, from the report's optional list): custom cursor, phone dock, hotspots, number counters, floating labels, media parallax (would need a 6–8% image crop). Add them only on request.
 
 # Cart, checkout, orders, reviews (decided 2026-10-05)

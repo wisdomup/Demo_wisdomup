@@ -220,3 +220,17 @@ button.link-arrow { height: var(--ctl); padding: 0; border: 0; background: none;
    `scrollbar-width: thin` on the cart list and the night menu. */
 html, body, * { scrollbar-width: none !important; -ms-overflow-style: none; }
 ::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
+
+/* SMOOTH TOUCH (2026-10-18, "run an audit and make the touch smooth … like butter"): while a panel locks the page (`html.wu-locked`,
+   set by guardPanelScroll) the page cannot rubber-band or chain a swipe from a panel's list, and the dark veil swallows swipes. */
+html.wu-locked, html.wu-locked body { overscroll-behavior: none; }
+html.wu-locked .scrim { touch-action: none; }
+/* off-screen loops pause (pauseOffscreen in common.js) — and every loop pauses in a hidden tab */
+.wu-idle, .wu-idle *, .wu-idle::before, .wu-idle::after, .wu-idle *::before, .wu-idle *::after,
+html.wu-hidden-tab *, html.wu-hidden-tab *::before, html.wu-hidden-tab *::after { animation-play-state: paused !important; }
+/* the loop carousels' tracks (tilted photos with deep shadows) keep their own GPU layer, drawn once instead of on every scroll frame */
+.loop__track, .promo-band__track, .news__track { will-change: transform; }
+/* taps: no grey flash painted over a tapped link / button (our controls have their own pressed states), and a quick double tap on
+   a control (the quantity +, a carousel arrow) never zooms the page on iPhone (touch-action: manipulation keeps pinch-zoom) */
+a, button, [role="button"], [role="tab"], summary, label, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+button, [role="button"], [role="tab"], summary, .chip, input[type="checkbox"], input[type="radio"] { touch-action: manipulation; }
