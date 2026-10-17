@@ -692,7 +692,9 @@
   /* ---------- Site nav ---------- */
   const nav = $('site-nav');
   // Slim nav (Ronin-style proportions): 56px pill = 40px row + 8px padding, 22px inside the hero on desktop
-  const NAV_INSET = 22, NAV_START = 64;
+  // NAV_START: pages without a banner park the nav 16px under the top link row (it ends at 24px, shown ≥ 768px) — 16px above it,
+  // like the 16px between the nav and the breadcrumb below it (2026-10-17, "the gap above the nav bar is not balanced"; was 64)
+  const NAV_INSET = 22, navStart = () => (vw() >= 768 ? 40 : 16);
   let navMode = '', navHidden = false, lastY = window.scrollY, activeCat = null;
   // A nav icon is "on" for its own type, or for any type inside the department it stands for
   const navOn = t => !!activeCat && (t === activeCat || (DEPTS.find(d => d.id === t) || { types: [] }).types.includes(activeCat));
@@ -993,7 +995,7 @@
     const anchor = [...document.querySelectorAll('[data-nav-anchor]')].find(el => el.offsetParent !== null); // first visible anchor
     let top;
     if (vw() < 640) top = anchor ? Math.max(10, anchor.getBoundingClientRect().top + 10) : 10;
-    else top = Math.max(16, (anchor ? anchor.getBoundingClientRect().top + y + NAV_INSET : NAV_START) - y);
+    else top = Math.max(16, (anchor ? anchor.getBoundingClientRect().top + y + NAV_INSET : navStart()) - y);
     if (y < 120) navHidden = false;
     else if (d > 6) navHidden = true;
     else if (d < -6) navHidden = false;

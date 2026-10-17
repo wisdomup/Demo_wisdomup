@@ -333,7 +333,7 @@
 /* ---------- BULK PAGE (bulk-order.html, 2026-10-14, "make the bulk page inspired by the corporate page"): the same engine and styles
    (`.page--corp .page--bulk`). Unlike the corporate page the site nav stays, floating over the intro photo (the nav tones itself on
    .cp-intro / .cp-range / dark bands — DARK in common.js), so the breadcrumb and the headline start below it. ---------- */
-.page--bulk .cp-crumbs { top: 136px; }
+.page--bulk .cp-crumbs { top: 112px; } /* 16px under the nav (40 → 96) */
 .page--bulk .cp-hero__top { max-width: 1040px; } /* the long H1 on two lines */
 .page--bulk .cp-contact h2 { max-width: 680px; }
 .page--bulk .cp-intro__a { padding-top: clamp(180px, 24svh, 220px); }
