@@ -50,6 +50,10 @@
     'About Us': url.about, 'Where to Buy': url.where, Blog: url.blog,
     'Smart Help Center': url.help, 'Help Center': url.help, 'Order Tracker': url.track, 'Express Delivery': url.express,
     'Exchange & Refund Policy': url.returns, 'Warranty Policy': url.warranty, 'Privacy Policy': url.privacy, 'Terms of Service': url.terms, 'Shipping Policy': url.shipping, 'Download e-Manual': url.manuals,
+    // the footer's compact labels (2026-10-17)
+    'All products': url.products, Cables: url.dept('cables'), Car: url.dept('car'), 'Personal care': url.dept('care'),
+    'Bulk orders': url.bulk, 'Corporate gifts': url.corporate, Creators: url.creators, Affiliates: url.affiliate, 'Live shopping': url.live,
+    'About us': url.about, 'Where to buy': url.where, 'Track order': url.track, Returns: url.returns, Warranty: url.warranty, Shipping: url.shipping, 'e-Manuals': url.manuals,
   };
   const linkFor = label => LINKS[label] || url.help; // every footer/utility label has a page; unknown labels fall back to Help
   // CORPORATE OPENS IN A NEW TAB (2026-10-14, "when click on corporate open in new tab"): every link to corporate.html — top bar, menu,
@@ -2032,6 +2036,10 @@
     panel.addEventListener('keydown', e => { if (e.key === 'Escape') close(true); });
     document.addEventListener('click', e => { if (!panel.hidden && !box.contains(e.target)) close(); });
   }
+  // PAYMENT LOGOS (2026-10-17, "take the images from ronin.pk for payment methods … all of them, it's generic logos"): the eight
+  // payment-partner tiles from ronin.pk's product page (100×100 PNGs, img/pay/) — ronin labels the EasyPaisa tile "Raast"; it is
+  // EasyPaisa. Ours first (JazzCash, EasyPaisa, Raast), then the card / wallet networks, as the owner asked.
+  const PAY_LOGOS = [['jazzcash', 'JazzCash'], ['easypaisa', 'EasyPaisa'], ['raast', 'Raast'], ['visa', 'Visa'], ['mastercard', 'Mastercard'], ['unionpay', 'UnionPay'], ['paypak', 'PayPak'], ['upaisa', 'UPaisa']];
   function renderFooter() {
     const el = $('footer');
     if (!el) return;
@@ -2040,25 +2048,43 @@
       ['Instagram', social.instagram], ['YouTube', social.youtube], ['Facebook', social.facebook], ['X', social.x]].map(([n, h]) => [n, /^https:\/\//.test(String(h || '')) ? h : '']);
     // Full-bleed, square footer that the page lifts off as you reach the end (the block is fixed under the page and
     // revealed through the wrap). Four groups — Products / Explore / Support / Contact — columns on desktop, accordion on phones.
-    const contact = { title: 'Contact', links: [['We’re here to help ›', url.help], ['support@wisdomup.pk', 'mailto:support@wisdomup.pk'], ['+92 327 9800153', 'tel:+923279800153'], ['Cookie preferences', '#cookie-preferences']] };
-    const groups = D.footer.map(c => ({ title: c.title, links: c.links.map(l => Array.isArray(l) ? l : [String(l), linkFor(String(l))]) })).concat(contact);
+    const contact = { title: 'Contact', links: [['Get help', url.help], ['support@wisdomup.pk', 'mailto:support@wisdomup.pk'], ['+92 327 9800153', 'tel:+923279800153']] }; // "Cookie preferences" moved to the bottom bar's legal links
+    // THREE columns like momax (2026-10-17, "use the exact spacing and positioning"): the Contact lines join the Support column
+    const groups = D.footer.map(c => ({ title: c.title, links: c.links.map(l => Array.isArray(l) ? l : [String(l), linkFor(String(l))]) }));
+    groups[groups.length - 1].links.push(...contact.links.filter(([t]) => t !== 'Get help'));
+    // MOMAX FOOTER (2026-10-17, "review the footer of momax.net and upgrade ours, don't skim"): momax.net's footer measured at 1440
+    // and 529 and rebuilt in our colours (day light grey, night red): a LEAD column (big "Stay updated." headline, one line, the email
+    // field joined to a "Subscribe" button, the social links with their names) beside the four link groups; a SIGNATURE row (the
+    // WISDOMUP wordmark cut from our own logo, full width, + our promise line); a BOTTOM BAR (Display mode, © + legal links, the
+    // payment methods). Phones: lead → accordions → wordmark → social row → bar, like momax's phone footer.
+    const socialList = `<ul class="footer__social" aria-label="WisdomUp on social media">${socials.map(([n, h]) => `<li>${h
+                ? `<a class="ft__soc" href="${esc(h)}" target="_blank" rel="noopener noreferrer" aria-label="WisdomUp on ${n}">${SF_ICONS[n]}<span>${n}</span></a>`
+                : `<span class="ft__soc" aria-hidden="true">${SF_ICONS[n]}<span>${n}</span></span>`}</li>`).join('')}</ul>`;
     el.innerHTML = `
       <div class="footer-fixed">
-        <footer class="footer">
-          <div class="footer__top">
-            <a class="footer__brand" href="${url.home}" aria-label="WisdomUp home"><img src="img/wu-logo.png" alt="WisdomUp"><img src="img/wu-logo-white.png" alt="" aria-hidden="true"></a>
-            <div class="footer__nl">
-              <p class="footer__nl-msg">New launches and live-only deals, straight to your inbox.</p>
-              <form class="newsletter"><input type="email" placeholder="Email address" aria-label="Email address"><button aria-label="Subscribe" type="submit">${icon('arrow', 18)}</button></form>
+        <footer class="footer footer--mx">
+          <div class="footer__main">
+            <div class="footer__lead">
+              <h2 class="footer__title">Stay updated.</h2>
+              <p class="footer__nl-msg">New launches and live deals, first.</p>
+              <form class="newsletter newsletter--mx"><input type="email" placeholder="Your email" aria-label="Email address"><button type="submit">Subscribe</button></form>
+              ${socialList}
+            </div>
+            <div class="footer__grid">
+              ${groups.map((c, i) => `<div class="ft__group"><h4><button type="button" class="ft__q" aria-expanded="false" aria-controls="ft-g${i}"><span>${esc(c.title)}</span><span class="ft__chev" aria-hidden="true"><svg viewBox="0 0 20 20" width="16" height="16"><path d="M10 4v12M4 10h12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span></button></h4><div class="ft__links" id="ft-g${i}" hidden>${c.links.map(([t, h]) => `<a href="${h}"${here() === h ? ' aria-current="page"' : ''}>${esc(t)}</a>`).join('')}</div></div>`).join('')}
             </div>
           </div>
-          <div class="footer__grid">
-            ${groups.map((c, i) => `<div class="ft__group"><h4><button type="button" class="ft__q" aria-expanded="false" aria-controls="ft-g${i}"><span>${esc(c.title)}</span><span class="ft__chev">${icon('chev-r', 18)}</span></button></h4><div class="ft__links" id="ft-g${i}" hidden>${c.links.map(([t, h]) => `<a href="${h}"${here() === h ? ' aria-current="page"' : ''}>${esc(t)}</a>`).join('')}</div></div>`).join('')}
+          <div class="footer__sig">
+            <a class="footer__mark" href="${url.home}" aria-label="WisdomUp home"><img src="img/wu-wordmark.png" alt="WisdomUp" width="957" height="150"><img src="img/wu-wordmark-white.png" alt="" aria-hidden="true" width="957" height="150"></a>
+            <p class="footer__tag">Delivered across Pakistan</p>
+            ${socialList.replace('aria-label="WisdomUp on social media"', 'aria-label="WisdomUp on social media (icons)"')}
           </div>
-        </footer>
-        <div class="subfooter">
-          <div class="sf__row">
-            <div class="sf__left">
+          <div class="footer__bar">
+            <div class="footer__barl">
+              <p class="sf__copy">© ${YEAR} WisdomUp</p>
+              <nav class="footer__legal" aria-label="Legal"><a href="${url.terms}">Terms</a><a href="${url.privacy}">Privacy</a><a href="#cookie-preferences">Cookies</a><a href="sitemap.html">Sitemap</a></nav>
+            </div>
+            <div class="footer__payrow"><ul class="footer__pays" aria-label="Ways to pay">${PAY_LOGOS.map(([f, n]) => `<li class="footer__logo"><img src="img/pay/${f}.png" alt="${n}" title="${n}" width="100" height="100" loading="lazy"></li>`).join('')}</ul>
               <div class="msort msort--up sf__mode">
                 <button type="button" class="msort__btn" aria-haspopup="listbox" aria-expanded="false" aria-controls="dm-list" aria-label="Display mode"><span class="msort__cur">Display mode</span><span class="msort__dot" aria-hidden="true"></span></button>
                 <div class="msort__panel" hidden>
@@ -2072,13 +2098,9 @@
                   </div>
                 </div>
               </div>
-              <div class="sf__social">${socials.map(([n, h]) => h
-                ? `<a class="sf__soc" href="${esc(h)}" target="_blank" rel="noopener noreferrer" aria-label="WisdomUp on ${n}" title="${n}" data-no-fill>${SF_ICONS[n]}</a>`
-                : `<span class="sf__soc" aria-hidden="true" title="${n}">${SF_ICONS[n]}</span>`).join('')}</div>
             </div>
-            <p class="sf__copy">© ${YEAR} WisdomUp. All rights reserved.</p>
           </div>
-        </div>
+        </footer>
       </div>`;
     mountModeMenu(el.querySelector('.sf__mode'));
     el.addEventListener('click', e => {
@@ -2138,7 +2160,7 @@
     const sda = !!(window.CSS && CSS.supports('animation-timeline: view()') && CSS.supports('animation-range: entry 0px entry 10px'));
     el.classList.toggle('is-sda', sda);
     let raf = 0, lastY = null, lastR = null;
-    // the page's bottom padding would leave a strip under the subfooter: pull the page end up to the wrap (sizes only)
+    // the page's bottom padding would leave a strip under the footer: pull the page end up to the wrap (sizes only)
     const fitGap = () => {
       el.style.marginBottom = '';
       const gap = Math.max(0, document.documentElement.scrollHeight - (el.offsetTop + el.offsetHeight));
@@ -2246,10 +2268,15 @@
     let raf = 0;
     const lift = () => {
       raf = 0;
-      const sub = document.querySelector('.subfooter');
+      const sub = document.querySelector('.footer__bar'); // the copyright bar (inside the footer since the momax footer, 2026-10-17)
       const over = sub ? Math.max(0, Math.round(innerHeight - sub.getBoundingClientRect().top)) : 0;
       toTop.style.setProperty('--totop-lift', over + 'px');
       if (waFab) waFab.style.setProperty('--totop-lift', over + 'px');
+      // PHONES (2026-10-17, "WhatsApp and back to top are covering on the phone view"): the footer's wordmark + social row sit
+      // where the two floating buttons ride, so once that row is on screen both fade out (the footer has its own WhatsApp link)
+      const sig = document.querySelector('.footer__sig');
+      const hide = innerWidth < 768 && !!sig && sig.getBoundingClientRect().top < innerHeight - 24;
+      document.body.classList.toggle('is-foot-near', hide);
     };
     const soon = () => { if (!raf) raf = requestAnimationFrame(lift); };
     window.addEventListener('scroll', soon, { passive: true });
@@ -2432,6 +2459,52 @@
     });
   }
 
+  // SMOOTH WHEEL SCROLL (2026-10-17, from momax.net's momax-home-scroll.js, read and rebuilt): on DESKTOPS with a mouse (≥1200px,
+  // hover + fine pointer) a wheel turn no longer jumps the page — it sets a target and the page glides to it with a soft exponential
+  // follow (each frame covers 1 − e^(−dt/110ms) of the way), so long pages feel weighted and calm. It steps aside, exactly like
+  // momax's: for ctrl/⌘/shift-wheel, horizontal or line/page-mode wheels (trackpads keep native feel when they scroll sideways),
+  // anything inside a scrollable box (panels, drawers, the search, rails, text fields, dialogs), a locked page (an open panel sets
+  // overflow hidden), a pointer press, a touch, any key (it jumps to the target), a hidden tab, a resize and reduced motion; and if
+  // something else moves the page (a link jump, the back-to-top glide) it stops at once.
+  function initSmoothWheel() {
+    const desk = matchMedia('(min-width: 1200px) and (hover: hover) and (pointer: fine)');
+    let raf = 0, target = scrollY, written = scrollY, prev = 0, maxY = 0, maxAt = -1e9;
+    const max = force => { const now = performance.now(); if (force || now - maxAt > 500) { maxY = Math.max(0, document.documentElement.scrollHeight - innerHeight); maxAt = now; } return maxY; };
+    const locked = () => /hidden|clip/.test(getComputedStyle(document.documentElement).overflowY) || /hidden|clip/.test(getComputedStyle(document.body).overflowY) || getComputedStyle(document.body).position === 'fixed';
+    const stop = () => { if (raf) cancelAnimationFrame(raf); raf = 0; target = written = scrollY; };
+    const write = y => { window.scrollTo({ top: y, left: scrollX, behavior: 'instant' }); written = scrollY; };
+    const finish = () => { if (raf && !locked()) write(Math.min(target, max(true))); stop(); };
+    const local = e => e.composedPath().some(el => {
+      if (!(el instanceof Element) || el === document.body || el === document.documentElement) return false;
+      if (el.matches('input, textarea, select, [contenteditable], [role="dialog"], .mnav, .cartd, .fdrawer, .search, .scrim, .msort__panel')) return true;
+      return el.scrollHeight > el.clientHeight + 1 && /auto|scroll/.test(getComputedStyle(el).overflowY);
+    });
+    const tick = now => {
+      if (!desk.matches || reduced() || locked() || Math.abs(scrollY - written) > 1) { stop(); return; }
+      target = Math.min(target, max());
+      const cur = scrollY, left = target - cur, dt = Math.min(50, Math.max(0, now - prev)); // a stalled frame never turns into a jump
+      prev = now;
+      if (Math.abs(left) <= 1) { write(target); stop(); return; }
+      const next = cur + left * (1 - Math.exp(-dt / 110));
+      write(Math.abs(next - cur) < 1 ? cur + Math.sign(left) : next);
+      raf = requestAnimationFrame(tick);
+    };
+    window.addEventListener('wheel', e => {
+      if (!desk.matches || e.defaultPrevented || !e.cancelable || reduced() || locked()) { if (raf) stop(); return; }
+      if (e.ctrlKey || e.metaKey || e.shiftKey || e.deltaMode !== 0 || !e.deltaY || Math.abs(e.deltaX) > Math.abs(e.deltaY) || local(e)) { if (raf) finish(); return; }
+      if (raf && Math.abs(scrollY - written) > 1) stop();
+      e.preventDefault();
+      target = Math.max(0, Math.min(max(), (raf ? target : scrollY) + e.deltaY));
+      if (!raf) { written = scrollY; prev = performance.now(); raf = requestAnimationFrame(tick); }
+    }, { passive: false });
+    window.addEventListener('pointerdown', stop, { passive: true });
+    window.addEventListener('touchstart', stop, { passive: true });
+    window.addEventListener('keydown', () => { if (raf) finish(); });
+    window.addEventListener('resize', () => { stop(); maxAt = -1e9; });
+    document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); });
+    desk.addEventListener('change', stop);
+  }
+
   function initMotion() {
     if (reduced() || !('IntersectionObserver' in window)) return;
     document.documentElement.classList.add('wu-motion');
@@ -2458,19 +2531,38 @@
       const m = String(cs.boxShadow).match(/(rgba?\([^)]*\))\s+0px\s+0px\s+0px\s+[\d.]+px\s+inset/);
       if (m && a(m[1]) > .05) b.classList.add('wu-line-r');
     };
-    revealer = new IntersectionObserver(entries => {
-      const byParent = new Map();
-      entries.forEach(e => {
-        if (!e.isIntersecting) return;
-        const list = byParent.get(e.target.parentElement) || [];
-        list.push(e.target);
-        byParent.set(e.target.parentElement, list);
+    // MOMAX QUEUED REVEAL (2026-10-17, "upgrade our whole website motion — review momax.net and upgrade what is best"; their
+    // momax-home-reveal.js read and rebuilt): blocks that come into view do not all pop at once — they join a QUEUE and play ONE
+    // AT A TIME in reading order (top, then left), at least 160ms apart (momax's GAP), so a screen fills in a calm sequence. Only
+    // what is actually on screen plays; what you have already scrolled past shows at once (never a wait behind a long queue); a
+    // big batch (a grid of cards arriving together) tightens to 110 / 70ms so the last card is never late. Hidden tab: paused.
+    const rvQ = new Set();
+    let rvT = 0, rvLast = -1e9;
+    const rvOn = el => { el.classList.add('is-in'); rvQ.delete(el); };
+    const rvPlay = () => {
+      rvT = 0;
+      const H = innerHeight, W = innerWidth, ready = [];
+      rvQ.forEach(el => {
+        if (!el.isConnected) { rvQ.delete(el); return; }
+        const b = el.getBoundingClientRect();
+        if (b.bottom <= 0) { rvOn(el); return; } // already scrolled past: show it now
+        if (b.width > 0 && b.top < H && b.bottom > 0 && b.left < W && b.right > 0) ready.push([b.top, b.left, el]);
       });
-      byParent.forEach(list => list.forEach((el, i) => {
-        if (el.dataset.rv === 'grid') el.style.setProperty('--rv-d', Math.min(i, 12) * (phone() ? 50 : 100) + 'ms');
-        el.classList.add('is-in');
-        revealer.unobserve(el);
-      }));
+      if (!ready.length) return; // the rest waits until it scrolls (or a rail swipes) into view
+      ready.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+      rvOn(ready[0][2]);
+      rvLast = performance.now();
+      rvSched(ready.length - 1);
+    };
+    const rvSched = (waiting = rvQ.size) => {
+      if (rvT || !rvQ.size || document.hidden) return;
+      const gap = waiting > 8 ? 70 : waiting > 4 ? 110 : 160;
+      rvT = setTimeout(() => requestAnimationFrame(rvPlay), Math.max(0, gap - (performance.now() - rvLast)));
+    };
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) rvSched(); });
+    revealer = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { rvQ.add(e.target); revealer.unobserve(e.target); } });
+      rvSched();
     }, { rootMargin: '0px 0px 12% 0px', threshold: 0 }); // starts just BEFORE a block scrolls in (it was 6% after), so nothing sits blank while you scroll — the audit, 2026-10-10; durations unchanged
     const kindOf = el => {
       if (el.matches(ZOOM_SEL)) return 'zoom';
@@ -2550,8 +2642,9 @@
       const H = innerHeight, W = innerWidth;
       document.querySelectorAll('[data-rv]:not(.is-in)').forEach(el => {
         const b = el.getBoundingClientRect();
-        if (b.top < H && b.left < W && b.right > 0) { el.classList.add('is-in'); revealer.unobserve(el); } // in view or already scrolled past
+        if (b.top < H && b.left < W && b.right > 0) { rvQ.add(el); revealer.unobserve(el); } // in view or already scrolled past → the queue
       });
+      rvSched();
       drive();
     };
     const soon = () => { if (!tick) tick = requestAnimationFrame(sweep); };
@@ -2709,6 +2802,7 @@
     tasteInit();
     fillPrices();
     initMotion();
+    initSmoothWheel();
     mountToTop();
     mountWhatsApp();
     mountNavTips();

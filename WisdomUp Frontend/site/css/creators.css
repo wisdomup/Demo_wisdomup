@@ -68,7 +68,7 @@
 .cr-pick__e b { color: #D91E05; }
 @media (hover: hover) and (pointer: fine) {
   .cr-pick:hover { box-shadow: inset 0 0 0 1.5px #111; }
-  .cr-pick:hover .cr-pick__img img { transform: scale(1.05); }
+  .cr-pick:hover .cr-pick__img img { transform: scale(1.04); }
 }
 
 /* ---------- Join ---------- */

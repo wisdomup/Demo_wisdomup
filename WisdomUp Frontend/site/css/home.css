@@ -487,7 +487,7 @@ a.news__card:hover { color: #fff; }
 .news__card::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; z-index: 0; height: 200px; background: linear-gradient(to top, rgba(0,0,0,.5) 0%, rgba(0,0,0,.33) 40%, rgba(0,0,0,.12) 70%, rgba(0,0,0,0) 100%); pointer-events: none; } /* insta360's fade */
 .news__ph { position: absolute; z-index: 1; top: 9%; bottom: 9%; right: 5%; width: 46%; display: grid; place-items: center; pointer-events: none; }
 .news__ph img { display: block; max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; border-radius: 16px; box-shadow: 0 24px 48px rgba(0,0,0,.35); transition: transform 500ms cubic-bezier(.3,1,.3,1); -webkit-user-drag: none; }
-@media (hover: hover) and (pointer: fine) { .news__card:hover .news__ph img { transform: scale(1.05); } }
+@media (hover: hover) and (pointer: fine) { .news__card:hover .news__ph img { transform: scale(1.04); } }
 .news__copy { position: absolute; left: 0; bottom: 0; z-index: 2; width: 52%; box-sizing: border-box; padding: 48px 32px 32px; display: flex; flex-direction: column; gap: 8px; }
 .news__k { margin-bottom: 4px; font: 600 12px/1 var(--font); letter-spacing: .2em; text-transform: uppercase; color: rgba(255,255,255,.72); }
 .news__t { font: 700 clamp(16px, 2.73vw, 28px)/1.15 var(--font); letter-spacing: -.01em; text-wrap: balance; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
@@ -1422,3 +1422,177 @@ html:not([data-theme="night"]) .cartd--b .cartd__links a::after {
    .8, a flatter, greyer glass) — over the same .45 dim, with the same deep bend, blur 6px + saturate 200% + brightness 1.06, 1.5px
    ring and bevel. (A .94 "white panels" pass the same day was undone for this.) Night unchanged. */
 html:not([data-theme="night"]) body :is(.mnav, .fdrawer) { background: rgba(255, 255, 255, .74); }
+
+/* ==========================================================================
+   MOMAX FOOTER (2026-10-17, "review the footer of momax.net and upgrade ours" + "structure our footer as momax — the order and the
+   positioning — use our design system and colour scheme"). momax.net measured at 1440: a 1200px content box (120px margins at
+   1440), 48px top/bottom; ROW 1 = a 390px LEAD column (40px uppercase "Stay updated.", a 14/22 grey line, the email field joined
+   to a white "Subscribe" button, social links with their names) and, 60px on, the link columns (12px bold uppercase heads, 14px
+   links 26px apart at white 70%); ROW 2 = the SIGNATURE (a huge wordmark ~636px + "RECHARGE FOR LIFE" 600 28/36 uppercase at
+   65%); ROW 3 = the BAR (© + legal links left, payment logos right). Phones (529): the lead stacked with a full-width field over a
+   full-width Subscribe, + accordions with hairlines, the wordmark full width, the social icons spread across, payments, ©, legal.
+   OURS: the same order + positions on our tokens — day = the light F1 footer (#F5F6F8, ink type, #E1E2E5 hairlines), night = the
+   red footer (white type); capsules for every control (the field + Subscribe are ONE capsule, phones two), text on the scale
+   (44 / 28 / 16 / 14 / 12), gaps on the scale; our wordmark (cut from the logo) red in day, white in night; payments as text chips
+   (we have no wallet logos); the Display mode capsule leads the bar.
+   ========================================================================== */
+.footer-wrap .footer.footer--mx { padding: 48px var(--gutter, 32px) 0; }
+.footer--mx > * { max-width: 1200px; margin-left: auto; margin-right: auto; }
+.footer--mx .footer__main { display: grid; grid-template-columns: minmax(0, 390px) minmax(0, 1fr); gap: 32px 64px; padding-bottom: 48px; }
+.footer--mx .footer__lead { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.footer--mx .footer__title { margin: 0; font: 700 44px/1.1 var(--font); letter-spacing: -.01em; text-transform: uppercase; color: #111; }
+.footer--mx .footer__nl-msg { margin: 0; font: 400 14px/22px var(--font); color: #6B6E73; }
+.footer-wrap .footer--mx .newsletter--mx { display: flex; align-items: center; height: 48px; padding: 0 4px 0 16px; border-radius: 999px; border: 1.5px solid #D2D2D2; background: #fff; }
+.footer-wrap .footer--mx .newsletter--mx input { flex: 1; min-width: 0; height: 100%; border: 0; background: transparent; outline: 0; font: 400 16px/1 var(--font); color: #111; }
+.footer-wrap .footer--mx .newsletter--mx button { flex: none; width: auto; height: 40px; padding: 0 16px; border: 0; border-radius: 999px; background: #111; color: #fff; font: 600 14px/1 var(--font); cursor: pointer; } /* hover = the site-wide liquid fill (autoMark), like every button */
+.footer-wrap .footer--mx .newsletter--mx:focus-within { border-color: #111; }
+.footer--mx .footer__social { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 12px 24px; }
+.footer-wrap .footer--mx .ft__soc { display: inline-flex; align-items: center; gap: 8px; padding: 0; font: 400 14px/1 var(--font); color: #3D3F44; text-decoration: none; }
+.footer--mx .ft__soc svg { width: 18px; height: 18px; flex: none; }
+.footer-wrap .footer--mx a.ft__soc:hover { color: #000; }
+.footer--mx span.ft__soc { cursor: default; }
+.footer--mx .footer__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px; padding: 0; border: 0; }
+.footer-wrap .footer--mx h4 { margin: 0 0 12px; }
+.footer--mx .ft__q { font: 700 12px/1.2 var(--font); letter-spacing: .02em; text-transform: uppercase; color: #111; }
+.footer--mx .ft__links { display: flex; flex-direction: column; gap: 4px; }
+.footer-wrap .footer--mx .ft__links a { padding: 4px 0; font: 400 14px/18px var(--font); color: #3D3F44; }
+.footer-wrap .footer--mx .ft__links a:hover, .footer-wrap .footer--mx .ft__links a[aria-current="page"] { color: #000; }
+/* the signature row: our wordmark big (momax's ~53% of the box) + the promise line */
+.footer--mx .footer__sig { display: flex; align-items: center; gap: 16px 48px; padding: 0 0 48px; }
+.footer-wrap .footer--mx .footer__mark { flex: 0 1 636px; display: block; padding: 0; min-width: 0; }
+.footer--mx .footer__mark img { display: block; width: 100%; height: auto; }
+.footer--mx .footer__mark img + img { display: none; }
+.footer--mx .footer__tag { margin: 0; flex: 0 1 300px; font: 700 28px/36px var(--font); text-transform: uppercase; color: #6B6E73; }
+/* the bar */
+.footer--mx .footer__bar { display: flex; align-items: center; justify-content: space-between; gap: 16px 32px; flex-wrap: wrap; padding: 24px 0 24px; box-shadow: inset 0 1.5px 0 #E1E2E5; }
+.footer--mx .footer__barl { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 24px; min-width: 0; }
+.footer--mx .sf__copy { margin: 0; text-align: left; font: 400 14px/18px var(--font); color: #6B6E73; }
+.footer--mx .footer__legal { display: flex; flex-wrap: wrap; gap: 8px 24px; }
+.footer-wrap .footer--mx .footer__legal a { padding: 0; font: 400 14px/18px var(--font); color: #6B6E73; }
+.footer-wrap .footer--mx .footer__legal a:hover { color: #000; }
+.footer--mx .footer__pays { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.footer--mx .footer__pays li { height: 32px; padding: 0 12px; display: inline-flex; align-items: center; border-radius: 999px; background: #fff; box-shadow: inset 0 0 0 1.5px #E1E2E5; font: 600 12px/1 var(--font); color: #3D3F44; }
+@media (max-width: 1023px) {
+  .footer--mx .footer__main { grid-template-columns: minmax(0, 1fr); }
+  .footer--mx .footer__lead { max-width: 480px; }
+}
+@media (max-width: 767px) {
+  .footer-wrap .footer.footer--mx { padding: 32px 16px 0; }
+  .footer--mx .footer__main { gap: 32px; padding-bottom: 32px; }
+  .footer--mx .footer__lead { max-width: none; }
+  .footer--mx .footer__title { font-size: 28px; text-transform: none; }
+  /* momax's phone form: the field over a full-width button */
+  .footer-wrap .footer--mx .newsletter--mx { flex-direction: column; align-items: stretch; height: auto; gap: 12px; padding: 0; border: 0; background: transparent; }
+  .footer-wrap .footer--mx .newsletter--mx input { height: 48px; padding: 0 16px; border-radius: 999px; border: 1.5px solid #D2D2D2; background: #fff; }
+  .footer-wrap .footer--mx .newsletter--mx button { height: 48px; width: 100%; }
+  .footer-wrap .footer--mx .newsletter--mx:focus-within { border: 0; }
+  .footer-wrap .footer--mx .newsletter--mx input:focus { border-color: #111; }
+  /* the social links move under the wordmark as a row of icons spread across (momax) */
+  .footer--mx .footer__lead .footer__social { display: none; }
+  .footer--mx .footer__grid { display: block; box-shadow: inset 0 1.5px 0 #E1E2E5; }
+  .footer-wrap .footer--mx h4 { margin: 0; }
+  .footer--mx .ft__q { min-height: 56px; font-size: 14px; }
+  .footer--mx .ft__chev { display: block; transition: transform 250ms ease; }
+  .footer--mx .ft__q[aria-expanded="true"] .ft__chev { transform: rotate(45deg); } /* + turns into × */
+  .footer--mx .footer__sig { flex-direction: column; align-items: stretch; gap: 24px; padding: 32px 0; }
+  .footer-wrap .footer--mx .footer__mark { flex: none; }
+  .footer--mx .footer__tag { display: none; }
+  .footer--mx .footer__bar { flex-direction: column-reverse; align-items: flex-start; padding: 24px 0 calc(24px + env(safe-area-inset-bottom)); }
+  .footer--mx .footer__pays { align-self: flex-end; }
+}
+/* the phone social row lives in the signature block (drawn by renderFooter as a second list) */
+.footer--mx .footer__sig .footer__social { display: none; }
+@media (max-width: 767px) {
+  .footer--mx .footer__sig .footer__social { display: flex; justify-content: space-between; gap: 0; margin: 0; }
+  .footer--mx .footer__sig .ft__soc span { display: none; }
+  .footer--mx .footer__sig .ft__soc { width: 40px; height: 40px; justify-content: center; }
+  .footer--mx .footer__sig .ft__soc svg { width: 22px; height: 22px; }
+}
+.footer--mx .footer__lead .sf__mode { align-self: flex-start; margin-top: 8px; } /* Display mode: under the social links, so the bar is one row like momax's */
+.footer--mx .ft__links[hidden] { display: none; } /* the flex column above must not undo the accordion's hidden */
+@media (max-width: 767px) { .footer-wrap .footer--mx .newsletter--mx input { flex: none; } } /* flex: 1 in a column zeroed its height */
+.footer--mx .footer__pays abbr { text-decoration: none; cursor: help; }
+
+/* MOMAX FOOTER — EXACT SPACING (2026-10-17, the owner's screenshot of momax.net's footer: "use the exact spacing and positioning so it
+   all looks tight and the same size of font visually"). Measured from that 2000px screenshot (= 1.396 × momax's 1440 layout, the
+   link columns 360px apart = their 258) and sized so OUR Inter looks as big as their narrower Graphie (each word set to the same
+   rendered width; the 12px floor of our scale kept for running text): headline 32px, column heads 11px, links / line / field /
+   button / social 12px, tagline 24px. Positions at 1440: lead 390px at 120, three link columns at 570 / 826 / 1084 (60px after the
+   lead, 32px apart), headline and column heads on one line; 20px headline → line → field; a 36px field; 26px to the social links,
+   rows 16px apart, items 24px apart; first link 8px under its head, links every 22px; 48px to the wordmark, 533px wide; the
+   tagline 32px to its right, centred on it. Phones keep the stacked layout above. */
+@media (min-width: 768px) {
+  .footer-wrap .footer.footer--mx { padding-top: 48px; }
+  .footer--mx .footer__main { grid-template-columns: minmax(0, 390px) minmax(0, 1fr); gap: 32px 60px; padding-bottom: 48px; }
+  .footer--mx .footer__lead { gap: 0; }
+  .footer--mx .footer__title { font-size: 32px; line-height: 38px; letter-spacing: 0; margin: -6px 0 0; }
+  .footer--mx .footer__nl-msg { margin: 20px 0 0; font-size: 12px; line-height: 19px; max-width: 356px; }
+  .footer-wrap .footer--mx .newsletter--mx { margin-top: 20px; height: 36px; padding: 0 2px 0 16px; }
+  .footer-wrap .footer--mx .newsletter--mx input { font-size: 12px; }
+  .footer-wrap .footer--mx .newsletter--mx button { height: 30px; padding: 0 24px; font-size: 12px; font-weight: 700; }
+  .footer--mx .footer__lead .footer__social { margin: 26px 0 0; gap: 16px 24px; }
+  .footer-wrap .footer--mx .ft__soc { gap: 8px; font-size: 12px; line-height: 17px; }
+  .footer--mx .ft__soc svg { width: 16px; height: 16px; }
+  .footer--mx .footer__lead .sf__mode { margin-top: 24px; }
+  .footer--mx .footer__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; }
+  .footer-wrap .footer--mx h4 { margin: 0 0 8px; }
+  .footer--mx .ft__q { font-size: 11px; line-height: 13px; letter-spacing: .02em; }
+  .footer--mx .ft__links { gap: 0; }
+  .footer-wrap .footer--mx .ft__links a { padding: 0; font-size: 12px; line-height: 22px; }
+  .footer--mx .footer__sig { gap: 32px; padding-bottom: 48px; }
+  .footer-wrap .footer--mx .footer__mark { flex: 0 1 533px; }
+  .footer--mx .footer__tag { flex: 0 1 auto; font-size: 24px; line-height: 30px; font-weight: 600; }
+  .footer--mx .footer__bar { padding: 24px 0; }
+  .footer--mx .sf__copy, .footer-wrap .footer--mx .footer__legal a { font-size: 12px; line-height: 17px; }
+}
+/* the wordmark is a logo, not a text link: no underline-draw on hover (2026-10-17, "remove the hover underline of the logo") */
+.footer-wrap .footer--mx .footer__mark, .footer-wrap .footer--mx .footer__mark:hover { background-image: none !important; text-decoration: none; }
+/* DISPLAY MODE PANEL IN THE FOOTER (2026-10-17, "fix the colour contrast on the dark and day theme for display mode panel"): the panel
+   now opens over the footer, so its glass is near-solid white (.94 — over the grey day footer / the red night footer the .8 / .86
+   glass went grey / pink) and its type is ink in BOTH themes (the night footer's blanket white `li` rule had turned the options white
+   on the white panel) */
+.footer-wrap .footer--mx .sf__mode .msort__sheet { background: rgba(255, 255, 255, .94) !important; }
+.footer-wrap .footer--mx .sf__mode .msort__opt, .footer-wrap .footer--mx .sf__mode .msort__opt span { color: #0B0B0B !important; }
+.footer-wrap .footer--mx .sf__mode .msort__title { color: #5F6368 !important; }
+/* phones: the floating WhatsApp + back-to-top fade out over the footer's wordmark / social row / bar (common.js lift()) */
+body.is-foot-near :is(.totop, .wafab) { opacity: 0 !important; pointer-events: none !important; transition: opacity 300ms ease; }
+/* Subscribe = the site's liquid-fill hover (2026-10-17, "on subscribe button use the same animation"), coloured like our other solid
+   buttons: day ink → white fills in with ink type and an ink edge; night (white on the red footer) → ink fills in with white type */
+.footer-wrap .footer--mx .newsletter--mx button { --fill: #fff !important; --fill-text: #0B0B0B !important; }
+html[data-theme="night"] .footer-wrap .footer--mx .newsletter--mx button { --fill: #0B0B0B !important; --fill-text: #fff !important; }
+@media (hover: hover) and (pointer: fine) {
+  .footer-wrap .footer--mx .newsletter--mx button.wu-fill:hover { color: var(--fill-text) !important; box-shadow: 0 0 0 1.5px #0B0B0B; }
+  html[data-theme="night"] .footer-wrap .footer--mx .newsletter--mx button.wu-fill:hover { box-shadow: 0 0 0 1.5px #fff; }
+}
+/* payment logo tiles in the footer bar (ronin.pk's set): 32px white rounded tiles (8px corners — media, not a control) with a soft
+   1.5px hairline, 4px apart; the COD chip keeps its capsule */
+.footer--mx .footer__pays { align-items: center; gap: 4px; }
+.footer--mx .footer__pays li.footer__logo { width: 32px; height: 32px; padding: 0; border-radius: 8px; overflow: hidden; background: #fff; box-shadow: inset 0 0 0 1.5px #E1E2E5; }
+.footer--mx .footer__logo img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.footer--mx .footer__pays li.footer__cod { margin-right: 4px; }
+html[data-theme="night"] .footer--mx .footer__pays li.footer__logo { background: #fff; box-shadow: none; }
+/* the payment row (same day, "remove the borders … keep the same height, remove COD … Display mode on the same row on the right"):
+   the logo tiles have no stroke (32px tall still); the row = logos then the Display mode capsule at its right end */
+.footer--mx .footer__pays li.footer__logo, html[data-theme="night"] .footer--mx .footer__pays li.footer__logo { box-shadow: none; }
+.footer--mx .footer__payrow { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+@media (max-width: 767px) {
+  .footer--mx .footer__payrow { width: 100%; justify-content: space-between; }
+  .footer--mx .footer__pays { align-self: auto; }
+}
+/* the logo PNGs are already transparent: no tile background, no stroke, no corner in either theme ("don't add white background
+   with those png files") */
+.footer--mx .footer__pays li.footer__logo, html[data-theme="night"] .footer--mx .footer__pays li.footer__logo { background: transparent; box-shadow: none; border-radius: 0; overflow: visible; }
+/* BAR = two rows (2026-10-17, "the terms / privacy / cookies / sitemap go right below the Display mode button, and decrease the gap
+   between these links"): row 1 = the payment logos (left) … Display mode (right); row 2 = © (left) … the legal links (right, under
+   Display mode), 12px apart (were 24). The pay row comes first in the grid whatever the source order. */
+.footer--mx .footer__bar { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "pay pay" "copy legal"; align-items: center; gap: 12px 24px; }
+.footer--mx .footer__barl { display: contents; }
+.footer--mx .footer__payrow { grid-area: pay; justify-content: space-between; width: 100%; }
+.footer--mx .sf__copy { grid-area: copy; }
+.footer--mx .footer__legal { grid-area: legal; justify-self: end; gap: 4px 12px; }
+@media (max-width: 767px) {
+  .footer--mx .footer__bar { flex-direction: initial; }
+}
+@media (max-width: 379px) { /* very narrow phones: the legal links drop under © on their own line, still right-aligned */
+  .footer--mx .footer__bar { grid-template-columns: minmax(0, 1fr); grid-template-areas: "pay" "legal" "copy"; }
+}

@@ -99,7 +99,7 @@
 .nh-tile:hover { box-shadow: inset 0 0 0 1.5px var(--line2); }
 .nh-tile__img { display: block; position: relative; aspect-ratio: 4 / 5; overflow: hidden; }
 .nh-tile__img img { width: 100%; height: 100%; transition: transform 700ms var(--ease); }
-.nh-tile:hover .nh-tile__img img { transform: scale(1.05); }
+.nh-tile:hover .nh-tile__img img { transform: scale(1.04); }
 .nh-tile__tag { position: absolute; top: 8px; left: 8px; }
 .nh-tile__wish, .nh-tile__add { position: absolute; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 50%; display: grid; place-items: center; cursor: pointer; transition: background-color 160ms var(--ease), opacity 160ms var(--ease), transform 160ms var(--ease); }
 .nh-tile__wish { top: 8px; right: 8px; background: rgba(15,17,19,.72); color: #fff; }

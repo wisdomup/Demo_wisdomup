@@ -49,10 +49,11 @@ window.WU_STORE = (function () {
       ['Are your earbuds compatible with iOS and Android?', 'Yes — all Bluetooth earbuds and headphones pair with iOS, Android, Windows, macOS and other Bluetooth devices.'],
       ['What payment methods do you accept?', 'Cash on Delivery, JazzCash, EasyPaisa and bank transfer. For JazzCash, EasyPaisa and bank transfer, send the total to our account and share the receipt on WhatsApp.'],
     ],
+    // compact labels (2026-10-17, "trim the wording so it looks compact" — momax-style short links); each maps to its page in LINKS (common.js)
     footer: [
-      { title: 'Products', links: ['All Items', 'Audio', 'Charging', 'Cables & Adapters', 'Car Accessories', 'Computer', 'Personal Care'] },
-      { title: 'Explore', links: ['Bulk Order', 'Corporate Order', 'Content Creators Program', 'Affiliate Program', 'Live Shopping', 'About Us', 'Where to Buy', 'Blog'] },
-      { title: 'Support', links: ['Smart Help Center', 'Order Tracker', 'Exchange & Refund Policy', 'Warranty Policy', 'Shipping Policy', 'Download e-Manual', 'Privacy Policy', 'Terms of Service'] },
+      { title: 'Products', links: ['All products', 'Audio', 'Charging', 'Cables', 'Car', 'Computer', 'Personal care'] },
+      { title: 'Explore', links: ['Bulk orders', 'Corporate gifts', 'Creators', 'Affiliates', 'Live shopping', 'About us', 'Where to buy', 'Blog'] },
+      { title: 'Support', links: ['Help Center', 'Track order', 'Returns', 'Warranty', 'Shipping', 'e-Manuals'] },
     ],
     contact: { phone: '+92 327 9800153', email: 'support@wisdomup.pk', hours: 'Mon–Sun, 10 AM – 6 PM' },
     lifestyle: HERO,

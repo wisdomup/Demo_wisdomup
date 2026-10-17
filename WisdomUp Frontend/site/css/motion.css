@@ -27,11 +27,15 @@
 @property --w { syntax: '<percentage>'; inherits: false; initial-value: 0%; }
 
 /* ---------- Scroll reveals: fade-up (2rem, 1.5s), fade-up-large (90%, 1s), words (30ms/word), zoom-out (1.3 → 1, 1.3s), grid (50px/500ms/100ms) ---------- */
-.wu-motion [data-rv] { opacity: 0; transition: opacity var(--rv-t, 1500ms) var(--e-reveal) var(--rv-d, 0ms), transform var(--rv-t, 1500ms) var(--e-reveal) var(--rv-d, 0ms); will-change: transform, opacity; }
-.wu-motion [data-rv="up"] { transform: translate3d(0, min(2rem, 90%), 0); }
-.wu-motion [data-rv="up-large"] { --rv-t: 1000ms; transform: translate3d(0, 90%, 0); }
+/* MOMAX REVEAL TIMING (2026-10-17, momax.net's [data-momax-reveal="running"]: 0.8s cubic-bezier(.22,1,.36,1), opacity 0 → 1 and a
+   rise of 80px): every reveal now plays on that curve and length (was 1–1.5s on --e-reveal); blocks + cards rise 80px like momax
+   (phones 40), text 48px; they play one at a time from common.js's queue */
+.wu-motion [data-rv] { opacity: 0; transition: opacity var(--rv-t, 800ms) cubic-bezier(.22, 1, .36, 1) var(--rv-d, 0ms), transform var(--rv-t, 800ms) cubic-bezier(.22, 1, .36, 1) var(--rv-d, 0ms); will-change: transform, opacity; }
+.wu-motion [data-rv="up"] { transform: translate3d(0, 48px, 0); }
+.wu-motion :is(.wpc, .tile, .post, .stat, .pd-stat, .rv__item, .faq__item, .seo__card, .duo__card, .promo, .loop__slide, .feat__slide, .news__card, .bcard, .cp-card, .cp-step, .nh-tile, .nh-feat, .afs__step, .afx, .afw__card, .afhp__row, .afj, .smap__group)[data-rv="up"] { transform: translate3d(0, 80px, 0); }
+.wu-motion [data-rv="up-large"] { transform: translate3d(0, 80px, 0); }
 .wu-motion [data-rv="zoom"] { --rv-t: 1300ms; opacity: 1; transform: scale(1.3); }
-.wu-motion [data-rv="grid"] { --rv-t: 500ms; transform: translate3d(0, 50px, 0); transition-timing-function: ease; }
+.wu-motion [data-rv="grid"] { transform: translate3d(0, 80px, 0); }
 .wu-motion [data-rv="words"] { opacity: 1; transform: none; transition: none; }
 /* split headings (bugatti.store split-words, 2026-10-06): each word sits in its own mask and rises from just below the line */
 .wu-wm { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .12em; margin-bottom: -.12em; }
@@ -39,7 +43,7 @@
 .wu-motion [data-rv="words"] .wu-w { display: inline-block; opacity: 0; transform: translate3d(0, 105%, 0); transition: opacity 1000ms var(--e-reveal) var(--rv-d, 0ms), transform 1000ms var(--e-reveal) var(--rv-d, 0ms); }
 .wu-motion [data-rv].is-in, .wu-motion [data-rv="words"].is-in .wu-w { opacity: 1; transform: none; }
 .wu-motion [data-rv="zoom"].is-in { transform: scale(1); }
-@media (max-width: 639px) { .wu-motion [data-rv="grid"] { --rv-t: 300ms; transform: translate3d(0, 30px, 0); } }
+@media (max-width: 639px) { .wu-motion [data-rv="grid"], .wu-motion :is(.wpc, .tile, .post, .bcard, .nh-tile, .smap__group)[data-rv="up"] { transform: translate3d(0, 40px, 0); } .wu-motion [data-rv="up"] { transform: translate3d(0, 32px, 0); } }
 
 /* ---------- Buttons: liquid fill (a circle rises from below on enter, leaves upward), text colour swaps 100ms behind ---------- */
 .wu-fill { position: relative; overflow: hidden; isolation: isolate; }
@@ -192,11 +196,11 @@ html[data-theme="night"] .ckc__btn--line { --fill: #fff; --fill-text: #0B0B0B; }
 /* ---------- Cards and media: the image zooms to 1.05 with the hover curve; no lifts ---------- */
 .wpc__photo { transition: transform var(--m-primary); }
 @media (hover: hover) and (pointer: fine) {
-  .wpc__media:hover .wpc__photo { transform: scale(1.05); }
+  .wpc__media:hover .wpc__photo { transform: scale(1.04); }
   .wpc__cta:not(:disabled):hover { transform: none; }
   .wpc__cta { transition: color var(--m-primary) 100ms, box-shadow var(--m-primary); }
   .nh-tile__img img, .nh-trio__media img { transition: transform var(--m-primary); }
-  .nh-tile:hover .nh-tile__img img { transform: scale(1.05); }
+  .nh-tile:hover .nh-tile__img img { transform: scale(1.04); }
   .tile, .post, .duo__card, .nh-feat, .nh-strip a { transition: background-color var(--m-primary), color var(--m-primary), box-shadow var(--m-primary); }
   .tile:hover, .post:hover { transform: none; }
 }
