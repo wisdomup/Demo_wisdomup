@@ -28,7 +28,7 @@
     { id: 'lfj-09', kicker: 'Grooming kit', chips: ['Clipper + shaver', 'Charging base'], bg: 'linear-gradient(120deg,#34302C,#0E0D0C)' },
   ].filter(t => P(t.id));
   const LOOP = [
-    { id: 'ts-11anc', kicker: 'Noise cancelling · TS-11ANC', title: 'Silence, on demand.', sub: 'Active noise cancelling and Bluetooth 6.0 in a pocket-sized case.', tag: 'Earbuds', bg: 'linear-gradient(120deg,#2C2D30,#0C0C0D)' },
+    { id: 'ts-11anc', img: 'img/loop/ts-11anc-bag.webp', imgSize: [1384, 1136], at: '50% 50%', atTall: '58% 50%', compact: true, tight: true, shade: 'linear-gradient(110deg, rgba(20, 9, 4, .62) 0%, rgba(20, 9, 4, .32) 28%, rgba(20, 9, 4, 0) 44%)', kicker: 'Noise cancelling · TS-11ANC', title: 'Silence, on demand.', sub: 'Active noise cancelling and Bluetooth 6.0 in a pocket-sized case.', tag: 'Earbuds', bg: '#2A160C' },
     { id: 'yx-28', kicker: 'Party speaker · YX-28', title: 'Bring the venue home.', sub: '150W, an RGB light show and an 18,000mAh battery.', tag: 'Speakers', bg: 'linear-gradient(120deg,#5A1208,#1A0503)' },
     { id: 'os-6', img: 'img/loop/os-6-light.webp', imgSize: [1384, 1136], at: '50% 50%', atTall: '52% 50%', compact: true, tight: true, shade: 'linear-gradient(100deg, rgba(10, 1, 1, .84) 0%, rgba(10, 1, 1, .6) 30%, rgba(10, 1, 1, 0) 50%)', kicker: 'Open-ear · OS-6', title: 'Hear the city. Keep the music.', sub: 'Open-ear comfort with Bluetooth 6.0.', tag: 'Earbuds', bg: '#120102' },
     // img = a full-card campaign photo (the card's own 1076 : 884 shape) in place of the framed product tile (2026-10-18, the owner's CDB-18 car photo)
