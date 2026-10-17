@@ -1766,3 +1766,29 @@ html body :is(.search__close, .msort__x, .cartd__x, .cartd__sx, .mnav__x, .fdraw
   .loop__slide--img .loop__sub { display: none; }
   .loop__slide--img .loop__shade { display: none; }
 }
+
+/* per-card options for photo cards (2026-10-18, the OS-6 photo): `shade` = the card's own shade over the photo (the OS-6 photo has a
+   bright peach light beam across the top-left, so its shade is deeper there); `compact` = no subtitle on any screen (the earbuds fill
+   the lower two-thirds, so kicker + title + Shop end above them) */
+@media (min-width: 1024px) {
+  .loop__slide--img .loop__shade { background: var(--loop-shade, linear-gradient(115deg, rgba(8, 14, 34, .55) 0%, rgba(8, 14, 34, .22) 34%, rgba(8, 14, 34, 0) 52%)); }
+}
+.loop__slide--compact .loop__sub { display: none; }
+/* `tight` photo cards on wide screens (OS-6, whose product fills most of the photo): a smaller title capped to four short lines and
+   the Shop button without its price, scaled with the card, so both end before the product */
+@media (min-width: 1024px) {
+  .loop__slide--tight .loop__title { font-size: 4.8cqw; max-width: 25cqw; text-wrap: wrap; }
+  .loop__slide--tight .loop__cta-p { display: none; }
+  .loop__slide--tight .loop__copy { top: 5.6cqw; }
+  .loop__slide--tight .loop__kicker { margin-bottom: 2cqw; }
+  .loop__slide--tight .loop__cta { margin-top: 3cqw; min-height: 32px; height: 7cqw; padding: 0 max(12px, 3cqw); font-size: max(12px, 2.6cqw); }
+}
+.loop__code { white-space: nowrap; } /* a model code ("TXD-01") never breaks at its hyphen */
+/* compact photo cards on the smaller desktop cards (≤ 520px wide, 1024–1250px screens): the Shop button scales with the card and
+   drops its price, so it ends before the product (TXD-01's handle); phones keep the full button */
+@media (min-width: 1024px) {
+  @container (max-width: 520px) {
+    .loop__slide--compact .loop__cta-p { display: none; }
+    .loop__slide--compact .loop__cta { min-height: 32px; height: 7cqw; padding: 0 max(12px, 3cqw); font-size: max(12px, 2.6cqw); }
+  }
+}
