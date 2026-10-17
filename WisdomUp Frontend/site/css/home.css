@@ -1730,3 +1730,14 @@ html body :is(.search__close, .msort__x, .cartd__x, .cartd__sx, .mnav__x, .fdraw
     --x-red: #E98A82; border: 0 !important; box-shadow: 0 5px 12px -1px rgba(232, 92, 80, .46), 0 1px 2px rgba(232, 92, 80, .2) !important;
   }
 }
+
+/* HOME BANNER 10% TALLER (2026-10-17, "increase the banner height by 10% on the home page"): every height rule of `.hero` × 1.1, in
+   the same order as the rules above — desktop / laptop, touch screens (tablets), phones. Landscape phones (≤ 540px tall) keep their
+   full-screen banner (it cannot grow). Both themes (the banner is shared). */
+.hero { height: calc(max(457px, calc((100vh - 100px) * .86 - 72px + 18px)) * 1.1); min-height: 506px; }
+@media (max-width: 639px) { .hero { height: calc((100svh - 64px - 8px) * 1.1); } }
+@media (hover: none) and (pointer: coarse) and (min-height: 541px) {
+  .hero { height: calc(max(457px, calc((100vh - 100px) * .86 - 72px + 18px)) * 1.265); min-height: 582px; }
+}
+@media (max-width: 639px) and (min-height: 541px) { .hero { height: clamp(531px, 91.08svh, 759px); min-height: 0; } }
+@media (max-height: 540px) and (orientation: landscape) { .hero { height: calc(100svh - 24px); min-height: 320px; } }
