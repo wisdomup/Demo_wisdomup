@@ -1028,3 +1028,11 @@ a.pd-row:hover > svg:last-child { transform: translateX(4px); }
    corner is 28 + 16 = 44px (was 16). Phones: the bottom sheet's two top corners take the same 44px. Both themes. */
 html body .scrim .search, html body .search { border-radius: 44px; }
 @media (max-width: 639px) { html body .scrim.is-anim .search, html body .scrim .search, html body .search { border-radius: 44px 44px 0 0 !important; } }
+
+/* ROOM AROUND THE PANEL × (2026-10-17, the owner's Display mode screenshot: "add a little padding around the button"): the × was as
+   tall as its row (the button's height), so it sat on the panel's edge. The row is now 12px taller and the × keeps 6px of panel
+   round it on every side — the footer Display mode (opens upward) and the All Products sort (opens downward), both themes. */
+.msort .msort__head { height: calc(var(--sb-h, 40px) + 12px); }
+.msort:not(.msort--up) .msort__head { padding-right: calc(6px + var(--sb-r, 0px)); }
+.msort--up .msort__head { padding-right: 6px; padding-left: 24px; }
+@media (max-width: 639px) { .msort--up .msort__head { padding-left: 16px; } }
