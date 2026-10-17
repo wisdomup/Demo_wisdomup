@@ -2459,6 +2459,38 @@
     });
   }
 
+  // PANELS NEVER SCROLL THE PAGE BEHIND THEM ON PHONES (2026-10-17, "when I scroll when these panels are open on phone the screen
+  // below scrolls along"): an open panel locks the page with overflow hidden on <html>, which iOS Safari ignores for touch — a swipe
+  // on the scrim, on a panel's header, or past the end of a panel's list moved the page underneath. While the page is locked, every
+  // touchmove is checked: it may only scroll a box that can still scroll that way (the panel's list, a sideways chip row, a field);
+  // otherwise it is cancelled, so it never reaches the page. Panel scrollers also get overscroll-behavior: contain (controls.css).
+  function guardPanelScroll() {
+    let x0 = 0, y0 = 0;
+    const can = (el, dx, dy) => {
+      for (; el && el !== document.body && el !== document.documentElement; el = el.parentElement) {
+        const c = getComputedStyle(el);
+        if (Math.abs(dy) >= Math.abs(dx)) {
+          if (/(auto|scroll)/.test(c.overflowY) && el.scrollHeight > el.clientHeight + 1) {
+            if (dy > 0 && el.scrollTop > 0) return true;                                          // finger down = scroll up
+            if (dy < 0 && el.scrollTop + el.clientHeight < el.scrollHeight - 1) return true;
+          }
+        } else if (/(auto|scroll)/.test(c.overflowX) && el.scrollWidth > el.clientWidth + 1) {
+          if (dx > 0 && el.scrollLeft > 0) return true;
+          if (dx < 0 && el.scrollLeft + el.clientWidth < el.scrollWidth - 1) return true;
+        }
+      }
+      return false;
+    };
+    document.addEventListener('touchstart', e => { const t = e.touches[0]; if (t) { x0 = t.clientX; y0 = t.clientY; } }, { passive: true });
+    document.addEventListener('touchmove', e => {
+      if (document.documentElement.style.overflow !== 'hidden' || e.touches.length > 1) return;
+      const t = e.touches[0], dx = t.clientX - x0, dy = t.clientY - y0;
+      if (e.target.closest && e.target.closest('input[type="range"], textarea, select')) return;
+      x0 = t.clientX; y0 = t.clientY;                                                            // judge each step, not the whole swipe
+      if (!can(e.target, dx, dy) && e.cancelable) e.preventDefault();
+    }, { passive: false });
+  }
+
   // SMOOTH WHEEL SCROLL (2026-10-17, from momax.net's momax-home-scroll.js, read and rebuilt): on DESKTOPS with a mouse (≥1200px,
   // hover + fine pointer) a wheel turn no longer jumps the page — it sets a target and the page glides to it with a soft exponential
   // follow (each frame covers 1 − e^(−dt/110ms) of the way), so long pages feel weighted and calm. It steps aside, exactly like
@@ -2815,6 +2847,7 @@
     fillPrices();
     initMotion();
     initSmoothWheel();
+    guardPanelScroll();
     mountToTop();
     mountWhatsApp();
     mountNavTips();
